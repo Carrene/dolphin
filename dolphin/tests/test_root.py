@@ -1,72 +1,101 @@
-
 import pytest
 
+from nanohttp import settings, contexts
 from restfulpy.configuration import configure
-from nanohttp import settings
+from restfulpy import Application
 from restfulpy.orm import DBSession
-from restfulpy.testing import WebAppTestCase
+from restfulpy.db import DatabaseManager
+from restfulpy.orm import setup_schema, session_factory, create_engine
+
+from ..controllers import Root
+from ..models.member import Member
+
 
 class DatabaseManager:
 
+    session = None
+    engine = None
+
     def __init__(self, configuration):
         self.configure(configuration)
-        self.prepare_database()
 
-    def prepare_database(self):
-        with DatabaseManager() as m:
-            m.drop_database()
-            m.create_database()
+    def configure(self, configuration):
+        configure(configuration, context=dict())
+        settings.db.url = settings.db.test_url
 
+    @classmethod
+    def connect(cls) -> 'Session':
         cls.engine = create_engine()
-        cls.session = session = session_factory(
+        cls.session = session =session_factory(
             bind=cls.engine,
             expire_on_commit=False
         )
-        setup_schema(session)
-        session.commit()
 
-    def configure(self, configuration):
-        configure(configuration)
-        settings.db.url = settings.db.test_url
-
-    def connect(self) -> 'Session':
-        raise NotImplementedError()
+    @classmethod
+    def close_all_connections(cls):
+        cls.session.close_all()
+        cls.engine.dispose()
 
     def drop_database(self):
-        raise NotImplementedError()
+        with DatabaseManager() as m:
+            m.drop_database()
 
     def create_database(self):
-        raise NotImplementedError()
+        with DatabaseManager() as m:
+            m.create_database()
 
-    def create_schema(self):
-        raise NotImplementedError()
+    @classmethod
+    def create_schema(cls):
+        setup_schema(cls.session)
+        cls.session.commit()
 
-    def insert_basedata(self):
-        raise NotImplementedError()
 
 
 @pytest.fixture
 def db():
-    configure()
-    print('Initializing DB')
+
+    print('Setup')
 
     builtin_configuration = '''
-	db:
-      test_url: postgresql://postgres:postgres@localhost/dolphin_test
-      administrative_url: postgresql://postgresql:postgres@localhost/postgres
+    db:
+      test_url: postgresql://postgres:postgres@localhost/panda_test
+      administrative_url: postgresql://postgres:postgres@localhost/postgres
+    logging:
+      loggers:
+        default:
+          level: critical
     '''
 
+    # configure
     database_manager = DatabaseManager(builtin_configuration)
-    return DatabaseManager
-    print('Teardown the DB')
+
+    # drop
+    database_manager.drop_database()
+
+    # create
+    database_manager.create_database()
+
+    # connect
+    database_manager.connect()
+
+    # schema
+    database_manager.create_schema()
+
+    #tear dwon
+    yield database_manager
+    print('Tear down')
+
+    # close all connections
+    database_manager.close_all_connections()
+
+    # Drop Db
+    database_manager.drop_database()
 
 
 def test_db(db):
-    database = db('''
 
-    ''')
-    with database.connect() as session:
-        assert session.query(Person).count() == 23
+    assert db.session.query(Member).count() == 2
+    raise
 
 
 

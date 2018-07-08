@@ -7,6 +7,18 @@ from .controllers import Root
 
 __version__ = '0.1.0-planning.0'
 
+dependencies = [
+    'restfulpy',
+    'sqlalchemy',
+    'nanohttp',
+
+    #Deployment
+    'gunicorn',
+
+    #Testing
+    'bddrest',
+    'pytest'
+]
 
 class Dolphin(Application):
 
