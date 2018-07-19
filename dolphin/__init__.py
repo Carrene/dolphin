@@ -3,18 +3,10 @@ from os.path import dirname, join
 from restfulpy import Application
 
 from .controllers.root import Root
-from .models import Item, Project, Release
+from .models import Task
 
 
 __version__ = '0.1.0-planning.0'
-
-
-dependencies = [
-    'restfulpy',
-
-    #Deployment
-    'gunicorn'
-]
 
 
 class Dolphin(Application):
