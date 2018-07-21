@@ -11,4 +11,3 @@ class Guest(Stakeholder):
 
     id = Field(Integer, ForeignKey('stakeholder.id'), primary_key=True)
 
-

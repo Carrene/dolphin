@@ -20,7 +20,7 @@ class Task(Subscribable):
 
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
     tag_id = Field(Integer, ForeignKey('tag.id'))
-#    stage_id = Field(Integer, ForeignKey('stage.id'))
+    stage_id = Field(Integer, ForeignKey('stage.id'))
     kind = Field(
         Enum('feature', 'enhancement', 'bug', name='kind'),
     )

@@ -10,12 +10,12 @@ class Release(Subscribable):
     __mapper_args__ = {'polymorphic_identity': __tablename__}
 
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
-#    admin_id = Field(Integer, ForeignKey('admin.id'))
+    admin_id = Field(Integer, ForeignKey('admin.id'))
     status = Field(
         Enum('in-progress', 'on-hold', 'delayed', 'complete', name='status'),
     )
     cutoff = Field(Date)
 
-#    projects = relationship('Project', backref='release')
+    projects = relationship('Project', backref='release')
 
 

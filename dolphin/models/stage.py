@@ -14,5 +14,5 @@ class Stage(DeclarativeBase):
     order = Field(Integer, unique=True)
 
     tasks = relationship('Task', backref='stage')
-#    items = relationship('Item', backref='stage')
+    items = relationship('Item', backref='stage')
 

@@ -11,8 +11,8 @@ class Project(Subscribable):
     __mapper_args__ = {'polymorphic_identity': __tablename__}
 
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
-#    admin_id = Field(Integer, ForeignKey('admin.id'))
-#    release_id = Field(Integer, ForeignKey('release.id'))
+    admin_id = Field(Integer, ForeignKey('admin.id'))
+    release_id = Field(Integer, ForeignKey('release.id'))
 
     status = Field(
         Enum('in-progress', 'on-hold', 'delayed', 'complete', name='status'),
