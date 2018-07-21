@@ -1,35 +1,25 @@
 
-from sqlalchemy import Integer, String, Time, ForeignKey, Table, Enum, Date
-from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy import Integer, Time, ForeignKey, Enum
 from sqlalchemy.orm import relationship
-from restfulpy.orm import DeclarativeBase, Field
+from restfulpy.orm import Field
+
+from .subscribable import Subscribable
 
 
-class Project(DeclarativeBase):
+class Project(Subscribable):
     __tablename__ = 'project'
+    __mapper_args__ = {'polymorphic_identity': __tablename__}
 
-    id = Field(Integer, primary_key=True, autoincrement=True)
-    description = Field(
-        String,
-        min_length=50,
-        nullable=True,
-        watermark='This is a description of summary'
-    )
-    status = Field(
-        ENUM('in-progress', 'on-hold', 'delayed', 'complete', name='status'),
-        nullable=False,
-        max_length=20,
-        example='Complete'
-    )
-    estimated_due_date = Field(Time, nullable=False, example='2080/08/16')
-    manager = Field(String,nullable=False,max_length=50)
-
-    workflow = Field(
-        String,
-        nullable=False
-    )
+    id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
+    admin_id = Field(Integer, ForeignKey('admin.id'))
     release_id = Field(Integer, ForeignKey('release.id'))
-    # Loading strategy in relationship between 'Item' and 'Project' is
-    # selectIn because number of records of project table is not much
-    items = relationship('Item', backref='project', lazy='selectin')
+
+    status = Field(
+        Enum('in-progress', 'on-hold', 'delayed', 'complete', name='status'),
+    )
+    phase = Field(
+        Enum('Done', 'Design', 'Impelemention', 'Deployment', name='phase'),
+    )
+
+    stages = relationship('Stage', backref='project')
 

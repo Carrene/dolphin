@@ -1,25 +1,21 @@
 
-from sqlalchemy import Integer, String, Table, ForeignKey
-from sqlalchemy.dialects.postgresql import ENUM
-from restfulpy.orm import DeclarativeBase, Field, relationship
+from sqlalchemy import Integer, Enum, DateTime, Time, ForeignKey
+from restfulpy.orm import Field, relationship
+
+from .subscribable import Subscribable
 
 
-class Release(DeclarativeBase):
+class Release(Subscribable):
     __tablename__ = 'release'
+    __mapper_args__ = {'polymorphic_identity': __tablename__}
 
-    id = Field(Integer, primary_key=True, autoincrement=True)
-    title = Field(String, max_length=20, nullable=False)
-    description = Field(
-        String,
-        min_length=50,
-        nullable=True,
-        watermark='This is a description of summary'
-    )
+    id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
+    admin_id = Field(Integer, ForeignKey('admin.id'))
     status = Field(
-        ENUM('in-progress', 'on-hold', 'delayed', 'complete', name='status'),
-        nullable=False,
-        max_length=20,
-        example='Complete'
+        Enum('in-progress', 'on-hold', 'delayed', 'complete', name='status'),
     )
-    projects = relationship('Project', backref='release', lazy='selectin')
+    cutoff = Field(DateTime)
+
+    projects = relationship('Project', backref='release')
+
 
