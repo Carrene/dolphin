@@ -3,8 +3,7 @@ from os.path import dirname, join
 from restfulpy import Application
 
 from .controllers.root import Root
-from .models import Task
-
+from .models import Subscribable, Stakeholder
 
 __version__ = '0.1.0-planning.0'
 
