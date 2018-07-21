@@ -7,7 +7,7 @@ from .task import Task, Tag
 from .stage import Stage
 from .admin import Admin
 from .resource import Resource
-# from .guest import Guest
+from .guest import Guest
 # from .team import Team
 # from .item import Item
 #
