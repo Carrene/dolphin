@@ -60,7 +60,7 @@ So, your changes will affect instantly on the installed version
 #### Configuration
 
 Dolphin is zero configuration application and there is no extra configuration file needed, but if you want to have your own 
-configuration file, you can make a `dolphin.yml` in the following  path: ~/.config/dolphin.yml
+configuration file, you can make a `dolphin.yml` in the following  path: `~/.config/dolphin.yml`
 
 #### Remove old abd create a new database **TAKE CARE ABOUT USING THAT**
 
