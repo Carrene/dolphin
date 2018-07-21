@@ -13,6 +13,6 @@ class Stage(DeclarativeBase):
     title = Field(String, max_length=50)
     order = Field(Integer, unique=True)
 
-#    tasks = relationship('Task', backref='stage')
+    tasks = relationship('Task', backref='stage')
 #    items = relationship('Item', backref='stage')
 
