@@ -4,7 +4,7 @@ from restfulpy import Application
 
 from .controllers.root import Root
 from .models import Subscribable, Stakeholder, Project, Release, Task, Tag,\
-    Stage, Admin, Resource, Guest
+    Stage, Admin, Resource, Guest, Team
 
 __version__ = '0.1.0-planning.0'
 
