@@ -7,12 +7,13 @@ from .subscribable import Subscribable
 
 
 class Project(Subscribable):
-    __mapper_args__ = {'polymorphic_identity': 'project'}
+    __tablename__ = 'project'
+    __mapper_args__ = {'polymorphic_identity': __tablename__}
 
+    id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
 #    admin_id = Field(Integer, ForeignKey('admin.id'))
 #    release_id = Field(Integer, ForeignKey('release.id'))
 
-    due_date = Field(Time, example='16 hours')
     status = Field(
         Enum('in-progress', 'on-hold', 'delayed', 'complete', name='status'),
     )

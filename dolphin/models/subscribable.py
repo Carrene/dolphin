@@ -1,6 +1,6 @@
 
-from sqlalchemy import Integer, String, Time, ForeignKey, Table, Enum, Date,\
-	Column
+from sqlalchemy import Integer, String, ForeignKey, Table, Enum, Date,\
+	Column, DateTime
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship
 from restfulpy.orm import DeclarativeBase, Field, TimestampMixin
@@ -30,6 +30,7 @@ class Subscribable(TimestampMixin, DeclarativeBase):
         watermark='This is a description of summary'
     )
     entry_time = Field(Date, example='2080/08/16')
+    due_date = Field(DateTime)
 
     stakeholders = relationship(
         'stakeholder',
