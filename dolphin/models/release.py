@@ -1,5 +1,5 @@
 
-from sqlalchemy import Integer, Enum, Date, Time, ForeignKey
+from sqlalchemy import Integer, Enum, DateTime, Time, ForeignKey
 from restfulpy.orm import Field, relationship
 
 from .subscribable import Subscribable
@@ -14,7 +14,7 @@ class Release(Subscribable):
     status = Field(
         Enum('in-progress', 'on-hold', 'delayed', 'complete', name='status'),
     )
-    cutoff = Field(Date)
+    cutoff = Field(DateTime)
 
     projects = relationship('Project', backref='release')
 
