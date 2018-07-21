@@ -3,7 +3,8 @@ from os.path import dirname, join
 from restfulpy import Application
 
 from .controllers.root import Root
-from .models import Subscribable, Stakeholder, Project, Release, Task, Tag
+from .models import Subscribable, Stakeholder, Project, Release, Task, Tag,\
+    Stage
 
 __version__ = '0.1.0-planning.0'
 

@@ -21,5 +21,5 @@ class Project(Subscribable):
         Enum('Done', 'Design', 'Impelemention', 'Deployment', name='phase'),
     )
 
-#    stages = relationship('Stage', backref='project')
+    stages = relationship('Stage', backref='project')
 
