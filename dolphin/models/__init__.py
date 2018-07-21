@@ -1,8 +1,8 @@
 
 from .stakeholder import Stakeholder
 from .subscribable import Subscribable
+from .project import Project
 #from .task import Task
-# from .project import Project
 # from .release import Release
 # from .admin import Admin
 # from .stage import Stage
