@@ -3,7 +3,7 @@ from .stakeholder import Stakeholder
 from .subscribable import Subscribable
 from .project import Project
 from .release import Release
-from .task import Task, Tag
+from .issue import Issue, Tag
 from .stage import Stage
 from .admin import Admin
 from .resource import Resource

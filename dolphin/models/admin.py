@@ -1,6 +1,5 @@
 from sqlalchemy import Integer, ForeignKey
-from sqlalchemy.orm import relationship
-from restfulpy.orm import Field
+from restfulpy.orm import Field, relationship
 
 from .stakeholder import Stakeholder
 
@@ -11,6 +10,6 @@ class Admin(Stakeholder):
 
     id = Field(Integer, ForeignKey('stakeholder.id'), primary_key=True)
 
-    projects = relationship('Project', backref='admin')
-    releases = relationship('Release', backref='admin')
+    projects = relationship('Project', back_populates='admin', protected=True)
+    releases = relationship('Release', back_populates='admin', protected=True)
 

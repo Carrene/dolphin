@@ -1,5 +1,7 @@
 from sqlalchemy import Integer, String, Unicode, BigInteger
-from restfulpy.orm import DeclarativeBase, Field, TimestampMixin
+from restfulpy.orm import DeclarativeBase, Field, TimestampMixin, relationship
+
+from .subscribable import association_table
 
 
 class Stakeholder(TimestampMixin, DeclarativeBase):
@@ -21,4 +23,10 @@ class Stakeholder(TimestampMixin, DeclarativeBase):
         pattern=r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'
     )
     phone = Field(BigInteger, unique=True)
+
+    subscriptions = relationship(
+        'Subscribable',
+        secondary=association_table,
+        back_populates='stakeholders',
+    )
 

@@ -12,5 +12,6 @@ class Resource(Stakeholder):
     team_id = Field(Integer, ForeignKey('team.id'))
     id = Field(Integer, ForeignKey('stakeholder.id'), primary_key=True)
 
-    items = relationship('Item', backref='resource')
+    items = relationship('Item', back_populates='resource', protected=True)
+    team = relationship('Team', back_populates='resources', protected=True)
 
