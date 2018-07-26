@@ -61,8 +61,10 @@ class TestRelease(LocalApplicationTestCase):
 
             when(
                 'Title length is more than limit',
-                form=Update(title='This is a title with the length more than \
-                            50 characters'),
+                form=Update(
+                    title='This is a title with the length more than 50 \
+                    characters'
+                )
             )
             assert status == '704 At most 50 characters are valid for title'
 
@@ -70,7 +72,8 @@ class TestRelease(LocalApplicationTestCase):
                 'Description length is less than limit',
                 form=Update(description='Description')
             )
-            assert status == '703 At least 20 characters are needed for description'
+            assert status == '703 At least 20 characters are needed for '\
+                'description'
 
             when(
                 'Due date format is wrong',
