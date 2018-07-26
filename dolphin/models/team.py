@@ -1,6 +1,5 @@
 from sqlalchemy import Integer, String
-from sqlalchemy.orm import relationship
-from restfulpy.orm import Field, DeclarativeBase
+from restfulpy.orm import Field, DeclarativeBase, relationship
 
 
 class Team(DeclarativeBase):
@@ -8,5 +7,5 @@ class Team(DeclarativeBase):
 
     id = Field(Integer, primary_key=True)
     name = Field(String, max_length=40, unique=True)
-    resources = relationship('Resource', backref='team')
+    resources = relationship('Resource', back_populates='team', protected=True)
 

@@ -12,10 +12,16 @@ class Release(Subscribable):
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
     admin_id = Field(Integer, ForeignKey('admin.id'))
     status = Field(
-        Enum('in-progress', 'on-hold', 'delayed', 'complete', name='status'),
+        Enum(
+            'started',
+            'in-progress',
+            'on-hold', 'delayed',
+            'complete',
+            name='status'
+        ),
+        nullable=True
     )
     cutoff = Field(DateTime)
 
-    projects = relationship('Project', backref='release')
-
+    admin = relationship('Admin', back_populates='releases', protected=True)
 

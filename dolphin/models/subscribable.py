@@ -2,8 +2,7 @@
 from sqlalchemy import Integer, String, ForeignKey, Table, Enum,Column,\
     DateTime
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import relationship
-from restfulpy.orm import DeclarativeBase, Field, TimestampMixin
+from restfulpy.orm import DeclarativeBase, Field, TimestampMixin, relationship
 
 
 association_table = Table('subscriptions', DeclarativeBase.metadata,
@@ -29,12 +28,11 @@ class Subscribable(TimestampMixin, DeclarativeBase):
         nullable=True,
         watermark='This is a description of summary'
     )
-    entry_time = Field(DateTime, example='2080/08/16')
     due_date = Field(DateTime)
 
     stakeholders = relationship(
-        'stakeholder',
+        'Stakeholder',
         secondary=association_table,
-        backref='subscriptions'
+        back_populates='subscriptions',
     )
 
