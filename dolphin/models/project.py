@@ -16,9 +16,11 @@ class Project(Subscribable):
 
     status = Field(
         Enum('in-progress', 'on-hold', 'delayed', 'complete', name='status'),
+        nullable=True
     )
     phase = Field(
         Enum('Design', 'Impelemention', 'Deployment', 'Done', name='phase'),
+        nullable=True
     )
 
     admin = relationship(

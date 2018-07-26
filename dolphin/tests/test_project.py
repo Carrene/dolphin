@@ -1,12 +1,14 @@
-from bddrest import status, response, Update, when, Remove, Append
+
+from bddrest import status, response, Update, when, Remove
 
 from dolphin.tests.helpers import LocalApplicationTestCase
 from dolphin.controllers.root import Root
-from dolphin.models import Release, Admin
+from dolphin.models import Project, Admin, Release
 
 
-class TestRelease(LocalApplicationTestCase):
+class TestProject(LocalApplicationTestCase):
     __controller_factory__ = Root
+
 
     @classmethod
     def mockup(cls):
@@ -28,29 +30,38 @@ class TestRelease(LocalApplicationTestCase):
             cutoff='2030-2-20',
         )
         session.add(release)
+        session.commit()
+
+        project = Project(
+            admin_id=admin.id,
+            release_id=release.id,
+            title='My first project',
+            description='A decription for my project',
+            due_date='2020-2-20',
+        )
+        session.add(project)
         session.flush()
         cls.admin_id = admin.id
+        cls.release_id = release.id
         session.commit()
 
     def test_create(self):
-        assert 1 == 1
         with self.given(
-            'Createing a release',
-            '/apiv1/releases',
+            'Createing a project',
+            '/apiv1/projects',
             'CREATE',
             form=dict(
                 adminId=self.admin_id,
-                title='My awesome release',
-                description='Decription for my release',
-                dueDate='2020-2-20',
-                cutoff='2030-2-20'
+                releaseId=self.release_id,
+                title='My awesome project',
+                description='A decription for my project',
+                dueDate='2020-2-20'
             )
         ):
             assert status == 200
-            assert response.json['title'] == 'My awesome release'
-            assert response.json['description'] == 'Decription for my release'
+            assert response.json['title'] == 'My awesome project'
+            assert response.json['description'] == 'A decription for my project'
             assert response.json['dueDate'] == '2020-02-20T00:00:00'
-            assert response.json['cutoff'] == '2030-02-20T00:00:00'
             assert response.json['status'] is None
 
             when(
@@ -62,7 +73,8 @@ class TestRelease(LocalApplicationTestCase):
             when(
                 'Title length is more than limit',
                 form=Update(title='This is a title with the length more than \
-                            50 characters'),
+                            50 characters'
+                            ),
             )
             assert status == '704 At most 50 characters are valid for title'
 
@@ -83,17 +95,5 @@ class TestRelease(LocalApplicationTestCase):
                 form=Remove('dueDate')
             )
             assert status == '711 Due date not exists'
-
-            when(
-                'Cutoff format is wrong',
-		    	form=Update(cutoff='30-20-20'),
-		    )
-            assert status == '702 Invalid cutoff format'
-
-            when(
-                'Due date is not in form',
-                form=Remove('cutoff')
-            )
-            assert status == '712 Cutoff not exists'
 
 
