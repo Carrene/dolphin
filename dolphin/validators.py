@@ -1,3 +1,4 @@
+
 import re
 
 from nanohttp import validate
@@ -26,3 +27,17 @@ release_validator = validate(
     ),
 )
 
+
+project_validator = validate(
+    title=dict(
+        required=(True, '710 Title not exists'),
+        max_length=(50, '704 At most 50 characters are valid for title')
+    ),
+    description=dict(
+        min_length=(20, '703 At least 20 characters are needed for description')
+    ),
+    dueDate=dict(
+        pattern=(DATE_PATTERN, '701 Invalid due date format'),
+        required=(True, '711 Due date not exists')
+    ),
+)
