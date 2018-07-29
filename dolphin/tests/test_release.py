@@ -70,7 +70,7 @@ class TestRelease(LocalApplicationTestCase):
 
             when(
                 'Description length is less than limit',
-                form=Update(description=(515*'a'))
+                form=Update(description=((512+1)*'a'))
             )
             assert status == '703 At most 512 characters are valid for '\
                 'description'
