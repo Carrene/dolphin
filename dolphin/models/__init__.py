@@ -5,7 +5,7 @@ from .project import Project
 from .release import Release
 from .issue import Issue, Tag
 from .stage import Stage
-from .admin import Admin
+from .administrator import Administrator
 from .resource import Resource
 from .guest import Guest
 from .team import Team

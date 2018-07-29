@@ -11,7 +11,7 @@ class Project(Subscribable):
     __mapper_args__ = {'polymorphic_identity': __tablename__}
 
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
-    admin_id = Field(Integer, ForeignKey('admin.id'))
+    administrator_id = Field(Integer, ForeignKey('administrator.id'))
     release_id = Field(Integer, ForeignKey('release.id'))
 
     status = Field(
@@ -23,9 +23,9 @@ class Project(Subscribable):
         nullable=True
     )
 
-    admin = relationship(
-        'Admin',
-        foreign_keys=[admin_id],
+    administrator = relationship(
+        'Administrator',
+        foreign_keys=[administrator_id],
         back_populates='projects',
         protected=True
     )

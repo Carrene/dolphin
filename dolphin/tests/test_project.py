@@ -3,7 +3,7 @@ from bddrest import status, response, Update, when, Remove
 
 from dolphin.tests.helpers import LocalApplicationTestCase
 from dolphin.controllers.root import Root
-from dolphin.models import Project, Admin, Release
+from dolphin.models import Project, Administrator, Release
 
 
 class TestProject(LocalApplicationTestCase):
@@ -14,16 +14,16 @@ class TestProject(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        admin = Admin(
-            title='First Admin',
+        administrator = Administrator(
+            title='First Administrator',
             email=None,
             phone=123456789
         )
-        session.add(admin)
+        session.add(administrator)
         session.commit()
 
         release = Release(
-            admin_id=admin.id,
+            administrator_id=administrator.id,
             title='My first release',
             description='A decription for my release',
             due_date='2020-2-20',
@@ -33,7 +33,7 @@ class TestProject(LocalApplicationTestCase):
         session.commit()
 
         project = Project(
-            admin_id=admin.id,
+            administrator_id=administrator.id,
             release_id=release.id,
             title='My first project',
             description='A decription for my project',
@@ -41,7 +41,7 @@ class TestProject(LocalApplicationTestCase):
         )
         session.add(project)
         session.flush()
-        cls.admin_id = admin.id
+        cls.administrator_id = administrator.id
         cls.release_id = release.id
         session.commit()
 
@@ -51,7 +51,7 @@ class TestProject(LocalApplicationTestCase):
             '/apiv1/projects',
             'CREATE',
             form=dict(
-                adminId=self.admin_id,
+                administratorId=self.administrator_id,
                 releaseId=self.release_id,
                 title='My awesome project',
                 description='A decription for my project',

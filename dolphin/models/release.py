@@ -10,12 +10,13 @@ class Release(Subscribable):
     __mapper_args__ = {'polymorphic_identity': __tablename__}
 
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
-    admin_id = Field(Integer, ForeignKey('admin.id'))
+    administrator_id = Field(Integer, ForeignKey('administrator.id'))
     status = Field(
         Enum(
             'started',
             'in-progress',
-            'on-hold', 'delayed',
+            'on-hold',
+            'delayed',
             'complete',
             name='status'
         ),
@@ -23,5 +24,5 @@ class Release(Subscribable):
     )
     cutoff = Field(DateTime)
 
-    admin = relationship('Admin', back_populates='releases', protected=True)
+    administrator = relationship('Administrator', back_populates='releases', protected=True)
 

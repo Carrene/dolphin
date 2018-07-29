@@ -2,7 +2,7 @@ from bddrest import status, response, Update, when, Remove, Append
 
 from dolphin.tests.helpers import LocalApplicationTestCase
 from dolphin.controllers.root import Root
-from dolphin.models import Release, Admin
+from dolphin.models import Release, Administrator
 
 
 class TestRelease(LocalApplicationTestCase):
@@ -12,16 +12,16 @@ class TestRelease(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        admin = Admin(
-            title='First Admin',
+        administrator = Administrator(
+            title='First Administrator',
             email=None,
             phone=123456789
         )
-        session.add(admin)
+        session.add(administrator)
         session.commit()
 
         release = Release(
-            admin_id=admin.id,
+            administrator_id=administrator.id,
             title='My first release',
             description='A decription for my release',
             due_date='2020-2-20',
@@ -29,7 +29,7 @@ class TestRelease(LocalApplicationTestCase):
         )
         session.add(release)
         session.flush()
-        cls.admin_id = admin.id
+        cls.administrator_id = administrator.id
         session.commit()
 
     def test_create(self):
@@ -39,7 +39,7 @@ class TestRelease(LocalApplicationTestCase):
             '/apiv1/releases',
             'CREATE',
             form=dict(
-                adminId=self.admin_id,
+                administratorId=self.administrator_id,
                 title='My awesome release',
                 description='Decription for my release',
                 dueDate='2020-2-20',
