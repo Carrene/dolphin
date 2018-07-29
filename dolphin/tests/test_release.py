@@ -1,12 +1,10 @@
 from bddrest import status, response, Update, when, Remove, Append
 
 from dolphin.tests.helpers import LocalApplicationTestCase
-from dolphin.controllers.root import Root
 from dolphin.models import Release, Administrator
 
 
 class TestRelease(LocalApplicationTestCase):
-    __controller_factory__ = Root
 
     @classmethod
     def mockup(cls):
@@ -70,15 +68,14 @@ class TestRelease(LocalApplicationTestCase):
 
             when(
                 'Description length is less than limit',
-                form=Update(description='Description')
+                form=Update(description=((512 + 1) * 'a'))
             )
-            assert status == '703 At least 20 characters are needed for '\
+            assert status == '703 At most 512 characters are valid for '\
                 'description'
-
             when(
                 'Due date format is wrong',
-		    	form=Update(dueDate='20-20-20')
-		    )
+                form=Update(dueDate='20-20-20')
+                    )
             assert status == '701 Invalid due date format'
 
             when(
@@ -89,8 +86,8 @@ class TestRelease(LocalApplicationTestCase):
 
             when(
                 'Cutoff format is wrong',
-		    	form=Update(cutoff='30-20-20'),
-		    )
+                form=Update(cutoff='30-20-20'),
+                    )
             assert status == '702 Invalid cutoff format'
 
             when(
@@ -98,5 +95,4 @@ class TestRelease(LocalApplicationTestCase):
                 form=Remove('cutoff')
             )
             assert status == '712 Cutoff not exists'
-
 
