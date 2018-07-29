@@ -96,7 +96,8 @@ class TestProject(LocalApplicationTestCase):
                 'Description length is less than limit',
                 form=Update(description=long_invalid_string)
             )
-            assert status == '703 At most 512 characters are valid for description'
+            assert status == '703 At most 512 characters are valid for '\
+                'description'
 
             when(
                 'Due date format is wrong',
