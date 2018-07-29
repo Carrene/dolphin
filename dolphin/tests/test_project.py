@@ -2,12 +2,10 @@
 from bddrest import status, response, Update, when, Remove
 
 from dolphin.tests.helpers import LocalApplicationTestCase
-from dolphin.controllers.root import Root
 from dolphin.models import Project, Administrator, Release
 
 
 class TestProject(LocalApplicationTestCase):
-    __controller_factory__ = Root
 
 
     @classmethod
@@ -81,7 +79,7 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Description length is less than limit',
-                form=Update(description=((512+1)*'a'))
+                form=Update(description=((512 + 1) * 'a'))
             )
             assert status == '703 At most 512 characters are valid for '\
                 'description'
