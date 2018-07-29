@@ -15,7 +15,8 @@ class Release(Subscribable):
         Enum(
             'started',
             'in-progress',
-            'on-hold', 'delayed',
+            'on-hold',
+            'delayed',
             'complete',
             name='status'
         ),
