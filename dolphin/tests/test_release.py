@@ -5,6 +5,19 @@ from dolphin.controllers.root import Root
 from dolphin.models import Release, Administrator
 
 
+long_invalid_string = '''
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod \
+tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, \
+quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo \
+consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse \
+cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non \
+proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Sed \
+ut perspiciatis unde omnis iste natus error sit voluptatem accusantium \
+doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore \
+veritatis et quasi architecto beatae vitae dicta sunt explicabo.
+'''
+
+
 class TestRelease(LocalApplicationTestCase):
     __controller_factory__ = Root
 
@@ -70,11 +83,10 @@ class TestRelease(LocalApplicationTestCase):
 
             when(
                 'Description length is less than limit',
-                form=Update(description='Description')
+                form=Update(description=long_invalid_string)
             )
-            assert status == '703 At least 20 characters are needed for '\
+            assert status == '703 At most 512 characters are valid for '\
                 'description'
-
             when(
                 'Due date format is wrong',
 		    	form=Update(dueDate='20-20-20')

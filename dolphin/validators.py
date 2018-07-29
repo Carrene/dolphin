@@ -15,7 +15,7 @@ release_validator = validate(
         max_length=(50, '704 At most 50 characters are valid for title')
     ),
     description=dict(
-        min_length=(20, '703 At least 20 characters are needed for description')
+        max_length=(512, '703 At most 512 characters are valid for description')
     ),
     dueDate=dict(
         pattern=(DATE_PATTERN, '701 Invalid due date format'),
@@ -34,7 +34,7 @@ project_validator = validate(
         max_length=(50, '704 At most 50 characters are valid for title')
     ),
     description=dict(
-        min_length=(20, '703 At least 20 characters are needed for description')
+        max_length=(512, '703 At most 512 characters are valid for description')
     ),
     dueDate=dict(
         pattern=(DATE_PATTERN, '701 Invalid due date format'),
