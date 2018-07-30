@@ -2,7 +2,7 @@
 from bddrest import status, response, Update, when, Remove
 
 from dolphin.tests.helpers import LocalApplicationTestCase
-from dolphin.models import Project, Administrator, Release
+from dolphin.models import Project, Manager, Release
 
 
 class TestProject(LocalApplicationTestCase):
@@ -12,26 +12,22 @@ class TestProject(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        administrator = Administrator(
-            title='First Administrator',
+        manager = Manager(
+            title='First Manager',
             email=None,
             phone=123456789
         )
-        session.add(administrator)
-        session.commit()
 
         release = Release(
-            administrator_id=administrator.id,
+            manager=manager,
             title='My first release',
             description='A decription for my release',
             due_date='2020-2-20',
             cutoff='2030-2-20',
         )
-        session.add(release)
-        session.commit()
 
         project = Project(
-            administrator_id=administrator.id,
+            manager=manager,
             release_id=release.id,
             title='My first project',
             description='A decription for my project',
@@ -39,7 +35,7 @@ class TestProject(LocalApplicationTestCase):
         )
         session.add(project)
         session.flush()
-        cls.administrator_id = administrator.id
+        cls.manager_id = manager.id
         cls.release_id = release.id
         session.commit()
 
@@ -49,7 +45,7 @@ class TestProject(LocalApplicationTestCase):
             '/apiv1/projects',
             'CREATE',
             form=dict(
-                administratorId=self.administrator_id,
+                managerId=self.manager_id,
                 releaseId=self.release_id,
                 title='My awesome project',
                 description='A decription for my project',
@@ -95,5 +91,4 @@ class TestProject(LocalApplicationTestCase):
                 form=Remove('dueDate')
             )
             assert status == '711 Due date not exists'
-
 

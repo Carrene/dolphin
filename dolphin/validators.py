@@ -1,7 +1,9 @@
-
 import re
 
-from nanohttp import validate
+from nanohttp import validate, HTTPStatus, context
+from restfulpy.orm import DBSession
+
+from dolphin.exceptions import empty_form_http_exception
 
 
 DATE_PATTERN = re.compile(
@@ -28,6 +30,22 @@ release_validator = validate(
 )
 
 
+update_release_validator = validate(
+    title=dict(
+        max_length=(50, '704 At most 50 characters are valid for title')
+    ),
+    description=dict(
+        max_length=(512, '703 At most 512 characters are valid for description')
+    ),
+    dueDate=dict(
+        pattern=(DATE_PATTERN, '701 Invalid due date format'),
+    ),
+    cutoff=dict(
+        pattern=(DATE_PATTERN, '702 Invalid cutoff format'),
+    ),
+)
+
+
 project_validator = validate(
     title=dict(
         required=(True, '710 Title not exists'),
@@ -41,3 +59,4 @@ project_validator = validate(
         required=(True, '711 Due date not exists')
     ),
 )
+

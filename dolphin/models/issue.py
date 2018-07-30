@@ -37,9 +37,13 @@ class Issue(Subscribable):
         Enum('feature', 'enhancement', 'bug', name='kind'),
     )
     duration = Field(DateTime)
-    status = Field(
-        Enum('in-progress', 'on-hold', 'delayed', 'complete', name='status'),
-    )
+    status = Field(Enum(
+        'in-progress',
+        'on-hold',
+        'delayed',
+        'complete',
+        name='issues_status'
+    ))
 
     tags = relationship(
         'Tag',
