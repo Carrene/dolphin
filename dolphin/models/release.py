@@ -5,24 +5,29 @@ from restfulpy.orm import Field, relationship
 from .subscribable import Subscribable
 
 
+release_statuses = [
+    'in-progress',
+    'on-hold',
+    'delayed',
+    'complete',
+]
+
+
 class Release(Subscribable):
     __tablename__ = 'release'
     __mapper_args__ = {'polymorphic_identity': __tablename__}
 
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
-    administrator_id = Field(Integer, ForeignKey('administrator.id'))
+    manager_id = Field(Integer, ForeignKey('manager.id'))
     status = Field(
-        Enum(
-            'started',
-            'in-progress',
-            'on-hold',
-            'delayed',
-            'complete',
-            name='status'
-        ),
+        Enum(*release_statuses, name='release_status'),
         nullable=True
     )
+
     cutoff = Field(DateTime)
 
-    administrator = relationship('Administrator', back_populates='releases', protected=True)
-
+    manager = relationship(
+        'Manager',
+        back_populates='releases',
+        protected=True
+    )
