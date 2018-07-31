@@ -192,7 +192,6 @@ class TestRelease(LocalApplicationTestCase):
             )
             assert status == 404
 
-
             when(
                 'Intended release with integer type not found',
                 url_parameters=dict(id=100)
@@ -202,3 +201,4 @@ class TestRelease(LocalApplicationTestCase):
         session = self.create_session()
         release = session.query(Release).filter(Release.id==1).one_or_none()
         assert release is None
+
