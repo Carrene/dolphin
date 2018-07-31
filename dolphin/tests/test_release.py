@@ -116,13 +116,14 @@ class TestRelease(LocalApplicationTestCase):
             assert response.json['status'] == 'in-progress'
 
             when(
-                'Type of "id" in url is not integer',
-                url_parameters=dict(id='not_integer')
+                'Intended release with string type not found',
+                url_parameters=dict(id='salam')
             )
-            assert status == 400
+            assert status == 404
+
 
             when(
-                'Intended release not found',
+                'Intended release with integer type not found',
                 url_parameters=dict(id=100)
             )
             assert status == 404

@@ -46,7 +46,7 @@ class ReleaseController(RestController):
         try:
             id = int(id)
         except:
-            raise HTTPBadRequest()
+            raise HTTPNotFound()
         release = DBSession.query(Release).filter(Release.id==id).one_or_none()
         if not release:
             raise HTTPNotFound()
