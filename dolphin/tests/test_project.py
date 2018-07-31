@@ -17,6 +17,8 @@ class TestProject(LocalApplicationTestCase):
             email=None,
             phone=123456789
         )
+        session.add(manager)
+        session.flush()
 
         release = Release(
             manager=manager,
@@ -25,9 +27,11 @@ class TestProject(LocalApplicationTestCase):
             due_date='2020-2-20',
             cutoff='2030-2-20',
         )
+        session.add(release)
+        session.flush()
 
         project = Project(
-            manager=manager,
+            manager_id=manager.id,
             release_id=release.id,
             title='My first project',
             description='A decription for my project',
