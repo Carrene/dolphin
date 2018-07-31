@@ -1,5 +1,4 @@
 from bddrest import status, response, Update, when, Remove, Append
-from nanohttp import HTTPNotFound, HTTPBadRequest
 
 from dolphin.tests.helpers import LocalApplicationTestCase
 from dolphin.models import Release, Manager
