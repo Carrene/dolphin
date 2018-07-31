@@ -42,6 +42,16 @@ class ReleaseController(RestController):
         form = context.form
 
         # FIXME: This validation must be performed inside the validation
+        # decorator
+        try:
+            id = int(id)
+        except:
+            raise HTTPBadRequest()
+        release = DBSession.query(Release).filter(Release.id==id).one_or_none()
+        if not release:
+            raise HTTPNotFound()
+
+        # FIXME: This validation must be performed inside the validation
         # decorator.
         if not len(form.keys()):
             raise HTTPStatus(f'708 No parameter exists in the form')

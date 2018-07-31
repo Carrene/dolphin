@@ -1,4 +1,5 @@
 from bddrest import status, response, Update, when, Remove, Append
+from nanohttp import HTTPNotFound, HTTPBadRequest
 
 from dolphin.tests.helpers import LocalApplicationTestCase
 from dolphin.models import Release, Manager
@@ -114,6 +115,18 @@ class TestRelease(LocalApplicationTestCase):
             assert response.json['dueDate'] == '2200-02-02T00:00:00'
             assert response.json['cutoff'] == '2300-02-02T00:00:00'
             assert response.json['status'] == 'in-progress'
+
+            when(
+                'Type of "id" in url is not integer',
+                url_parameters=dict(id='not_integer')
+            )
+            assert status == 400
+
+            when(
+                'Intended release not found',
+                url_parameters=dict(id=100)
+            )
+            assert status == 404
 
             when(
                 'Title length is more than limit',
