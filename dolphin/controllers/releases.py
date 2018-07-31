@@ -89,3 +89,22 @@ class ReleaseController(RestController):
         release.update_from_request()
         return release
 
+    @json
+    @Release.expose
+    @commit
+    def abort(self, id):
+
+        # FIXME: This validation must be performed inside the validation
+        # decorator
+        try:
+            id = int(id)
+        except:
+            raise HTTPNotFound()
+
+        release = DBSession.query(Release).filter(Release.id==id).one_or_none()
+        if not release:
+            raise HTTPNotFound()
+
+        DBSession.delete(release)
+        return release
+

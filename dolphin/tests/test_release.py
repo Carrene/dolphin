@@ -117,7 +117,7 @@ class TestRelease(LocalApplicationTestCase):
 
             when(
                 'Intended release with string type not found',
-                url_parameters=dict(id='salam')
+                url_parameters=dict(id='Alphabetical')
             )
             assert status == 404
 
@@ -177,3 +177,28 @@ class TestRelease(LocalApplicationTestCase):
             form=dict()
         ):
             assert status == '708 No parameter exists in the form'
+
+    def test_abort(self):
+        with self.given(
+            'Aborting a release',
+            '/apiv1/releases/id:1',
+            'ABORT'
+        ):
+            assert status == 200
+
+            when(
+                'Intended release with string type not found',
+                url_parameters=dict(id='Alphabetical')
+            )
+            assert status == 404
+
+            when(
+                'Intended release with integer type not found',
+                url_parameters=dict(id=100)
+            )
+            assert status == 404
+
+        session = self.create_session()
+        release = session.query(Release).filter(Release.id == 1).one_or_none()
+        assert release is None
+
