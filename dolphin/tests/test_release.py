@@ -117,7 +117,7 @@ class TestRelease(LocalApplicationTestCase):
 
             when(
                 'Intended release with string type not found',
-                url_parameters=dict(id='no_integer')
+                url_parameters=dict(id='Alphabetical')
             )
             assert status == 404
 
@@ -188,7 +188,7 @@ class TestRelease(LocalApplicationTestCase):
 
             when(
                 'Intended release with string type not found',
-                url_parameters=dict(id='no_integer')
+                url_parameters=dict(id='Alphabetical')
             )
             assert status == 404
 
@@ -199,6 +199,6 @@ class TestRelease(LocalApplicationTestCase):
             assert status == 404
 
         session = self.create_session()
-        release = session.query(Release).filter(Release.id==1).one_or_none()
+        release = session.query(Release).filter(Release.id == 1).one_or_none()
         assert release is None
 
