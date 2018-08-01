@@ -60,3 +60,18 @@ project_validator = validate(
     ),
 )
 
+
+update_project_validator = validate(
+    title=dict(
+        max_length=(50, '704 At most 50 characters are valid for title')
+    ),
+    description=dict(
+        max_length=(512, '703 At most 512 characters are valid for description')
+    ),
+    dueDate=dict(
+        pattern=(DATE_PATTERN, '701 Invalid due date format'),
+    ),
+    cutoff=dict(
+        pattern=(DATE_PATTERN, '702 Invalid cutoff format'),
+    ),
+)

@@ -14,6 +14,14 @@ project_statuses = [
 ]
 
 
+project_phases = [
+    'design',
+    'development',
+    'deployment',
+    'done'
+]
+
+
 class Project(Subscribable):
     __tablename__ = 'project'
     __mapper_args__ = {'polymorphic_identity': __tablename__}
@@ -26,13 +34,10 @@ class Project(Subscribable):
         Enum(*project_statuses, name='project_status'),
         nullable=True
     )
-    phase = Field(Enum(
-        'design',
-        'impelemention',
-        'deployment',
-        'done',
-        name='project_phase'
-    ), nullable=True)
+    phase = Field(
+        Enum(*project_phases, name='project_phase'),
+        nullable=True
+    )
 
     manager = relationship(
         'Manager',
