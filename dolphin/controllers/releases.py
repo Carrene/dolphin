@@ -78,7 +78,7 @@ class ReleaseController(RestController):
                 .filter(func.lower(Release.title) == form['title'].lower()) \
                 .count() >= 1:
             raise HTTPStatus(
-                f'600 Another release with title: "{form["title"]}" is already '
+                f'600 Another release with title: "{form["title"]}" is already'
                 f'exists'
             )
 
