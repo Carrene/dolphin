@@ -118,13 +118,13 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['phase'] == 'development'
 
             when(
-                'Intended release with string type not found',
+                'Intended project with string type not found',
                 url_parameters=dict(id='Alphabetical')
             )
             assert status == 404
 
             when(
-                'Intended release with string type not found',
+                'Intended project with string type not found',
                 url_parameters=dict(id=100)
             )
             assert status == 404

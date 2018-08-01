@@ -52,7 +52,7 @@ class ProjectController(ModelRestController):
         if not len(form.keys()):
             raise HTTPStatus('708 No parameter exists in the form')
 
-        # FIXME: these lines should be removed and replaced by Release.validate
+        # FIXME: these lines should be removed and replaced by Project.validate
         # decorator
         json_columns = set(
             c.info.get('json', to_camel_case(c.key)) for c in
