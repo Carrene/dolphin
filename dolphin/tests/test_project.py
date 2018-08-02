@@ -39,6 +39,17 @@ class TestProject(LocalApplicationTestCase):
         )
         session.add(project)
         session.flush()
+
+        hidden_project = Project(
+            manager_id=manager.id,
+            release_id=release.id,
+            title='My hidden project',
+            description='A decription for my project',
+            due_date='2020-2-20',
+            removed_at='2020-2-20'
+        )
+        session.add(hidden_project)
+
         cls.manager_id = manager.id
         cls.release_id = release.id
         session.commit()
@@ -209,6 +220,30 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'There is parameter in form',
+                form=dict(any_parameter='A parameter in the form')
+            )
+            assert status == '709 Form not allowed'
+
+    def test_show(self):
+        with self.given(
+            'Showing a unhidden project',
+            '/apiv1/projects/id:3',
+            'SHOW'
+        ):
+            session = self.create_session()
+            project = session.query(Project) \
+                .filter(Project.id == 3).one_or_none()
+            assert status == 200
+            project.assert_is_not_deleted()
+
+            when(
+                'Project not found',
+                url_parameters=dict(id=100)
+            )
+            assert status == 404
+
+            when(
+                'There is parameter is form',
                 form=dict(any_parameter='A parameter in the form')
             )
             assert status == '709 Form not allowed'
