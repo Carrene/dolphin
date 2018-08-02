@@ -86,3 +86,39 @@ class ProjectController(ModelRestController):
         project.update_from_request()
         return project
 
+    @json
+    @Project.expose
+    @commit
+    def hide(self, id):
+        form = context.form
+
+        project = DBSession.query(Project) \
+            .filter(Project.id == id).one_or_none()
+
+        if not project:
+            raise HTTPNotFound()
+
+        if len(form):
+            raise HTTPStatus('709 Form not allowed')
+
+        project.soft_delete()
+        return project
+
+    @json
+    @Project.expose
+    @commit
+    def show(self, id):
+        form = context.form
+
+        project = DBSession.query(Project) \
+            .filter(Project.id == id).one_or_none()
+
+        if not project:
+            raise HTTPNotFound()
+
+        if len(form):
+            raise HTTPStatus('709 Form not allowed')
+
+        project.soft_undelete()
+        return project
+

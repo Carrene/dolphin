@@ -1,7 +1,7 @@
 
 from sqlalchemy import Integer, Time, ForeignKey, Enum
 from sqlalchemy.orm import backref
-from restfulpy.orm import Field, relationship
+from restfulpy.orm import Field, relationship, SoftDeleteMixin
 
 from .subscribable import Subscribable
 
@@ -22,7 +22,7 @@ project_phases = [
 ]
 
 
-class Project(Subscribable):
+class Project(SoftDeleteMixin, Subscribable):
     __tablename__ = 'project'
     __mapper_args__ = {'polymorphic_identity': __tablename__}
 
