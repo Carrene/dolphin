@@ -189,3 +189,29 @@ class TestProject(LocalApplicationTestCase):
         ):
             assert status == '708 No parameter exists in the form'
 
+    def test_hide(self):
+        with self.given(
+            'Hiding a project',
+            '/apiv1/projects/id:2',
+            'HIDE'
+        ):
+            session = self.create_session()
+            project = session.query(Project) \
+                .filter(Project.id == 2).one_or_none()
+            assert status == 200
+            project.assert_is_deleted()
+
+            when(
+                'Project not found',
+                url_parameters=dict(id=100)
+            )
+            assert status == 404
+
+        with self.given(
+            'Hide a project when parameter is in form',
+            '/apiv1/projects/id:3',
+            'HIDE',
+            form=dict(any_parameter='Paramter must not be in form')
+        ):
+            assert status == '709 Form not allowed'
+
