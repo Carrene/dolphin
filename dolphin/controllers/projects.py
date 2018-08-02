@@ -101,8 +101,6 @@ class ProjectController(ModelRestController):
         if len(form):
             raise HTTPStatus('709 Form not allowed')
 
-        project = DBSession.query(Project) \
-            .filter(Project.id == id).one_or_none()
-
         project.soft_delete()
         return project
+
