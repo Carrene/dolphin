@@ -207,11 +207,9 @@ class TestProject(LocalApplicationTestCase):
             )
             assert status == 404
 
-        with self.given(
-            'Hide a project when parameter is in form',
-            '/apiv1/projects/id:3',
-            'HIDE',
-            form=dict(any_parameter='Paramter must not be in form')
-        ):
+            when(
+                'There is parameter in form',
+                form=dict(any_parameter='A parameter in the form')
+            )
             assert status == '709 Form not allowed'
 
