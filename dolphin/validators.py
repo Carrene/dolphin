@@ -75,3 +75,10 @@ update_project_validator = validate(
         pattern=(DATE_PATTERN, '702 Invalid cutoff format'),
     ),
 )
+
+assign_manager_validator = validate(
+    projectId=dict(
+        required=(True, '713 Project id not in form'),
+        type_=(int, '714 Invalid project id type')
+    )
+)
