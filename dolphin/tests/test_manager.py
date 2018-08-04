@@ -57,13 +57,13 @@ class TestManager(LocalApplicationTestCase):
             assert status == 200
 
             when(
-                'Intended project with string type not found',
+                'Intended manager with string type not found',
                 url_parameters=dict(id='Alphabetical')
             )
             assert status == 404
 
             when(
-                'Intended project with string type not found',
+                'Intended manager with string type not found',
                 url_parameters=dict(id=100)
             )
             assert status == 404
