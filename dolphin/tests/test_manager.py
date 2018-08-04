@@ -63,7 +63,7 @@ class TestManager(LocalApplicationTestCase):
             assert status == 404
 
             when(
-                'Intended manager with string type not found',
+                'Intended manager with integer type not found',
                 url_parameters=dict(id=100)
             )
             assert status == 404
@@ -85,5 +85,5 @@ class TestManager(LocalApplicationTestCase):
                 form=dict(projectId=100)
             )
             assert status == 601
-            assert status.text.startswith('Not found project')
+            assert status.text.startswith('Project not found ')
 
