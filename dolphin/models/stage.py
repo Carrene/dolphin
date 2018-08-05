@@ -17,6 +17,5 @@ class Stage(DeclarativeBase):
         foreign_keys=[project_id],
         protected=True
     )
-    items = relationship('Item', back_populates='stage', protected=True)
     issues = relationship('Issue', back_populates='stage', protected=True)
 

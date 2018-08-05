@@ -14,5 +14,4 @@ class Item(TimestampMixin, DeclarativeBase):
     end = Field(DateTime)
 
     resource = relationship('Resource', back_populates='items', protected=True)
-    stage = relationship('Stage', back_populates='items', protected=True)
 
