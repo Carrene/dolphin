@@ -54,7 +54,7 @@ class TestRelease(LocalApplicationTestCase):
                 'Title is not in form',
                 form=Remove('title')
             )
-            assert status == '710 Title not exists'
+            assert status == '710 Title not in form'
 
             when(
                 'Title length is more than limit',
@@ -81,7 +81,7 @@ class TestRelease(LocalApplicationTestCase):
                 'Due date is not in form',
                 form=Remove('dueDate')
             )
-            assert status == '711 Due date not exists'
+            assert status == '711 Due date not in form'
 
             when(
                 'Cutoff format is wrong',
@@ -93,7 +93,7 @@ class TestRelease(LocalApplicationTestCase):
                 'Due date is not in form',
                 form=Remove('cutoff')
             )
-            assert status == '712 Cutoff not exists'
+            assert status == '712 Cutoff not in form'
 
     def test_update(self):
         with self.given(

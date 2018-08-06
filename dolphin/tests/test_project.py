@@ -77,7 +77,7 @@ class TestProject(LocalApplicationTestCase):
                 'Title is not in form',
                 form=Remove('title')
             )
-            assert status == '710 Title not exists'
+            assert status == '710 Title not in form'
 
             when(
                 'Title length is more than limit',
@@ -105,7 +105,7 @@ class TestProject(LocalApplicationTestCase):
                 'Due date is not in form',
                 form=Remove('dueDate')
             )
-            assert status == '711 Due date not exists'
+            assert status == '711 Due date not in form'
 
     def test_update(self):
         with self.given(

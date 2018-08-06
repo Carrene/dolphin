@@ -13,7 +13,7 @@ DATE_PATTERN = re.compile(
 
 release_validator = validate(
     title=dict(
-        required=(True, '710 Title not exists'),
+        required=(True, '710 Title not in form'),
         max_length=(50, '704 At most 50 characters are valid for title')
     ),
     description=dict(
@@ -21,11 +21,11 @@ release_validator = validate(
     ),
     dueDate=dict(
         pattern=(DATE_PATTERN, '701 Invalid due date format'),
-        required=(True, '711 Due date not exists')
+        required=(True, '711 Due date not in form')
     ),
     cutoff=dict(
         pattern=(DATE_PATTERN, '702 Invalid cutoff format'),
-        required=(True, '712 Cutoff not exists')
+        required=(True, '712 Cutoff not in form')
     ),
 )
 
@@ -48,7 +48,7 @@ update_release_validator = validate(
 
 project_validator = validate(
     title=dict(
-        required=(True, '710 Title not exists'),
+        required=(True, '710 Title not in form'),
         max_length=(50, '704 At most 50 characters are valid for title')
     ),
     description=dict(
@@ -56,7 +56,7 @@ project_validator = validate(
     ),
     dueDate=dict(
         pattern=(DATE_PATTERN, '701 Invalid due date format'),
-        required=(True, '711 Due date not exists')
+        required=(True, '711 Due date not in form')
     ),
 )
 
@@ -76,9 +76,33 @@ update_project_validator = validate(
     ),
 )
 
+
 assign_manager_validator = validate(
     projectId=dict(
         required=(True, '713 Project id not in form'),
         type_=(int, '714 Invalid project id type')
     )
 )
+
+
+issue_validator = validate(
+    title=dict(
+        required=(True, '710 Title not in form'),
+        max_length=(50, '704 At most 50 characters are valid for title')
+    ),
+    description=dict(
+        max_length=(512, '703 At most 512 characters are valid for description')
+    ),
+    dueDate=dict(
+        pattern=(DATE_PATTERN, '701 Invalid due date format'),
+        required=(True, '711 Due date not in form')
+    ),
+    kind=dict(
+        required=(True, '718 Kind not in form')
+    ),
+    days=dict(
+        type_=(int, '721 Invalid days type'),
+        required=(True, '720 Days not in form')
+    ),
+)
+

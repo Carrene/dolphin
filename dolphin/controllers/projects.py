@@ -38,8 +38,7 @@ class ProjectController(ModelRestController):
 
         # FIXME: This validation must be performed inside the validation
         # decorator
-        try:
-            id = int(id)
+        try: id = int(id)
         except:
             raise HTTPNotFound()
 

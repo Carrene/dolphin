@@ -5,12 +5,15 @@ import dolphin
 from .releases import ReleaseController
 from .projects import ProjectController
 from .managers import ManagerController
+from .issues import IssueController
+
 
 class Apiv1(Controller):
 
     releases = ReleaseController()
     projects = ProjectController()
     managers = ManagerController()
+    issues = IssueController()
 
     @json
     def version(self):
