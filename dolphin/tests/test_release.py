@@ -142,7 +142,7 @@ class TestRelease(LocalApplicationTestCase):
                 form=Update(title='My interesting release')
             )
             assert status == 600
-            assert status.text.startswith('Another release')
+            assert status.text.startswith('Another release with title')
 
             when(
                 'Description length is less than limit',

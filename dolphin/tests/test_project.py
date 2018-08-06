@@ -145,7 +145,7 @@ class TestProject(LocalApplicationTestCase):
                 form=Update(title='My interesting project')
             )
             assert status == 600
-            assert status.text.startswith('Another project')
+            assert status.text.startswith('Another project with title')
 
             when(
                 'Title length is more than limit',

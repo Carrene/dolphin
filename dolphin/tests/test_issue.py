@@ -91,7 +91,7 @@ class TestIssue(LocalApplicationTestCase):
                 form=Update(title='First issue')
             )
             assert status == 600
-            assert status.text.startswith('Another project')
+            assert status.text.startswith('Another project with title')
 
             when(
                 'Invalid kind value is in form',
