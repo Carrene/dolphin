@@ -53,6 +53,7 @@ class Project(SoftDeleteMixin, Subscribable):
     releases = relationship(
         'Release',
         foreign_keys=[release_id],
+        backref='projects',
         protected=True
     )
 
