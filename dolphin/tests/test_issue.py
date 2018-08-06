@@ -39,17 +39,8 @@ class TestIssue(LocalApplicationTestCase):
         session.add(project)
         session.flush()
 
-        stage = Stage(
-            project=project,
-            title='triage',
-            order=0
-        )
-        session.add(stage)
-        session.flush()
-
         issue = Issue(
             project=project,
-            stage=stage,
             title='First issue',
             description='This is description of first issue',
             due_date='2020-2-20',
@@ -58,7 +49,6 @@ class TestIssue(LocalApplicationTestCase):
         )
 
         cls.project = project
-        cls.stage = stage
         session.add(issue)
         session.commit()
 
@@ -74,7 +64,6 @@ class TestIssue(LocalApplicationTestCase):
                 kind='enhancement',
                 days=3,
                 projectId=self.project.id,
-                stageId=self.stage.id
             )
         ):
             assert status == 200
@@ -84,7 +73,7 @@ class TestIssue(LocalApplicationTestCase):
             assert response.json['dueDate'] == '2200-02-20T00:00:00'
             assert response.json['kind'] == 'enhancement'
             assert response.json['days'] == 3
-            assert response.json['status'] == None
+            assert response.json['status'] == 'triage'
 
             when(
                 'Title is repetitive',
