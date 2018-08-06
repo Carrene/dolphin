@@ -79,15 +79,15 @@ class TestIssue(LocalApplicationTestCase):
         ):
             assert status == 200
             assert response.json['title'] == 'Defined issue'
-            assert response.json['description'] == 'A description for defined'\
-                ' issue'
+            assert response.json['description'] == 'A description for '\
+                'defined issue'
             assert response.json['dueDate'] == '2200-02-20T00:00:00'
             assert response.json['kind'] == 'enhancement'
             assert response.json['days'] == 3
             assert response.json['status'] == None
 
             when(
-                'Title is repetetive',
+                'Title is repetitive',
                 form=Update(title='First issue')
             )
             assert status == 600
