@@ -99,3 +99,9 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         protected=True
     )
 
+    items = relationship(
+        'Item',
+        back_populates='issue',
+        protected=True
+    )
+
