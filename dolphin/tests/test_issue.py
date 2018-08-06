@@ -44,6 +44,8 @@ class TestIssue(LocalApplicationTestCase):
             title='triage',
             order=0
         )
+        session.add(stage)
+        session.flush()
 
         issue = Issue(
             project=project,
