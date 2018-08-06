@@ -14,4 +14,16 @@ class Item(TimestampMixin, DeclarativeBase):
     end = Field(DateTime)
 
     resource = relationship('Resource', back_populates='items', protected=True)
+    stage = relationship(
+        'Stage',
+        foreign_keys=[stage_id],
+        back_populates='items',
+        protected=True
+    )
+    issue = relationship(
+        'Issue',
+        foreign_keys=[issue_id],
+        back_populates='items',
+        protected=True
+    )
 

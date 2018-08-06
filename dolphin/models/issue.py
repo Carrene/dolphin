@@ -13,6 +13,8 @@ association_table = Table('issue_tag', DeclarativeBase.metadata,
 
 
 issue_statuses = [
+    'backlog',
+    'triage',
     'in-progress',
     'on-hold',
     'delayed',
@@ -45,12 +47,15 @@ class Issue(Subscribable):
     __mapper_args__ = {'polymorphic_identity': __tablename__}
 
     project_id = Field(Integer, ForeignKey('project.id'))
-    stage_id = Field(Integer, ForeignKey('stage.id'))
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
 
     kind = Field(Enum(*issue_kinds, name='kind'))
     days = Field(Integer)
-    status = Field(Enum(*issue_statuses, name='issues_status'), nullable=True)
+    status = Field(
+        Enum(*issue_statuses, name='issues_status'),
+        nullable=True,
+        default='triage'
+    )
 
     tags = relationship(
         'Tag',
@@ -58,16 +63,17 @@ class Issue(Subscribable):
         back_populates='issues',
         protected=True
     )
-    stage = relationship(
-        'Stage',
-        back_populates='issues',
-        foreign_keys=[stage_id],
-        protected=True
-    )
+
     project = relationship(
         'Project',
         foreign_keys=[project_id],
         backref='issues',
+        protected=True
+    )
+
+    items = relationship(
+        'Item',
+        back_populates='issue',
         protected=True
     )
 
