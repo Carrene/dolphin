@@ -121,3 +121,11 @@ update_issue_validator = validate(
         type_=(int, '721 Invalid days type'),
     ),
 )
+
+
+update_item_validator = validate(
+    status=dict(
+        required=(True, '719 Status not in form')
+    )
+)
+

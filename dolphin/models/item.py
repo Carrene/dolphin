@@ -1,7 +1,15 @@
 
-from sqlalchemy import DateTime, Integer, ForeignKey
+from sqlalchemy import DateTime, Integer, ForeignKey, Enum
 from restfulpy.orm import Field, DeclarativeBase, relationship
 from restfulpy.orm.mixins import TimestampMixin
+
+
+item_statuses = [
+    'in-progress',
+    'on-hold',
+    'delayed',
+    'complete',
+]
 
 
 class Item(TimestampMixin, DeclarativeBase):
@@ -11,6 +19,10 @@ class Item(TimestampMixin, DeclarativeBase):
     issue_id = Field(Integer, ForeignKey('issue.id'))
     resource_id = Field(Integer, ForeignKey('resource.id'))
     id = Field(Integer, primary_key=True)
+    status = Field(
+        Enum(*item_statuses, name='item_status'),
+        nullable=True
+    )
     end = Field(DateTime)
 
     resource = relationship('Resource', back_populates='items', protected=True)
