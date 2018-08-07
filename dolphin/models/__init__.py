@@ -9,5 +9,5 @@ from .manager import Manager
 from .resource import Resource
 from .guest import Guest
 from .team import Team
-from .item import Item
+from .item import Item, item_statuses
 
