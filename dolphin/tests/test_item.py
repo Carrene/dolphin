@@ -5,6 +5,7 @@ from dolphin.models import Item, Stage, Issue, Manager, Release, Project, \
     Resource, Team
 from dolphin.tests.helpers import LocalApplicationTestCase
 
+
 class TestItem(LocalApplicationTestCase):
 
     @classmethod
