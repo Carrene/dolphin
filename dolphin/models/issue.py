@@ -1,7 +1,9 @@
 
 from sqlalchemy import Integer, Time, ForeignKey, DateTime, Enum, String,\
     Column, Table
-from restfulpy.orm import Field, DeclarativeBase, TimestampMixin, relationship
+from restfulpy.orm import Field, DeclarativeBase, TimestampMixin, \
+    relationship, ModifiedMixin, OrderingMixin, FilteringMixin,\
+    PaginationMixin
 
 from .subscribable import Subscribable
 
@@ -42,7 +44,13 @@ class Tag(DeclarativeBase):
     )
 
 
-class Issue(Subscribable):
+class Issue(
+    ModifiedMixin,
+    OrderingMixin,
+    FilteringMixin,
+    PaginationMixin,
+    Subscribable
+):
     __tablename__ = 'issue'
     __mapper_args__ = {'polymorphic_identity': __tablename__}
 
