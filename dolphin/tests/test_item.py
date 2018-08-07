@@ -70,7 +70,6 @@ class TestItem(LocalApplicationTestCase):
         session.add(item)
         session.commit()
 
-
     def test_update(self):
         with self.given(
             'Update status of an item',

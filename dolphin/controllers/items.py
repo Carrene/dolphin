@@ -31,7 +31,7 @@ class ItemController(ModelRestController):
 
         if status not in item_statuses:
             raise HTTPStatus(
-                f'705 Invalid status value, only '\
+                f'705 Invalid status value, only ' \
                 f'"{", ".join(item_statuses)}" will be accepted.'
             )
 
