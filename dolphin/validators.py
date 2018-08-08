@@ -13,7 +13,7 @@ DATE_PATTERN = re.compile(
 
 release_validator = validate(
     title=dict(
-        required=('710 Title not in form'),
+        required='710 Title not in form',
         max_length=(50, '704 At most 50 characters are valid for title')
     ),
     description=dict(
@@ -21,11 +21,11 @@ release_validator = validate(
     ),
     dueDate=dict(
         pattern=(DATE_PATTERN, '701 Invalid due date format'),
-        required=('711 Due date not in form')
+        required='711 Due date not in form'
     ),
     cutoff=dict(
         pattern=(DATE_PATTERN, '702 Invalid cutoff format'),
-        required=('712 Cutoff not in form')
+        required='712 Cutoff not in form'
     ),
 )
 
@@ -48,8 +48,8 @@ update_release_validator = validate(
 
 project_validator = validate(
     title=dict(
-        required=('710 Title not in form'),
-        not_none=('727 Ttile is null'),
+        required='710 Title not in form',
+        not_none='727 Ttile is null',
         max_length=(50, '704 At most 50 characters are valid for title')
     ),
     description=dict(
@@ -57,7 +57,7 @@ project_validator = validate(
     ),
     dueDate=dict(
         pattern=(DATE_PATTERN, '701 Invalid due date format'),
-        required=('711 Due date not in form')
+        required='711 Due date not in form'
     ),
 )
 
@@ -80,7 +80,7 @@ update_project_validator = validate(
 
 assign_manager_validator = validate(
     projectId=dict(
-        required=('713 Project id not in form'),
+        required='713 Project id not in form',
         type_=(int, '714 Invalid project id type')
     )
 )
@@ -88,7 +88,7 @@ assign_manager_validator = validate(
 
 issue_validator = validate(
     title=dict(
-        required=('710 Title not in form'),
+        required='710 Title not in form',
         max_length=(50, '704 At most 50 characters are valid for title')
     ),
     description=dict(
@@ -96,14 +96,14 @@ issue_validator = validate(
     ),
     dueDate=dict(
         pattern=(DATE_PATTERN, '701 Invalid due date format'),
-        required=('711 Due date not in form')
+        required='711 Due date not in form'
     ),
     kind=dict(
-        required=('718 Kind not in form')
+        required='718 Kind not in form'
     ),
     days=dict(
         type_=(int, '721 Invalid days type'),
-        required=('720 Days not in form')
+        required='720 Days not in form'
     ),
 )
 
@@ -126,7 +126,7 @@ update_issue_validator = validate(
 
 update_item_validator = validate(
     status=dict(
-        required=('719 Status not in form')
+        required='719 Status not in form'
     )
 )
 

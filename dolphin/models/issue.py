@@ -44,13 +44,9 @@ class Tag(DeclarativeBase):
     )
 
 
-class Issue(
-    ModifiedMixin,
-    OrderingMixin,
-    FilteringMixin,
-    PaginationMixin,
-    Subscribable
-):
+class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
+            Subscribable):
+
     __tablename__ = 'issue'
     __mapper_args__ = {'polymorphic_identity': __tablename__}
 
