@@ -19,11 +19,11 @@ class ProjectController(ModelRestController):
         project = DBSession.query(Project).filter_by(title=title) \
             .one_or_none()
 
-        if project is not None:
-            raise HTTPStatus(
-                f'600 A project with title: {title} is already exists.'
-            )
-
+#        if project is not None:
+#            raise HTTPStatus(
+#                f'600 A project with title: {title} is already exists.'
+#            )
+#
         project = Project()
         project.update_from_request()
         DBSession.add(project)

@@ -1,5 +1,5 @@
 
-from bddrest import status, response, Update, when, Remove, Append
+from bddrest import status, response, Update, when, Remove, Append, given_form
 
 from dolphin.tests.helpers import LocalApplicationTestCase
 from dolphin.models import Project, Manager, Release
@@ -81,23 +81,20 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Title length is more than limit',
-                form=Update(
-                    title='This is a title with the length more than 50 '\
-                    'characters'
-                )
+                form=Update(title=((50 + 1) * 'a'))
             )
             assert status == '704 At most 50 characters are valid for title'
 
             when(
                 'Description length is less than limit',
-                form=Update(description=((512 + 1) * 'a'))
+                form=given_form + dict(description=((512 + 1) * 'a'), title='Another title')
             )
             assert status == '703 At most 512 characters are valid for '\
                 'description'
 
             when(
                 'Due date format is wrong',
-                form=Update(dueDate='20-20-20')
+                form=Update(dueDate='20-20-20', title='Another title')
             )
             assert status == '701 Invalid due date format'
 
