@@ -16,16 +16,12 @@ class TestManager(LocalApplicationTestCase):
             email=None,
             phone=123456789
         )
-        session.add(assigned_manager)
-        session.flush()
 
         unassigned_manager = Manager(
             title='Second Manager',
             email=None,
             phone=987654321
         )
-        session.add(unassigned_manager)
-        session.flush()
 
         release = Release(
             manager=assigned_manager,
@@ -34,8 +30,6 @@ class TestManager(LocalApplicationTestCase):
             due_date='2020-2-20',
             cutoff='2030-2-20',
         )
-        session.add(release)
-        session.flush()
 
         project = Project(
             manager=assigned_manager,
@@ -50,7 +44,7 @@ class TestManager(LocalApplicationTestCase):
     def test_assign(self):
         with self.given(
             'Assign a manager to project',
-            '/apiv1/managers/id:2',
+            '/apiv1/managers/id:1',
             'ASSIGN',
             form=dict(projectId='2')
         ):

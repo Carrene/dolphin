@@ -19,14 +19,12 @@ class ReleaseController(RestController):
     @Release.expose
     @commit
     def create(self):
-        form_title = context.form.get('title')
-        title_exist = DBSession.\
-            query(Release).\
-            filter_by(title=form_title).\
-            one_or_none()
+        title = context.form.get('title')
+        release = DBSession.query(Release) \
+            .filter(Release.title == title).one_or_none()
 
-        if title_exist is not None:
-            raise HTTPStatus('600 Repetitive title')
+#        if release is not None:
+#            raise HTTPStatus('600 Repetitive title')
 
         new_release = Release()
         new_release.update_from_request()
@@ -74,13 +72,13 @@ class ReleaseController(RestController):
                 f'"{", ".join(release_statuses)}" will be accepted'
             )
 
-        if 'title' in form and DBSession.query(Release) \
-                .filter(func.lower(Release.title) == form['title'].lower()) \
-                .count() >= 1:
-            raise HTTPStatus(
-                f'600 Another release with title: "{form["title"]}" is already'
-                f'exists'
-            )
+#        if 'title' in form and DBSession.query(Release) \
+#                .filter(func.lower(Release.title) == form['title'].lower()) \
+#                .count() >= 1:
+#            raise HTTPStatus(
+#                f'600 Another release with title: "{form["title"]}" is already'
+#                f'exists'
+#            )
 
         release = DBSession.query(Release) \
             .filter(Release.id == id) \

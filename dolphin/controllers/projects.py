@@ -16,14 +16,14 @@ class ProjectController(ModelRestController):
     @commit
     def create(self):
         title = context.form['title']
-        project = DBSession.query(Project).filter_by(title=title) \
+        project = DBSession.query(Project).filter(Project.title == title) \
             .one_or_none()
 
-#        if project is not None:
-#            raise HTTPStatus(
-#                f'600 A project with title: {title} is already exists.'
-#            )
-#
+        if project is not None:
+            raise HTTPStatus(
+                f'600 A project with title: {title} is already exists.'
+            )
+
         project = Project()
         project.update_from_request()
         DBSession.add(project)
@@ -76,13 +76,6 @@ class ProjectController(ModelRestController):
                 f'"{", ".join(project_statuses)}" will be accepted'
             )
 
-        if 'title' in form and DBSession.query(Project) \
-                .filter(Project.title == form['title']).count() >= 1:
-            raise HTTPStatus(
-                f'600 Another project with title: "{form["title"]}" is already'
-                f' exists'
-            )
-
         project.update_from_request()
         return project
 
@@ -92,9 +85,13 @@ class ProjectController(ModelRestController):
     def hide(self, id):
         form = context.form
 
+        try:
+            id = int(id)
+        except:
+            raise HTTPNotFound()
+
         project = DBSession.query(Project) \
             .filter(Project.id == id).one_or_none()
-
         if not project:
             raise HTTPNotFound()
 
@@ -110,9 +107,13 @@ class ProjectController(ModelRestController):
     def show(self, id):
         form = context.form
 
+        try:
+            id = int(id)
+        except:
+            raise HTTPNotFound()
+
         project = DBSession.query(Project) \
             .filter(Project.id == id).one_or_none()
-
         if not project:
             raise HTTPNotFound()
 
