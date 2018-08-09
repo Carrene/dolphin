@@ -3,7 +3,7 @@ import re
 from nanohttp import validate, HTTPStatus, context
 from restfulpy.orm import DBSession, commit
 
-from dolphin.models import Project
+from dolphin.models import Project, Release
 from dolphin.exceptions import empty_form_http_exception
 
 
@@ -18,7 +18,28 @@ def project_not_exists_validator(title, container, field):
         .one_or_none()
     if project is not None:
         raise HTTPStatus(
-            f'600 A project with title: {title} is already exists.'
+            f'600 Another project with title: {title} is already exists.'
+        )
+    return title
+
+def project_id_exists_validator(projectId, container, field):
+
+    project = DBSession.query(Project) \
+            .filter(Project.id == context.form['projectId']).one_or_none()
+    if not project:
+        raise HTTPStatus(f'601 Project not found with id: '
+                         f'{context.form["projectId"]}'
+        )
+    return
+
+
+def release_not_exists_validator(title, container, field):
+
+    release = DBSession.query(Release).filter(Release.title == title) \
+        .one_or_none()
+    if release is not None:
+        raise HTTPStatus(
+            f'600 Another release with title: {title} is already exists.'
         )
     return title
 
@@ -44,7 +65,8 @@ release_validator = validate(
 
 update_release_validator = validate(
     title=dict(
-        max_length=(50, '704 At most 50 characters are valid for title')
+        max_length=(50, '704 At most 50 characters are valid for title'),
+        callback=release_not_exists_validator
     ),
     description=dict(
         max_length=(512, '703 At most 512 characters are valid for description')
@@ -76,6 +98,7 @@ project_validator = validate(
 
 update_project_validator = validate(
     title=dict(
+        callback=project_not_exists_validator,
         max_length=(50, '704 At most 50 characters are valid for title')
     ),
     description=dict(

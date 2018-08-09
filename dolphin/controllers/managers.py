@@ -35,6 +35,8 @@ class ManagerController(ModelRestController):
                              f'{form["projectId"]}'
             )
 
+        import pudb; pudb.set_trace()  # XXX BREAKPOINT
+
         project.manager = manager
         return manager
 

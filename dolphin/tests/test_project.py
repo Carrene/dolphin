@@ -81,13 +81,16 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Title length is more than limit',
-                form=Update(title=((50 + 1) * 'a'))
+                form=given_form | dict(title=((50 + 1) * 'a'))
             )
             assert status == '704 At most 50 characters are valid for title'
 
             when(
                 'Description length is less than limit',
-                form=given_form + dict(description=((512 + 1) * 'a'), title='Another title')
+                form=given_form | dict(
+                    description=((512 + 1) * 'a'),
+                    title='Another title'
+                )
             )
             assert status == '703 At most 512 characters are valid for '\
                 'description'
@@ -100,7 +103,7 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Due date is not in form',
-                form=Remove('dueDate')
+                form=given_form - ['dueDate'] | dict(title='Another title')
             )
             assert status == '711 Due date not in form'
 
@@ -127,12 +130,14 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Intended project with string type not found',
+                form=given_form | dict(title='Another title'),
                 url_parameters=dict(id='Alphabetical')
             )
             assert status == 404
 
             when(
                 'Intended project with string type not found',
+                form=given_form | dict(title='Another title'),
                 url_parameters=dict(id=100)
             )
             assert status == 404
@@ -147,16 +152,16 @@ class TestProject(LocalApplicationTestCase):
             when(
                 'Title length is more than limit',
                 form=Update(
-                    title='This is a title with the length more than 50 '\
-                    ' characters'
+                    title=((50 + 1) * 'a')
                 )
             )
             assert status == '704 At most 50 characters are valid for title'
 
             when(
                 'Description length is more than limit',
-                form=Update(
-                    description=((512 + 1) * 'a')
+                form=given_form | dict(
+                    description=((512 + 1) * 'a'),
+                    title='Another title'
                 )
             )
             assert status == '703 At most 512 characters are valid for '\
@@ -164,27 +169,37 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Due date format is wrong',
-                form=Update(dueDate='2200-2-32')
+                form=given_form | dict(
+                    dueDate='2200-2-32',
+                    title='Another title'
+                )
             )
             assert status == '701 Invalid due date format'
 
             when(
                 'Status value is invalid',
-                form=Update(status='progressing')
+                form=given_form | dict(
+                    status='progressing',
+                    title='Another title'
+                )
             )
             assert status == 705
             assert status.text.startswith('Invalid status')
 
             when(
                 'Phase value is invalid',
-                form=Update(phase='compeleting')
+                form=given_form | dict(
+                    phase='compeleting',
+                    title='Another title'
+                )
             )
             assert status == 706
             assert status.text.startswith('Invalid phase')
 
             when(
                 'Invalid parameter is in the form',
-                form=Append(invalid_param='This is an external parameter')
+                form=given_form + dict(invalid_param='External parameter') | \
+                dict(title='Another title')
             )
             assert status == 707
             assert status.text.startswith('Invalid field')
@@ -210,9 +225,12 @@ class TestProject(LocalApplicationTestCase):
             project.assert_is_deleted()
 
             when(
-                'Project not found',
+                'Intended project with string type not found',
                 url_parameters=dict(id=100)
             )
+            assert status == 404
+
+            when('Project not found', url_parameters=dict(id=100))
             assert status == 404
 
             when(
