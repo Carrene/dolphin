@@ -84,7 +84,11 @@ update_release_validator = validate(
 project_validator = validate(
     title=dict(
         required=('710 Title not in form'),
+<<<<<<< HEAD
         callback=project_not_exists_validator,
+=======
+        not_none=('727 Ttile is null'),
+>>>>>>> 687181aa09b22b4fdf2cb898f1feec29c1cf262b
         max_length=(50, '704 At most 50 characters are valid for title')
     ),
     description=dict(
@@ -116,8 +120,12 @@ update_project_validator = validate(
 
 assign_manager_validator = validate(
     projectId=dict(
+<<<<<<< HEAD
 #        required=('713 Project id not in form'),
         callback=project_id_exists_validator,
+=======
+        required=('713 Project id not in form'),
+>>>>>>> 687181aa09b22b4fdf2cb898f1feec29c1cf262b
         type_=(int, '714 Invalid project id type')
     )
 )
