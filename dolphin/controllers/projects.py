@@ -16,9 +16,9 @@ class ProjectController(ModelRestController):
     @commit
     def create(self):
         title = context.form['title']
-        project = DBSession.query(Project).filter(Project.title == title) \
+        project = DBSession.query(Project) \
+            .filter(Project.title == title) \
             .one_or_none()
-
         project = Project()
         project.update_from_request()
         DBSession.add(project)
@@ -76,7 +76,8 @@ class ProjectController(ModelRestController):
             raise HTTPNotFound()
 
         project = DBSession.query(Project) \
-            .filter(Project.id == id).one_or_none()
+            .filter(Project.id == id) \
+            .one_or_none()
         if not project:
             raise HTTPNotFound()
 
@@ -97,7 +98,8 @@ class ProjectController(ModelRestController):
             raise HTTPNotFound()
 
         project = DBSession.query(Project) \
-            .filter(Project.id == id).one_or_none()
+            .filter(Project.id == id) \
+            .one_or_none()
         if not project:
             raise HTTPNotFound()
 
