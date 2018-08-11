@@ -4,7 +4,7 @@ from nanohttp import validate, HTTPStatus, context
 from restfulpy.orm import DBSession, commit
 
 from dolphin.models import Project, Release, Issue, issue_kinds, \
-    issue_statuses, item_statuses
+    issue_statuses, item_statuses, project_statuses, project_phases
 from dolphin.exceptions import empty_form_http_exception
 
 
@@ -87,6 +87,26 @@ def item_status_value_validator(status, container, field):
     return form['status']
 
 
+def project_status_value_validator(status, container, field):
+    form = context.form
+    if 'status' in form and form['status'] not in project_statuses:
+        raise HTTPStatus(
+            f'705 Invalid status value, only one of ' \
+            f'"{", ".join(project_statuses)}" will be accepted'
+        )
+    return form['status']
+
+
+def project_phase_value_validator(status, container, field):
+    form = context.form
+    if 'phase' in form and form['phase'] not in project_phases:
+        raise HTTPStatus(
+            f'706 Invalid phase value, only one of ' \
+            f'"{", ".join(project_phases)}" will be accepted'
+        )
+    return form['phase']
+
+
 
 release_validator = validate(
     title=dict(
@@ -139,6 +159,12 @@ project_validator = validate(
         pattern=(DATE_PATTERN, '701 Invalid due date format'),
         required=('711 Due date not in form')
     ),
+    status=dict(
+        callback=project_status_value_validator
+    ),
+    phase=dict(
+        callback=project_phase_value_validator
+    )
 )
 
 
@@ -156,6 +182,12 @@ update_project_validator = validate(
     cutoff=dict(
         pattern=(DATE_PATTERN, '702 Invalid cutoff format'),
     ),
+    status=dict(
+        callback=project_status_value_validator
+    ),
+    phase=dict(
+        callback=project_phase_value_validator
+    )
 )
 
 
