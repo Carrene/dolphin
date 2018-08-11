@@ -7,7 +7,6 @@ from dolphin.models import Project, Manager, Release
 
 class TestProject(LocalApplicationTestCase):
 
-
     @classmethod
     def mockup(cls):
         session = cls.create_session()
@@ -130,7 +129,6 @@ class TestProject(LocalApplicationTestCase):
             assert status == 706
             assert status.text.startswith('Invalid phase')
 
-
     def test_update(self):
         with self.given(
             'Updating a project',
@@ -146,7 +144,7 @@ class TestProject(LocalApplicationTestCase):
         ):
             assert status == 200
             assert response.json['title'] == 'My interesting project'
-            assert response.json['description'] == 'A updated project '\
+            assert response.json['description'] == 'A updated project ' \
                 'description'
             assert response.json['dueDate'] == '2200-02-20T00:00:00'
             assert response.json['status'] == 'in-progress'
@@ -188,7 +186,7 @@ class TestProject(LocalApplicationTestCase):
                     title='Another title'
                 )
             )
-            assert status == '703 At most 512 characters are valid for '\
+            assert status == '703 At most 512 characters are valid for ' \
                 'description'
 
             when(
@@ -222,8 +220,9 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Invalid parameter is in the form',
-                form=given_form + dict(invalid_param='External parameter') | \
-                dict(title='Another title')
+                form=given_form + \
+                    dict(invalid_param='External parameter') | \
+                    dict(title='Another title')
             )
             assert status == 707
             assert status.text.startswith('Invalid field')
@@ -244,7 +243,8 @@ class TestProject(LocalApplicationTestCase):
         ):
             session = self.create_session()
             project = session.query(Project) \
-                .filter(Project.id == 2).one_or_none()
+                .filter(Project.id == 2) \
+                .one_or_none()
             assert status == 200
             project.assert_is_deleted()
 
@@ -271,7 +271,8 @@ class TestProject(LocalApplicationTestCase):
         ):
             session = self.create_session()
             project = session.query(Project) \
-                .filter(Project.id == 3).one_or_none()
+                .filter(Project.id == 3) \
+                .one_or_none()
             assert status == 200
             project.assert_is_not_deleted()
 

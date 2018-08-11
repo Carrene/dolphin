@@ -1,4 +1,4 @@
-from nanohttp import HTTPStatus, json, context, HTTPNotFound, HTTPBadRequest
+from nanohttp import json, context, HTTPNotFound
 from restfulpy.orm import DBSession, commit
 from restfulpy.controllers import ModelRestController
 

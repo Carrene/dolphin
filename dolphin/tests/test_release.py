@@ -19,15 +19,14 @@ class TestRelease(LocalApplicationTestCase):
         session.flush()
 
         release = Release(
-            manager_id=manager.id,
+            manager=manager,
             title='My first release',
             description='A decription for my release',
             due_date='2020-2-20',
             cutoff='2030-2-20',
         )
-        session.add(release)
-        session.flush()
         cls.manager_id = manager.id
+        session.add(release)
         session.commit()
 
     def test_create(self):
@@ -139,7 +138,6 @@ class TestRelease(LocalApplicationTestCase):
                 url_parameters=dict(id='Alphabetical')
             )
             assert status == 404
-
 
             when(
                 'Intended release with integer type not found',

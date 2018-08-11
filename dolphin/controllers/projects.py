@@ -3,7 +3,7 @@ from restfulpy.orm import DBSession, commit
 from restfulpy.utils import to_camel_case
 from restfulpy.controllers import ModelRestController
 
-from dolphin.models import Project, project_statuses, project_phases
+from dolphin.models import Project
 from dolphin.validators import project_validator, update_project_validator
 
 
@@ -24,7 +24,7 @@ class ProjectController(ModelRestController):
         DBSession.add(project)
         return project
 
-    @json
+    @json(prevent_empty_form='708 No parameter exists in the form')
     @update_project_validator
     @Project.expose
     @commit
@@ -43,9 +43,6 @@ class ProjectController(ModelRestController):
             .one_or_none()
         if not project:
             raise HTTPNotFound()
-
-        if not len(form.keys()):
-            raise HTTPStatus('708 No parameter exists in the form')
 
         # FIXME: these lines should be removed and replaced by Project.validate
         # decorator
