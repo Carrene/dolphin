@@ -35,7 +35,7 @@ class Tag(DeclarativeBase):
     __tablename__ = 'tag'
 
     id = Field(Integer, primary_key=True)
-    name = Field(String, max_length=40, unique=True, example='feature')
+    title = Field(String, max_length=40, unique=True, example='feature')
 
     issues = relationship(
         'Issue',
