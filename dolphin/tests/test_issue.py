@@ -1,5 +1,5 @@
 
-from bddrest import status, response, Update, when, Remove, Append
+from bddrest import status, response, Update, when, Remove, Append, given_form
 
 from dolphin.tests.helpers import LocalApplicationTestCase
 from dolphin.models import Issue, Project, Manager, Release, Stage
@@ -77,72 +77,80 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Title is not in form',
-                form=Remove('title')
+                form=given_form - 'title'
             )
             assert status == '710 Title not in form'
 
             when(
+                'Title is repetitive',
+                form=Update(title='First issue')
+            )
+            assert status == 600
+            assert status.text.startswith('Another issue with title')
+
+            when(
                 'Title length is more than limit',
-                form=Update(
-                    title='This is a title with the length more than 50 '\
-                    'characters'
-                )
+                form=given_form | dict(title=((50 + 1) * 'a'))
             )
             assert status == '704 At most 50 characters are valid for title'
 
             when(
                 'Description length is less than limit',
-                form=Update(description=((512 + 1) * 'a'))
+                form=given_form | dict(
+                    description=((512 + 1) * 'a'),
+                    title=('Another title')
+                )
             )
             assert status == '703 At most 512 characters are valid for '\
                 'description'
 
             when(
                 'Due date format is wrong',
-                form=Update(dueDate='20-20-20')
+                form=given_form | dict(
+                    dueDate='20-20-20',
+                    title='Another title'
+                )
             )
             assert status == '701 Invalid due date format'
 
             when(
                 'Due date is not in form',
-                form=Remove('dueDate')
+                form=given_form - 'dueDate' | dict(title='Another title')
             )
             assert status == '711 Due date not in form'
 
             when(
                 'Kind is not in form',
-                form=Remove('kind')
+                form=given_form - 'kind' | dict(title='Another title')
             )
             assert status == '718 Kind not in form'
 
             when(
                 'Days is not in form',
-                form=Remove('days')
+                form=given_form - 'days' | dict(title='Another title')
             )
             assert status == '720 Days not in form'
 
             when(
                 'Days type is wrong',
-                form=Update(days='Alphabetical')
+                form=given_form | dict(
+                    days='Alphabetical',
+                    title='Another title'
+                )
             )
             assert status == '721 Invalid days type'
-            when(
-                'Title is repetitive',
-                form=Update(title='First issue')
-            )
-            assert status == 600
-            assert status.text.startswith('Another project with title')
 
             when(
                 'Invalid kind value is in form',
-                form=Update(kind='enhancing')
+                form=given_form | dict(kind='enhancing', title='Another title')
             )
             assert status == 717
             assert status.text.startswith('Invalid kind')
 
             when(
                 'Invalid status value is in form',
-                form=Append(status='progressing')
+                form=given_form + dict(status='progressing') | \
+                    dict(title='Another title')
             )
             assert status == 705
             assert status.text.startswith('Invalid status')
@@ -164,68 +172,68 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Intended issue with string type not found',
-                url_parameters=dict(id='Alphabetical')
+                url_parameters=dict(id='Alphabetical'),
+                form=given_form | dict(title='Another issue')
             )
             assert status == 404
 
             when(
-                'Intended issue with string type not found',
-                url_parameters=dict(id=100)
+                'Intended issue with integer type not found',
+                url_parameters=dict(id=100),
+                form=given_form | dict(title='Another issue')
             )
             assert status == 404
 
+            when(
+                'Title is repetitive',
+                form=given_form | dict(title='Defined issue')
+            )
+            assert status == 600
+            assert status.text.startswith('Another issue with title')
             when(
                 'Title length is more than limit',
-                form=Update(
-                    title='This is a title with the length more than 50 '\
-                    'characters'
-                )
+                form=given_form | dict(title=((50 + 1) * 'a'))
             )
             assert status == '704 At most 50 characters are valid for title'
 
             when(
                 'Description length is less than limit',
-                form=Update(description=((512 + 1) * 'a'))
+                form=given_form | dict(
+                    description=((512 + 1) * 'a'),
+                    title=('Another title')
+                )
             )
             assert status == '703 At most 512 characters are valid for '\
                 'description'
 
             when(
                 'Due date format is wrong',
-                form=Update(dueDate='20-20-20')
+                form=given_form | dict(
+                    dueDate='20-20-20',
+                    title='Another title'
+                )
             )
             assert status == '701 Invalid due date format'
 
             when(
-                'Intended issue with string type not found',
-                url_parameters=dict(id='Alphabetical')
-            )
-            assert status == 404
-
-            when(
                 'Invalid kind value is in form',
-                form=Update(kind='enhancing')
+                form=given_form | dict(kind='enhancing', title='Another title')
             )
             assert status == 717
             assert status.text.startswith('Invalid kind')
 
             when(
                 'Invalid status value is in form',
-                form=Append(status='progressing')
+                form=given_form + dict(status='progressing') | \
+                    dict(title='Another title')
             )
             assert status == 705
             assert status.text.startswith('Invalid status')
 
             when(
-                'Title is repetitive',
-                form=Update(title='Defined issue')
-            )
-            assert status == 600
-            assert status.text.startswith('Another project with title')
-
-            when(
                 'Invalid parameter is in the form',
-                form=Append(invalid_param='This is an external parameter')
+                form=given_form + dict(invalid_param='External parameter') | \
+                    dict(title='Another title')
             )
             assert status == 707
             assert status.text.startswith('Invalid field')

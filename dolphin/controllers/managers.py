@@ -30,12 +30,6 @@ class ManagerController(ModelRestController):
 
         project = DBSession.query(Project) \
             .filter(Project.id == form['projectId']).one_or_none()
-        if not project:
-            raise HTTPStatus(f'601 Project not found with id: '
-                             f'{form["projectId"]}'
-            )
-
-        import pudb; pudb.set_trace()  # XXX BREAKPOINT
 
         project.manager = manager
         return manager

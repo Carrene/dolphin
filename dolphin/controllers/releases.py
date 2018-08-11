@@ -5,7 +5,6 @@ from nanohttp import HTTPStatus, RestController, validate, json, context, \
 from restfulpy.controllers import RootController
 from restfulpy.orm import DBSession, commit
 from restfulpy.utils import to_camel_case
-from sqlalchemy import func
 
 import dolphin
 from dolphin.models import Release, release_statuses
@@ -22,9 +21,6 @@ class ReleaseController(RestController):
         title = context.form.get('title')
         release = DBSession.query(Release) \
             .filter(Release.title == title).one_or_none()
-
-#        if release is not None:
-#            raise HTTPStatus('600 Repetitive title')
 
         new_release = Release()
         new_release.update_from_request()
@@ -71,14 +67,6 @@ class ReleaseController(RestController):
                 f'705 Invalid status, only one of '
                 f'"{", ".join(release_statuses)}" will be accepted'
             )
-
-#        if 'title' in form and DBSession.query(Release) \
-#                .filter(func.lower(Release.title) == form['title'].lower()) \
-#                .count() >= 1:
-#            raise HTTPStatus(
-#                f'600 Another release with title: "{form["title"]}" is already'
-#                f'exists'
-#            )
 
         release = DBSession.query(Release) \
             .filter(Release.id == id) \
