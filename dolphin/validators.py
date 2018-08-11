@@ -3,7 +3,7 @@ import re
 from nanohttp import validate, HTTPStatus, context
 from restfulpy.orm import DBSession, commit
 
-from dolphin.models import Project, Release, Issue
+from dolphin.models import Project, Release, Issue, issue_kinds, issue_statuses
 from dolphin.exceptions import empty_form_http_exception
 
 
@@ -54,6 +54,26 @@ def issue_not_exists_validator(title, container, field):
             f'600 Another issue with title: "{title}" is already exists.'
         )
     return title
+
+
+def kind_value_validator(kind, container, field):
+    form = context.form
+    if 'kind' in form and form['kind'] not in issue_kinds:
+        raise HTTPStatus(
+            f'717 Invalid kind, only one of ' \
+            f'"{", ".join(issue_kinds)}" will be accepted'
+        )
+    return form['kind']
+
+
+def status_value_validator(status, container, field):
+    form = context.form
+    if 'status' in form and form['status'] not in issue_statuses:
+        raise HTTPStatus(
+            f'705 Invalid status, only one of ' \
+            f'"{", ".join(issue_statuses)}" will be accepted'
+        )
+    return form['status']
 
 
 release_validator = validate(
@@ -150,7 +170,11 @@ issue_validator = validate(
         required=('711 Due date not in form')
     ),
     kind=dict(
-        required=('718 Kind not in form')
+        required=('718 Kind not in form'),
+        callback=kind_value_validator
+    ),
+    status=dict(
+        callback=status_value_validator
     ),
     days=dict(
         type_=(int, '721 Invalid days type'),
@@ -169,6 +193,12 @@ update_issue_validator = validate(
     ),
     dueDate=dict(
         pattern=(DATE_PATTERN, '701 Invalid due date format'),
+    ),
+    kind=dict(
+        callback=kind_value_validator
+    ),
+    status=dict(
+        callback=status_value_validator
     ),
     days=dict(
         type_=(int, '721 Invalid days type'),
