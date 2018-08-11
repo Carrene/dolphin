@@ -29,6 +29,7 @@ class ItemController(ModelRestController):
         if not item:
             raise HTTPNotFound()
 
+        # FIXME: as a validator
         if status not in item_statuses:
             raise HTTPStatus(
                 f'705 Invalid status value, only ' \

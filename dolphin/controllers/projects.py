@@ -19,11 +19,6 @@ class ProjectController(ModelRestController):
         project = DBSession.query(Project).filter(Project.title == title) \
             .one_or_none()
 
-        if project is not None:
-            raise HTTPStatus(
-                f'600 A project with title: {title} is already exists.'
-            )
-
         project = Project()
         project.update_from_request()
         DBSession.add(project)
@@ -117,6 +112,7 @@ class ProjectController(ModelRestController):
         if not project:
             raise HTTPNotFound()
 
+        # FIXME: as a validator
         if len(form):
             raise HTTPStatus('709 Form not allowed')
 

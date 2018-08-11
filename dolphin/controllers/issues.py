@@ -18,22 +18,18 @@ class IssueController(ModelRestController):
         form = context.form
         title = form['title']
 
+        # FIXME: as a validator
         if form['kind'] not in issue_kinds:
             raise HTTPStatus(
                 f'717 Invalid kind, only one of ' \
                 f'"{", ".join(issue_kinds)}" will be accepted'
             )
 
+        # FIXME: as a validator
         if 'status' in form.keys() and form['status'] not in issue_kinds:
             raise HTTPStatus(
                 f'705 Invalid status, only one of ' \
                 f'"{", ".join(issue_statuses)}" will be accepted'
-            )
-
-        if DBSession.query(Issue) \
-                .filter(Issue.title == title).one_or_none():
-            raise HTTPStatus(
-                f'600 Another project with title: "{title}" is already exists.'
             )
 
         issue = Issue()
@@ -49,11 +45,17 @@ class IssueController(ModelRestController):
     def update(self, id):
         form = context.form
 
+        # FIXME: as a validator
         try:
             id = int(id)
         except:
             raise HTTPNotFound()
 
+        issue = DBSession.query(Issue).filter(Issue.id == id).one_or_none()
+        if not issue:
+            raise HTTPNotFound()
+
+        # FIXME: as a validator
         if not len(form.keys()):
             raise HTTPStatus('708 No parameter exists in the form')
 
@@ -69,27 +71,18 @@ class IssueController(ModelRestController):
                 f'"{", ".join(json_columns)}" is accepted'
             )
 
-        issue = DBSession.query(Issue).filter(Issue.id == id).one_or_none()
-        if not issue:
-            raise HTTPNotFound()
-
+        # FIXME: as a validator
         if 'status' in form and form['status'] not in issue_statuses:
             raise HTTPStatus(
                 f'705 Invalid status, only one of ' \
                 f'"{", ".join(issue_statuses)}" will be accepted'
             )
 
+        # FIXME: as a validator
         if 'kind' in form and form['kind'] not in issue_kinds:
             raise HTTPStatus(
                 f'717 Invalid kind, only one of ' \
                 f'"{", ".join(issue_kinds)}" will be accepted'
-            )
-
-        if 'title' in form and DBSession.query(Issue) \
-                .filter(Issue.title == form['title']).one_or_none():
-            raise HTTPStatus(
-                f'600 Another project with title: "{form["title"]}" '\
-                f'is already exists.'
             )
 
         issue.update_from_request()
