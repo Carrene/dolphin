@@ -1,18 +1,17 @@
 import re
 
-from nanohttp import HTTPStatus, RestController, validate, json, context, \
-    text, HTTPNotFound, HTTPBadRequest
-from restfulpy.controllers import RootController
+from nanohttp import json, context, HTTPNotFound
+from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 from restfulpy.utils import to_camel_case
 
-import dolphin
 from dolphin.models import Release, release_statuses
 from dolphin.validators import release_validator, update_release_validator
-from dolphin.exceptions import empty_form_http_exception
 
 
-class ReleaseController(RestController):
+class ReleaseController(ModelRestController):
+    __model__ = Release
+
     @json
     @release_validator
     @Release.expose
@@ -20,12 +19,12 @@ class ReleaseController(RestController):
     def create(self):
         title = context.form.get('title')
         release = DBSession.query(Release) \
-            .filter(Release.title == title).one_or_none()
+            .filter(Release.title == title) \
+            .one_or_none()
 
         new_release = Release()
         new_release.update_from_request()
         DBSession.add(new_release)
-
         return new_release
 
     @json(prevent_empty_form='708 No parameter exists in the form')
@@ -41,7 +40,10 @@ class ReleaseController(RestController):
             id = int(id)
         except:
             raise HTTPNotFound()
-        release = DBSession.query(Release).filter(Release.id==id).one_or_none()
+
+        release = DBSession.query(Release) \
+            .filter(Release.id == id) \
+            .one_or_none()
         if not release:
             raise HTTPNotFound()
 
@@ -60,7 +62,6 @@ class ReleaseController(RestController):
         release = DBSession.query(Release) \
             .filter(Release.id == id) \
             .one_or_none()
-
         release.update_from_request()
         return release
 
@@ -76,7 +77,9 @@ class ReleaseController(RestController):
         except:
             raise HTTPNotFound()
 
-        release = DBSession.query(Release).filter(Release.id==id).one_or_none()
+        release = DBSession.query(Release) \
+            .filter(Release.id == id) \
+            .one_or_none()
         if not release:
             raise HTTPNotFound()
 
