@@ -102,6 +102,17 @@ class TestRelease(LocalApplicationTestCase):
             )
             assert status == '712 Cutoff not in form'
 
+            when(
+                'Invalid status in form',
+                form=given_form | dict(
+                    status='progressing',
+                    title='Another title'
+                )
+            )
+            assert status == 705
+            assert status.text.startswith('Invalid status')
+
+
     def test_update(self):
         with self.given(
             'Updating a release',
