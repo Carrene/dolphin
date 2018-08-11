@@ -121,7 +121,8 @@ def release_status_value_validator(status, container, field):
 release_validator = validate(
     title=dict(
         required='710 Title not in form',
-        max_length=(50, '704 At most 50 characters are valid for title')
+        max_length=(50, '704 At most 50 characters are valid for title'),
+        callback=release_not_exists_validator
     ),
     description=dict(
         max_length=(512, '703 At most 512 characters are valid for description')
@@ -163,6 +164,7 @@ update_release_validator = validate(
 project_validator = validate(
     title=dict(
         required='710 Title not in form',
+        callback=project_not_exists_validator,
         not_none='727 Ttile is null',
         max_length=(50, '704 At most 50 characters are valid for title')
     ),
@@ -207,6 +209,7 @@ update_project_validator = validate(
 
 assign_manager_validator = validate(
     projectId=dict(
+        callback=project_id_exists_validator,
         required='713 Project id not in form',
         type_=(int, '714 Invalid project id type')
     )
@@ -216,7 +219,8 @@ assign_manager_validator = validate(
 issue_validator = validate(
     title=dict(
         required='710 Title not in form',
-        max_length=(50, '704 At most 50 characters are valid for title')
+        max_length=(50, '704 At most 50 characters are valid for title'),
+        callback=issue_not_exists_validator
     ),
     description=dict(
         max_length=(512, '703 At most 512 characters are valid for description')
@@ -226,7 +230,11 @@ issue_validator = validate(
         required='711 Due date not in form'
     ),
     kind=dict(
-        required='718 Kind not in form'
+        required='718 Kind not in form',
+        callback=kind_value_validator
+    ),
+    status=dict(
+        callback=issue_status_value_validator
     ),
     days=dict(
         type_=(int, '721 Invalid days type'),
@@ -260,7 +268,8 @@ update_issue_validator = validate(
 
 update_item_validator = validate(
     status=dict(
-        required='719 Status not in form'
+        required='719 Status not in form',
+        callback=item_status_value_validator
     )
 )
 
