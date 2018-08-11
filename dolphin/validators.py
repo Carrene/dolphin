@@ -3,7 +3,8 @@ import re
 from nanohttp import validate, HTTPStatus, context
 from restfulpy.orm import DBSession, commit
 
-from dolphin.models import Project, Release, Issue, issue_kinds, issue_statuses
+from dolphin.models import Project, Release, Issue, issue_kinds, \
+    issue_statuses, item_statuses
 from dolphin.exceptions import empty_form_http_exception
 
 
@@ -66,7 +67,7 @@ def kind_value_validator(kind, container, field):
     return form['kind']
 
 
-def status_value_validator(status, container, field):
+def issue_status_value_validator(status, container, field):
     form = context.form
     if 'status' in form and form['status'] not in issue_statuses:
         raise HTTPStatus(
@@ -74,6 +75,17 @@ def status_value_validator(status, container, field):
             f'"{", ".join(issue_statuses)}" will be accepted'
         )
     return form['status']
+
+
+def item_status_value_validator(status, container, field):
+    form = context.form
+    if 'status' in form and form['status'] not in item_statuses:
+        raise HTTPStatus(
+            f'705 Invalid status value, only one of ' \
+            f'"{", ".join(item_statuses)}" will be accepted'
+        )
+    return form['status']
+
 
 
 release_validator = validate(
@@ -190,7 +202,7 @@ update_issue_validator = validate(
         callback=kind_value_validator
     ),
     status=dict(
-        callback=status_value_validator
+        callback=issue_status_value_validator
     ),
     days=dict(
         type_=(int, '721 Invalid days type'),
