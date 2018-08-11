@@ -4,7 +4,8 @@ from nanohttp import validate, HTTPStatus, context
 from restfulpy.orm import DBSession, commit
 
 from dolphin.models import Project, Release, Issue, issue_kinds, \
-    issue_statuses, item_statuses, project_statuses, project_phases
+    issue_statuses, item_statuses, project_statuses, project_phases, \
+    release_statuses
 from dolphin.exceptions import empty_form_http_exception
 
 
@@ -107,6 +108,15 @@ def project_phase_value_validator(status, container, field):
     return form['phase']
 
 
+def release_status_value_validator(status, container, field):
+    form = context.form
+    if 'status' in form and form['status'] not in release_statuses:
+        raise HTTPStatus(
+            f'705 Invalid status value, only one of ' \
+            f'"{", ".join(release_statuses)}" will be accepted'
+        )
+    return form['status']
+
 
 release_validator = validate(
     title=dict(
@@ -125,6 +135,9 @@ release_validator = validate(
         pattern=(DATE_PATTERN, '702 Invalid cutoff format'),
         required=('712 Cutoff not in form')
     ),
+    status=dict(
+        callback=release_status_value_validator
+    )
 )
 
 
@@ -142,6 +155,9 @@ update_release_validator = validate(
     cutoff=dict(
         pattern=(DATE_PATTERN, '702 Invalid cutoff format'),
     ),
+    status=dict(
+        callback=release_status_value_validator
+    )
 )
 
 

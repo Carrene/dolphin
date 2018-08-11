@@ -28,7 +28,7 @@ class ReleaseController(RestController):
 
         return new_release
 
-    @json
+    @json(prevent_empty_form='708 No parameter exists in the form')
     @update_release_validator
     @Release.expose
     @commit
@@ -45,11 +45,6 @@ class ReleaseController(RestController):
         if not release:
             raise HTTPNotFound()
 
-        # FIXME: This validation must be performed inside the validation
-        # decorator.
-        if not len(form.keys()):
-            raise HTTPStatus(f'708 No parameter exists in the form')
-
         # FIXME: these lines should be removed and replaced by Release.validate
         # decorator
         json_columns = set(
@@ -60,12 +55,6 @@ class ReleaseController(RestController):
             raise HTTPStatus(
                 f'707 Invalid field, only one of '
                 f'{", ".join(release_statuses)} will be accepted'
-            )
-
-        if 'status' in form and form['status'] not in release_statuses:
-            raise HTTPStatus(
-                f'705 Invalid status, only one of '
-                f'"{", ".join(release_statuses)}" will be accepted'
             )
 
         release = DBSession.query(Release) \
