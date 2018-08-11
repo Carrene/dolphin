@@ -24,12 +24,14 @@ class ManagerController(ModelRestController):
             raise HTTPNotFound()
 
         manager = DBSession.query(Manager) \
-            .filter(Manager.id == id).one_or_none()
+            .filter(Manager.id == id) \
+            .one_or_none()
         if not manager:
             raise HTTPNotFound()
 
         project = DBSession.query(Project) \
-            .filter(Project.id == form['projectId']).one_or_none()
+            .filter(Project.id == form['projectId']) \
+            .one_or_none()
 
         project.manager = manager
         return manager
