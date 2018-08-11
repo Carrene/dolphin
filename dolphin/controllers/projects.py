@@ -59,27 +59,17 @@ class ProjectController(ModelRestController):
                 f'"{", ".join(json_columns)}" is accepted'
             )
 
-        if 'phase' in form and form['phase'] not in project_phases:
-            raise HTTPStatus(
-                f'706 Invalid phase, only one of '
-                f'"{", ".join(project_phases)}" will be accepted'
-            )
-
-        if 'status' in form and form['status'] not in project_statuses:
-            raise HTTPStatus(
-                f'705 Invalid status, only one of '
-                f'"{", ".join(project_statuses)}" will be accepted'
-            )
-
         project.update_from_request()
         return project
 
-    @json
+    @json(prevent_form='709 Form not allowed')
     @Project.expose
     @commit
     def hide(self, id):
         form = context.form
 
+        # FIXME: This validation must be performed inside the validation
+        # decorator
         try:
             id = int(id)
         except:
@@ -90,18 +80,17 @@ class ProjectController(ModelRestController):
         if not project:
             raise HTTPNotFound()
 
-        if len(form):
-            raise HTTPStatus('709 Form not allowed')
-
         project.soft_delete()
         return project
 
-    @json
+    @json(prevent_form='709 Form not allowed')
     @Project.expose
     @commit
     def show(self, id):
         form = context.form
 
+        # FIXME: This validation must be performed inside the validation
+        # decorator
         try:
             id = int(id)
         except:
@@ -111,10 +100,6 @@ class ProjectController(ModelRestController):
             .filter(Project.id == id).one_or_none()
         if not project:
             raise HTTPNotFound()
-
-        # FIXME: as a validator
-        if len(form):
-            raise HTTPStatus('709 Form not allowed')
 
         project.soft_undelete()
         return project

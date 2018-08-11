@@ -97,7 +97,10 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Due date format is wrong',
-                form=Update(dueDate='20-20-20', title='Another title')
+                form=given_form | dict(
+                    dueDate='20-20-20',
+                    title='Another title'
+                )
             )
             assert status == '701 Invalid due date format'
 
@@ -106,6 +109,27 @@ class TestProject(LocalApplicationTestCase):
                 form=given_form - ['dueDate'] | dict(title='Another title')
             )
             assert status == '711 Due date not in form'
+
+            when(
+                'Status value is invalid',
+                form=given_form | dict(
+                    status='progressing',
+                    title='Another title'
+                )
+            )
+            assert status == 705
+            assert status.text.startswith('Invalid status')
+
+            when(
+                'Phase value is invalid',
+                form=given_form | dict(
+                    phase='compeleting',
+                    title='Another title'
+                )
+            )
+            assert status == 706
+            assert status.text.startswith('Invalid phase')
+
 
     def test_update(self):
         with self.given(
