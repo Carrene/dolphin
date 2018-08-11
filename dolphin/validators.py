@@ -165,7 +165,6 @@ project_validator = validate(
     title=dict(
         required='710 Title not in form',
         callback=project_not_exists_validator,
-        not_none='727 Ttile is null',
         max_length=(50, '704 At most 50 characters are valid for title')
     ),
     description=dict(

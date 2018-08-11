@@ -52,3 +52,10 @@ class IssueController(ModelRestController):
         issue.update_from_request()
         return issue
 
+    @json
+    @Issue.expose
+    def list(self):
+
+        query = DBSession.query(Issue)
+        return query
+

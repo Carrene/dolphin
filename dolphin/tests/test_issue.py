@@ -32,17 +32,44 @@ class TestIssue(LocalApplicationTestCase):
             due_date='2020-2-20',
         )
 
-        issue = Issue(
+        issue1 = Issue(
             project=project,
             title='First issue',
             description='This is description of first issue',
             due_date='2020-2-20',
             kind='feature',
+            days=1
+        )
+
+        issue2 = Issue(
+            project=project,
+            title='Second issue',
+            description='This is description of second issue',
+            due_date='2020-2-20',
+            kind='feature',
             days=2
         )
 
+        issue3 = Issue(
+            project=project,
+            title='Third issue',
+            description='This is description of third issue',
+            due_date='2020-2-20',
+            kind='feature',
+            days=3
+        )
+
+        issue4 = Issue(
+            project=project,
+            title='Fourth issue',
+            description='This is description of fourth issue',
+            due_date='2020-2-20',
+            kind='feature',
+            days=4
+        )
+
         cls.project = project
-        session.add(issue)
+        session.add(project)
         session.commit()
 
     def test_define(self):
@@ -238,4 +265,56 @@ class TestIssue(LocalApplicationTestCase):
             form=dict()
         ):
             assert status == '708 No parameter exists in the form'
+
+
+    def test_list(self):
+        with self.given(
+            'List issues',
+            '/apiv1/issues',
+            'LIST',
+        ):
+            assert status == 200
+            assert len(response.json) == 5
+
+        with self.given(
+            'Sort issues by title',
+            '/apiv1/issues',
+            'LIST',
+            query=dict(sort='title')
+        ):
+            assert response.json[0]['title'] == 'Defined issue'
+
+            when(
+                'Reverse sorting titles by alphabet',
+                query=dict(sort='-title')
+            )
+            assert response.json[0]['title'] == 'Third issue'
+
+        with self.given(
+            'Filter issues',
+            '/apiv1/issues',
+            'LIST',
+            query=dict(title='Defined issue')
+        ):
+            assert response.json[0]['title'] == 'Defined issue'
+
+            when(
+                'List issues except one of them',
+                query=dict(title='!Defined issue')
+            )
+            assert response.json[0]['title'] == 'Second issue'
+
+        with self.given(
+             'Issues pagination',
+             '/apiv1/issues',
+             'LIST',
+             query=dict(take=1, skip=3)
+         ):
+            assert response.json[0]['title'] == 'Defined issue'
+
+            when(
+                'Manipulate sorting and pagination',
+                query=dict(sort='-title', take=1, skip=2)
+            )
+            assert response.json[0]['title'] == 'New issue'
 
