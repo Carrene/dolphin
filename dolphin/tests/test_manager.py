@@ -24,7 +24,6 @@ class TestManager(LocalApplicationTestCase):
         )
 
         release = Release(
-            manager=assigned_manager,
             title='My first release',
             description='A decription for my release',
             due_date='2020-2-20',

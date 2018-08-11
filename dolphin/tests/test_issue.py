@@ -18,7 +18,6 @@ class TestIssue(LocalApplicationTestCase):
         )
 
         release = Release(
-            manager=manager,
             title='My first release',
             description='A decription for my release',
             due_date='2020-2-20',

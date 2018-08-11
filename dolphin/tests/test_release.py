@@ -10,22 +10,12 @@ class TestRelease(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        manager = Manager(
-            title='First Manager',
-            email=None,
-            phone=123456789
-        )
-        session.add(manager)
-        session.flush()
-
         release = Release(
-            manager=manager,
             title='My first release',
             description='A decription for my release',
             due_date='2020-2-20',
             cutoff='2030-2-20',
         )
-        cls.manager_id = manager.id
         session.add(release)
         session.commit()
 
@@ -35,7 +25,6 @@ class TestRelease(LocalApplicationTestCase):
             '/apiv1/releases',
             'CREATE',
             form=dict(
-                managerId=self.manager_id,
                 title='My awesome release',
                 description='Decription for my release',
                 dueDate='2020-2-20',
