@@ -19,12 +19,16 @@ def release_exists_validator(releaseId, container, field):
     try:
         releaseId = int(releaseId)
     except:
-        raise HTTPStatus('607 Release Not Found')
+        raise HTTPStatus(
+            f'607 Release not found with id: {context.form["releaseId"]}'
+        )
 
     if 'releaseId' in form and not DBSession.query(Release) \
             .filter(Release.id == releaseId) \
             .one_or_none():
-        raise HTTPStatus('607 Release Not Found')
+        raise HTTPStatus(
+            f'607 Release not found with id: {context.form["releaseId"]}'
+        )
 
     return releaseId
 
@@ -61,13 +65,12 @@ def project_not_exists_validator(title, container, field):
     return title
 
 
-def project_id_exists_validator(projectId, container, field):
+def project_exists_validator(projectId, container, field):
 
     project = DBSession.query(Project) \
             .filter(Project.id == context.form['projectId']).one_or_none()
     if not project:
         raise HTTPStatus(
-            f'601 Project not found with id: {context.form["projectId"]}'
         )
     return projectId
 
@@ -138,12 +141,16 @@ def manager_exists_validator(managerId, container, field):
     try:
         managerId = int(managerId)
     except:
-        raise HTTPStatus('608 Manager Not Found')
+        raise HTTPStatus(
+            f'608 Manager not found with id: {context.form["managerId"]}'
+        )
 
     if 'managerId' in form and not DBSession.query(Manager) \
             .filter(Manager.id == managerId) \
             .one_or_none():
-        raise HTTPStatus('608 Manager Not Found')
+        raise HTTPStatus(
+            f'608 Manager not found with id: {context.form["managerId"]}'
+        )
 
     return managerId
 
@@ -246,7 +253,7 @@ update_project_validator = validate(
 
 assign_manager_validator = validate(
     projectId=dict(
-        callback=project_id_exists_validator,
+        callback=project_exists_validator,
         required='713 Project id not in form',
         type_=(int, '714 Invalid project id type')
     )
@@ -277,6 +284,10 @@ issue_validator = validate(
         type_=(int, '721 Invalid days type'),
         required='720 Days not in form'
     ),
+    projectId=dict(
+        required='713 Project id not in form',
+        callback=project_exists_validator
+    )
 )
 
 
