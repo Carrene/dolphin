@@ -28,7 +28,7 @@ class Project(SoftDeleteMixin, Subscribable):
 
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
     manager_id = Field(Integer, ForeignKey('manager.id'))
-    release_id = Field(Integer, ForeignKey('release.id'))
+    release_id = Field(Integer, ForeignKey('release.id'), nullable=True)
 
     status = Field(
         Enum(*project_statuses, name='project_status'),
