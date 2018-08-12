@@ -71,6 +71,7 @@ def project_exists_validator(projectId, container, field):
             .filter(Project.id == context.form['projectId']).one_or_none()
     if not project:
         raise HTTPStatus(
+            f'601 Project not found with id: {context.form["projectId"]}'
         )
     return projectId
 
@@ -253,9 +254,9 @@ update_project_validator = validate(
 
 assign_manager_validator = validate(
     projectId=dict(
-        callback=project_exists_validator,
         required='713 Project id not in form',
-        type_=(int, '714 Invalid project id type')
+        type_=(int, '714 Invalid project id type'),
+        callback=project_exists_validator
     )
 )
 
@@ -286,6 +287,7 @@ issue_validator = validate(
     ),
     projectId=dict(
         required='713 Project id not in form',
+        type_=(int, '714 Invalid project id type'),
         callback=project_exists_validator
     )
 )
