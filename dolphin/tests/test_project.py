@@ -152,15 +152,6 @@ class TestProject(LocalApplicationTestCase):
             assert status == 705
             assert status.text.startswith('Invalid status')
 
-            when(
-                'Phase value is invalid',
-                form=given_form | dict(
-                    phase='compeleting',
-                    title='Another title'
-                )
-            )
-            assert status == 706
-            assert status.text.startswith('Invalid phase')
 
     def test_update(self):
         with self.given(
@@ -171,8 +162,7 @@ class TestProject(LocalApplicationTestCase):
                 title='My interesting project',
                 description='A updated project description',
                 dueDate='2200-2-20',
-                status='in-progress',
-                phase='development'
+                status='in-progress'
             )
         ):
             assert status == 200
@@ -181,7 +171,6 @@ class TestProject(LocalApplicationTestCase):
                 'description'
             assert response.json['dueDate'] == '2200-02-20T00:00:00'
             assert response.json['status'] == 'in-progress'
-            assert response.json['phase'] == 'development'
 
             when(
                 'Intended project with string type not found',
@@ -240,16 +229,6 @@ class TestProject(LocalApplicationTestCase):
             )
             assert status == 705
             assert status.text.startswith('Invalid status')
-
-            when(
-                'Phase value is invalid',
-                form=given_form | dict(
-                    phase='compeleting',
-                    title='Another title'
-                )
-            )
-            assert status == 706
-            assert status.text.startswith('Invalid phase')
 
             when(
                 'Invalid parameter is in the form',
