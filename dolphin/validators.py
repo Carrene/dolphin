@@ -203,7 +203,6 @@ project_validator = validate(
     title=dict(
         required='710 Title not in form',
         callback=project_not_exists_validator,
-        not_none='727 Ttile is null',
         max_length=(50, '704 At most 50 characters are valid for title')
     ),
     description=dict(
@@ -254,6 +253,7 @@ update_project_validator = validate(
 
 assign_manager_validator = validate(
     projectId=dict(
+        callback=project_id_exists_validator,
         required='713 Project id not in form',
         type_=(int, '714 Invalid project id type'),
         callback=project_exists_validator
