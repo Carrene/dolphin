@@ -96,6 +96,25 @@ class TestIssue(LocalApplicationTestCase):
             assert response.json['status'] == 'triage'
 
             when(
+                'Project id not in form',
+                form=given_form - 'projectId' | dict(title='1')
+            )
+            assert status == '713 Project id not in form'
+
+            when(
+                'Project not found with string type',
+                form=given_form | dict(projectId='Alphabetical', title='1')
+            )
+            assert status == '714 Invalid project id type'
+
+            when(
+                'Project not found with integer type',
+                form=given_form | dict(projectId=100, title='1')
+            )
+            assert status == 601
+            assert status.text.startswith('Project not found')
+
+            when(
                 'Title is not in form',
                 form=given_form - 'title'
             )

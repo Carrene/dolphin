@@ -3,8 +3,10 @@ from os.path import dirname, join
 from restfulpy import Application
 
 from .controllers.root import Root
-from .models import Subscribable, Stakeholder, Project, Release, Issue, Tag,\
+from .models import Subscribable, Member, Project, Release, Issue, Tag,\
     Stage, Manager, Resource, Guest, Team, Item
+from . import mockup
+
 
 __version__ = '0.1.0-planning.0'
 
@@ -25,6 +27,9 @@ class Dolphin(Application):
             root_path=join(dirname(__file__), '..'),
             version=__version__
         )
+
+    def insert_mockup(self, *args):
+        mockup.insert()
 
 
 dolphin = Dolphin()

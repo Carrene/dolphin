@@ -72,6 +72,40 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['status'] is None
 
             when(
+                'Manager id not in form',
+                form=given_form - 'managerId' | dict(title='1')
+            )
+            assert status == '734 Manager id not in form'
+
+            when(
+                'Manger not found with string type',
+                form=given_form | dict(managerId='Alphabetical', title='1')
+            )
+            assert status == 608
+            assert status.text.startswith('Manager not found')
+
+            when(
+                'Manager not found with integer type',
+                form=given_form | dict(managerId=100, title='1')
+            )
+            assert status == 608
+            assert status.text.startswith('Manager not found')
+
+            when(
+                'Release not found with string type',
+                form=given_form | dict(releaseId='Alphabetical', title='1')
+            )
+            assert status == 607
+            assert status.text.startswith('Release not found')
+
+            when(
+                'Release not found with integer type',
+                form=given_form | dict(releaseId=100, title='1')
+            )
+            assert status == 607
+            assert status.text.startswith('Release not found')
+
+            when(
                 'Title is not in form',
                 form=Remove('title')
             )

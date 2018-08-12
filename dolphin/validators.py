@@ -5,13 +5,53 @@ from restfulpy.orm import DBSession, commit
 
 from dolphin.models import Project, Release, Issue, issue_kinds, \
     issue_statuses, item_statuses, project_statuses, project_phases, \
-    release_statuses
+    release_statuses, Manager
 from dolphin.exceptions import empty_form_http_exception
 
 
 DATE_PATTERN = re.compile(
     '^(\d{4})-(0[1-9]|1[012]|[1-9])-(0[1-9]|[12]\d{1}|3[01]|[1-9])$'
 )
+
+
+def release_exists_validator(releaseId, container, field):
+    form = context.form
+    try:
+        releaseId = int(releaseId)
+    except:
+        raise HTTPStatus(
+            f'607 Release not found with id: {context.form["releaseId"]}'
+        )
+
+    if 'releaseId' in form and not DBSession.query(Release) \
+            .filter(Release.id == releaseId) \
+            .one_or_none():
+        raise HTTPStatus(
+            f'607 Release not found with id: {context.form["releaseId"]}'
+        )
+
+    return releaseId
+
+
+def release_status_value_validator(status, container, field):
+    form = context.form
+    if 'status' in form and form['status'] not in release_statuses:
+        raise HTTPStatus(
+            f'705 Invalid status value, only one of ' \
+            f'"{", ".join(release_statuses)}" will be accepted'
+        )
+    return form['status']
+
+
+def release_not_exists_validator(title, container, field):
+
+    release = DBSession.query(Release).filter(Release.title == title) \
+        .one_or_none()
+    if release is not None:
+        raise HTTPStatus(
+            f'600 Another release with title: {title} is already exists.'
+        )
+    return title
 
 
 def project_not_exists_validator(title, container, field):
@@ -25,7 +65,7 @@ def project_not_exists_validator(title, container, field):
     return title
 
 
-def project_id_exists_validator(projectId, container, field):
+def project_exists_validator(projectId, container, field):
 
     project = DBSession.query(Project) \
             .filter(Project.id == context.form['projectId']).one_or_none()
@@ -36,15 +76,24 @@ def project_id_exists_validator(projectId, container, field):
     return projectId
 
 
-def release_not_exists_validator(title, container, field):
-
-    release = DBSession.query(Release).filter(Release.title == title) \
-        .one_or_none()
-    if release is not None:
+def project_status_value_validator(status, container, field):
+    form = context.form
+    if 'status' in form and form['status'] not in project_statuses:
         raise HTTPStatus(
-            f'600 Another release with title: {title} is already exists.'
+            f'705 Invalid status value, only one of ' \
+            f'"{", ".join(project_statuses)}" will be accepted'
         )
-    return title
+    return form['status']
+
+
+def project_phase_value_validator(status, container, field):
+    form = context.form
+    if 'phase' in form and form['phase'] not in project_phases:
+        raise HTTPStatus(
+            f'706 Invalid phase value, only one of ' \
+            f'"{", ".join(project_phases)}" will be accepted'
+        )
+    return form['phase']
 
 
 def issue_not_exists_validator(title, container, field):
@@ -88,34 +137,23 @@ def item_status_value_validator(status, container, field):
     return form['status']
 
 
-def project_status_value_validator(status, container, field):
+def manager_exists_validator(managerId, container, field):
     form = context.form
-    if 'status' in form and form['status'] not in project_statuses:
+    try:
+        managerId = int(managerId)
+    except:
         raise HTTPStatus(
-            f'705 Invalid status value, only one of ' \
-            f'"{", ".join(project_statuses)}" will be accepted'
+            f'608 Manager not found with id: {context.form["managerId"]}'
         )
-    return form['status']
 
-
-def project_phase_value_validator(status, container, field):
-    form = context.form
-    if 'phase' in form and form['phase'] not in project_phases:
+    if 'managerId' in form and not DBSession.query(Manager) \
+            .filter(Manager.id == managerId) \
+            .one_or_none():
         raise HTTPStatus(
-            f'706 Invalid phase value, only one of ' \
-            f'"{", ".join(project_phases)}" will be accepted'
+            f'608 Manager not found with id: {context.form["managerId"]}'
         )
-    return form['phase']
 
-
-def release_status_value_validator(status, container, field):
-    form = context.form
-    if 'status' in form and form['status'] not in release_statuses:
-        raise HTTPStatus(
-            f'705 Invalid status value, only one of ' \
-            f'"{", ".join(release_statuses)}" will be accepted'
-        )
-    return form['status']
+    return managerId
 
 
 release_validator = validate(
@@ -179,6 +217,13 @@ project_validator = validate(
     ),
     phase=dict(
         callback=project_phase_value_validator
+    ),
+    releaseId=dict(
+        callback=release_exists_validator
+    ),
+    managerId=dict(
+        required='734 Manager id not in form',
+        callback=manager_exists_validator
     )
 )
 
@@ -208,9 +253,9 @@ update_project_validator = validate(
 
 assign_manager_validator = validate(
     projectId=dict(
-        callback=project_id_exists_validator,
         required='713 Project id not in form',
-        type_=(int, '714 Invalid project id type')
+        type_=(int, '714 Invalid project id type'),
+        callback=project_exists_validator
     )
 )
 
@@ -239,6 +284,11 @@ issue_validator = validate(
         type_=(int, '721 Invalid days type'),
         required='720 Days not in form'
     ),
+    projectId=dict(
+        required='713 Project id not in form',
+        type_=(int, '714 Invalid project id type'),
+        callback=project_exists_validator
+    )
 )
 
 

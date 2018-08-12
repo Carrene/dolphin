@@ -27,8 +27,8 @@ class Project(SoftDeleteMixin, Subscribable):
     __mapper_args__ = {'polymorphic_identity': __tablename__}
 
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
-    manager_id = Field(Integer, ForeignKey('manager.id'))
-    release_id = Field(Integer, ForeignKey('release.id'))
+    manager_id = Field(Integer, ForeignKey('member.id'))
+    release_id = Field(Integer, ForeignKey('release.id'), nullable=True)
 
     status = Field(
         Enum(*project_statuses, name='project_status'),
