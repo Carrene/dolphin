@@ -1,12 +1,11 @@
 
-from bddrest import status, response, Update, when, Remove, Append
+from bddrest import status, response, Update, when, Remove, Append, given_form
 
 from dolphin.tests.helpers import LocalApplicationTestCase
 from dolphin.models import Project, Manager, Release
 
 
 class TestProject(LocalApplicationTestCase):
-
 
     @classmethod
     def mockup(cls):
@@ -21,7 +20,6 @@ class TestProject(LocalApplicationTestCase):
         session.flush()
 
         release = Release(
-            manager=manager,
             title='My first release',
             description='A decription for my release',
             due_date='2020-2-20',
@@ -81,31 +79,54 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Title length is more than limit',
-                form=Update(
-                    title='This is a title with the length more than 50 '\
-                    'characters'
-                )
+                form=given_form | dict(title=((50 + 1) * 'a'))
             )
             assert status == '704 At most 50 characters are valid for title'
 
             when(
                 'Description length is less than limit',
-                form=Update(description=((512 + 1) * 'a'))
+                form=given_form | dict(
+                    description=((512 + 1) * 'a'),
+                    title='Another title'
+                )
             )
             assert status == '703 At most 512 characters are valid for '\
                 'description'
 
             when(
                 'Due date format is wrong',
-                form=Update(dueDate='20-20-20')
+                form=given_form | dict(
+                    dueDate='20-20-20',
+                    title='Another title'
+                )
             )
             assert status == '701 Invalid due date format'
 
             when(
                 'Due date is not in form',
-                form=Remove('dueDate')
+                form=given_form - ['dueDate'] | dict(title='Another title')
             )
             assert status == '711 Due date not in form'
+
+            when(
+                'Status value is invalid',
+                form=given_form | dict(
+                    status='progressing',
+                    title='Another title'
+                )
+            )
+            assert status == 705
+            assert status.text.startswith('Invalid status')
+
+            when(
+                'Phase value is invalid',
+                form=given_form | dict(
+                    phase='compeleting',
+                    title='Another title'
+                )
+            )
+            assert status == 706
+            assert status.text.startswith('Invalid phase')
 
     def test_update(self):
         with self.given(
@@ -122,7 +143,7 @@ class TestProject(LocalApplicationTestCase):
         ):
             assert status == 200
             assert response.json['title'] == 'My interesting project'
-            assert response.json['description'] == 'A updated project '\
+            assert response.json['description'] == 'A updated project ' \
                 'description'
             assert response.json['dueDate'] == '2200-02-20T00:00:00'
             assert response.json['status'] == 'in-progress'
@@ -130,12 +151,14 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Intended project with string type not found',
+                form=given_form | dict(title='Another title'),
                 url_parameters=dict(id='Alphabetical')
             )
             assert status == 404
 
             when(
                 'Intended project with string type not found',
+                form=given_form | dict(title='Another title'),
                 url_parameters=dict(id=100)
             )
             assert status == 404
@@ -150,44 +173,55 @@ class TestProject(LocalApplicationTestCase):
             when(
                 'Title length is more than limit',
                 form=Update(
-                    title='This is a title with the length more than 50 '\
-                    ' characters'
+                    title=((50 + 1) * 'a')
                 )
             )
             assert status == '704 At most 50 characters are valid for title'
 
             when(
                 'Description length is more than limit',
-                form=Update(
-                    description=((512 + 1) * 'a')
+                form=given_form | dict(
+                    description=((512 + 1) * 'a'),
+                    title='Another title'
                 )
             )
-            assert status == '703 At most 512 characters are valid for '\
+            assert status == '703 At most 512 characters are valid for ' \
                 'description'
 
             when(
                 'Due date format is wrong',
-                form=Update(dueDate='2200-2-32')
+                form=given_form | dict(
+                    dueDate='2200-2-32',
+                    title='Another title'
+                )
             )
             assert status == '701 Invalid due date format'
 
             when(
                 'Status value is invalid',
-                form=Update(status='progressing')
+                form=given_form | dict(
+                    status='progressing',
+                    title='Another title'
+                )
             )
             assert status == 705
             assert status.text.startswith('Invalid status')
 
             when(
                 'Phase value is invalid',
-                form=Update(phase='compeleting')
+                form=given_form | dict(
+                    phase='compeleting',
+                    title='Another title'
+                )
             )
             assert status == 706
             assert status.text.startswith('Invalid phase')
 
             when(
                 'Invalid parameter is in the form',
-                form=Append(invalid_param='This is an external parameter')
+                form=given_form + \
+                    dict(invalid_param='External parameter') | \
+                    dict(title='Another title')
             )
             assert status == 707
             assert status.text.startswith('Invalid field')
@@ -208,14 +242,18 @@ class TestProject(LocalApplicationTestCase):
         ):
             session = self.create_session()
             project = session.query(Project) \
-                .filter(Project.id == 2).one_or_none()
+                .filter(Project.id == 2) \
+                .one_or_none()
             assert status == 200
             project.assert_is_deleted()
 
             when(
-                'Project not found',
+                'Intended project with string type not found',
                 url_parameters=dict(id=100)
             )
+            assert status == 404
+
+            when('Project not found', url_parameters=dict(id=100))
             assert status == 404
 
             when(
@@ -232,7 +270,8 @@ class TestProject(LocalApplicationTestCase):
         ):
             session = self.create_session()
             project = session.query(Project) \
-                .filter(Project.id == 3).one_or_none()
+                .filter(Project.id == 3) \
+                .one_or_none()
             assert status == 200
             project.assert_is_not_deleted()
 

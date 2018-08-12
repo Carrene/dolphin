@@ -11,5 +11,4 @@ class Manager(Stakeholder):
     id = Field(Integer, ForeignKey('stakeholder.id'), primary_key=True)
 
     projects = relationship('Project', back_populates='manager', protected=True)
-    releases = relationship('Release', back_populates='manager', protected=True)
 

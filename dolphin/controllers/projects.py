@@ -3,7 +3,7 @@ from restfulpy.orm import DBSession, commit
 from restfulpy.utils import to_camel_case
 from restfulpy.controllers import ModelRestController
 
-from dolphin.models import Project, project_statuses, project_phases
+from dolphin.models import Project
 from dolphin.validators import project_validator, update_project_validator
 
 
@@ -16,20 +16,15 @@ class ProjectController(ModelRestController):
     @commit
     def create(self):
         title = context.form['title']
-        project = DBSession.query(Project).filter_by(title=title) \
+        project = DBSession.query(Project) \
+            .filter(Project.title == title) \
             .one_or_none()
-
-        if project is not None:
-            raise HTTPStatus(
-                f'600 A project with title: {title} is already exists.'
-            )
-
         project = Project()
         project.update_from_request()
         DBSession.add(project)
         return project
 
-    @json
+    @json(prevent_empty_form='708 No parameter exists in the form')
     @update_project_validator
     @Project.expose
     @commit
@@ -49,9 +44,6 @@ class ProjectController(ModelRestController):
         if not project:
             raise HTTPNotFound()
 
-        if not len(form.keys()):
-            raise HTTPStatus('708 No parameter exists in the form')
-
         # FIXME: these lines should be removed and replaced by Project.validate
         # decorator
         json_columns = set(
@@ -64,60 +56,49 @@ class ProjectController(ModelRestController):
                 f'"{", ".join(json_columns)}" is accepted'
             )
 
-        if 'phase' in form and form['phase'] not in project_phases:
-            raise HTTPStatus(
-                f'706 Invalid phase, only one of '
-                f'"{", ".join(project_phases)}" will be accepted'
-            )
-
-        if 'status' in form and form['status'] not in project_statuses:
-            raise HTTPStatus(
-                f'705 Invalid status, only one of '
-                f'"{", ".join(project_statuses)}" will be accepted'
-            )
-
-        if 'title' in form and DBSession.query(Project) \
-                .filter(Project.title == form['title']).count() >= 1:
-            raise HTTPStatus(
-                f'600 Another project with title: "{form["title"]}" is already'
-                f' exists'
-            )
-
         project.update_from_request()
         return project
 
-    @json
+    @json(prevent_form='709 Form not allowed')
     @Project.expose
     @commit
     def hide(self, id):
         form = context.form
 
-        project = DBSession.query(Project) \
-            .filter(Project.id == id).one_or_none()
-
-        if not project:
+        # FIXME: This validation must be performed inside the validation
+        # decorator
+        try:
+            id = int(id)
+        except:
             raise HTTPNotFound()
 
-        if len(form):
-            raise HTTPStatus('709 Form not allowed')
+        project = DBSession.query(Project) \
+            .filter(Project.id == id) \
+            .one_or_none()
+        if not project:
+            raise HTTPNotFound()
 
         project.soft_delete()
         return project
 
-    @json
+    @json(prevent_form='709 Form not allowed')
     @Project.expose
     @commit
     def show(self, id):
         form = context.form
 
-        project = DBSession.query(Project) \
-            .filter(Project.id == id).one_or_none()
-
-        if not project:
+        # FIXME: This validation must be performed inside the validation
+        # decorator
+        try:
+            id = int(id)
+        except:
             raise HTTPNotFound()
 
-        if len(form):
-            raise HTTPStatus('709 Form not allowed')
+        project = DBSession.query(Project) \
+            .filter(Project.id == id) \
+            .one_or_none()
+        if not project:
+            raise HTTPNotFound()
 
         project.soft_undelete()
         return project

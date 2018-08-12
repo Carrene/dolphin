@@ -1,4 +1,4 @@
-from nanohttp import HTTPStatus, json, context, HTTPNotFound, HTTPBadRequest
+from nanohttp import json, context, HTTPNotFound
 from restfulpy.orm import DBSession, commit
 from restfulpy.controllers import ModelRestController
 
@@ -24,16 +24,14 @@ class ManagerController(ModelRestController):
             raise HTTPNotFound()
 
         manager = DBSession.query(Manager) \
-            .filter(Manager.id == id).one_or_none()
+            .filter(Manager.id == id) \
+            .one_or_none()
         if not manager:
             raise HTTPNotFound()
 
         project = DBSession.query(Project) \
-            .filter(Project.id == form['projectId']).one_or_none()
-        if not project:
-            raise HTTPStatus(f'601 Project not found with id: '
-                             f'{form["projectId"]}'
-            )
+            .filter(Project.id == form['projectId']) \
+            .one_or_none()
 
         project.manager = manager
         return manager

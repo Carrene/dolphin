@@ -1,4 +1,4 @@
-from nanohttp import HTTPStatus, json, context, HTTPNotFound
+from nanohttp import json, context, HTTPNotFound
 from restfulpy.orm import DBSession, commit
 from restfulpy.controllers import ModelRestController
 
@@ -28,12 +28,6 @@ class ItemController(ModelRestController):
             .one_or_none()
         if not item:
             raise HTTPNotFound()
-
-        if status not in item_statuses:
-            raise HTTPStatus(
-                f'705 Invalid status value, only ' \
-                f'"{", ".join(item_statuses)}" will be accepted.'
-            )
 
         item.status = status
         return item
