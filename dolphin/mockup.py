@@ -82,5 +82,3 @@ def insert():
     DBSession.add(item)
     DBSession.commit()
 
-
-
