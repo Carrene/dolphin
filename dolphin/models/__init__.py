@@ -4,7 +4,7 @@ from .subscribable import Subscribable
 from .project import Project, project_statuses, project_phases
 from .release import Release, release_statuses
 from .issue import Issue, Tag, issue_kinds, issue_statuses
-from .stage import Stage
+from .phase import Phase
 from .manager import Manager
 from .resource import Resource
 from .guest import Guest

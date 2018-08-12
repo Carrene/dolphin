@@ -15,7 +15,7 @@ item_statuses = [
 class Item(TimestampMixin, DeclarativeBase):
     __tablename__ = 'item'
 
-    stage_id = Field(Integer, ForeignKey('stage.id'))
+    phase_id = Field(Integer, ForeignKey('phase.id'))
     issue_id = Field(Integer, ForeignKey('issue.id'))
     resource_id = Field(Integer, ForeignKey('member.id'))
     id = Field(Integer, primary_key=True)
@@ -26,9 +26,9 @@ class Item(TimestampMixin, DeclarativeBase):
     end = Field(DateTime)
 
     resource = relationship('Resource', back_populates='items', protected=True)
-    stage = relationship(
-        'Stage',
-        foreign_keys=[stage_id],
+    phase = relationship(
+        'Phase',
+        foreign_keys=[phase_id],
         back_populates='items',
         protected=True
     )

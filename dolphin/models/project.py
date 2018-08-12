@@ -45,8 +45,8 @@ class Project(SoftDeleteMixin, Subscribable):
         back_populates='projects',
         protected=True
     )
-    stages = relationship(
-        'Stage',
+    phases = relationship(
+        'Phase',
         back_populates='project',
         protected=True
     )
