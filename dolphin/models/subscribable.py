@@ -7,7 +7,7 @@ from restfulpy.orm import DeclarativeBase, Field, TimestampMixin, relationship
 
 association_table = Table('subscriptions', DeclarativeBase.metadata,
     Column('subscribable_id', Integer, ForeignKey('subscribable.id')),
-    Column('stakeholder_id', Integer, ForeignKey('stakeholder.id'))
+    Column('member_id', Integer, ForeignKey('member.id'))
 )
 
 
@@ -30,8 +30,8 @@ class Subscribable(TimestampMixin, DeclarativeBase):
     )
     due_date = Field(DateTime)
 
-    stakeholders = relationship(
-        'Stakeholder',
+    members = relationship(
+        'Member',
         secondary=association_table,
         back_populates='subscriptions',
     )

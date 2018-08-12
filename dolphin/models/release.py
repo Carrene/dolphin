@@ -18,7 +18,6 @@ class Release(Subscribable):
     __mapper_args__ = {'polymorphic_identity': __tablename__}
 
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
-    manager_id = Field(Integer, ForeignKey('manager.id'))
     status = Field(
         Enum(*release_statuses, name='release_status'),
         nullable=True
@@ -26,8 +25,3 @@ class Release(Subscribable):
 
     cutoff = Field(DateTime)
 
-    manager = relationship(
-        'Manager',
-        back_populates='releases',
-        protected=True
-    )

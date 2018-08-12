@@ -1,4 +1,4 @@
-from bddrest import status, response, Update, when, Remove, Append
+from bddrest import status, response, Update, when, Remove, Append, given_form
 
 from dolphin.tests.helpers import LocalApplicationTestCase
 from dolphin.models import Release, Manager
@@ -10,24 +10,13 @@ class TestRelease(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        manager = Manager(
-            title='First Manager',
-            email=None,
-            phone=123456789
-        )
-        session.add(manager)
-        session.flush()
-
         release = Release(
-            manager_id=manager.id,
             title='My first release',
             description='A decription for my release',
             due_date='2020-2-20',
             cutoff='2030-2-20',
         )
         session.add(release)
-        session.flush()
-        cls.manager_id = manager.id
         session.commit()
 
     def test_create(self):
@@ -36,7 +25,6 @@ class TestRelease(LocalApplicationTestCase):
             '/apiv1/releases',
             'CREATE',
             form=dict(
-                managerId=self.manager_id,
                 title='My awesome release',
                 description='Decription for my release',
                 dueDate='2020-2-20',
@@ -58,42 +46,60 @@ class TestRelease(LocalApplicationTestCase):
 
             when(
                 'Title length is more than limit',
-                form=Update(
-                    title='This is a title with the length more than 50 \
-                    characters'
-                )
+                form=given_form | dict(title=((50 + 1) * 'a'))
             )
             assert status == '704 At most 50 characters are valid for title'
 
             when(
                 'Description length is less than limit',
-                form=Update(description=((512 + 1) * 'a'))
+                form=given_form | dict(
+                    description=((512 + 1) * 'a'),
+                    title='Another title'
+                )
             )
-            assert status == '703 At most 512 characters are valid for '\
+            assert status == '703 At most 512 characters are valid for ' \
                 'description'
+
             when(
                 'Due date format is wrong',
-                form=Update(dueDate='20-20-20')
-                    )
+                form=given_form | dict(
+                    dueDate='20-20-20',
+                    title='Another title'
+                )
+            )
             assert status == '701 Invalid due date format'
 
             when(
                 'Due date is not in form',
-                form=Remove('dueDate')
+                form=given_form - 'dueDate' | dict(title='Another title')
             )
             assert status == '711 Due date not in form'
 
             when(
                 'Cutoff format is wrong',
-                form=Update(cutoff='30-20-20'),
-                    )
+                form=given_form | dict(
+                    cutoff='30-20-20',
+                    title='Another title'
+                )
+            )
             assert status == '702 Invalid cutoff format'
 
             when(
                 'Due date is not in form',
-                form=Remove('cutoff')
+                form=given_form - 'cutoff' | dict(title='Another title')
             )
             assert status == '712 Cutoff not in form'
+
+            when(
+                'Invalid status in form',
+                form=given_form | dict(
+                    status='progressing',
+                    title='Another title'
+                )
+            )
+            assert status == 705
+            assert status.text.startswith('Invalid status')
+
 
     def test_update(self):
         with self.given(
@@ -117,23 +123,21 @@ class TestRelease(LocalApplicationTestCase):
 
             when(
                 'Intended release with string type not found',
+                form=given_form | dict(title='Another title'),
                 url_parameters=dict(id='Alphabetical')
             )
             assert status == 404
 
-
             when(
                 'Intended release with integer type not found',
+                form=given_form | dict(title='Another title'),
                 url_parameters=dict(id=100)
             )
             assert status == 404
 
             when(
                 'Title length is more than limit',
-                form=Update(
-                    title='This is a title with the length more than 50 \
-                    characters'
-                )
+                form=given_form | dict(title=((50 + 1) * 'a'))
             )
             assert status == '704 At most 50 characters are valid for title'
 
@@ -146,26 +150,38 @@ class TestRelease(LocalApplicationTestCase):
 
             when(
                 'Description length is less than limit',
-                form=Update(description=((512 + 1) * 'a'))
+                form=given_form | dict(
+                    description=((512 + 1) * 'a'),
+                    title='Another title'
+                )
             )
             assert status == '703 At most 512 characters are valid for '\
                 'description'
 
             when(
                 'Due date format is wrong',
-                form=Update(dueDate='20-20-20')
+                form=given_form | dict(
+                    dueDate='20-20-20',
+                    title='Another title'
+                )
             )
             assert status == '701 Invalid due date format'
 
             when(
                 'Cutoff format is wrong',
-                form=Update(cutoff='30-20-20'),
+                form=given_form | dict(
+                    cutoff='30-20-20',
+                    title='Another title'
+                )
             )
             assert status == '702 Invalid cutoff format'
 
             when(
                 'Invalid status in form',
-                form=Update(status='progressing')
+                form=given_form | dict(
+                    status='progressing',
+                    title='Another title'
+                )
             )
             assert status == 705
             assert status.text.startswith('Invalid status')

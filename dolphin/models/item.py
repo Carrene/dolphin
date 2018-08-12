@@ -17,7 +17,7 @@ class Item(TimestampMixin, DeclarativeBase):
 
     stage_id = Field(Integer, ForeignKey('stage.id'))
     issue_id = Field(Integer, ForeignKey('issue.id'))
-    resource_id = Field(Integer, ForeignKey('resource.id'))
+    resource_id = Field(Integer, ForeignKey('member.id'))
     id = Field(Integer, primary_key=True)
     status = Field(
         Enum(*item_statuses, name='item_status'),
