@@ -3,7 +3,7 @@ from os.path import dirname, join
 from restfulpy import Application
 
 from .controllers.root import Root
-from .models import Subscribable, Stakeholder, Project, Release, Issue, Tag,\
+from .models import Subscribable, Member, Project, Release, Issue, Tag,\
     Stage, Manager, Resource, Guest, Team, Item
 from . import mockup
 

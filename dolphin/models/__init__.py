@@ -1,5 +1,5 @@
 
-from .stakeholder import Stakeholder
+from .member import Member
 from .subscribable import Subscribable
 from .project import Project, project_statuses, project_phases
 from .release import Release, release_statuses

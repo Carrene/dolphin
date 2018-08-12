@@ -2,9 +2,9 @@
 from sqlalchemy import Integer, ForeignKey
 from restfulpy.orm import Field
 
-from .stakeholder import Stakeholder
+from .member import Member
 
 
-class Guest(Stakeholder):
+class Guest(Member):
     __mapper_args__ = {'polymorphic_identity': 'guest'}
 

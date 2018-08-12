@@ -1,7 +1,7 @@
 
 from restfulpy.orm import DBSession, commit
 
-from .models import Subscribable, Stakeholder, Project, Release, Issue, Tag,\
+from .models import Subscribable, Member, Project, Release, Issue, Tag,\
     Stage, Manager, Resource, Guest, Team, Item
 
 

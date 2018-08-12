@@ -4,12 +4,12 @@ from restfulpy.orm import DeclarativeBase, Field, TimestampMixin, relationship
 from .subscribable import association_table
 
 
-class Stakeholder(TimestampMixin, DeclarativeBase):
-    __tablename__ = 'stakeholder'
+class Member(TimestampMixin, DeclarativeBase):
+    __tablename__ = 'member'
 
-    type_ = Field(String(50))
+    role = Field(String(50))
     __mapper_args__ = {
-        'polymorphic_on': type_,
+        'polymorphic_on': role,
         'polymorphic_identity': __tablename__
     }
 
@@ -27,6 +27,6 @@ class Stakeholder(TimestampMixin, DeclarativeBase):
     subscriptions = relationship(
         'Subscribable',
         secondary=association_table,
-        back_populates='stakeholders',
+        back_populates='members',
     )
 
