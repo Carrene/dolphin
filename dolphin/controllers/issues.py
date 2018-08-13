@@ -115,5 +115,6 @@ class IssueController(ModelRestController):
             raise HTTPStatus('612 Not Subscribed Yet')
 
         DBSession.delete(subscription)
+
         return issue
 

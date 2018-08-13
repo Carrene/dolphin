@@ -3,6 +3,8 @@ from bddrest import status, response, Update, when, Remove, Append, given_form
 
 from dolphin.tests.helpers import LocalApplicationTestCase
 from dolphin.models import Issue, Project, Manager, Release, Phase
+# FIXME: remove this line
+from dolphin.models import Association
 
 
 class TestIssue(LocalApplicationTestCase):
@@ -386,7 +388,6 @@ class TestIssue(LocalApplicationTestCase):
                 form=given_form | dict(memberId=1)
             )
             assert status == '611 Already subscribed'
-
 
     def test_unsubscribe(self):
         with self.given(
