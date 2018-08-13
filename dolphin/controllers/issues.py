@@ -27,7 +27,6 @@ class IssueController(ModelRestController):
     def update(self, id):
         form = context.form
 
-        # FIXME: as a validator
         try:
             id = int(id)
         except:
@@ -58,4 +57,5 @@ class IssueController(ModelRestController):
 
         query = DBSession.query(Issue)
         return query
+
 

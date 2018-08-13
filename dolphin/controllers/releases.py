@@ -24,8 +24,7 @@ class ReleaseController(ModelRestController):
 
         new_release = Release()
         new_release.update_from_request()
-        DBSession.add(new_release)
-        return new_release
+        DBSession.add(new_release) return new_release
 
     @json(prevent_empty_form='708 No parameter exists in the form')
     @update_release_validator
@@ -34,8 +33,6 @@ class ReleaseController(ModelRestController):
     def update(self, id):
         form = context.form
 
-        # FIXME: This validation must be performed inside the validation
-        # decorator
         try:
             id = int(id)
         except:
@@ -70,8 +67,6 @@ class ReleaseController(ModelRestController):
     @commit
     def abort(self, id):
 
-        # FIXME: This validation must be performed inside the validation
-        # decorator
         try:
             id = int(id)
         except:

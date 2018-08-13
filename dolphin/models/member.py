@@ -1,7 +1,7 @@
 from sqlalchemy import Integer, String, Unicode, BigInteger
 from restfulpy.orm import DeclarativeBase, Field, TimestampMixin, relationship
 
-from .subscribable import association_table
+from .subscribable import Association
 
 
 class Member(TimestampMixin, DeclarativeBase):
@@ -26,7 +26,7 @@ class Member(TimestampMixin, DeclarativeBase):
 
     subscriptions = relationship(
         'Subscribable',
-        secondary=association_table,
+        secondary='association',
         back_populates='members',
     )
 
