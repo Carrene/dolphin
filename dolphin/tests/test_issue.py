@@ -2,7 +2,7 @@
 from bddrest import status, response, Update, when, Remove, Append, given_form
 
 from dolphin.tests.helpers import LocalApplicationTestCase
-from dolphin.models import Issue, Project, Manager, Release, Phase
+from dolphin.models import Issue, Project, Manager, Release, Phase, Resource
 
 
 class TestIssue(LocalApplicationTestCase):
@@ -15,6 +15,12 @@ class TestIssue(LocalApplicationTestCase):
             title='First Manager',
             email=None,
             phone=123456789
+        )
+
+        resource = Resource(
+            title='First Resource',
+            email=None,
+            phone=987654321
         )
 
         release = Release(
@@ -69,7 +75,7 @@ class TestIssue(LocalApplicationTestCase):
         )
 
         cls.project = project
-        session.add(project)
+        session.add_all([project, resource])
         session.commit()
 
     def test_define(self):
@@ -387,3 +393,11 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert status == '611 Already subscribed'
 
+    def test_assign(self):
+        with self.given(
+            'Assign an issue to a resource',
+            '/apiv1/issues/id:4',
+            'ASSIGN',
+            form=dict(resourceId=2)
+        ):
+            assert status == 200

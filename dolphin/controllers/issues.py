@@ -3,9 +3,10 @@ from restfulpy.utils import to_camel_case
 from restfulpy.orm import DBSession, commit
 from restfulpy.controllers import ModelRestController
 
-from dolphin.models import Issue, issue_kinds, issue_statuses, Association
+from dolphin.models import Issue, issue_kinds, issue_statuses, Association, \
+    Resource
 from dolphin.validators import issue_validator, update_issue_validator, \
-    subscribe_issue_validator
+    subscribe_issue_validator, assign_issue_validator
 
 
 class IssueController(ModelRestController):
@@ -86,5 +87,28 @@ class IssueController(ModelRestController):
             member=form['memberId']
         )
         DBSession.add(association)
+        return issue
+
+    @json
+    @assign_issue_validator
+    @Issue.expose
+    @commit
+    def assign(self, id):
+        form = context.form
+
+        try:
+            id = int(id)
+        except:
+            raise HTTPNotFound()
+
+        issue = DBSession.query(Issue).filter(Issue.id == id).one_or_none()
+        if not issue:
+            raise HTTPNotFound()
+
+        resource = DBSession.query(Resource) \
+            .filter(Resource.id == form['resourceId']) \
+            .one_or_none()
+
+        resource.issue = resource
         return issue
 
