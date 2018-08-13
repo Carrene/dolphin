@@ -86,5 +86,6 @@ class IssueController(ModelRestController):
             member=form['memberId']
         )
         DBSession.add(subscription)
+
         return issue
 
