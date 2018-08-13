@@ -3,6 +3,8 @@ from bddrest import status, response, Update, when, Remove, Append, given_form
 
 from dolphin.tests.helpers import LocalApplicationTestCase
 from dolphin.models import Issue, Project, Manager, Release, Phase
+# FIXME: remove this line
+from dolphin.models import Association
 
 
 class TestIssue(LocalApplicationTestCase):
@@ -336,4 +338,54 @@ class TestIssue(LocalApplicationTestCase):
                 query=dict(sort='-title', take=1, skip=2)
             )
             assert response.json[0]['title'] == 'New issue'
+
+
+    def test_subscribe(self):
+        with self.given(
+            'Subscribe an issue',
+            '/apiv1/issues/id:4',
+            'SUBSCRIBE',
+            form=dict(memberId=1)
+        ):
+            assert status == 200
+
+            when(
+                'Intended issue with string type not found',
+                url_parameters=dict(id='Alphabetical'),
+                form=given_form | dict(title='Another issue')
+            )
+            assert status == 404
+
+            when(
+                'Intended issue with integer type not found',
+                url_parameters=dict(id=100),
+                form=given_form | dict(title='Another issue')
+            )
+            assert status == 404
+
+            when(
+                'Member id not in form',
+                form=given_form - 'memberId'
+            )
+            assert status == '735 Member id not in form'
+
+            when(
+                'Member not found',
+                form=given_form | dict(memberId=100)
+            )
+            assert status == 610
+            assert status.text.startswith('Member not found')
+
+            when(
+                'Member id type is invalid',
+                form=given_form | dict(memberId='Alphabetical')
+            )
+            assert status == '736 Invalid member id type'
+
+            when(
+                'Issue is already subscribed',
+                url_parameters=dict(id=4),
+                form=given_form | dict(memberId=1)
+            )
+            assert status == '611 Already subscribed'
 

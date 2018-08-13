@@ -14,7 +14,7 @@ from restfulpy.orm import DeclarativeBase, Field, TimestampMixin, relationship
 class Association(DeclarativeBase):
     __tablename__ = 'association'
 
-    subcribable = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
+    subscribable = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
     member = Field(Integer, ForeignKey('member.id'), primary_key=True)
 
 

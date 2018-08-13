@@ -24,7 +24,8 @@ class ReleaseController(ModelRestController):
 
         new_release = Release()
         new_release.update_from_request()
-        DBSession.add(new_release) return new_release
+        DBSession.add(new_release)
+        return new_release
 
     @json(prevent_empty_form='708 No parameter exists in the form')
     @update_release_validator
