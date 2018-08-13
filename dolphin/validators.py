@@ -4,7 +4,8 @@ from nanohttp import validate, HTTPStatus, context
 from restfulpy.orm import DBSession, commit
 
 from dolphin.models import Project, Release, Issue, issue_kinds, Member, \
-    issue_statuses, item_statuses, project_statuses, release_statuses, Manager
+    issue_statuses, item_statuses, project_statuses, release_statuses, \
+    Manager, Resource
 from dolphin.exceptions import empty_form_http_exception
 
 
@@ -164,6 +165,18 @@ def member_exists_validator(memberId, container, field):
         raise HTTPStatus(f'610 Member not found with id: {form["memberId"]}')
 
     return memberId
+
+
+def resource_exists_validator(resourceId, container, field):
+    form = context.form
+    resource = DBSession.query(Resource) \
+        .filter(Resource.id == form['resourceId']) \
+        .one_or_none()
+    if not resource:
+        raise HTTPStatus(
+            f'609 Resource not found with id: {form["resourceId"]}'
+        )
+    return resourceId
 
 
 release_validator = validate(
@@ -338,6 +351,15 @@ subscribe_issue_validator = validate(
         required='735 Member id not in form',
         type_=(int, '736 Invalid member id type'),
         callback=member_exists_validator
+    )
+)
+
+
+assign_issue_validator = validate(
+    resourceId=dict(
+        required='715 Resource Id Not In Form',
+        type_=(int, '736 Invalid Resource Id Type'),
+        callback=resource_exists_validator
     )
 )
 
