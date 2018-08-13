@@ -1,3 +1,4 @@
+
 from nanohttp import HTTPStatus, json, context, HTTPNotFound
 from restfulpy.utils import to_camel_case
 from restfulpy.orm import DBSession, commit
@@ -87,5 +88,32 @@ class IssueController(ModelRestController):
         )
         DBSession.add(subscription)
 
+        return issue
+
+    @json
+    @subscribe_issue_validator
+    @Issue.expose
+    @commit
+    def unsubscribe(self, id):
+        form = context.form
+
+        try:
+            id = int(id)
+        except:
+            raise HTTPNotFound()
+
+        issue = DBSession.query(Issue).filter(Issue.id == id).one_or_none()
+        if not issue:
+            raise HTTPNotFound()
+
+        association = DBSession.query(Association).filter(
+            Association.subscribable == id,
+            Association.member == form['memberId']
+        ).one_or_none()
+
+        if not association:
+            raise HTTPStatus('612 Not Subscribed Yet')
+
+        DBSession.delete(association)
         return issue
 
