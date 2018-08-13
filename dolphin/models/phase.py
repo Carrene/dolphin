@@ -3,8 +3,8 @@ from sqlalchemy import Integer, String, ForeignKey
 from restfulpy.orm import DeclarativeBase, Field, relationship
 
 
-class Stage(DeclarativeBase):
-    __tablename__ = 'stage'
+class Phase(DeclarativeBase):
+    __tablename__ = 'phase'
 
     project_id = Field(Integer, ForeignKey('project.id'))
     id = Field(Integer, primary_key=True)
@@ -13,9 +13,9 @@ class Stage(DeclarativeBase):
 
     project = relationship(
         'Project',
-        back_populates='stages',
+        back_populates='phases',
         foreign_keys=[project_id],
         protected=True
     )
-    items = relationship('Item', back_populates='stage', protected=True)
+    items = relationship('Item', back_populates='phase', protected=True)
 

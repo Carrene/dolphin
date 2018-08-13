@@ -4,7 +4,7 @@ from restfulpy import Application
 
 from .controllers.root import Root
 from .models import Subscribable, Member, Project, Release, Issue, Tag,\
-    Stage, Manager, Resource, Guest, Team, Item
+    Phase, Manager, Resource, Guest, Team, Item
 from . import mockup
 
 

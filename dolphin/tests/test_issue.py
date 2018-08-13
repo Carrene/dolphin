@@ -2,7 +2,7 @@
 from bddrest import status, response, Update, when, Remove, Append, given_form
 
 from dolphin.tests.helpers import LocalApplicationTestCase
-from dolphin.models import Issue, Project, Manager, Release, Stage
+from dolphin.models import Issue, Project, Manager, Release, Phase
 
 
 class TestIssue(LocalApplicationTestCase):
