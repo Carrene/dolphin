@@ -3,7 +3,7 @@ from restfulpy.utils import to_camel_case
 from restfulpy.orm import DBSession, commit
 from restfulpy.controllers import ModelRestController
 
-from dolphin.models import Issue, issue_kinds, issue_statuses, Association
+from dolphin.models import Issue, issue_kinds, issue_statuses, Subscription
 from dolphin.validators import issue_validator, update_issue_validator, \
     subscribe_issue_validator
 
@@ -75,16 +75,16 @@ class IssueController(ModelRestController):
         if not issue:
             raise HTTPNotFound()
 
-        if DBSession.query(Association).filter(
-            Association.subscribable == id,
-            Association.member == form['memberId']
+        if DBSession.query(Subscription).filter(
+            Subscription.subscribable == id,
+            Subscription.member == form['memberId']
         ).one_or_none():
             raise HTTPStatus('611 Already subscribed')
 
-        association = Association(
+        subscription = Subscription(
             subscribable=issue.id,
             member=form['memberId']
         )
-        DBSession.add(association)
+        DBSession.add(subscription)
         return issue
 

@@ -5,8 +5,8 @@ from sqlalchemy.ext.declarative import declared_attr
 from restfulpy.orm import DeclarativeBase, Field, TimestampMixin, relationship
 
 
-class Association(DeclarativeBase):
-    __tablename__ = 'association'
+class Subscription(DeclarativeBase):
+    __tablename__ = 'subscription'
 
     subscribable = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
     member = Field(Integer, ForeignKey('member.id'), primary_key=True)
@@ -33,7 +33,7 @@ class Subscribable(TimestampMixin, DeclarativeBase):
 
     members = relationship(
         'Member',
-        secondary='association',
-        back_populates='subscriptions',
+        secondary='subscription',
+        back_populates='subscribables',
     )
 
