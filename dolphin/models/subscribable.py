@@ -5,12 +5,6 @@ from sqlalchemy.ext.declarative import declared_attr
 from restfulpy.orm import DeclarativeBase, Field, TimestampMixin, relationship
 
 
-#association_table = Table('subscriptions', DeclarativeBase.metadata,
-#    Column('subscribable_id', Integer, ForeignKey('subscribable.id')),
-#    Column('member_id', Integer, ForeignKey('member.id'))
-#)
-
-
 class Association(DeclarativeBase):
     __tablename__ = 'association'
 
