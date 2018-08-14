@@ -5,7 +5,7 @@ from restfulpy.orm import DBSession, commit
 
 from dolphin.models import Project, Release, Issue, issue_kinds, Member, \
     issue_statuses, item_statuses, project_statuses, release_statuses, \
-    Manager, Resource
+    Manager, Resource, Phase
 from dolphin.exceptions import empty_form_http_exception
 
 
@@ -125,6 +125,17 @@ def issue_status_value_validator(status, container, field):
             f'"{", ".join(issue_statuses)}" will be accepted'
         )
     return form['status']
+
+
+def phase_exists_validator(phaseId, container, field):
+    form = context.form
+
+    if 'phaseId' in form and not DBSession.query(Phase) \
+            .filter(Phase.id == form['phaseId']) \
+            .one_or_none():
+        raise HTTPStatus(f'613 Phase not found with id: {form["phaseId"]}')
+
+    return phaseId
 
 
 def item_status_value_validator(status, container, field):
@@ -358,8 +369,13 @@ subscribe_issue_validator = validate(
 assign_issue_validator = validate(
     resourceId=dict(
         required='715 Resource Id Not In Form',
-        type_=(int, '736 Invalid Resource Id Type'),
+        type_=(int, '716 Invalid Resource Id Type'),
         callback=resource_exists_validator
+    ),
+    phaseId=dict(
+        required='737 Phase Id Not In Form',
+        type_=(int, '738 Invalid Phase Id Type'),
+        callback=phase_exists_validator
     )
 )
 

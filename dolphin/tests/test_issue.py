@@ -38,6 +38,12 @@ class TestIssue(LocalApplicationTestCase):
             due_date='2020-2-20',
         )
 
+        phase = Phase(
+            title='development',
+            order=2,
+            project=project
+        )
+
         issue1 = Issue(
             project=project,
             title='First issue',
@@ -75,7 +81,7 @@ class TestIssue(LocalApplicationTestCase):
         )
 
         cls.project = project
-        session.add_all([project, resource])
+        session.add_all([project, resource, phase])
         session.commit()
 
     def test_define(self):
@@ -398,6 +404,66 @@ class TestIssue(LocalApplicationTestCase):
             'Assign an issue to a resource',
             '/apiv1/issues/id:4',
             'ASSIGN',
-            form=dict(resourceId=2)
+            form=dict(resourceId=2, phaseId=1)
         ):
             assert status == 200
+
+            when(
+                'Intended issue with string type not found',
+                url_parameters=dict(id='Alphabetical'),
+                form=given_form | dict(title='Another issue')
+            )
+            assert status == 404
+
+            when(
+                'Intended issue with integer type not found',
+                url_parameters=dict(id=100),
+                form=given_form | dict(title='Another issue')
+            )
+            assert status == 404
+
+            when(
+                'Resource not found',
+                form=given_form | dict(resourceId=100)
+            )
+            assert status == 609
+            assert status.text.startswith('Resource not found')
+
+            when(
+                'Resource id is not in form',
+                form=given_form - 'resourceId'
+            )
+            assert status == '715 Resource Id Not In Form'
+
+            when(
+                'Resource id type is not valid',
+                form=given_form | dict(resourceId='Alphabetical')
+            )
+            assert status == '716 Invalid Resource Id Type'
+
+            when(
+                'Phase not found',
+                form=given_form | dict(phaseId=100)
+            )
+            assert status == 613
+            assert status.text.startswith('Phase not found')
+
+            when(
+                'Phase id is not in form',
+                form=given_form - 'phaseId'
+            )
+            assert status == '737 Phase Id Not In Form'
+
+            when(
+                'Phase id type is not valid',
+                form=given_form | dict(phaseId='Alphabetical')
+            )
+            assert status == '738 Invalid Phase Id Type'
+
+            when(
+                'Issue is already assigned',
+                url_parameters=dict(id=4),
+                form=given_form | dict(resourceId=2)
+            )
+            assert status == '602 Already Assigned'
+

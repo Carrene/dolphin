@@ -4,7 +4,7 @@ from restfulpy.orm import DBSession, commit
 from restfulpy.controllers import ModelRestController
 
 from dolphin.models import Issue, issue_kinds, issue_statuses, Association, \
-    Resource
+    Resource, Item, Phase
 from dolphin.validators import issue_validator, update_issue_validator, \
     subscribe_issue_validator, assign_issue_validator
 
@@ -109,6 +109,23 @@ class IssueController(ModelRestController):
             .filter(Resource.id == form['resourceId']) \
             .one_or_none()
 
-        resource.issue = resource
+        phase = DBSession.query(Phase) \
+            .filter(Phase.id == form['phaseId']) \
+            .one_or_none()
+
+        if DBSession.query(Item).filter(
+            Item.phase == phase,
+            Item.resource == resource,
+            Item.issue == issue
+        ).one_or_none():
+            raise HTTPStatus('602 Already Assigned')
+
+        item = Item(
+            phase=phase,
+            resource=resource,
+            issue=issue
+        )
+
+        DBSession.add(item)
         return issue
 
