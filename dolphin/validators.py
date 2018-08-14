@@ -4,7 +4,8 @@ from nanohttp import validate, HTTPStatus, context
 from restfulpy.orm import DBSession, commit
 
 from dolphin.models import Project, Release, Issue, issue_kinds, Member, \
-    issue_statuses, item_statuses, project_statuses, release_statuses, Manager
+    issue_statuses, item_statuses, project_statuses, release_statuses, \
+    Manager, Resource, Phase
 from dolphin.exceptions import empty_form_http_exception
 
 
@@ -126,6 +127,17 @@ def issue_status_value_validator(status, container, field):
     return form['status']
 
 
+def phase_exists_validator(phaseId, container, field):
+    form = context.form
+
+    if 'phaseId' in form and not DBSession.query(Phase) \
+            .filter(Phase.id == form['phaseId']) \
+            .one_or_none():
+        raise HTTPStatus(f'613 Phase not found with id: {form["phaseId"]}')
+
+    return phaseId
+
+
 def item_status_value_validator(status, container, field):
     form = context.form
     if 'status' in form and form['status'] not in item_statuses:
@@ -164,6 +176,18 @@ def member_exists_validator(memberId, container, field):
         raise HTTPStatus(f'610 Member not found with id: {form["memberId"]}')
 
     return memberId
+
+
+def resource_exists_validator(resourceId, container, field):
+    form = context.form
+    resource = DBSession.query(Resource) \
+        .filter(Resource.id == form['resourceId']) \
+        .one_or_none()
+    if not resource:
+        raise HTTPStatus(
+            f'609 Resource not found with id: {form["resourceId"]}'
+        )
+    return resourceId
 
 
 release_validator = validate(
@@ -338,6 +362,20 @@ subscribe_issue_validator = validate(
         required='735 Member id not in form',
         type_=(int, '736 Invalid member id type'),
         callback=member_exists_validator
+    )
+)
+
+
+assign_issue_validator = validate(
+    resourceId=dict(
+        required='715 Resource Id Not In Form',
+        type_=(int, '716 Invalid Resource Id Type'),
+        callback=resource_exists_validator
+    ),
+    phaseId=dict(
+        required='737 Phase Id Not In Form',
+        type_=(int, '738 Invalid Phase Id Type'),
+        callback=phase_exists_validator
     )
 )
 

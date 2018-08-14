@@ -1,4 +1,3 @@
-
 from .member import Member
 from .subscribable import Subscribable, Subscription
 from .project import Project, project_statuses
