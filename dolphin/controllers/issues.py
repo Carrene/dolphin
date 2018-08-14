@@ -4,7 +4,8 @@ from restfulpy.utils import to_camel_case
 from restfulpy.orm import DBSession, commit
 from restfulpy.controllers import ModelRestController
 
-from dolphin.models import Issue, issue_kinds, issue_statuses, Subscription
+from dolphin.models import Issue, issue_kinds, issue_statuses, Subscription, \
+    Resource, Phase, Item
 from dolphin.validators import issue_validator, update_issue_validator, \
     subscribe_issue_validator, assign_issue_validator
 
