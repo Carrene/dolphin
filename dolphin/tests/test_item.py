@@ -1,7 +1,7 @@
 
 from bddrest import status, response, Update, when, Remove
 
-from dolphin.models import Item, Stage, Issue, Manager, Release, Project, \
+from dolphin.models import Item, Phase, Issue, Manager, Release, Project, \
     Resource, Team
 from dolphin.tests.helpers import LocalApplicationTestCase
 
@@ -53,7 +53,7 @@ class TestItem(LocalApplicationTestCase):
             phone=987654321
         )
 
-        stage = Stage(
+        phase = Phase(
             project=project,
             title='design',
             order=1,
@@ -61,7 +61,7 @@ class TestItem(LocalApplicationTestCase):
 
         item = Item(
             resource=resource,
-            stage=stage,
+            phase=phase,
             issue=issue,
             status='in-progress',
             end='2020-2-2'

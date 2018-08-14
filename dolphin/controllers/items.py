@@ -16,8 +16,6 @@ class ItemController(ModelRestController):
     def update(self, id):
         status = context.form['status']
 
-        # FIXME: This validation must be performed inside the validation
-        # decorator
         try:
             id = int(id)
         except:

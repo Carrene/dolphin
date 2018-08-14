@@ -2,7 +2,7 @@
 from restfulpy.orm import DBSession, commit
 
 from .models import Subscribable, Member, Project, Release, Issue, Tag,\
-    Stage, Manager, Resource, Guest, Team, Item
+    Phase, Manager, Resource, Guest, Team, Item
 
 
 def insert():
@@ -60,12 +60,12 @@ def insert():
     )
     DBSession.add(issue)
 
-    stage = Stage(
+    phase = Phase(
         project=project,
         title='design',
         order=1,
     )
-    DBSession.add(stage)
+    DBSession.add(phase)
 
     tag = Tag(
         title='Acomplish'
@@ -74,7 +74,7 @@ def insert():
 
     item = Item(
         resource=resource,
-        stage=stage,
+        phase=phase,
         issue=issue,
         status='in-progress',
         end='2020-2-2'
