@@ -16,8 +16,6 @@ class ManagerController(ModelRestController):
     def assign(self, id):
         form = context.form
 
-        # FIXME: This validation must be performed inside the validation
-        # decorator
         try:
             id = int(id)
         except:

@@ -31,8 +31,6 @@ class ProjectController(ModelRestController):
     def update(self, id):
         form = context.form
 
-        # FIXME: This validation must be performed inside the validation
-        # decorator
         try:
             id = int(id)
         except:
@@ -65,8 +63,6 @@ class ProjectController(ModelRestController):
     def hide(self, id):
         form = context.form
 
-        # FIXME: This validation must be performed inside the validation
-        # decorator
         try:
             id = int(id)
         except:
@@ -87,8 +83,6 @@ class ProjectController(ModelRestController):
     def show(self, id):
         form = context.form
 
-        # FIXME: This validation must be performed inside the validation
-        # decorator
         try:
             id = int(id)
         except:

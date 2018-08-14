@@ -3,8 +3,9 @@ from restfulpy.utils import to_camel_case
 from restfulpy.orm import DBSession, commit
 from restfulpy.controllers import ModelRestController
 
-from dolphin.models import Issue, issue_kinds, issue_statuses
-from dolphin.validators import issue_validator, update_issue_validator
+from dolphin.models import Issue, issue_kinds, issue_statuses, Subscription
+from dolphin.validators import issue_validator, update_issue_validator, \
+    subscribe_issue_validator
 
 
 class IssueController(ModelRestController):
@@ -27,7 +28,6 @@ class IssueController(ModelRestController):
     def update(self, id):
         form = context.form
 
-        # FIXME: as a validator
         try:
             id = int(id)
         except:
@@ -58,4 +58,33 @@ class IssueController(ModelRestController):
 
         query = DBSession.query(Issue)
         return query
+
+    @json
+    @subscribe_issue_validator
+    @Issue.expose
+    @commit
+    def subscribe(self, id):
+        form = context.form
+
+        try:
+            id = int(id)
+        except:
+            raise HTTPNotFound()
+
+        issue = DBSession.query(Issue).filter(Issue.id == id).one_or_none()
+        if not issue:
+            raise HTTPNotFound()
+
+        if DBSession.query(Subscription).filter(
+            Subscription.subscribable == id,
+            Subscription.member == form['memberId']
+        ).one_or_none():
+            raise HTTPStatus('611 Already subscribed')
+
+        subscription = Subscription(
+            subscribable=issue.id,
+            member=form['memberId']
+        )
+        DBSession.add(subscription)
+        return issue
 
