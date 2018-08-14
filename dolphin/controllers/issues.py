@@ -106,14 +106,14 @@ class IssueController(ModelRestController):
         if not issue:
             raise HTTPNotFound()
 
-        association = DBSession.query(Association).filter(
-            Association.subscribable == id,
-            Association.member == form['memberId']
+        subscription = DBSession.query(Subscription).filter(
+            Subscription.subscribable == id,
+            Subscription.member == form['memberId']
         ).one_or_none()
 
-        if not association:
+        if not subscription:
             raise HTTPStatus('612 Not Subscribed Yet')
 
-        DBSession.delete(association)
+        DBSession.delete(subscription)
         return issue
 

@@ -3,8 +3,6 @@ from bddrest import status, response, Update, when, Remove, Append, given_form
 
 from dolphin.tests.helpers import LocalApplicationTestCase
 from dolphin.models import Issue, Project, Manager, Release, Phase
-# FIXME: remove this line
-from dolphin.models import Association
 
 
 class TestIssue(LocalApplicationTestCase):
