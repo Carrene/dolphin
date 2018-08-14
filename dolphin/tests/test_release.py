@@ -214,6 +214,12 @@ class TestRelease(LocalApplicationTestCase):
             )
             assert status == 404
 
+            when(
+                'There is parameter in form',
+                form=dict(any_parameter='A parameter in the form')
+            )
+            assert status == '709 Form not allowed'
+
         session = self.create_session()
         release = session.query(Release).filter(Release.id == 1).one_or_none()
         assert release is None

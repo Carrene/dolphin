@@ -63,7 +63,7 @@ class ReleaseController(ModelRestController):
         release.update_from_request()
         return release
 
-    @json
+    @json(prevent_form='709 Form not allowed')
     @Release.expose
     @commit
     def abort(self, id):
