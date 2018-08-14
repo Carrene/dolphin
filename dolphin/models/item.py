@@ -23,7 +23,7 @@ class Item(TimestampMixin, DeclarativeBase):
         Enum(*item_statuses, name='item_status'),
         nullable=True
     )
-    end = Field(DateTime)
+    end = Field(DateTime, nullable=True)
 
     resource = relationship('Resource', back_populates='items', protected=True)
     phase = relationship(

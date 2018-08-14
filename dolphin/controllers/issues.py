@@ -138,6 +138,23 @@ class IssueController(ModelRestController):
             .filter(Resource.id == form['resourceId']) \
             .one_or_none()
 
-        resource.issue = resource
+        phase = DBSession.query(Phase) \
+            .filter(Phase.id == form['phaseId']) \
+            .one_or_none()
+
+        if DBSession.query(Item).filter(
+            Item.phase == phase,
+            Item.resource == resource,
+            Item.issue == issue
+        ).one_or_none():
+            raise HTTPStatus('602 Already Assigned')
+
+        item = Item(
+            phase=phase,
+            resource=resource,
+            issue=issue
+        )
+
+        DBSession.add(item)
         return issue
 
