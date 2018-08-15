@@ -11,7 +11,7 @@ with open(join(dirname(__file__), 'dolphin', '__init__.py')) as v_file:
 
 
 dependencies = [
-    'restfulpy==1.2.0b1',
+    'restfulpy>=1.2.0b1',
 
     # Deployment
     'gunicorn',
