@@ -328,23 +328,23 @@ class TestProject(LocalApplicationTestCase):
             'Filter projects',
             '/apiv1/projects',
             'LIST',
-            query=dict(title='My awesome project')
+            query=dict(sort='id', title='My awesome project')
         ):
             assert response.json[0]['title'] == 'My awesome project'
 
             when(
                 'List projects except one of them',
-                query=dict(title='!My awesome project')
+                query=dict(sort='id', title='!My awesome project')
             )
-            assert response.json[0]['title'] == 'My hidden project'
+            assert response.json[0]['title'] == 'My interesting project'
 
         with self.given(
             'Project pagination',
             '/apiv1/projects',
             'LIST',
-            query=dict(take=1, skip=2)
+            query=dict(sort='id', take=1, skip=2)
         ):
-            assert response.json[0]['title'] == 'My interesting project'
+            assert response.json[0]['title'] == 'My awesome project'
 
             when(
                 'Manipulate sorting and pagination',
