@@ -300,3 +300,55 @@ class TestProject(LocalApplicationTestCase):
             )
             assert status == '709 Form not allowed'
 
+    def test_list(self):
+        with self.given(
+            'List projects',
+            '/apiv1/projects',
+            'LIST',
+        ):
+            assert status == 200
+            assert len(response.json) == 3
+
+        with self.given(
+            'Sort projects by phases title',
+            '/apiv1/projects',
+            'LIST',
+            query=dict(sort='title')
+        ):
+            assert status == 200
+            assert response.json[0]['title'] == 'My awesome project'
+
+            when(
+                'Reverse sorting titles by alphabet',
+                query=dict(sort='-title')
+            )
+            assert response.json[0]['title'] == 'My interesting project'
+
+        with self.given(
+            'Filter projects',
+            '/apiv1/projects',
+            'LIST',
+            query=dict(title='My awesome project')
+        ):
+            assert response.json[0]['title'] == 'My awesome project'
+
+            when(
+                'List projects except one of them',
+                query=dict(title='!My awesome project')
+            )
+            assert response.json[0]['title'] == 'My hidden project'
+
+        with self.given(
+            'Project pagination',
+            '/apiv1/projects',
+            'LIST',
+            query=dict(take=1, skip=2)
+        ):
+            assert response.json[0]['title'] == 'My interesting project'
+
+            when(
+                'Manipulate sorting and pagination',
+                query=dict(sort='-title', take=1, skip=2)
+            )
+            assert response.json[0]['title'] == 'My awesome project'
+
