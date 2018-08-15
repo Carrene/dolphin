@@ -82,3 +82,10 @@ class ReleaseController(ModelRestController):
         DBSession.delete(release)
         return release
 
+    @json
+    @Release.expose
+    def list(self):
+
+        query = DBSession.query(Release)
+        return query
+

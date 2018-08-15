@@ -1,6 +1,7 @@
 
 from sqlalchemy import Integer, Enum, DateTime, Time, ForeignKey
-from restfulpy.orm import Field, relationship
+from restfulpy.orm import Field, relationship, ModifiedMixin, FilteringMixin, \
+    OrderingMixin, PaginationMixin
 
 from .subscribable import Subscribable
 
@@ -13,7 +14,9 @@ release_statuses = [
 ]
 
 
-class Release(Subscribable):
+class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
+              Subscribable):
+
     __tablename__ = 'release'
     __mapper_args__ = {'polymorphic_identity': __tablename__}
 
