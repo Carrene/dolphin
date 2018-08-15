@@ -10,13 +10,34 @@ class TestRelease(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        release = Release(
+        release1 = Release(
             title='My first release',
-            description='A decription for my release',
+            description='A decription for my first release',
             due_date='2020-2-20',
             cutoff='2030-2-20',
         )
-        session.add(release)
+
+        release2 = Release(
+            title='My second release',
+            description='A decription for my second release',
+            due_date='2020-2-20',
+            cutoff='2030-2-20',
+        )
+
+        release3 = Release(
+            title='My third release',
+            description='A decription for my third release',
+            due_date='2020-2-20',
+            cutoff='2030-2-20',
+        )
+
+        release4 = Release(
+            title='My fourth release',
+            description='A decription for my fourth release',
+            due_date='2020-2-20',
+            cutoff='2030-2-20',
+        )
+        session.add_all([release1, release2, release3, release4])
         session.commit()
 
     def test_create(self):
@@ -223,4 +244,56 @@ class TestRelease(LocalApplicationTestCase):
         session = self.create_session()
         release = session.query(Release).filter(Release.id == 1).one_or_none()
         assert release is None
+
+    def test_list(self):
+        with self.given(
+            'List releases',
+            '/apiv1/releases',
+            'LIST'
+        ):
+            assert status == 200
+            assert len(response.json) == 4
+
+        with self.given(
+            'Sort releases by title',
+            '/apiv1/releases',
+            'LIST',
+            query=dict(sort='title')
+        ):
+            assert response.json[0]['title'] == 'My awesome release'
+
+            when(
+                'Reverse sorting titles by alphabet',
+                query=dict(sort='-title')
+            )
+            assert response.json[0]['title'] == 'My third release'
+
+        with self.given(
+            'Filter releases',
+            '/apiv1/releases',
+            'LIST',
+            query=dict(sort='id', take=1, skip=2)
+        ):
+            assert response.json[0]['title'] == 'My fourth release'
+
+            when(
+                'List releases except one of them',
+                query=dict(title='!My second release')
+            )
+            assert response.json[0]['title'] == 'My third release'
+
+        with self.given(
+             'Issues pagination',
+             '/apiv1/releases',
+             'LIST',
+             query=dict(sort='id', take=1, skip=2)
+         ):
+            assert response.json[0]['title'] == 'My fourth release'
+
+            when(
+                'Manipulate sorting and pagination',
+                query=dict(sort='-title', take=1, skip=2)
+            )
+            assert response.json[0]['title'] == 'My fourth release'
+
 
