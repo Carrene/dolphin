@@ -1,4 +1,11 @@
-# dolphin
+
+dolphin
+===
+branches
+---
+### master
+[![Build Status](https://travis-ci.com/Carrene/dolphin.svg?token=6WpJ2w8ex7Mp4ndx7xs2&branch=master)](https://travis-ci.com/Carrene/dolphin) 
+[![Coverage Status](https://coveralls.io/repos/github/Carrene/dolphin/badge.svg?t=fWXT5d)](https://coveralls.io/github/Carrene/dolphin)
 
 ![dolphin](https://www.wildquest.com/wp-content/gallery/wallpapers-2014/September-2017.jpg)
 
