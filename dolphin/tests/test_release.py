@@ -296,4 +296,3 @@ class TestRelease(LocalApplicationTestCase):
             )
             assert response.json[0]['title'] == 'My fourth release'
 
-
