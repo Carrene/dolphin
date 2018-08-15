@@ -5,7 +5,7 @@ from .models import Subscribable, Member, Project, Release, Issue, Tag,\
     Phase, Manager, Resource, Guest, Team, Item
 
 
-def insert():
+def insert(): # pragma: no cover
     guest = Guest(
         title='First Guest',
         email=None,
