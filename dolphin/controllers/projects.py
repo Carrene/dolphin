@@ -97,3 +97,10 @@ class ProjectController(ModelRestController):
         project.soft_undelete()
         return project
 
+    @json
+    @Project.expose
+    def list(self):
+
+        query = DBSession.query(Project)
+        return query
+
