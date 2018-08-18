@@ -357,7 +357,7 @@ update_item_validator = validate(
 )
 
 
-subscribe_issue_validator = validate(
+subscribe_validator = validate(
     memberId=dict(
         required='735 Member id not in form',
         type_=(int, '736 Invalid member id type'),

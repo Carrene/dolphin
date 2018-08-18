@@ -7,7 +7,7 @@ from restfulpy.controllers import ModelRestController
 from dolphin.models import Issue, issue_kinds, issue_statuses, Subscription, \
     Resource, Phase, Item
 from dolphin.validators import issue_validator, update_issue_validator, \
-    subscribe_issue_validator, assign_issue_validator
+    subscribe_validator, assign_issue_validator
 
 
 class IssueController(ModelRestController):
@@ -62,7 +62,7 @@ class IssueController(ModelRestController):
         return query
 
     @json
-    @subscribe_issue_validator
+    @subscribe_validator
     @Issue.expose
     @commit
     def subscribe(self, id):
@@ -92,7 +92,7 @@ class IssueController(ModelRestController):
         return issue
 
     @json
-    @subscribe_issue_validator
+    @subscribe_validator
     @Issue.expose
     @commit
     def unsubscribe(self, id):
