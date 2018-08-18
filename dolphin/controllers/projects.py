@@ -3,8 +3,9 @@ from restfulpy.orm import DBSession, commit
 from restfulpy.utils import to_camel_case
 from restfulpy.controllers import ModelRestController
 
-from dolphin.models import Project
-from dolphin.validators import project_validator, update_project_validator
+from dolphin.models import Project, Subscription
+from dolphin.validators import project_validator, update_project_validator, \
+    subscribe_validator
 
 
 class ProjectController(ModelRestController):
@@ -103,4 +104,36 @@ class ProjectController(ModelRestController):
 
         query = DBSession.query(Project)
         return query
+
+    @json
+    @subscribe_validator
+    @Project.expose
+    @commit
+    def subscribe(self, id):
+        form = context.form
+
+        try:
+            id = int(id)
+        except:
+            raise HTTPNotFound()
+
+        project = DBSession.query(Project) \
+            .filter(Project.id == id) \
+            .one_or_none()
+        if not project:
+            raise HTTPNotFound()
+
+        if DBSession.query(Subscription).filter(
+            Subscription.subscribable == id,
+            Subscription.member == form['memberId']
+        ).one_or_none():
+            raise HTTPStatus('611 Already subscribed')
+
+        subscription = Subscription(
+            subscribable=id,
+            member=form['memberId']
+        )
+        DBSession.add(subscription)
+
+        return project
 
