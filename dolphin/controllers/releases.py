@@ -122,3 +122,33 @@ class ReleaseController(ModelRestController):
 
         return release
 
+    @json
+    @subscribe_validator
+    @Release.expose
+    @commit
+    def unsubscribe(self, id):
+        form = context.form
+
+        try:
+            id = int(id)
+        except:
+            raise HTTPNotFound()
+
+        release = DBSession.query(Release) \
+            .filter(Release.id == id) \
+            .one_or_none()
+        if not release:
+            raise HTTPNotFound()
+
+        subscription = DBSession.query(Subscription).filter(
+            Subscription.subscribable == id,
+            Subscription.member == form['memberId']
+        ).one_or_none()
+
+        if not subscription:
+            raise HTTPStatus('612 Not Subscribed Yet')
+
+        DBSession.delete(subscription)
+
+        return release
+
