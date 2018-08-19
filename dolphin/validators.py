@@ -192,20 +192,20 @@ def resource_exists_validator(resourceId, container, field):
 
 release_validator = validate(
     title=dict(
-        required='710 Title not in form',
-        max_length=(50, '704 At most 50 characters are valid for title'),
+        required='710 Title Not In Form',
+        max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
         callback=release_not_exists_validator
     ),
     description=dict(
-        max_length=(512, '703 At most 512 characters are valid for description')
+        max_length=(512, '703 At Most 512 Characters Are Valid For Description')
     ),
     dueDate=dict(
-        pattern=(DATE_PATTERN, '701 Invalid due date format'),
-        required='711 Due date not in form'
+        pattern=(DATE_PATTERN, '701 Invalid Due Date Format'),
+        required='711 Due Date Not In Form'
     ),
     cutoff=dict(
-        pattern=(DATE_PATTERN, '702 Invalid cutoff format'),
-        required='712 Cutoff not in form'
+        pattern=(DATE_PATTERN, '702 Invalid Cutoff Format'),
+        required='712 Cutoff Not In Form'
     ),
     status=dict(
         callback=release_status_value_validator
@@ -215,17 +215,17 @@ release_validator = validate(
 
 update_release_validator = validate(
     title=dict(
-        max_length=(50, '704 At most 50 characters are valid for title'),
+        max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
         callback=release_not_exists_validator
     ),
     description=dict(
-        max_length=(512, '703 At most 512 characters are valid for description')
+        max_length=(512, '703 At Most 512 Characters Are Valid For Description')
     ),
     dueDate=dict(
-        pattern=(DATE_PATTERN, '701 Invalid due date format'),
+        pattern=(DATE_PATTERN, '701 Invalid Due Date Format'),
     ),
     cutoff=dict(
-        pattern=(DATE_PATTERN, '702 Invalid cutoff format'),
+        pattern=(DATE_PATTERN, '702 Invalid Cutoff Format'),
     ),
     status=dict(
         callback=release_status_value_validator
@@ -235,16 +235,16 @@ update_release_validator = validate(
 
 project_validator = validate(
     title=dict(
-        required='710 Title not in form',
+        required='710 Title Not In Form',
         callback=project_not_exists_validator,
-        max_length=(50, '704 At most 50 characters are valid for title')
+        max_length=(50, '704 At Most 50 Characters Are Valid For Title')
     ),
     description=dict(
-        max_length=(512, '703 At most 512 characters are valid for description')
+        max_length=(512, '703 At Most 512 Characters Are Valid For Description')
     ),
     dueDate=dict(
-        pattern=(DATE_PATTERN, '701 Invalid due date format'),
-        required='711 Due date not in form'
+        pattern=(DATE_PATTERN, '701 Invalid Due Date Format'),
+        required='711 Due Date Not In Form'
     ),
     status=dict(
         callback=project_status_value_validator
@@ -256,7 +256,7 @@ project_validator = validate(
         callback=release_exists_validator
     ),
     managerId=dict(
-        required='734 Manager id not in form',
+        required='734 Manager Id Not In Form',
         callback=manager_exists_validator
     )
 )
@@ -265,16 +265,16 @@ project_validator = validate(
 update_project_validator = validate(
     title=dict(
         callback=project_not_exists_validator,
-        max_length=(50, '704 At most 50 characters are valid for title')
+        max_length=(50, '704 At Most 50 Characters Are Valid For Title')
     ),
     description=dict(
-        max_length=(512, '703 At most 512 characters are valid for description')
+        max_length=(512, '703 At Most 512 Characters Are Valid For Description')
     ),
     dueDate=dict(
-        pattern=(DATE_PATTERN, '701 Invalid due date format'),
+        pattern=(DATE_PATTERN, '701 Invalid Due Date Format'),
     ),
     cutoff=dict(
-        pattern=(DATE_PATTERN, '702 Invalid cutoff format'),
+        pattern=(DATE_PATTERN, '702 Invalid Cutoff Format'),
     ),
     status=dict(
         callback=project_status_value_validator
@@ -287,8 +287,8 @@ update_project_validator = validate(
 
 assign_manager_validator = validate(
     projectId=dict(
-        required='713 Project id not in form',
-        type_=(int, '714 Invalid project id type'),
+        required='713 Project Id Not In Form',
+        type_=(int, '714 Invalid Project Id Type'),
         callback=project_exists_validator
     )
 )
@@ -296,31 +296,31 @@ assign_manager_validator = validate(
 
 issue_validator = validate(
     title=dict(
-        required='710 Title not in form',
-        max_length=(50, '704 At most 50 characters are valid for title'),
+        required='710 Title Not In Form',
+        max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
         callback=issue_not_exists_validator
     ),
     description=dict(
-        max_length=(512, '703 At most 512 characters are valid for description')
+        max_length=(512, '703 At Most 512 Characters Are Valid For Description')
     ),
     dueDate=dict(
-        pattern=(DATE_PATTERN, '701 Invalid due date format'),
-        required='711 Due date not in form'
+        pattern=(DATE_PATTERN, '701 Invalid Due Date Format'),
+        required='711 Due Date Not In Form'
     ),
     kind=dict(
-        required='718 Kind not in form',
+        required='718 Kind Not In Form',
         callback=kind_value_validator
     ),
     status=dict(
         callback=issue_status_value_validator
     ),
     days=dict(
-        type_=(int, '721 Invalid days type'),
-        required='720 Days not in form'
+        type_=(int, '721 Invalid Days Type'),
+        required='720 Days Not In Form'
     ),
     projectId=dict(
-        required='713 Project id not in form',
-        type_=(int, '714 Invalid project id type'),
+        required='713 Project Id Not In Form',
+        type_=(int, '714 Invalid Project Id Type'),
         callback=project_exists_validator
     )
 )
@@ -328,14 +328,14 @@ issue_validator = validate(
 
 update_issue_validator = validate(
     title=dict(
-        max_length=(50, '704 At most 50 characters are valid for title'),
+        max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
         callback=issue_not_exists_validator
     ),
     description=dict(
-        max_length=(512, '703 At most 512 characters are valid for description')
+        max_length=(512, '703 At Most 512 Characters Are Valid For Description')
     ),
     dueDate=dict(
-        pattern=(DATE_PATTERN, '701 Invalid due date format'),
+        pattern=(DATE_PATTERN, '701 Invalid Due Date Format'),
     ),
     kind=dict(
         callback=kind_value_validator
@@ -344,23 +344,23 @@ update_issue_validator = validate(
         callback=issue_status_value_validator
     ),
     days=dict(
-        type_=(int, '721 Invalid days type'),
+        type_=(int, '721 Invalid Days Type'),
     ),
 )
 
 
 update_item_validator = validate(
     status=dict(
-        required='719 Status not in form',
+        required='719 Status Not In Form',
         callback=item_status_value_validator
     )
 )
 
 
-subscribe_issue_validator = validate(
+subscribe_validator = validate(
     memberId=dict(
-        required='735 Member id not in form',
-        type_=(int, '736 Invalid member id type'),
+        required='735 Member Id Not In Form',
+        type_=(int, '736 Invalid Member Id Type'),
         callback=member_exists_validator
     )
 )
