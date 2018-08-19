@@ -13,11 +13,9 @@ class TestProject(LocalApplicationTestCase):
 
         manager = Manager(
             title='First Manager',
-           email=None,
+            email=None,
             phone=123456789
         )
-        session.add(manager)
-        session.flush()
 
         release = Release(
             title='My first release',
@@ -25,32 +23,28 @@ class TestProject(LocalApplicationTestCase):
             due_date='2020-2-20',
             cutoff='2030-2-20',
         )
-        session.add(release)
-        session.flush()
 
         project = Project(
-            manager_id=manager.id,
-            release_id=release.id,
+            manager=manager,
+            releases=[release],
             title='My first project',
             description='A decription for my project',
             due_date='2020-2-20',
         )
-        session.add(project)
-        session.flush()
 
         hidden_project = Project(
-            manager_id=manager.id,
-            release_id=release.id,
+            manager=manager,
+            releases=[release],
             title='My hidden project',
             description='A decription for my project',
             due_date='2020-2-20',
             removed_at='2020-2-20'
         )
-        session.add(hidden_project)
 
-        cls.manager_id = manager.id
-        cls.release_id = release.id
+        session.add_all([manager, project, hidden_project, release])
         session.commit()
+        cls.manager_id = manager.id
+        cls.release = release
 
     def test_create(self):
         with self.given(
@@ -59,7 +53,7 @@ class TestProject(LocalApplicationTestCase):
             'CREATE',
             form=dict(
                 managerId=self.manager_id,
-                releaseId=self.release_id,
+                releases=self.release,
                 title='My awesome project',
                 description='A decription for my project',
                 dueDate='2020-2-20'
@@ -156,7 +150,7 @@ class TestProject(LocalApplicationTestCase):
     def test_update(self):
         with self.given(
             'Updating a project',
-            '/apiv1/projects/id:2',
+            '/apiv1/projects/id:1',
             'UPDATE',
             form=dict(
                 title='My interesting project',
@@ -250,12 +244,12 @@ class TestProject(LocalApplicationTestCase):
     def test_hide(self):
         with self.given(
             'Hiding a project',
-            '/apiv1/projects/id:2',
+            '/apiv1/projects/id:1',
             'HIDE'
         ):
             session = self.create_session()
             project = session.query(Project) \
-                .filter(Project.id == 2) \
+                .filter(Project.id == 1) \
                 .one_or_none()
             assert status == 200
             project.assert_is_deleted()
