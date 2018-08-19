@@ -69,7 +69,7 @@ class TestRelease(LocalApplicationTestCase):
                 'Title is not in form',
                 form=Remove('title')
             )
-            assert status == '710 Title not in form'
+            assert status == '710 Title Not In Form'
 
             when(
                 'Title length is more than limit',

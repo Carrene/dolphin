@@ -23,7 +23,7 @@ class IssueController(ModelRestController):
         DBSession.add(issue)
         return issue
 
-    @json(prevent_empty_form='708 No parameter exists in the form')
+    @json(prevent_empty_form='708 No Parameter Exists In The Form')
     @update_issue_validator
     @Issue.expose
     @commit
@@ -81,7 +81,7 @@ class IssueController(ModelRestController):
             Subscription.subscribable == id,
             Subscription.member == form['memberId']
         ).one_or_none():
-            raise HTTPStatus('611 Already subscribed')
+            raise HTTPStatus('611 Already Subscribed')
 
         subscription = Subscription(
             subscribable=issue.id,

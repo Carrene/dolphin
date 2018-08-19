@@ -111,7 +111,7 @@ class TestIssue(LocalApplicationTestCase):
                 'Project id not in form',
                 form=given_form - 'projectId' | dict(title='1')
             )
-            assert status == '713 Project id not in form'
+            assert status == '713 Project Id Not In Form'
 
             when(
                 'Project not found with string type',
@@ -291,7 +291,7 @@ class TestIssue(LocalApplicationTestCase):
 
         with self.given(
             'Updating project with empty form',
-            '/apiv1/projects/id:2',
+            '/apiv1/issues/id:2',
             'UPDATE',
             form=dict()
         ):
@@ -426,7 +426,7 @@ class TestIssue(LocalApplicationTestCase):
                 'Member id not in form',
                 form=given_form - 'memberId'
             )
-            assert status == '735 Member id not in form'
+            assert status == '735 Member Id Not In Form'
 
             when(
                 'Member not found',
