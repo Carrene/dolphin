@@ -47,7 +47,7 @@ class TestItem(LocalApplicationTestCase):
         )
 
         resource = Resource(
-            team=team,
+            teams=[team],
             title='Developer',
             email='dev@example.com',
             phone=987654321
