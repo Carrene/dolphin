@@ -15,7 +15,6 @@ class TestRelease(LocalApplicationTestCase):
             email=None,
             phone=123456789
         )
-        session.add(manager)
 
         release1 = Release(
             title='My first release',
@@ -328,7 +327,7 @@ class TestRelease(LocalApplicationTestCase):
                 'Member id not in form',
                 form=given_form - 'memberId'
             )
-            assert status == '735 Member id not in form'
+            assert status == '735 Member Id Not In Form'
 
             when(
                 'Member not found',

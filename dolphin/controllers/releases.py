@@ -5,8 +5,8 @@ from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 from restfulpy.utils import to_camel_case
 
-from dolphin.models import Release, release_statuses, Subscription
-from dolphin.validators import release_validator, update_release_validator, \
+from ..models import Release, release_statuses, Subscription
+from ..validators import release_validator, update_release_validator, \
     subscribe_validator
 
 
@@ -112,7 +112,7 @@ class ReleaseController(ModelRestController):
             Subscription.subscribable == id,
             Subscription.member == form['memberId']
         ).one_or_none():
-            raise HTTPStatus('611 Already subscribed')
+            raise HTTPStatus('611 Already Subscribed')
 
         subscription = Subscription(
             subscribable=id,
