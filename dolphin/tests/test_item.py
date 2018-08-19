@@ -85,7 +85,7 @@ class TestItem(LocalApplicationTestCase):
                 'Status is not in form',
                 form=Remove('status')
             )
-            assert status == '719 Status not in form'
+            assert status == '719 Status Not In Form'
 
             when(
                 'Invalid status value is in the form',

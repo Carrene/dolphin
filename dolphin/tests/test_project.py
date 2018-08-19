@@ -69,7 +69,7 @@ class TestProject(LocalApplicationTestCase):
                 'Manager id not in form',
                 form=given_form - 'managerId' | dict(title='1')
             )
-            assert status == '734 Manager id not in form'
+            assert status == '734 Manager Id Not In Form'
 
             when(
                 'Manger not found with string type',
@@ -103,13 +103,13 @@ class TestProject(LocalApplicationTestCase):
                 'Title is not in form',
                 form=Remove('title')
             )
-            assert status == '710 Title not in form'
+            assert status == '710 Title Not In Form'
 
             when(
                 'Title length is more than limit',
                 form=given_form | dict(title=((50 + 1) * 'a'))
             )
-            assert status == '704 At most 50 characters are valid for title'
+            assert status == '704 At Most 50 Characters Are Valid For Title'
 
             when(
                 'Description length is less than limit',
@@ -118,8 +118,8 @@ class TestProject(LocalApplicationTestCase):
                     title='Another title'
                 )
             )
-            assert status == '703 At most 512 characters are valid for '\
-                'description'
+            assert status == '703 At Most 512 Characters Are Valid For '\
+                'Description'
 
             when(
                 'Due date format is wrong',
@@ -128,13 +128,12 @@ class TestProject(LocalApplicationTestCase):
                     title='Another title'
                 )
             )
-            assert status == '701 Invalid due date format'
+            assert status == '701 Invalid Due Date Format'
 
             when(
                 'Due date is not in form',
                 form=given_form - ['dueDate'] | dict(title='Another title')
             )
-            assert status == '711 Due date not in form'
 
             when(
                 'Status value is invalid',
@@ -193,7 +192,7 @@ class TestProject(LocalApplicationTestCase):
                     title=((50 + 1) * 'a')
                 )
             )
-            assert status == '704 At most 50 characters are valid for title'
+            assert status == '704 At Most 50 Characters Are Valid For Title'
 
             when(
                 'Description length is more than limit',
@@ -202,8 +201,8 @@ class TestProject(LocalApplicationTestCase):
                     title='Another title'
                 )
             )
-            assert status == '703 At most 512 characters are valid for ' \
-                'description'
+            assert status == '703 At Most 512 Characters Are Valid For ' \
+                'Description'
 
             when(
                 'Due date format is wrong',
@@ -212,7 +211,7 @@ class TestProject(LocalApplicationTestCase):
                     title='Another title'
                 )
             )
-            assert status == '701 Invalid due date format'
+            assert status == '701 Invalid Due Date Format'
 
             when(
                 'Status value is invalid',
@@ -239,7 +238,7 @@ class TestProject(LocalApplicationTestCase):
             'UPDATE',
             form=dict()
         ):
-            assert status == '708 No parameter exists in the form'
+            assert status == '708 No Parameter Exists In The Form'
 
     def test_hide(self):
         with self.given(
@@ -255,7 +254,7 @@ class TestProject(LocalApplicationTestCase):
             project.assert_is_deleted()
 
             when(
-                'Intended project with string type not found',
+                'Intended Project With String Type Not Found',
                 url_parameters=dict(id=100)
             )
             assert status == 404
@@ -267,7 +266,7 @@ class TestProject(LocalApplicationTestCase):
                 'There is parameter in form',
                 form=dict(any_parameter='A parameter in the form')
             )
-            assert status == '709 Form not allowed'
+            assert status == '709 Form Not Allowed'
 
     def test_show(self):
         with self.given(
@@ -292,7 +291,7 @@ class TestProject(LocalApplicationTestCase):
                 'There is parameter is form',
                 form=dict(any_parameter='A parameter in the form')
             )
-            assert status == '709 Form not allowed'
+            assert status == '709 Form Not Allowed'
 
     def test_list(self):
         with self.given(
@@ -373,7 +372,7 @@ class TestProject(LocalApplicationTestCase):
                 'Member id not in form',
                 form=given_form - 'memberId'
             )
-            assert status == '735 Member id not in form'
+            assert status == '735 Member Id Not In Form'
 
             when(
                 'Member not found',
@@ -386,14 +385,14 @@ class TestProject(LocalApplicationTestCase):
                 'Member id type is invalid',
                 form=given_form | dict(memberId='Alphabetical')
             )
-            assert status == '736 Invalid member id type'
+            assert status == '736 Invalid Member Id Type'
 
             when(
                 'Issue is already subscribed',
                 url_parameters=dict(id=4),
                 form=given_form | dict(memberId=1)
             )
-            assert status == '611 Already subscribed'
+            assert status == '611 Already Subscribed'
 
     def test_unsubscribe(self):
         with self.given(
@@ -422,7 +421,7 @@ class TestProject(LocalApplicationTestCase):
                 'Member id not in form',
                 form=given_form - 'memberId'
             )
-            assert status == '735 Member id not in form'
+            assert status == '735 Member Id Not In Form'
 
             when(
                 'Member not found',
@@ -435,7 +434,7 @@ class TestProject(LocalApplicationTestCase):
                 'Member id type is invalid',
                 form=given_form | dict(memberId='Alphabetical')
             )
-            assert status == '736 Invalid member id type'
+            assert status == '736 Invalid Member Id Type'
 
             when(
                 'Issue is not subscribed yet',

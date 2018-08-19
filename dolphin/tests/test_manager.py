@@ -65,13 +65,13 @@ class TestManager(LocalApplicationTestCase):
                 'Project id not in form',
                 form=given_form - 'projectId'
             )
-            assert status == '713 Project id not in form'
+            assert status == '713 Project Id Not In Form'
 
             when(
                 'Project id type is invalid',
                 form=given_form | dict(projectId='Alphabetical')
             )
-            assert status == '714 Invalid project id type'
+            assert status == '714 Invalid Project Id Type'
 
             when(
                 'Project not found with integer type',
