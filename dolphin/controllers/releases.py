@@ -1,12 +1,13 @@
 import re
 
-from nanohttp import json, context, HTTPNotFound
+from nanohttp import json, context, HTTPNotFound, HTTPStatus
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 from restfulpy.utils import to_camel_case
 
-from dolphin.models import Release, release_statuses
-from dolphin.validators import release_validator, update_release_validator
+from ..models import Release, release_statuses, Subscription
+from ..validators import release_validator, update_release_validator, \
+    subscribe_validator
 
 
 class ReleaseController(ModelRestController):
@@ -88,4 +89,36 @@ class ReleaseController(ModelRestController):
 
         query = DBSession.query(Release)
         return query
+
+    @json
+    @subscribe_validator
+    @Release.expose
+    @commit
+    def subscribe(self, id):
+        form = context.form
+
+        try:
+            id = int(id)
+        except:
+            raise HTTPNotFound()
+
+        release = DBSession.query(Release) \
+            .filter(Release.id == id) \
+            .one_or_none()
+        if not release:
+            raise HTTPNotFound()
+
+        if DBSession.query(Subscription).filter(
+            Subscription.subscribable == id,
+            Subscription.member == form['memberId']
+        ).one_or_none():
+            raise HTTPStatus('611 Already Subscribed')
+
+        subscription = Subscription(
+            subscribable=id,
+            member=form['memberId']
+        )
+        DBSession.add(subscription)
+
+        return release
 

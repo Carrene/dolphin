@@ -4,6 +4,7 @@ from sqlalchemy.orm import backref
 from restfulpy.orm import Field, relationship, SoftDeleteMixin, \
     ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin
 
+from .issue import Issue
 from .subscribable import Subscribable
 
 
@@ -45,6 +46,13 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         'Release',
         foreign_keys=[release_id],
         backref='projects',
+        protected=True
+    )
+
+    issues = relationship(
+        'Issue',
+        primaryjoin=id == Issue.project_id,
+        back_populates='project',
         protected=True
     )
 

@@ -10,6 +10,12 @@ class TestRelease(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
+        manager = Manager(
+            title='First Manager',
+            email=None,
+            phone=123456789
+        )
+
         release1 = Release(
             title='My first release',
             description='A decription for my first release',
@@ -37,7 +43,7 @@ class TestRelease(LocalApplicationTestCase):
             due_date='2020-2-20',
             cutoff='2030-2-20',
         )
-        session.add_all([release1, release2, release3, release4])
+        session.add_all([release1, release2, release3, release4, manager])
         session.commit()
 
     def test_create(self):
@@ -295,4 +301,51 @@ class TestRelease(LocalApplicationTestCase):
                 query=dict(sort='-title', take=1, skip=2)
             )
             assert response.json[0]['title'] == 'My fourth release'
+
+    def test_subscribe(self):
+        with self.given(
+            'Subscribe release',
+            '/apiv1/releases/id:2',
+            'SUBSCRIBE',
+            form=dict(memberId=1)
+        ):
+            assert status == 200
+
+            when(
+                'Intended release with string type not found',
+                url_parameters=dict(id='Alphabetical')
+            )
+            assert status == 404
+
+            when(
+                'Intended release with integer type not found',
+                url_parameters=dict(id=100)
+            )
+            assert status == 404
+
+            when(
+                'Member id not in form',
+                form=given_form - 'memberId'
+            )
+            assert status == '735 Member Id Not In Form'
+
+            when(
+                'Member not found',
+                form=given_form | dict(memberId=100)
+            )
+            assert status == 610
+            assert status.text.startswith('Member not found')
+
+            when(
+                'Member id type is invalid',
+                form=given_form | dict(memberId='Alphabetical')
+            )
+            assert status == '736 Invalid Member Id Type'
+
+            when(
+                'Issue is already subscribed',
+                url_parameters=dict(id=2),
+                form=given_form | dict(memberId=1)
+            )
+            assert status == '611 Already Subscribed'
 
