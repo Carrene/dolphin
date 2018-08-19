@@ -3,8 +3,8 @@ from restfulpy.orm import DBSession, commit
 from restfulpy.utils import to_camel_case
 from restfulpy.controllers import ModelRestController
 
-from dolphin.models import Project, Subscription
-from dolphin.validators import project_validator, update_project_validator, \
+from ..models import Project, Subscription
+from ..validators import project_validator, update_project_validator, \
     subscribe_validator
 
 
