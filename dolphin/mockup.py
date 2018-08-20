@@ -41,22 +41,88 @@ def insert(): # pragma: no cover
     )
     DBSession.add(release)
 
-    project = Project(
+    project1 = Project(
         manager=manager,
         releases=release,
         title='My first project',
         description='A decription for my project',
         due_date='2020-2-20',
+        status='in-progress'
     )
-    DBSession.add(project)
+    DBSession.add(project1)
 
-    issue = Issue(
-        project=project,
+    project2 = Project(
+        manager=manager,
+        releases=release,
+        title='My second project',
+        description='A decription for my project',
+        due_date='2020-2-20',
+        status='on-hold'
+    )
+    DBSession.add(project2)
+
+    project3 = Project(
+        manager=manager,
+        releases=release,
+        title='My third project',
+        description='A decription for my project',
+        due_date='2020-2-20',
+        status='delayed'
+    )
+    DBSession.add(project3)
+
+    project4 = Project(
+        manager=manager,
+        releases=release,
+        title='My fourth project',
+        description='A decription for my project',
+        due_date='2020-2-20',
+        status='done'
+    )
+    DBSession.add(project4)
+
+    issue1 = Issue(
+        project=project1,
         title='First issue',
         description='This is description of first issue',
         due_date='2020-2-20',
         kind='feature',
+        status='in-progeress',
         days=1
+    )
+    DBSession.add(issue1)
+
+    issue2 = Issue(
+        project=project1,
+        title='Second issue',
+        description='This is description of second issue',
+        due_date='2020-2-20',
+        kind='feature',
+        status='on-hold',
+        days=2
+    )
+    DBSession.add(issue2)
+
+
+    issue3 = Issue(
+        project=project1,
+        title='Third issue',
+        description='This is description of third issue',
+        due_date='2020-2-20',
+        kind='feature',
+        status='delayed',
+        days=3
+    )
+    DBSession.add(issue3)
+
+    issue4 = Issue(
+        project=project1,
+        title='Fourth issue',
+        description='This is description of fourth issue',
+        due_date='2020-2-20',
+        kind='feature',
+        status='done'
+        days=4
     )
     DBSession.add(issue)
 
