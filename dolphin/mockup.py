@@ -87,7 +87,7 @@ def insert(): # pragma: no cover
         description='This is description of first issue',
         due_date='2020-2-20',
         kind='feature',
-        status='in-progeress',
+        status='in-progress',
         days=1
     )
     DBSession.add(issue1)
@@ -121,13 +121,13 @@ def insert(): # pragma: no cover
         description='This is description of fourth issue',
         due_date='2020-2-20',
         kind='feature',
-        status='done'
+        status='done',
         days=4
     )
-    DBSession.add(issue)
+    DBSession.add(issue4)
 
     phase = Phase(
-        project=project,
+        project=project1,
         title='design',
         order=1,
     )
@@ -141,7 +141,7 @@ def insert(): # pragma: no cover
     item = Item(
         resource=resource,
         phase=phase,
-        issue=issue,
+        issue=issue1,
         status='in-progress',
         end='2020-2-2'
     )
