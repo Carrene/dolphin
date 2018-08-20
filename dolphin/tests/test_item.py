@@ -31,7 +31,7 @@ class TestItem(LocalApplicationTestCase):
 
         project = Project(
             manager=manager,
-            releases=release,
+            releases=[release],
             title='My first project',
             description='A decription for my project',
             due_date='2020-2-20',
@@ -47,7 +47,7 @@ class TestItem(LocalApplicationTestCase):
         )
 
         resource = Resource(
-            team=team,
+            teams=[team],
             title='Developer',
             email='dev@example.com',
             phone=987654321
@@ -85,7 +85,7 @@ class TestItem(LocalApplicationTestCase):
                 'Status is not in form',
                 form=Remove('status')
             )
-            assert status == '719 Status not in form'
+            assert status == '719 Status Not In Form'
 
             when(
                 'Invalid status value is in the form',

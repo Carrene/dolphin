@@ -24,7 +24,6 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
     manager_id = Field(Integer, ForeignKey('member.id'))
-    release_id = Field(Integer, ForeignKey('release.id'), nullable=True)
 
     status = Field(
         Enum(*project_statuses, name='project_status'),
@@ -44,11 +43,10 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     )
     releases = relationship(
         'Release',
-        foreign_keys=[release_id],
-        backref='projects',
+        secondary='releaseproject',
+        back_populates='projects',
         protected=True
     )
-
     issues = relationship(
         'Issue',
         primaryjoin=id == Issue.project_id,

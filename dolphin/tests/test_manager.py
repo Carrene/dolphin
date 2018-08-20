@@ -32,7 +32,7 @@ class TestManager(LocalApplicationTestCase):
 
         project = Project(
             manager=assigned_manager,
-            releases=release,
+            releases=[release],
             title='My first project',
             description='A decription for my project',
             due_date='2020-2-20',
@@ -45,7 +45,7 @@ class TestManager(LocalApplicationTestCase):
             'Assign a manager to project',
             '/apiv1/managers/id:1',
             'ASSIGN',
-            form=dict(projectId='2')
+            form=dict(projectId='1')
         ):
             assert status == 200
 
@@ -65,13 +65,13 @@ class TestManager(LocalApplicationTestCase):
                 'Project id not in form',
                 form=given_form - 'projectId'
             )
-            assert status == '713 Project id not in form'
+            assert status == '713 Project Id Not In Form'
 
             when(
                 'Project id type is invalid',
                 form=given_form | dict(projectId='Alphabetical')
             )
-            assert status == '714 Invalid project id type'
+            assert status == '714 Invalid Project Id Type'
 
             when(
                 'Project not found with integer type',
