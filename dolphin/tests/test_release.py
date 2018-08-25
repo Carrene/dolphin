@@ -69,13 +69,13 @@ class TestRelease(LocalApplicationTestCase):
                 'Title is not in form',
                 form=Remove('title')
             )
-            assert status == '710 Title not in form'
+            assert status == '710 Title Not In Form'
 
             when(
                 'Title length is more than limit',
                 form=given_form | dict(title=((50 + 1) * 'a'))
             )
-            assert status == '704 At most 50 characters are valid for title'
+            assert status == '704 At Most 50 Characters Are Valid For Title'
 
             when(
                 'Description length is less than limit',
@@ -84,8 +84,8 @@ class TestRelease(LocalApplicationTestCase):
                     title='Another title'
                 )
             )
-            assert status == '703 At most 512 characters are valid for ' \
-                'description'
+            assert status == '703 At Most 512 Characters Are Valid For '\
+                'Description'
 
             when(
                 'Due date format is wrong',
@@ -94,13 +94,13 @@ class TestRelease(LocalApplicationTestCase):
                     title='Another title'
                 )
             )
-            assert status == '701 Invalid due date format'
+            assert status == '701 Invalid Due Date Format'
 
             when(
                 'Due date is not in form',
                 form=given_form - 'dueDate' | dict(title='Another title')
             )
-            assert status == '711 Due date not in form'
+            assert status == '711 Due Date Not In Form'
 
             when(
                 'Cutoff format is wrong',
@@ -109,13 +109,13 @@ class TestRelease(LocalApplicationTestCase):
                     title='Another title'
                 )
             )
-            assert status == '702 Invalid cutoff format'
+            assert status == '702 Invalid Cutoff Format'
 
             when(
                 'Due date is not in form',
                 form=given_form - 'cutoff' | dict(title='Another title')
             )
-            assert status == '712 Cutoff not in form'
+            assert status == '712 Cutoff Not In Form'
 
             when(
                 'Invalid status in form',
@@ -166,7 +166,7 @@ class TestRelease(LocalApplicationTestCase):
                 'Title length is more than limit',
                 form=given_form | dict(title=((50 + 1) * 'a'))
             )
-            assert status == '704 At most 50 characters are valid for title'
+            assert status == '704 At Most 50 Characters Are Valid For Title'
 
             when(
                 'Title is repetitive',
@@ -182,8 +182,8 @@ class TestRelease(LocalApplicationTestCase):
                     title='Another title'
                 )
             )
-            assert status == '703 At most 512 characters are valid for '\
-                'description'
+            assert status == '703 At Most 512 Characters Are Valid For '\
+                'Description'
 
             when(
                 'Due date format is wrong',
@@ -192,7 +192,7 @@ class TestRelease(LocalApplicationTestCase):
                     title='Another title'
                 )
             )
-            assert status == '701 Invalid due date format'
+            assert status == '701 Invalid Due Date Format'
 
             when(
                 'Cutoff format is wrong',
@@ -201,7 +201,7 @@ class TestRelease(LocalApplicationTestCase):
                     title='Another title'
                 )
             )
-            assert status == '702 Invalid cutoff format'
+            assert status == '702 Invalid Cutoff Format'
 
             when(
                 'Invalid status in form',
@@ -219,7 +219,7 @@ class TestRelease(LocalApplicationTestCase):
             'UPDATE',
             form=dict()
         ):
-            assert status == '708 No parameter exists in the form'
+            assert status == '708 No Parameter Exists In The Form'
 
     def test_abort(self):
         with self.given(
@@ -245,7 +245,7 @@ class TestRelease(LocalApplicationTestCase):
                 'There is parameter in form',
                 form=dict(any_parameter='A parameter in the form')
             )
-            assert status == '709 Form not allowed'
+            assert status == '709 Form Not Allowed'
 
         session = self.create_session()
         release = session.query(Release).filter(Release.id == 1).one_or_none()
@@ -374,7 +374,7 @@ class TestRelease(LocalApplicationTestCase):
                 'Member id not in form',
                 form=given_form - 'memberId'
             )
-            assert status == '735 Member id not in form'
+            assert status == '735 Member Id Not In Form'
 
             when(
                 'Member not found',

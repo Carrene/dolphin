@@ -28,7 +28,7 @@ class ReleaseController(ModelRestController):
         DBSession.add(new_release)
         return new_release
 
-    @json(prevent_empty_form='708 No parameter exists in the form')
+    @json(prevent_empty_form='708 No Parameter Exists In The Form')
     @update_release_validator
     @Release.expose
     @commit
@@ -64,7 +64,7 @@ class ReleaseController(ModelRestController):
         release.update_from_request()
         return release
 
-    @json(prevent_form='709 Form not allowed')
+    @json(prevent_form='709 Form Not Allowed')
     @Release.expose
     @commit
     def abort(self, id):

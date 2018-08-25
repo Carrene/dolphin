@@ -25,7 +25,7 @@ class ProjectController(ModelRestController):
         DBSession.add(project)
         return project
 
-    @json(prevent_empty_form='708 No parameter exists in the form')
+    @json(prevent_empty_form='708 No Parameter Exists In The Form')
     @update_project_validator
     @Project.expose
     @commit
@@ -58,7 +58,7 @@ class ProjectController(ModelRestController):
         project.update_from_request()
         return project
 
-    @json(prevent_form='709 Form not allowed')
+    @json(prevent_form='709 Form Not Allowed')
     @Project.expose
     @commit
     def hide(self, id):
@@ -78,7 +78,7 @@ class ProjectController(ModelRestController):
         project.soft_delete()
         return project
 
-    @json(prevent_form='709 Form not allowed')
+    @json(prevent_form='709 Form Not Allowed')
     @Project.expose
     @commit
     def show(self, id):
@@ -127,7 +127,7 @@ class ProjectController(ModelRestController):
             Subscription.subscribable == id,
             Subscription.member == form['memberId']
         ).one_or_none():
-            raise HTTPStatus('611 Already subscribed')
+            raise HTTPStatus('611 Already Subscribed')
 
         subscription = Subscription(
             subscribable=id,

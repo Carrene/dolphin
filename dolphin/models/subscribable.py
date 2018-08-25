@@ -35,5 +35,6 @@ class Subscribable(TimestampMixin, DeclarativeBase):
         'Member',
         secondary='subscription',
         back_populates='subscribables',
+        protected=True
     )
 
