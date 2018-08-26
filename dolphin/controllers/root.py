@@ -7,6 +7,7 @@ from .projects import ProjectController
 from .managers import ManagerController
 from .issues import IssueController
 from .items import ItemController
+from .tokens import TokenController
 
 
 class Apiv1(Controller):
@@ -16,6 +17,7 @@ class Apiv1(Controller):
     managers = ManagerController()
     issues = IssueController()
     items = ItemController()
+    tokens = TokenController()
 
     @json
     def version(self):
