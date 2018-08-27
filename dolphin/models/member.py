@@ -97,6 +97,6 @@ class Member(TimestampMixin, DeclarativeBase):
     @classmethod
     def current(cls):
         return DBSession.query(cls) \
-            .filter(cls.email == context.identity.email).one()
-
+            .filter(cls.email == context.identity.email) \
+            .one()
 

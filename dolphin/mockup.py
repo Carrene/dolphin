@@ -106,7 +106,6 @@ def insert(): # pragma: no cover
     )
     DBSession.add(issue2)
 
-
     issue3 = Issue(
         project=project1,
         title='Third issue',
