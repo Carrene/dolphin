@@ -14,6 +14,7 @@ class TestProject(LocalApplicationTestCase):
         manager = Manager(
             title='First Manager',
             email=None,
+            password='123456',
             phone=123456789
         )
 

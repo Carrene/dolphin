@@ -9,6 +9,7 @@ def insert(): # pragma: no cover
     guest = Guest(
         title='First Guest',
         email=None,
+        password='123456',
         phone=1234556789
     )
     DBSession.add(guest)
@@ -16,6 +17,7 @@ def insert(): # pragma: no cover
     manager = Manager(
         title='First Manager',
         email=None,
+        password='123456',
         phone=123456789
     )
     DBSession.add(manager)
@@ -29,6 +31,7 @@ def insert(): # pragma: no cover
         team=team,
         title='Developer',
         email='dev@example.com',
+        password='123456',
         phone=987654321
     )
     DBSession.add(resource)
@@ -102,7 +105,6 @@ def insert(): # pragma: no cover
         days=2
     )
     DBSession.add(issue2)
-
 
     issue3 = Issue(
         project=project1,
