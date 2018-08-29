@@ -28,7 +28,7 @@ def insert(): # pragma: no cover
     DBSession.add(team)
 
     resource = Resource(
-        team=team,
+        teams=[team],
         title='Developer',
         email='dev@example.com',
         password='123456',
@@ -46,7 +46,7 @@ def insert(): # pragma: no cover
 
     project1 = Project(
         manager=manager,
-        releases=release,
+        releases=[release],
         title='My first project',
         description='A decription for my project',
         due_date='2020-2-20',
@@ -56,7 +56,7 @@ def insert(): # pragma: no cover
 
     project2 = Project(
         manager=manager,
-        releases=release,
+        releases=[release],
         title='My second project',
         description='A decription for my project',
         due_date='2020-2-20',
@@ -66,7 +66,7 @@ def insert(): # pragma: no cover
 
     project3 = Project(
         manager=manager,
-        releases=release,
+        releases=[release],
         title='My third project',
         description='A decription for my project',
         due_date='2020-2-20',
@@ -76,7 +76,7 @@ def insert(): # pragma: no cover
 
     project4 = Project(
         manager=manager,
-        releases=release,
+        releases=[release],
         title='My fourth project',
         description='A decription for my project',
         due_date='2020-2-20',
