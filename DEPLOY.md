@@ -1,5 +1,5 @@
 
-Owl deployment guide for fist time
+Dolphin deployment guide for fist time
 ==================================
 
 Preparation
