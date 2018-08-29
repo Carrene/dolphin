@@ -2,6 +2,7 @@ from os.path import dirname, join
 
 from restfulpy import Application
 
+from .authentication import Authenticator
 from .controllers.root import Root
 from .models import Subscribable, Member, Project, Release, Issue, Tag,\
     Phase, Manager, Resource, Guest, Team, Item
@@ -12,7 +13,7 @@ __version__ = '0.1.0-planning.0'
 
 
 class Dolphin(Application):
-
+    __authenticator__ = Authenticator()
     __configuration__ = '''
       db:
         url: postgresql://postgres:postgres@localhost/dolphin_dev

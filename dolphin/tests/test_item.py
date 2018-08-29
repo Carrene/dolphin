@@ -19,6 +19,7 @@ class TestItem(LocalApplicationTestCase):
         manager = Manager(
             title='First Manager',
             email=None,
+            password='123456',
             phone=123456789
         )
 
@@ -50,6 +51,7 @@ class TestItem(LocalApplicationTestCase):
             teams=[team],
             title='Developer',
             email='dev@example.com',
+            password='123456',
             phone=987654321
         )
 

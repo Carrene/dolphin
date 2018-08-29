@@ -12,7 +12,7 @@ project_statuses = [
     'in-progress',
     'on-hold',
     'delayed',
-    'complete',
+    'done',
 ]
 
 

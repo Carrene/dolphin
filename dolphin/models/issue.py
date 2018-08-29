@@ -20,7 +20,7 @@ issue_statuses = [
     'in-progress',
     'on-hold',
     'delayed',
-    'complete',
+    'done',
 ]
 
 
@@ -72,18 +72,6 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         'Project',
         foreign_keys=[project_id],
         back_populates='issues',
-        protected=True
-    )
-
-    items = relationship(
-        'Item',
-        back_populates='issue',
-        protected=True
-    )
-
-    items = relationship(
-        'Item',
-        back_populates='issue',
         protected=True
     )
 
