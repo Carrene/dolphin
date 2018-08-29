@@ -38,7 +38,7 @@ def insert(): # pragma: no cover
 
     release = Release(
         title='My first release',
-        description='A decription for my release',
+        description='A decription for my release.',
         due_date='2020-2-20',
         cutoff='2030-2-20',
     )
@@ -48,7 +48,7 @@ def insert(): # pragma: no cover
         manager=manager,
         releases=[release],
         title='My first project',
-        description='A decription for my project',
+        description='This is description for my awesome project.',
         due_date='2020-2-20',
         status='in-progress'
     )
@@ -58,8 +58,8 @@ def insert(): # pragma: no cover
         manager=manager,
         releases=[release],
         title='My second project',
-        description='A decription for my project',
-        due_date='2020-2-20',
+        description='A project for facilating your teamwork.',
+        due_date='2018-3-30',
         status='on-hold'
     )
     DBSession.add(project2)
@@ -68,8 +68,8 @@ def insert(): # pragma: no cover
         manager=manager,
         releases=[release],
         title='My third project',
-        description='A decription for my project',
-        due_date='2020-2-20',
+        description='A project with interesting features.',
+        due_date='2024-2-24',
         status='delayed'
     )
     DBSession.add(project3)
@@ -78,8 +78,8 @@ def insert(): # pragma: no cover
         manager=manager,
         releases=[release],
         title='My fourth project',
-        description='A decription for my project',
-        due_date='2020-2-20',
+        description='Description of project.',
+        due_date='2028-2-28',
         status='done'
     )
     DBSession.add(project4)
