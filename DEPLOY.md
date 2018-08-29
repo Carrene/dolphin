@@ -8,15 +8,38 @@ Preparation
 ### Prerequicites:
 
 ```bash
-sudo apt-get install build-essential python3-pip postgresql libpq-dev
+sudo apt-get install nginx build-essential python3-pip postgresql libpq-dev
+```
+
+#### Install python3.6
+
+Edit /etc/apt/sources.list and uncomment followings in lines 7 & 12:
+
+```
+deb-src http://archive.ubuntu.com/ubuntu/ xenial main restricted 
+deb-src http://archive.ubuntu.com/ubuntu/ xenial-updates main restricted    
+```
+
+Then run following commands:
+
+```bash
+cd /tmp
+sudo apt update && sudo apt build-dep python3.5
+sudo apt install build-essential libncursesw5-dev libreadline6-dev \
+libssl-dev libgdbm-dev libc6-dev libsqlite3-dev tk-dev sqlite3    
+wget https://www.python.org/ftp/python/3.6.4/Python-3.6.4.tgz    
+tar -xvf Python-*.tgz    
+cd Python-*    
+./configure && make -j 8    
+sudo make altinstall    
 ```
 
 ### Virtual env
 
 ```bash
-sudo pip3 install -U pip setuptools wheel
-sudo pip3 install virtualenvwrapper
-``` 
+sudo pip3.6 install -U pip setuptools wheel
+sudo pip3.6 install virtualenvwrapper
+```
 
 ##### Create and login as `dev` user
 
@@ -42,6 +65,11 @@ echo "ALTER USER dev WITH PASSWORD 'password'" | sudo -u postgres psql
 ```
 
 ##### Config file
+
+Create a configuration file directory:
+```bash
+mkdir /etc/maestro
+```
 
 Create a file `/etc/maestro/dolphin.yml` with this contents:
 
