@@ -150,3 +150,83 @@ def insert(): # pragma: no cover
     DBSession.add(item)
     DBSession.commit()
 
+    print('# Added following guest role:')
+    for key in guest.to_dict():
+        print(f'\t{key}: {guest.to_dict()[key]}')
+
+    print('\n# Added following manager role:')
+    for key in manager.to_dict():
+        print(f'\t{key}: {manager.to_dict()[key]}')
+
+    print('\n# Added following team role:')
+    for key in team.to_dict():
+        print(f'\t{key}: {resource.to_dict()[key]}')
+
+    print('\n# Added following resource role:')
+    for key in resource.to_dict():
+        print(f'\t{key}: {resource.to_dict()[key]}')
+    print(f'\trelated to team with id: {team.id}')
+
+    print('\n# Added following release entity:')
+    for key in release.to_dict():
+        print(f'\t{key}: {release.to_dict()[key]}')
+
+    print('\n# Added following projects entity:')
+    print('\tproject1')
+    for key in project1.to_dict():
+        print(f'\t{key}: {project1.to_dict()[key]}')
+    print(f'\trelated to release with id: {release.id}')
+
+    print('\n\tproject2')
+    for key in project2.to_dict():
+        print(f'\t{key}: {project2.to_dict()[key]}')
+    print(f'\trelated to release with id: {release.id}')
+
+    print('\n\tproject3')
+    for key in project3.to_dict():
+        print(f'\t{key}: {project3.to_dict()[key]}')
+    print(f'\trelated to release with id: {release.id}')
+
+    print('\n\tproject4')
+    for key in project4.to_dict():
+        print(f'\t{key}: {project4.to_dict()[key]}')
+    print(f'\trelated to release with id: {release.id}')
+
+    print('\n# Added following issues entity:')
+    print('\tissue1')
+    for key in issue1.to_dict():
+        print(f'\t{key}: {issue1.to_dict()[key]}')
+    print(f'\trelated to project with id: {project1.id}')
+
+    print('\n\tissue2')
+    for key in issue2.to_dict():
+        print(f'\t{key}: {issue2.to_dict()[key]}')
+    print(f'\trelated to project with id: {project1.id}')
+
+    print('\n\tissue3')
+    for key in issue3.to_dict():
+        print(f'\t{key}: {issue3.to_dict()[key]}')
+    print(f'\trelated to project with id: {project1.id}')
+
+    print('\n\tissue4')
+    for key in issue4.to_dict():
+        print(f'\t{key}: {issue4.to_dict()[key]}')
+    print(f'\trelated to project with id: {project1.id}')
+
+    print('\n# Added following phase entity:')
+    for key in phase.to_dict():
+        print(f'\t{key}: {phase.to_dict()[key]}')
+    print(f'\trelated to project with id: {project1.id}')
+
+    print('\n# Added following tag entity:')
+    for key in tag.to_dict():
+        print(f'\t{key}: {tag.to_dict()[key]}')
+
+    print('\n# Added following item entity:')
+    for key in item.to_dict():
+        print(f'\t{key}: {item.to_dict()[key]}')
+    print(
+        f'\tCreated by assiging resource with id: {resource.id} to issue1 '
+        f'with id: {issue1.id} in the phase with id: {phase.id}'
+    )
+
