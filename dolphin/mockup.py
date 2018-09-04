@@ -5,6 +5,40 @@ from .models import Subscribable, Member, Project, Release, Issue, Tag,\
     Phase, Manager, Resource, Guest, Team, Item
 
 
+def indented(n):
+    def decorator(f):
+        def wrapper(*a, **kw):
+            for i in f(*a, **kw):
+                print(f'{n*" "}{i}')
+            print()
+        return wrapper
+    return decorator
+
+
+@indented(2)
+def print_member(m):
+    yield f'user: {m.title}'
+    yield f'mail: {m.email}'
+    yield f'pass: 123456'
+
+
+@indented(2)
+def print_team(t):
+    yield f'title: {t.title}'
+
+
+@indented(2)
+def print_subscribables(s):
+    yield f'user: {s.title}'
+
+
+@indented(2)
+def print_item(i):
+    yield f'This item is created by assigning issue: ' \
+        f'"{i.issue.title}" to resource: "{i.resource.title}", in phase: ' \
+        f'"{i.phase.title}".'
+
+
 def insert(): # pragma: no cover
     guest = Guest(
         title='First Guest',
@@ -29,7 +63,7 @@ def insert(): # pragma: no cover
 
     resource = Resource(
         teams=[team],
-        title='Developer',
+        title='First resource',
         email='resource1@example.com',
         password='123456',
         phone=987654321
@@ -150,96 +184,38 @@ def insert(): # pragma: no cover
     DBSession.add(item)
     DBSession.commit()
 
-    print()
-    print('Added following guest role:')
-    for key in guest.to_dict():
-        print(f'\t{key}: {guest.to_dict()[key]}')
-
-    print()
-    print('Added following manager role:')
-    for key in manager.to_dict():
-        print(f'\t{key}: {manager.to_dict()[key]}')
-
-    print()
-    print('Added following team role:')
-    for key in team.to_dict():
-        print(f'\t{key}: {resource.to_dict()[key]}')
-
-    print('Added following resource role:')
-    for key in resource.to_dict():
-        print(f'\t{key}: {resource.to_dict()[key]}')
-    print(f'\trelated to team with id: {team.id}')
-
-    print()
-    print('Added following release entity:')
-    for key in release.to_dict():
-        print(f'\t{key}: {release.to_dict()[key]}')
-
-    print('Added following projects entity:')
-    print('\tproject1')
-    for key in project1.to_dict():
-        print(f'\t{key}: {project1.to_dict()[key]}')
-    print(f'\trelated to release with id: {release.id}')
-
-    print()
-    print('\tproject2')
-    for key in project2.to_dict():
-        print(f'\t{key}: {project2.to_dict()[key]}')
-    print(f'\trelated to release with id: {release.id}')
-
-    print('\tproject3')
-    for key in project3.to_dict():
-        print(f'\t{key}: {project3.to_dict()[key]}')
-    print(f'\trelated to release with id: {release.id}')
-
-    print()
-    print('\tproject4')
-    for key in project4.to_dict():
-        print(f'\t{key}: {project4.to_dict()[key]}')
-    print(f'\trelated to release with id: {release.id}')
-
-    print()
-    print('Added following issues entity:')
-    print('\tissue1')
-    for key in issue1.to_dict():
-        print(f'\t{key}: {issue1.to_dict()[key]}')
-    print(f'\trelated to project with id: {project1.id}')
-
-    print()
-    print('\tissue2')
-    for key in issue2.to_dict():
-        print(f'\t{key}: {issue2.to_dict()[key]}')
-    print(f'\trelated to project with id: {project1.id}')
-
-    print()
-    print('\tissue3')
-    for key in issue3.to_dict():
-        print(f'\t{key}: {issue3.to_dict()[key]}')
-    print(f'\trelated to project with id: {project1.id}')
-
-    print()
-    print('\tissue4')
-    for key in issue4.to_dict():
-        print(f'\t{key}: {issue4.to_dict()[key]}')
-    print(f'\trelated to project with id: {project1.id}')
-
-    print()
-    print('Added following phase entity:')
-    for key in phase.to_dict():
-        print(f'\t{key}: {phase.to_dict()[key]}')
-    print(f'\trelated to project with id: {project1.id}')
-
-    print()
-    print('Added following tag entity:')
-    for key in tag.to_dict():
-        print(f'\t{key}: {tag.to_dict()[key]}')
-
-    print()
-    print('Added following item entity:')
-    for key in item.to_dict():
-        print(f'\t{key}: {item.to_dict()[key]}')
     print(
-        f'\tCreated by assiging resource with id: {resource.id} to issue1 '
-        f'with id: {issue1.id} in the phase with id: {phase.id}'
+        'Following members have been added, you may log-in using '
+        '"/apiv1/tokens"'
     )
+    print_member(guest)
+    print_member(manager)
+    print_member(resource)
+
+    print('Following teams have been added:')
+    print_team(team)
+
+    print('Following releases have been added:')
+    print_subscribables(release)
+
+    print('Following projects have been added:')
+    print_subscribables(project1)
+    print_subscribables(project2)
+    print_subscribables(project3)
+    print_subscribables(project4)
+
+    print('Following issues has been added:')
+    print_subscribables(issue1)
+    print_subscribables(issue2)
+    print_subscribables(issue3)
+    print_subscribables(issue4)
+
+    print('Following phases have been added:')
+    print_subscribables(phase)
+
+    print('Following tags have been added:')
+    print_subscribables(tag)
+
+    print('Following items have been added:')
+    print_item(item)
 

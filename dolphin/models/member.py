@@ -28,7 +28,7 @@ class Member(TimestampMixin, DeclarativeBase):
         index=True,
         pattern=r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'
     )
-    _password = Field('password', Unicode(128), min_length=6)
+    _password = Field('password', Unicode(128), min_length=6, protected=True)
     phone = Field(BigInteger, unique=True)
 
     subscribables = relationship(
