@@ -18,7 +18,7 @@ class TestItem(LocalApplicationTestCase):
 
         manager = Manager(
             title='First Manager',
-            email=None,
+            email='manager1@example.com',
             password='123456',
             phone=123456789
         )

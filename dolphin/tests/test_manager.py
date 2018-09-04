@@ -13,14 +13,14 @@ class TestManager(LocalApplicationTestCase):
 
         assigned_manager = Manager(
             title='First Manager',
-            email=None,
+            email='manager1@example.com',
             password='123456',
             phone=123456789
         )
 
         unassigned_manager = Manager(
             title='Second Manager',
-            email=None,
+            email='manager1@example.com',
             password='123456',
             phone=987654321
         )

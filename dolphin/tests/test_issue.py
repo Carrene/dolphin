@@ -13,14 +13,14 @@ class TestIssue(LocalApplicationTestCase):
 
         manager = Manager(
             title='First Manager',
-            email=None,
+            email='manager1@example.com',
             password='123456',
             phone=123456789
         )
 
         resource = Resource(
             title='First Resource',
-            email=None,
+            email='resource1@example.com',
             password='123456',
             phone=987654321
         )
