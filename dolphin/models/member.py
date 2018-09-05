@@ -6,12 +6,15 @@ from sqlalchemy import Integer, String, Unicode, BigInteger
 from sqlalchemy.orm import synonym
 from restfulpy.principal import JwtPrincipal, JwtRefreshToken
 from restfulpy.orm import DeclarativeBase, Field, TimestampMixin, \
-    relationship, DBSession
+    relationship, DBSession, SoftDeleteMixin, ModifiedMixin, FilteringMixin, \
+    PaginationMixin, OrderingMixin
 
 from .subscribable import Subscription
 
 
-class Member(TimestampMixin, DeclarativeBase):
+class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
+             SoftDeleteMixin, DeclarativeBase):
+
     __tablename__ = 'member'
 
     role = Field(String(50))
