@@ -41,22 +41,6 @@ class TestManager(LocalApplicationTestCase):
         )
         session.add(manager2)
 
-        manager3 = Manager(
-            title='Third Manager',
-            email='manager3@example.com',
-            password='123456',
-            phone=128973465
-        )
-        session.add(manager3)
-
-        manager4 = Manager(
-            title='Fourth Manager',
-            email='manager4@example.com',
-            password='123456',
-            phone=1289733465
-        )
-        session.add(manager4)
-
         release = Release(
             title='My first release',
             description='A decription for my release',
@@ -121,7 +105,7 @@ class TestManager(LocalApplicationTestCase):
             'LIST',
         ):
             assert status == 200
-            assert len(response.json) == 5
+            assert len(response.json) == 3
 
         with self.given(
             'Sort managers by title',
@@ -136,7 +120,7 @@ class TestManager(LocalApplicationTestCase):
                 'Reverse sorting titles by alphabet',
                 query=dict(sort='-title')
             )
-            assert response.json[0]['title'] == 'Third Manager'
+            assert response.json[0]['title'] == 'Second Manager'
 
         with self.given(
             'Filter managers',
@@ -158,11 +142,11 @@ class TestManager(LocalApplicationTestCase):
             'LIST',
             query=dict(sort='id', take=1, skip=2)
         ):
-            assert response.json[0]['title'] == 'Third Manager'
+            assert response.json[0]['title'] == 'Assigned Manager'
 
             when(
                 'Manipulate sorting and pagination',
                 query=dict(sort='-title', take=1, skip=2)
             )
-            assert response.json[0]['title'] == 'Fourth Manager'
+            assert response.json[0]['title'] == 'Assigned Manager'
 
