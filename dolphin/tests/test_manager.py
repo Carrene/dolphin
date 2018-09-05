@@ -12,18 +12,34 @@ class TestManager(LocalApplicationTestCase):
         session = cls.create_session()
 
         assigned_manager = Manager(
-            title='First Manager',
-            email=None,
+            title='Assigned Manager',
+            email='assigned@example.com',
             password='123456',
             phone=123456789
         )
 
         unassigned_manager = Manager(
-            title='Second Manager',
-            email=None,
+            title='Unassigned Manager',
+            email='unassigned@example.com',
             password='123456',
             phone=987654321
         )
+
+        manager1 = Manager(
+            title='First Manager',
+            email='manager1@example.com',
+            password='123456',
+            phone=123987465
+        )
+        session.add(manager1)
+
+        manager2 = Manager(
+            title='Second Manager',
+            email='manager2@example.com',
+            password='123456',
+            phone=1287465
+        )
+        session.add(manager2)
 
         release = Release(
             title='My first release',
@@ -81,4 +97,56 @@ class TestManager(LocalApplicationTestCase):
             )
             assert status == 601
             assert status.text.startswith('Project not found')
+
+    def test_list(self):
+        with self.given(
+            'List managers',
+            '/apiv1/managers',
+            'LIST',
+        ):
+            assert status == 200
+            assert len(response.json) == 3
+
+        with self.given(
+            'Sort managers by title',
+            '/apiv1/managers',
+            'LIST',
+            query=dict(sort='title')
+        ):
+            assert status == 200
+            assert response.json[0]['title'] == 'Assigned Manager'
+
+            when(
+                'Reverse sorting titles by alphabet',
+                query=dict(sort='-title')
+            )
+            assert response.json[0]['title'] == 'Second Manager'
+
+        with self.given(
+            'Filter managers',
+            '/apiv1/managers',
+            'LIST',
+            query=dict(sort='id', title='First Manager')
+        ):
+            assert response.json[0]['title'] == 'First Manager'
+
+            when(
+                'List managers except one of them',
+                query=dict(title='!Assigned Manager')
+            )
+            assert response.json[0]['title'] != 'Assigned Manager'
+
+        with self.given(
+            'Manager pagination',
+            '/apiv1/managers',
+            'LIST',
+            query=dict(sort='id', take=1, skip=2)
+        ):
+            assert response.json[0]['title'] == 'Assigned Manager'
+
+            when(
+                'Manipulate sorting and pagination',
+                query=dict(sort='-title', take=1, skip=2)
+            )
+            assert response.json[0]['title'] == 'Assigned Manager'
 

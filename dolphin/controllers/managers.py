@@ -34,3 +34,9 @@ class ManagerController(ModelRestController):
         project.manager = manager
         return manager
 
+    @json
+    @Manager.expose
+    def list(self):
+        query = DBSession.query(Manager)
+        return query
+
