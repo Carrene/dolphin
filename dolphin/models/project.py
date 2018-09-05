@@ -9,9 +9,9 @@ from .subscribable import Subscribable
 
 
 project_statuses = [
-    'in-progress',
+    'active',
     'on-hold',
-    'delayed',
+    'queued',
     'done',
 ]
 

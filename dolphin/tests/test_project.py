@@ -156,7 +156,7 @@ class TestProject(LocalApplicationTestCase):
                 title='My interesting project',
                 description='A updated project description',
                 dueDate='2200-2-20',
-                status='in-progress'
+                status='active'
             )
         ):
             assert status == 200
@@ -164,7 +164,7 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['description'] == 'A updated project ' \
                 'description'
             assert response.json['dueDate'] == '2200-02-20T00:00:00'
-            assert response.json['status'] == 'in-progress'
+            assert response.json['status'] == 'active'
 
             when(
                 'Intended project with string type not found',
