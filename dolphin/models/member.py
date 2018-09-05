@@ -13,7 +13,7 @@ from .subscribable import Subscription
 
 
 class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
-              SoftDeleteMixin, DeclarativeBase):
+             SoftDeleteMixin, DeclarativeBase):
 
     __tablename__ = 'member'
 
