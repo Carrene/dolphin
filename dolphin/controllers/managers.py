@@ -37,7 +37,6 @@ class ManagerController(ModelRestController):
     @json
     @Manager.expose
     def list(self):
-
         query = DBSession.query(Manager)
         return query
 

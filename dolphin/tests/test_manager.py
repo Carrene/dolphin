@@ -26,32 +26,36 @@ class TestManager(LocalApplicationTestCase):
         )
 
         manager1 = Manager(
-            title = 'First Manager',
-            email = 'manager1@example.com',
-            password = '123456',
-            phone = 123987465
+            title='First Manager',
+            email='manager1@example.com',
+            password='123456',
+            phone=123987465
         )
+        session.add(manager1)
 
         manager2 = Manager(
-            title = 'Second Manager',
-            email = 'manager2@example.com',
-            password = '123456',
-            phone = 1287465
+            title='Second Manager',
+            email='manager2@example.com',
+            password='123456',
+            phone=1287465
         )
+        session.add(manager2)
 
         manager3 = Manager(
-            title = 'Third Manager',
-            email = 'manager3@example.com',
-            password = '123456',
-            phone = 128973465
+            title='Third Manager',
+            email='manager3@example.com',
+            password='123456',
+            phone=128973465
         )
+        session.add(manager3)
 
         manager4 = Manager(
-            title = 'Fourth Manager',
-            email = 'manager4@example.com',
-            password = '123456',
-            phone = 1289733465
+            title='Fourth Manager',
+            email='manager4@example.com',
+            password='123456',
+            phone=1289733465
         )
+        session.add(manager4)
 
         release = Release(
             title='My first release',
@@ -67,7 +71,7 @@ class TestManager(LocalApplicationTestCase):
             description='A decription for my project',
             due_date='2020-2-20',
         )
-        session.add_all([project, manager1, manager2, manager3, manager4])
+        session.add(project)
         session.commit()
 
     def test_assign(self):
@@ -146,7 +150,7 @@ class TestManager(LocalApplicationTestCase):
                 'List managers except one of them',
                 query=dict(title='!Assigned Manager')
             )
-            assert response.json[0]['title'] == 'First Manager'
+            assert response.json[0]['title'] != 'Assigned Manager'
 
         with self.given(
             'Manager pagination',
@@ -154,7 +158,7 @@ class TestManager(LocalApplicationTestCase):
             'LIST',
             query=dict(sort='id', take=1, skip=2)
         ):
-            assert response.json[0]['title'] == 'Second Manager'
+            assert response.json[0]['title'] == 'Third Manager'
 
             when(
                 'Manipulate sorting and pagination',
