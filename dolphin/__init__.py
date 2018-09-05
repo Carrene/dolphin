@@ -4,8 +4,6 @@ from restfulpy import Application
 
 from .authentication import Authenticator
 from .controllers.root import Root
-from .models import Subscribable, Member, Project, Release, Issue, Tag,\
-    Phase, Manager, Resource, Guest, Team, Item
 from . import mockup
 
 

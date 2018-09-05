@@ -24,6 +24,7 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
     manager_id = Field(Integer, ForeignKey('member.id'))
+    group_id = Field(Integer, ForeignKey('group.id'), nullable=True)
 
     status = Field(
         Enum(*project_statuses, name='project_status'),
@@ -53,4 +54,8 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         back_populates='project',
         protected=True
     )
-
+    group = relationship(
+        'Group',
+        back_populates='projects',
+        protected=True
+    )
