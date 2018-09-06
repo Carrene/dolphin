@@ -48,13 +48,37 @@ def insert(): # pragma: no cover
     )
     DBSession.add(guest)
 
-    manager = Manager(
+    manager1 = Manager(
         title='First Manager',
         email='manager1@example.com',
         password='123456',
         phone=123456789
     )
-    DBSession.add(manager)
+    DBSession.add(manager1)
+
+    manager2 = Manager(
+        title='Second Manager',
+        email='manager2@example.com',
+        password='123456',
+        phone=1236789
+    )
+    DBSession.add(manager2)
+
+    manager3 = Manager(
+        title='Third Manager',
+        email='manager3@example.com',
+        password='123456',
+        phone=12456789
+    )
+    DBSession.add(manager3)
+
+    manager4 = Manager(
+        title='Fourth Manager',
+        email='manager4@example.com',
+        password='123456',
+        phone=12345678
+    )
+    DBSession.add(manager4)
 
     team = Team(
         title='Awesome team'
@@ -112,7 +136,7 @@ def insert(): # pragma: no cover
 
 
     project1 = Project(
-        manager=manager,
+        manager=manager1,
         releases=[release1],
         title='My first project',
         description='This is description for my awesome project.',
@@ -122,7 +146,7 @@ def insert(): # pragma: no cover
     DBSession.add(project1)
 
     project2 = Project(
-        manager=manager,
+        manager=manager1,
         releases=[release1],
         title='My second project',
         description='A project for facilating your teamwork.',
@@ -132,7 +156,7 @@ def insert(): # pragma: no cover
     DBSession.add(project2)
 
     project3 = Project(
-        manager=manager,
+        manager=manager1,
         releases=[release1],
         title='My third project',
         description='A project with interesting features.',
@@ -142,7 +166,7 @@ def insert(): # pragma: no cover
     DBSession.add(project3)
 
     project4 = Project(
-        manager=manager,
+        manager=manager1,
         releases=[release1],
         title='My fourth project',
         description='Description of project.',
@@ -222,7 +246,10 @@ def insert(): # pragma: no cover
         '"/apiv1/tokens"'
     )
     print_member(guest)
-    print_member(manager)
+    print_member(manager1)
+    print_member(manager2)
+    print_member(manager3)
+    print_member(manager4)
     print_member(resource)
 
     print('Following teams have been added:')
