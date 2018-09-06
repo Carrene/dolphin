@@ -1,8 +1,5 @@
-
-from sqlalchemy import Integer, String, ForeignKey, Table, Enum, Column, \
-    DateTime
-from sqlalchemy.ext.declarative import declared_attr
-from restfulpy.orm import DeclarativeBase, Field, TimestampMixin, relationship
+from restfulpy.orm import DeclarativeBase, Field, relationship
+from sqlalchemy import Integer, String
 
 
 class Group(DeclarativeBase):
