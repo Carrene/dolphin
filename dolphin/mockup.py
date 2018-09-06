@@ -84,7 +84,7 @@ def insert(): # pragma: no cover
         title='My first project',
         description='This is description for my awesome project.',
         due_date='2020-2-20',
-        status='in-progress'
+        status='active'
     )
     DBSession.add(project1)
 
@@ -104,7 +104,7 @@ def insert(): # pragma: no cover
         title='My third project',
         description='A project with interesting features.',
         due_date='2024-2-24',
-        status='delayed'
+        status='queued'
     )
     DBSession.add(project3)
 

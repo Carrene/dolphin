@@ -9,9 +9,9 @@ from .subscribable import Subscribable
 
 
 project_statuses = [
-    'in-progress',
+    'active',
     'on-hold',
-    'delayed',
+    'queued',
     'done',
 ]
 
@@ -53,4 +53,8 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         back_populates='project',
         protected=True
     )
+
+    @property
+    def boardings(self):
+        return ['on-time', 'at-risk', 'delayed']
 
