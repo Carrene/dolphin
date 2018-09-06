@@ -59,3 +59,4 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         back_populates='projects',
         protected=True
     )
+
