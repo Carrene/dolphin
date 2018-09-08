@@ -69,6 +69,6 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         raise NotImplementedError
 
     @property
-    def _boardings(self):
-        return ['on-time', 'at-risk', 'delayed']
+    def boardings(self):
+        raise NotImplementedError
 
