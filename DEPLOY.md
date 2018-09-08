@@ -41,12 +41,29 @@ sudo pip3.6 install -U pip setuptools wheel
 sudo pip3.6 install virtualenvwrapper
 ```
 
-##### Create and login as `dev` user
+##### Create deploy key
+
+Generate deploy key by following [Github instruction](https://developer.github.com/v3/guides/managing-deploy-keys/#deploy-keys).
+
+##### Project directory
+
+Create a project directory:
 
 ```bash
-sudo adduser dev
-su - dev
-mkdir ~/workspace
+sudo mkdir /usr/local/maestro
+```
+
+Clone `dolphin` project by SSH:
+
+```bash
+cd /usr/local/maestro
+sudo git clone git@github.com:Carrene/dolphin.git
+```
+##### Create and login as `maestro` user
+
+```bash
+sudo adduser maestro
+su - maestro
 echo "export VIRTUALENVWRAPPER_PYTHON=`which python3.6`" >> ~/.bashrc
 echo "alias v.activate=\"source $(which virtualenvwrapper.sh)\"" >> ~/.bashrc
 source ~/.bashrc
@@ -58,10 +75,10 @@ mkvirtualenv --python=$(which python3.6) --no-site-packages dolphin
 ##### Setup Database
 
 ```bash
-echo 'CREATE USER dev' | sudo -u postgres psql
+echo 'CREATE USER maestro' | sudo -u postgres psql
 echo 'CREATE DATABASE dolphin' | sudo -u postgres psql
-echo 'GRANT ALL PRIVILEGES ON DATABASE dolphin TO dev' | sudo -u postgres psql
-echo "ALTER USER dev WITH PASSWORD 'password'" | sudo -u postgres psql
+echo 'GRANT ALL PRIVILEGES ON DATABASE dolphin TO maestro' | sudo -u postgres psql
+echo "ALTER USER maestro WITH PASSWORD 'password'" | sudo -u postgres psql
 ```
 
 ##### Config file
@@ -75,7 +92,7 @@ Create a file `/etc/maestro/dolphin.yml` with this contents:
 
 ```yaml
 db:
-  url: postgresql://dev:password@localhost/dolphin
+  url: postgresql://maestro:password@localhost/dolphin
   echo: false
 
 logging:
@@ -101,8 +118,8 @@ logging:
 
 #### dolphin:
 ```bash
-su - dev
-cd ~/workspace/dolphin
+su - maestro
+cd /usr/local/maestro/dolphin
 v.activate && workon dolphin
 pip install -e .
 ```
@@ -116,7 +133,7 @@ dolphin -c /etc/maestro/dolphin.yml db schema
 
 ##### wsgi
 
-/etc/maestro/dolphin_wsgi.py
+Create `/etc/maestro/dolphin_wsgi.py`:
 ```python
 from dolphin import dolphin as app
 
@@ -128,7 +145,7 @@ app.initialize_orm()
 
 ##### Systemd
 
-/etc/systemd/system/dolphin.service:
+Create `/etc/systemd/system/dolphin.service`:
 
 ```ini
 [Unit]
@@ -138,10 +155,10 @@ After=network.target
 
 [Service]
 PIDFile=/run/dolphin/pid
-User=dev
-Group=dev
-WorkingDirectory=/home/dev/workspace/dolphin/
-ExecStart=/home/dev/.virtualenvs/dolphin/bin/gunicorn --pid /run/dolphin/pid --chdir /etc/maestro dolphin_wsgi:app
+User=maestro
+Group=maestro
+WorkingDirectory=/usr/local/maestro/dolphin/
+ExecStart=/home/maestro/.virtualenvs/dolphin/bin/gunicorn --pid /run/dolphin/pid --chdir /etc/maestro dolphin_wsgi:app
 ExecReload=/bin/kill -s HUP $MAINPID
 ExecStop=/bin/kill -s TERM $MAINPID
 PrivateTmp=true
@@ -168,7 +185,7 @@ WantedBy=sockets.target
 /usr/lib/tmpfiles.d/dolphin.conf:
 
 ```
-d /run/dolphin 0755 dev dev -
+d /run/dolphin 0755 maestro maestro -
 ```
 
 Next enable the services so they autostart at boot:
@@ -187,7 +204,7 @@ systemctl start dolphin.socket
 
 ### NGINX
 
-/etc/nginx/sites-available/maestro.carrene.com
+Create `/etc/nginx/sites-available/maestro.carrene.com`:
 
 ```
 upstream dolphin_webapi {
@@ -201,7 +218,7 @@ server {
 
     server_name maestro.carrene.com;
 
-    root /home/dev/workspace/otter;
+    root /home/maestro/workspace/otter;
     index index.html;
 
 
