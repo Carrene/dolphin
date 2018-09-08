@@ -54,3 +54,7 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         protected=True
     )
 
+    @property
+    def _boardings(self):
+        return ['on-time', 'at-risk', 'delayed']
+
