@@ -22,6 +22,7 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     __tablename__ = 'project'
     __mapper_args__ = {'polymorphic_identity': __tablename__}
 
+    _boarding = ['on-time', 'delayed', 'at-risk']
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
     manager_id = Field(Integer, ForeignKey('member.id'))
 
@@ -55,6 +56,6 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     )
 
     @property
-    def _boardings(self):
-        return ['on-time', 'at-risk', 'delayed']
+    def boardings(self):
+        raise NotImplementedError
 
