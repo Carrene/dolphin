@@ -64,7 +64,7 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['title'] == 'My awesome project'
             assert response.json['description'] == 'A decription for my project'
             assert response.json['dueDate'] == '2020-02-20T00:00:00'
-            assert response.json['status'] is None
+            assert response.json['status'] == 'queued'
 
             when(
                 'Manager id not in form',
