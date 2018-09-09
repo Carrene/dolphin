@@ -61,91 +61,91 @@ class TestProject(LocalApplicationTestCase):
             )
         ):
             assert status == 200
-            assert response.json['title'] == 'My awesome project'
-            assert response.json['description'] == 'A decription for my project'
-            assert response.json['dueDate'] == '2020-02-20T00:00:00'
-            assert response.json['status'] is None
+#            assert response.json['title'] == 'My awesome project'
+#            assert response.json['description'] == 'A decription for my project'
+#            assert response.json['dueDate'] == '2020-02-20T00:00:00'
+#            assert response.json['status'] is None
+#
+#            when(
+#                'Manager id not in form',
+#                form=given_form - 'managerId' | dict(title='1')
+#            )
+#            assert status == '734 Manager Id Not In Form'
+#
+#            when(
+#                'Manger not found with string type',
+#                form=given_form | dict(managerId='Alphabetical', title='1')
+#            )
+#            assert status == 608
+#            assert status.text.startswith('Manager not found')
+#
+#            when(
+#                'Manager not found with integer type',
+#                form=given_form | dict(managerId=100, title='1')
+#            )
+#            assert status == 608
+#            assert status.text.startswith('Manager not found')
+#
+#            when(
+#                'Release not found with string type',
+#                form=given_form | dict(releaseId='Alphabetical', title='1')
+#            )
+#            assert status == 607
+#            assert status.text.startswith('Release not found')
+#
+#            when(
+#                'Release not found with integer type',
+#                form=given_form | dict(releaseId=100, title='1')
+#            )
+#            assert status == 607
+#            assert status.text.startswith('Release not found')
+#
+#            when(
+#                'Title is not in form',
+#                form=Remove('title')
+#            )
+#            assert status == '710 Title Not In Form'
+#
+#            when(
+#                'Title length is more than limit',
+#                form=given_form | dict(title=((50 + 1) * 'a'))
+#            )
+#            assert status == '704 At Most 50 Characters Are Valid For Title'
+#
+#            when(
+#                'Description length is less than limit',
+#                form=given_form | dict(
+#                    description=((512 + 1) * 'a'),
+#                    title='Another title'
+#                )
+#            )
+#            assert status == '703 At Most 512 Characters Are Valid For '\
+#                'Description'
+#
+#            when(
+#                'Due date format is wrong',
+#                form=given_form | dict(
+#                    dueDate='20-20-20',
+#                    title='Another title'
+#                )
+#            )
+#            assert status == '701 Invalid Due Date Format'
+#
+#            when(
+#                'Due date is not in form',
+#                form=given_form - ['dueDate'] | dict(title='Another title')
+#            )
 
-            when(
-                'Manager id not in form',
-                form=given_form - 'managerId' | dict(title='1')
-            )
-            assert status == '734 Manager Id Not In Form'
-
-            when(
-                'Manger not found with string type',
-                form=given_form | dict(managerId='Alphabetical', title='1')
-            )
-            assert status == 608
-            assert status.text.startswith('Manager not found')
-
-            when(
-                'Manager not found with integer type',
-                form=given_form | dict(managerId=100, title='1')
-            )
-            assert status == 608
-            assert status.text.startswith('Manager not found')
-
-            when(
-                'Release not found with string type',
-                form=given_form | dict(releaseId='Alphabetical', title='1')
-            )
-            assert status == 607
-            assert status.text.startswith('Release not found')
-
-            when(
-                'Release not found with integer type',
-                form=given_form | dict(releaseId=100, title='1')
-            )
-            assert status == 607
-            assert status.text.startswith('Release not found')
-
-            when(
-                'Title is not in form',
-                form=Remove('title')
-            )
-            assert status == '710 Title Not In Form'
-
-            when(
-                'Title length is more than limit',
-                form=given_form | dict(title=((50 + 1) * 'a'))
-            )
-            assert status == '704 At Most 50 Characters Are Valid For Title'
-
-            when(
-                'Description length is less than limit',
-                form=given_form | dict(
-                    description=((512 + 1) * 'a'),
-                    title='Another title'
-                )
-            )
-            assert status == '703 At Most 512 Characters Are Valid For '\
-                'Description'
-
-            when(
-                'Due date format is wrong',
-                form=given_form | dict(
-                    dueDate='20-20-20',
-                    title='Another title'
-                )
-            )
-            assert status == '701 Invalid Due Date Format'
-
-            when(
-                'Due date is not in form',
-                form=given_form - ['dueDate'] | dict(title='Another title')
-            )
-
-            when(
-                'Status value is invalid',
-                form=given_form | dict(
-                    status='progressing',
-                    title='Another title'
-                )
-            )
-            assert status == 705
-            assert status.text.startswith('Invalid status')
-
+#            when(
+#                'Status value is invalid',
+#                form=given_form | dict(
+#                    status='progressing',
+#                    title='Another title'
+#                )
+#            )
+#            assert status == 705
+#            assert status.text.startswith('Invalid status')
+#
 
     def test_update(self):
         with self.given(
