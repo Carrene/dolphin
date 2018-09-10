@@ -1,4 +1,4 @@
-from bddrest import status, response, Update, when, Remove, Append, given_form
+from bddrest import status, response, Update, when, Remove, Append, given
 
 from dolphin.tests.helpers import LocalApplicationTestCase
 from dolphin.models import Release, Manager
@@ -74,13 +74,13 @@ class TestRelease(LocalApplicationTestCase):
 
             when(
                 'Title length is more than limit',
-                form=given_form | dict(title=((50 + 1) * 'a'))
+                form=given | dict(title=((50 + 1) * 'a'))
             )
             assert status == '704 At Most 50 Characters Are Valid For Title'
 
             when(
                 'Description length is less than limit',
-                form=given_form | dict(
+                form=given | dict(
                     description=((512 + 1) * 'a'),
                     title='Another title'
                 )
@@ -90,7 +90,7 @@ class TestRelease(LocalApplicationTestCase):
 
             when(
                 'Due date format is wrong',
-                form=given_form | dict(
+                form=given | dict(
                     dueDate='20-20-20',
                     title='Another title'
                 )
@@ -99,13 +99,13 @@ class TestRelease(LocalApplicationTestCase):
 
             when(
                 'Due date is not in form',
-                form=given_form - 'dueDate' | dict(title='Another title')
+                form=given - 'dueDate' | dict(title='Another title')
             )
             assert status == '711 Due Date Not In Form'
 
             when(
                 'Cutoff format is wrong',
-                form=given_form | dict(
+                form=given | dict(
                     cutoff='30-20-20',
                     title='Another title'
                 )
@@ -114,13 +114,13 @@ class TestRelease(LocalApplicationTestCase):
 
             when(
                 'Due date is not in form',
-                form=given_form - 'cutoff' | dict(title='Another title')
+                form=given - 'cutoff' | dict(title='Another title')
             )
             assert status == '712 Cutoff Not In Form'
 
             when(
                 'Invalid status in form',
-                form=given_form | dict(
+                form=given | dict(
                     status='progressing',
                     title='Another title'
                 )
@@ -151,21 +151,21 @@ class TestRelease(LocalApplicationTestCase):
 
             when(
                 'Intended release with string type not found',
-                form=given_form | dict(title='Another title'),
+                form=given | dict(title='Another title'),
                 url_parameters=dict(id='Alphabetical')
             )
             assert status == 404
 
             when(
                 'Intended release with integer type not found',
-                form=given_form | dict(title='Another title'),
+                form=given | dict(title='Another title'),
                 url_parameters=dict(id=100)
             )
             assert status == 404
 
             when(
                 'Title length is more than limit',
-                form=given_form | dict(title=((50 + 1) * 'a'))
+                form=given | dict(title=((50 + 1) * 'a'))
             )
             assert status == '704 At Most 50 Characters Are Valid For Title'
 
@@ -178,7 +178,7 @@ class TestRelease(LocalApplicationTestCase):
 
             when(
                 'Description length is less than limit',
-                form=given_form | dict(
+                form=given | dict(
                     description=((512 + 1) * 'a'),
                     title='Another title'
                 )
@@ -188,7 +188,7 @@ class TestRelease(LocalApplicationTestCase):
 
             when(
                 'Due date format is wrong',
-                form=given_form | dict(
+                form=given | dict(
                     dueDate='20-20-20',
                     title='Another title'
                 )
@@ -197,7 +197,7 @@ class TestRelease(LocalApplicationTestCase):
 
             when(
                 'Cutoff format is wrong',
-                form=given_form | dict(
+                form=given | dict(
                     cutoff='30-20-20',
                     title='Another title'
                 )
@@ -206,7 +206,7 @@ class TestRelease(LocalApplicationTestCase):
 
             when(
                 'Invalid status in form',
-                form=given_form | dict(
+                form=given | dict(
                     status='progressing',
                     title='Another title'
                 )
@@ -326,27 +326,27 @@ class TestRelease(LocalApplicationTestCase):
 
             when(
                 'Member id not in form',
-                form=given_form - 'memberId'
+                form=given - 'memberId'
             )
             assert status == '735 Member Id Not In Form'
 
             when(
                 'Member not found',
-                form=given_form | dict(memberId=100)
+                form=given | dict(memberId=100)
             )
             assert status == 610
             assert status.text.startswith('Member not found')
 
             when(
                 'Member id type is invalid',
-                form=given_form | dict(memberId='Alphabetical')
+                form=given | dict(memberId='Alphabetical')
             )
             assert status == '736 Invalid Member Id Type'
 
             when(
                 'Issue is already subscribed',
                 url_parameters=dict(id=2),
-                form=given_form | dict(memberId=1)
+                form=given | dict(memberId=1)
             )
             assert status == '611 Already Subscribed'
 
@@ -373,27 +373,27 @@ class TestRelease(LocalApplicationTestCase):
 
             when(
                 'Member id not in form',
-                form=given_form - 'memberId'
+                form=given - 'memberId'
             )
             assert status == '735 Member Id Not In Form'
 
             when(
                 'Member not found',
-                form=given_form | dict(memberId=100)
+                form=given | dict(memberId=100)
             )
             assert status == 610
             assert status.text.startswith('Member not found')
 
             when(
                 'Member id type is invalid',
-                form=given_form | dict(memberId='Alphabetical')
+                form=given | dict(memberId='Alphabetical')
             )
             assert status == '736 Invalid Member Id Type'
 
             when(
                 'Issue is not subscribed yet',
                 url_parameters=dict(id=2),
-                form=given_form | dict(memberId=1)
+                form=given | dict(memberId=1)
             )
             assert status == '612 Not Subscribed Yet'
 
