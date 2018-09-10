@@ -30,8 +30,13 @@ class Profile(RestController):
 
 
 class Root(RestController):
+<<<<<<< HEAD
     tokens = Token()
     profiles = Profile()
+=======
+    token = Token()
+    profile = Profile()
+>>>>>>> Enhance integration
 
 
 @contextmanager
@@ -45,12 +50,32 @@ def oauth_mockup_server(root_controller):
         yield app
 
 
+<<<<<<< HEAD
 class TestToken(LocalApplicationTestCase):
 
     def test_redirect_to_cas(self):
         settings.merge(f'''
             oauth:
               application_id: 1
+=======
+class TestCASClient(LocalApplicationTestCase):
+
+    def test_redirect_to_cas(self):
+
+        settings.merge('''
+            oauth:
+              secret: A1dFVpz4w/qyym+HeXKWYmm6Ocj4X5ZNv1JQ7kgHBEk=\n
+              application_id: 1
+              authorization_code:
+                url: http://localhost:8080/apiv1/authorizationcodes
+                verb: create
+              access_token:
+                url: http://localhost:8080/apiv1/accesstokens
+                verb: create
+              member:
+                url: http://localhost:8080/apiv1/members
+                verb: get
+>>>>>>> Enhance integration
         ''')
 
         with self.given(
@@ -67,6 +92,7 @@ class TestToken(LocalApplicationTestCase):
 
     def test_get_access_token(self):
         with oauth_mockup_server(Root()):
+<<<<<<< HEAD
             settings.merge(f'''
                 oauth:
                   secret: A1dFVpz4w/qyym+HeXKWYmm6Ocj4X5ZNv1JQ7kgHBEk=\n
@@ -79,6 +105,10 @@ class TestToken(LocalApplicationTestCase):
                     verb: get
             ''')
 
+=======
+            settings.oauth.access_token.url = f'{settings.tokenizer.url}/token'
+            settings.oauth.member.url = f'{settings.tokenizer.url}/profile'
+>>>>>>> Enhance integration
             with self.given(
                 'Try to get an access token from CAS',
                 '/apiv1/oauth2/tokens',
@@ -86,8 +116,11 @@ class TestToken(LocalApplicationTestCase):
                 form=dict(authorizationCode='authorization code')
             ):
                 assert status == 200
+<<<<<<< HEAD
                 assert 'token' in response.json
                 assert 'X-New-Jwt-Token' in response.headers
+=======
+>>>>>>> Enhance integration
 
                 when(
                     'Trying to pass without the authorization code parameter',

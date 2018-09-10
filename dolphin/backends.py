@@ -1,7 +1,15 @@
+<<<<<<< HEAD
 import json
 
 import requests
 from nanohttp import settings, HTTPForbidden
+=======
+import urllib
+import json
+
+import requests
+from nanohttp import settings, HTTPFound, HTTPForbidden
+>>>>>>> Enhance integration
 
 
 class CASClient:
@@ -10,7 +18,11 @@ class CASClient:
 
         if authorization_code is None:
             raise HTTPForbidden()
+<<<<<<< HEAD
         response = requests.request(
+=======
+        cas_access_token = requests.request(
+>>>>>>> Enhance integration
             'CREATE',
             settings.oauth.access_token.url,
             data=dict(
@@ -19,10 +31,17 @@ class CASClient:
                 applicationId=settings.oauth['application_id']
             )
         )
+<<<<<<< HEAD
         if response.status_code != 200:
             raise HTTPForbiden()
 
         result = json.loads(response.text)
+=======
+        if cas_access_token.status_code != 200:
+            raise HTTPForbiden()
+
+        result = json.loads(cas_access_token.text)
+>>>>>>> Enhance integration
         return result['accessToken'], result['memberId']
 
     def get_member(self, member_id, access_token):
