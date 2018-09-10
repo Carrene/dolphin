@@ -4,6 +4,7 @@ set -e # Exit with nonzero exit code if anything fails
 
 # Exit safely when this build is a pull request
 if [ $TRAVIS_PULL_REQUEST != false ]; then
+	echo "Do not upload a pull request to wikies"
 	exit 0
 fi
 
