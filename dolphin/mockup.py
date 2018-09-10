@@ -29,7 +29,7 @@ def print_team(t):
 
 @indented(2)
 def print_subscribables(s):
-    yield f'user: {s.title}'
+    yield f'title: {s.title}'
 
 
 @indented(2)
@@ -48,13 +48,37 @@ def insert(): # pragma: no cover
     )
     DBSession.add(guest)
 
-    manager = Manager(
+    manager1 = Manager(
         title='First Manager',
         email='manager1@example.com',
         password='123456',
         phone=123456789
     )
-    DBSession.add(manager)
+    DBSession.add(manager1)
+
+    manager2 = Manager(
+        title='Second Manager',
+        email='manager2@example.com',
+        password='123456',
+        phone=1236789
+    )
+    DBSession.add(manager2)
+
+    manager3 = Manager(
+        title='Third Manager',
+        email='manager3@example.com',
+        password='123456',
+        phone=12456789
+    )
+    DBSession.add(manager3)
+
+    manager4 = Manager(
+        title='Fourth Manager',
+        email='manager4@example.com',
+        password='123456',
+        phone=12345678
+    )
+    DBSession.add(manager4)
 
     team = Team(
         title='Awesome team'
@@ -70,17 +94,50 @@ def insert(): # pragma: no cover
     )
     DBSession.add(resource)
 
-    release = Release(
+    release1 = Release(
         title='My first release',
-        description='A decription for my release.',
+        description='This is an awesome product.',
         due_date='2020-2-20',
         cutoff='2030-2-20',
     )
-    DBSession.add(release)
+    DBSession.add(release1)
+
+    release2 = Release(
+        title='My second release',
+        description='A decription for my release.',
+        due_date='2018-2-20',
+        cutoff='2022-2-20',
+    )
+    DBSession.add(release2)
+
+    release3 = Release(
+        title='My third release',
+        description='One of the most interesting releases.',
+        due_date='2025-2-20',
+        cutoff='2027-2-20',
+    )
+    DBSession.add(release3)
+
+    release4 = Release(
+        title='My fourth release',
+        description='A description for fourth release.',
+        due_date='2028-2-20',
+        cutoff='2030-2-20',
+    )
+    DBSession.add(release4)
+
+    release5 = Release(
+        title='My fifth release',
+        description='This release has awesome projects.',
+        due_date='2032-2-20',
+        cutoff='2034-2-20',
+    )
+    DBSession.add(release5)
+
 
     project1 = Project(
-        manager=manager,
-        releases=[release],
+        manager=manager1,
+        releases=[release1],
         title='My first project',
         description='This is description for my awesome project.',
         due_date='2020-2-20',
@@ -89,8 +146,8 @@ def insert(): # pragma: no cover
     DBSession.add(project1)
 
     project2 = Project(
-        manager=manager,
-        releases=[release],
+        manager=manager1,
+        releases=[release1],
         title='My second project',
         description='A project for facilating your teamwork.',
         due_date='2018-3-30',
@@ -99,8 +156,8 @@ def insert(): # pragma: no cover
     DBSession.add(project2)
 
     project3 = Project(
-        manager=manager,
-        releases=[release],
+        manager=manager1,
+        releases=[release1],
         title='My third project',
         description='A project with interesting features.',
         due_date='2024-2-24',
@@ -109,8 +166,8 @@ def insert(): # pragma: no cover
     DBSession.add(project3)
 
     project4 = Project(
-        manager=manager,
-        releases=[release],
+        manager=manager1,
+        releases=[release1],
         title='My fourth project',
         description='Description of project.',
         due_date='2028-2-28',
@@ -189,14 +246,21 @@ def insert(): # pragma: no cover
         '"/apiv1/tokens"'
     )
     print_member(guest)
-    print_member(manager)
+    print_member(manager1)
+    print_member(manager2)
+    print_member(manager3)
+    print_member(manager4)
     print_member(resource)
 
     print('Following teams have been added:')
     print_team(team)
 
     print('Following releases have been added:')
-    print_subscribables(release)
+    print_subscribables(release1)
+    print_subscribables(release2)
+    print_subscribables(release3)
+    print_subscribables(release4)
+    print_subscribables(release5)
 
     print('Following projects have been added:')
     print_subscribables(project1)

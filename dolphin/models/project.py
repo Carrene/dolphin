@@ -29,7 +29,7 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     status = Field(
         Enum(*project_statuses, name='project_status'),
-        nullable=True
+        default='queued'
     )
 
     manager = relationship(
