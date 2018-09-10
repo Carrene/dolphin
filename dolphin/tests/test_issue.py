@@ -1,5 +1,5 @@
 
-from bddrest import status, response, Update, when, Remove, Append, given_form
+from bddrest import status, response, Update, when, Remove, Append, given
 
 from dolphin.tests.helpers import LocalApplicationTestCase
 from dolphin.models import Issue, Project, Manager, Release, Phase, Resource
@@ -111,26 +111,26 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Project id not in form',
-                form=given_form - 'projectId' | dict(title='1')
+                form=given - 'projectId' | dict(title='1')
             )
             assert status == '713 Project Id Not In Form'
 
             when(
                 'Project not found with string type',
-                form=given_form | dict(projectId='Alphabetical', title='1')
+                form=given | dict(projectId='Alphabetical', title='1')
             )
             assert status == '714 Invalid Project Id Type'
 
             when(
                 'Project not found with integer type',
-                form=given_form | dict(projectId=100, title='1')
+                form=given | dict(projectId=100, title='1')
             )
             assert status == 601
             assert status.text.startswith('Project not found')
 
             when(
                 'Title is not in form',
-                form=given_form - 'title'
+                form=given - 'title'
             )
             assert status == '710 Title Not In Form'
 
@@ -143,13 +143,13 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Title length is more than limit',
-                form=given_form | dict(title=((50 + 1) * 'a'))
+                form=given | dict(title=((50 + 1) * 'a'))
             )
             assert status == '704 At Most 50 Characters Are Valid For Title'
 
             when(
                 'Description length is less than limit',
-                form=given_form | dict(
+                form=given | dict(
                     description=((512 + 1) * 'a'),
                     title=('Another title')
                 )
@@ -159,7 +159,7 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Due date format is wrong',
-                form=given_form | dict(
+                form=given | dict(
                     dueDate='20-20-20',
                     title='Another title'
                 )
@@ -168,25 +168,25 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Due date is not in form',
-                form=given_form - 'dueDate' | dict(title='Another title')
+                form=given - 'dueDate' | dict(title='Another title')
             )
             assert status == '711 Due Date Not In Form'
 
             when(
                 'Kind is not in form',
-                form=given_form - 'kind' | dict(title='Another title')
+                form=given - 'kind' | dict(title='Another title')
             )
             assert status == '718 Kind Not In Form'
 
             when(
                 'Days is not in form',
-                form=given_form - 'days' | dict(title='Another title')
+                form=given - 'days' | dict(title='Another title')
             )
             assert status == '720 Days Not In Form'
 
             when(
                 'Days type is wrong',
-                form=given_form | dict(
+                form=given | dict(
                     days='Alphabetical',
                     title='Another title'
                 )
@@ -195,14 +195,14 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Invalid kind value is in form',
-                form=given_form | dict(kind='enhancing', title='Another title')
+                form=given | dict(kind='enhancing', title='Another title')
             )
             assert status == 717
             assert status.text.startswith('Invalid kind')
 
             when(
                 'Invalid status value is in form',
-                form=given_form + dict(status='progressing') | \
+                form=given + dict(status='progressing') | \
                     dict(title='Another title')
             )
             assert status == 705
@@ -226,32 +226,32 @@ class TestIssue(LocalApplicationTestCase):
             when(
                 'Intended issue with string type not found',
                 url_parameters=dict(id='Alphabetical'),
-                form=given_form | dict(title='Another issue')
+                form=given | dict(title='Another issue')
             )
             assert status == 404
 
             when(
                 'Intended issue with integer type not found',
                 url_parameters=dict(id=100),
-                form=given_form | dict(title='Another issue')
+                form=given | dict(title='Another issue')
             )
             assert status == 404
 
             when(
                 'Title is repetitive',
-                form=given_form | dict(title='Defined issue')
+                form=given | dict(title='Defined issue')
             )
             assert status == 600
             assert status.text.startswith('Another issue with title')
             when(
                 'Title length is more than limit',
-                form=given_form | dict(title=((50 + 1) * 'a'))
+                form=given | dict(title=((50 + 1) * 'a'))
             )
             assert status == '704 At Most 50 Characters Are Valid For Title'
 
             when(
                 'Description length is less than limit',
-                form=given_form | dict(
+                form=given | dict(
                     description=((512 + 1) * 'a'),
                     title=('Another title')
                 )
@@ -261,7 +261,7 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Due date format is wrong',
-                form=given_form | dict(
+                form=given | dict(
                     dueDate='20-20-20',
                     title='Another title'
                 )
@@ -270,14 +270,14 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Invalid kind value is in form',
-                form=given_form | dict(kind='enhancing', title='Another title')
+                form=given | dict(kind='enhancing', title='Another title')
             )
             assert status == 717
             assert status.text.startswith('Invalid kind')
 
             when(
                 'Invalid status value is in form',
-                form=given_form + dict(status='progressing') | \
+                form=given + dict(status='progressing') | \
                     dict(title='Another title')
             )
             assert status == 705
@@ -285,7 +285,7 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Invalid parameter is in the form',
-                form=given_form + dict(invalid_param='External parameter') | \
+                form=given + dict(invalid_param='External parameter') | \
                     dict(title='Another title')
             )
             assert status == 707
@@ -364,40 +364,40 @@ class TestIssue(LocalApplicationTestCase):
             when(
                 'Intended issue with string type not found',
                 url_parameters=dict(id='Alphabetical'),
-                form=given_form | dict(title='Another issue')
+                form=given | dict(title='Another issue')
             )
             assert status == 404
 
             when(
                 'Intended issue with integer type not found',
                 url_parameters=dict(id=100),
-                form=given_form | dict(title='Another issue')
+                form=given | dict(title='Another issue')
             )
             assert status == 404
 
             when(
                 'Member id not in form',
-                form=given_form - 'memberId'
+                form=given - 'memberId'
             )
             assert status == '735 Member Id Not In Form'
 
             when(
                 'Member not found',
-                form=given_form | dict(memberId=100)
+                form=given | dict(memberId=100)
             )
             assert status == 610
             assert status.text.startswith('Member not found')
 
             when(
                 'Member id type is invalid',
-                form=given_form | dict(memberId='Alphabetical')
+                form=given | dict(memberId='Alphabetical')
             )
             assert status == '736 Invalid Member Id Type'
 
             when(
                 'Issue is already subscribed',
                 url_parameters=dict(id=4),
-                form=given_form | dict(memberId=1)
+                form=given | dict(memberId=1)
             )
             assert status == '611 Already Subscribed'
 
@@ -413,40 +413,40 @@ class TestIssue(LocalApplicationTestCase):
             when(
                 'Intended issue with string type not found',
                 url_parameters=dict(id='Alphabetical'),
-                form=given_form | dict(title='Another issue')
+                form=given | dict(title='Another issue')
             )
             assert status == 404
 
             when(
                 'Intended issue with integer type not found',
                 url_parameters=dict(id=100),
-                form=given_form | dict(title='Another issue')
+                form=given | dict(title='Another issue')
             )
             assert status == 404
 
             when(
                 'Member id not in form',
-                form=given_form - 'memberId'
+                form=given - 'memberId'
             )
             assert status == '735 Member Id Not In Form'
 
             when(
                 'Member not found',
-                form=given_form | dict(memberId=100)
+                form=given | dict(memberId=100)
             )
             assert status == 610
             assert status.text.startswith('Member not found')
 
             when(
                 'Member id type is invalid',
-                form=given_form | dict(memberId='Alphabetical')
+                form=given | dict(memberId='Alphabetical')
             )
             assert status == '736 Invalid Member Id Type'
 
             when(
                 'Issue is not subscribed yet',
                 url_parameters=dict(id=4),
-                form=given_form | dict(memberId=1)
+                form=given | dict(memberId=1)
             )
             assert status == '612 Not Subscribed Yet'
 
@@ -462,59 +462,59 @@ class TestIssue(LocalApplicationTestCase):
             when(
                 'Intended issue with string type not found',
                 url_parameters=dict(id='Alphabetical'),
-                form=given_form | dict(title='Another issue')
+                form=given | dict(title='Another issue')
             )
             assert status == 404
 
             when(
                 'Intended issue with integer type not found',
                 url_parameters=dict(id=100),
-                form=given_form | dict(title='Another issue')
+                form=given | dict(title='Another issue')
             )
             assert status == 404
 
             when(
                 'Resource not found',
-                form=given_form | dict(resourceId=100)
+                form=given | dict(resourceId=100)
             )
             assert status == 609
             assert status.text.startswith('Resource not found')
 
             when(
                 'Resource id is not in form',
-                form=given_form - 'resourceId'
+                form=given - 'resourceId'
             )
             assert status == '715 Resource Id Not In Form'
 
             when(
                 'Resource id type is not valid',
-                form=given_form | dict(resourceId='Alphabetical')
+                form=given | dict(resourceId='Alphabetical')
             )
             assert status == '716 Invalid Resource Id Type'
 
             when(
                 'Phase not found',
-                form=given_form | dict(phaseId=100)
+                form=given | dict(phaseId=100)
             )
             assert status == 613
             assert status.text.startswith('Phase not found')
 
             when(
                 'Phase id is not in form',
-                form=given_form - 'phaseId'
+                form=given - 'phaseId'
             )
             assert status == '737 Phase Id Not In Form'
 
             when(
                 'Phase id type is not valid',
-                form=given_form | dict(phaseId='Alphabetical')
+                form=given | dict(phaseId='Alphabetical')
             )
             assert status == '738 Invalid Phase Id Type'
 
             when(
                 'Issue is already assigned',
                 url_parameters=dict(id=4),
-                form=given_form | dict(resourceId=2)
+                form=given | dict(resourceId=2)
             )
             assert status == '602 Already Assigned'
 

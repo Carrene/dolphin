@@ -1,5 +1,5 @@
 
-from bddrest import status, response, Update, when, Remove, Append, given_form
+from bddrest import status, response, Update, when, Remove, Append, given
 
 from dolphin.tests.helpers import LocalApplicationTestCase
 from dolphin.models import Project, Manager, Release
@@ -81,19 +81,19 @@ class TestManager(LocalApplicationTestCase):
 
             when(
                 'Project id not in form',
-                form=given_form - 'projectId'
+                form=given - 'projectId'
             )
             assert status == '713 Project Id Not In Form'
 
             when(
                 'Project id type is invalid',
-                form=given_form | dict(projectId='Alphabetical')
+                form=given | dict(projectId='Alphabetical')
             )
             assert status == '714 Invalid Project Id Type'
 
             when(
                 'Project not found with integer type',
-                form=given_form | dict(projectId=100)
+                form=given | dict(projectId=100)
             )
             assert status == 601
             assert status.text.startswith('Project not found')
