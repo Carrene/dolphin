@@ -7,7 +7,7 @@ from .controllers.root import Root
 from . import mockup
 
 
-__version__ = '0.1.0-planning.0'
+__version__ = '0.8.0'
 
 
 class Dolphin(Application):
