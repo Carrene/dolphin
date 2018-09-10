@@ -1,4 +1,5 @@
 from restfulpy.controllers import RestController
+<<<<<<< HEAD
 
 from .tokens import TokenController
 
@@ -9,4 +10,15 @@ class OAUTHController(RestController):
     def __call__(self, *remaining_paths):
         if len(remaining_paths) == 1 and remaining_paths[0] == 'tokens':
             return self._token_controller()
+=======
+from .token import TokenController
+
+
+class OAUTHController(RestController):
+    __token_controller = TokenController()
+
+    def __call__(self, *remaining_paths):
+        if len(remaining_paths) == 1  and remaining_paths[0] == 'tokens':
+            return self.__token_controller()
+>>>>>>> Enhance integration
 
