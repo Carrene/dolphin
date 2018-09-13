@@ -19,6 +19,7 @@ class Apiv1(Controller):
     issues = IssueController()
     items = ItemController()
     tokens = TokenController()
+    oauth2 = OAUTHController()
 
     @json
     def version(self):

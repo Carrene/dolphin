@@ -32,7 +32,7 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         pattern=r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'
     )
     access_token = Field(Unicode(200), protected=True)
-    phone = Field(BigInteger, unique=True)
+    phone = Field(BigInteger, unique=True, nullable=True)
 
     subscribables = relationship(
         'Subscribable',
