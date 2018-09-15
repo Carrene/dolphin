@@ -48,6 +48,8 @@ class TestRelease(LocalApplicationTestCase):
         session.commit()
 
     def test_create(self):
+        self.login('manager1@example.com')
+
         with self.given(
             'Createing a release',
             '/apiv1/releases',
@@ -128,8 +130,12 @@ class TestRelease(LocalApplicationTestCase):
             assert status == 705
             assert status.text.startswith('Invalid status')
 
+            when('Request is not authorized', authorization=None)
+            assert status == 401
 
     def test_update(self):
+        self.login('manager1@example.com')
+
         with self.given(
             'Updating a release',
             '/apiv1/releases/id:1',
@@ -214,6 +220,9 @@ class TestRelease(LocalApplicationTestCase):
             assert status == 705
             assert status.text.startswith('Invalid status')
 
+            when('Request is not authorized', authorization=None)
+            assert status == 401
+
         with self.given(
             'Send HTTP request with empty form parameter',
             '/apiv1/releases/id:1',
@@ -223,6 +232,8 @@ class TestRelease(LocalApplicationTestCase):
             assert status == '708 No Parameter Exists In The Form'
 
     def test_abort(self):
+        self.login('manager1@example.com')
+
         with self.given(
             'Aborting a release',
             '/apiv1/releases/id:1',
@@ -248,11 +259,18 @@ class TestRelease(LocalApplicationTestCase):
             )
             assert status == '709 Form Not Allowed'
 
-        session = self.create_session()
-        release = session.query(Release).filter(Release.id == 1).one_or_none()
-        assert release is None
+            session = self.create_session()
+            release = session.query(Release) \
+                .filter(Release.id == 1) \
+                .one_or_none()
+            assert release is None
+
+            when('Request is not authorized', authorization=None)
+            assert status == 401
 
     def test_list(self):
+        self.login('manager1@example.com')
+
         with self.given(
             'List releases',
             '/apiv1/releases',
@@ -303,7 +321,12 @@ class TestRelease(LocalApplicationTestCase):
             )
             assert response.json[0]['title'] == 'My fourth release'
 
+            when('Request is not authorized', authorization=None)
+            assert status == 401
+
     def test_subscribe(self):
+        self.login('manager1@example.com')
+
         with self.given(
             'Subscribe release',
             '/apiv1/releases/id:2',
@@ -350,7 +373,12 @@ class TestRelease(LocalApplicationTestCase):
             )
             assert status == '611 Already Subscribed'
 
+            when('Request is not authorized', authorization=None)
+            assert status == 401
+
     def test_unsubscribe(self):
+        self.login('manager1@example.com')
+
         with self.given(
             'Unsubscribe release',
             '/apiv1/releases/id:2',
@@ -396,4 +424,7 @@ class TestRelease(LocalApplicationTestCase):
                 form=given | dict(memberId=1)
             )
             assert status == '612 Not Subscribed Yet'
+
+            when('Request is not authorized', authorization=None)
+            assert status == 401
 

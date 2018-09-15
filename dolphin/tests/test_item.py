@@ -72,6 +72,8 @@ class TestItem(LocalApplicationTestCase):
         session.commit()
 
     def test_update(self):
+        self.login('manager1@example.com')
+
         with self.given(
             'Update status of an item',
             '/apiv1/items/id:1',
@@ -95,4 +97,7 @@ class TestItem(LocalApplicationTestCase):
             )
             assert status == 705
             assert status.text.startswith('Invalid status value')
+
+            when('Request is not authorized', authorization=None)
+            assert status == 401
 

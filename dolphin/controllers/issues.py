@@ -1,5 +1,6 @@
 
 from nanohttp import HTTPStatus, json, context, HTTPNotFound
+from restfulpy.authorization import authorize
 from restfulpy.utils import to_camel_case
 from restfulpy.orm import DBSession, commit
 from restfulpy.controllers import ModelRestController
@@ -13,6 +14,7 @@ from dolphin.validators import issue_validator, update_issue_validator, \
 class IssueController(ModelRestController):
     __model__ = Issue
 
+    @authorize
     @json
     @issue_validator
     @Issue.expose
@@ -23,6 +25,7 @@ class IssueController(ModelRestController):
         DBSession.add(issue)
         return issue
 
+    @authorize
     @json(prevent_empty_form='708 No Parameter Exists In The Form')
     @update_issue_validator
     @Issue.expose
@@ -54,6 +57,7 @@ class IssueController(ModelRestController):
         issue.update_from_request()
         return issue
 
+    @authorize
     @json
     @Issue.expose
     def list(self):
@@ -61,6 +65,7 @@ class IssueController(ModelRestController):
         query = DBSession.query(Issue)
         return query
 
+    @authorize
     @json
     @subscribe_validator
     @Issue.expose
@@ -91,6 +96,7 @@ class IssueController(ModelRestController):
 
         return issue
 
+    @authorize
     @json
     @subscribe_validator
     @Issue.expose
@@ -119,6 +125,7 @@ class IssueController(ModelRestController):
 
         return issue
 
+    @authorize
     @json
     @assign_issue_validator
     @Issue.expose

@@ -59,6 +59,8 @@ class TestManager(LocalApplicationTestCase):
         session.commit()
 
     def test_assign(self):
+        self.login('manager1@example.com')
+
         with self.given(
             'Assign a manager to project',
             '/apiv1/managers/id:1',
@@ -98,7 +100,12 @@ class TestManager(LocalApplicationTestCase):
             assert status == 601
             assert status.text.startswith('Project not found')
 
+            when('Request is not authorized', authorization=None)
+            assert status == 401
+
     def test_list(self):
+        self.login('manager1@example.com')
+
         with self.given(
             'List managers',
             '/apiv1/managers',
@@ -149,4 +156,7 @@ class TestManager(LocalApplicationTestCase):
                 query=dict(sort='-title', take=1, skip=2)
             )
             assert response.json[0]['title'] == 'Assigned Manager'
+
+            when('Request is not authorized', authorization=None)
+            assert status == 401
 

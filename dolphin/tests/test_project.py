@@ -48,6 +48,8 @@ class TestProject(LocalApplicationTestCase):
         cls.release = release
 
     def test_create(self):
+        self.login('manager1@example.com')
+
         with self.given(
             'Createing a project',
             '/apiv1/projects',
@@ -145,8 +147,12 @@ class TestProject(LocalApplicationTestCase):
             assert status == 705
             assert status.text.startswith('Invalid status')
 
+            when('Request is not authorized', authorization=None)
+            assert status == 401
 
     def test_update(self):
+        self.login('manager1@example.com')
+
         with self.given(
             'Updating a project',
             '/apiv1/projects/id:1',
@@ -232,6 +238,13 @@ class TestProject(LocalApplicationTestCase):
             assert status == 707
             assert status.text.startswith('Invalid field')
 
+            when(
+                'Request is not authorized',
+                form=given | dict(title='Another title'),
+                authorization=None
+            )
+            assert status == 401
+
         with self.given(
             'Updating project with empty form',
             '/apiv1/projects/id:2',
@@ -241,6 +254,8 @@ class TestProject(LocalApplicationTestCase):
             assert status == '708 No Parameter Exists In The Form'
 
     def test_hide(self):
+        self.login('manager1@example.com')
+
         with self.given(
             'Hiding a project',
             '/apiv1/projects/id:1',
@@ -268,7 +283,12 @@ class TestProject(LocalApplicationTestCase):
             )
             assert status == '709 Form Not Allowed'
 
+            when('Request is not authorized', authorization=None)
+            assert status == 401
+
     def test_show(self):
+        self.login('manager1@example.com')
+
         with self.given(
             'Showing a unhidden project',
             '/apiv1/projects/id:3',
@@ -293,7 +313,12 @@ class TestProject(LocalApplicationTestCase):
             )
             assert status == '709 Form Not Allowed'
 
+            when('Request is not authorized', authorization=None)
+            assert status == 401
+
     def test_list(self):
+        self.login('manager1@example.com')
+
         with self.given(
             'List projects',
             '/apiv1/projects',
@@ -345,7 +370,12 @@ class TestProject(LocalApplicationTestCase):
             )
             assert response.json[0]['title'] == 'My awesome project'
 
+            when('Request is not authorized', authorization=None)
+            assert status == 401
+
     def test_subscribe(self):
+        self.login('manager1@example.com')
+
         with self.given(
             'Subscribe project',
             '/apiv1/projects/id:4',
@@ -394,7 +424,12 @@ class TestProject(LocalApplicationTestCase):
             )
             assert status == '611 Already Subscribed'
 
+            when('Request is not authorized', authorization=None)
+            assert status == 401
+
     def test_unsubscribe(self):
+        self.login('manager1@example.com')
+
         with self.given(
             'Unsubscribe an project',
             '/apiv1/projects/id:4',
@@ -442,4 +477,7 @@ class TestProject(LocalApplicationTestCase):
                 form=given | dict(memberId=1)
             )
             assert status == '612 Not Subscribed Yet'
+
+            when('Request is not authorized', authorization=None)
+            assert status == 401
 

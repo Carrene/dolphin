@@ -1,4 +1,5 @@
 from nanohttp import HTTPStatus, json, context, HTTPNotFound
+from restfulpy.authorization import authorize
 from restfulpy.orm import DBSession, commit
 from restfulpy.utils import to_camel_case
 from restfulpy.controllers import ModelRestController
@@ -11,6 +12,7 @@ from ..validators import project_validator, update_project_validator, \
 class ProjectController(ModelRestController):
     __model__ = Project
 
+    @authorize
     @json
     @project_validator
     @Project.expose
@@ -25,6 +27,7 @@ class ProjectController(ModelRestController):
         DBSession.add(project)
         return project
 
+    @authorize
     @json(prevent_empty_form='708 No Parameter Exists In The Form')
     @update_project_validator
     @Project.expose
@@ -58,6 +61,7 @@ class ProjectController(ModelRestController):
         project.update_from_request()
         return project
 
+    @authorize
     @json(prevent_form='709 Form Not Allowed')
     @Project.expose
     @commit
@@ -78,6 +82,7 @@ class ProjectController(ModelRestController):
         project.soft_delete()
         return project
 
+    @authorize
     @json(prevent_form='709 Form Not Allowed')
     @Project.expose
     @commit
@@ -98,6 +103,7 @@ class ProjectController(ModelRestController):
         project.soft_undelete()
         return project
 
+    @authorize
     @json
     @Project.expose
     def list(self):
@@ -105,6 +111,7 @@ class ProjectController(ModelRestController):
         query = DBSession.query(Project)
         return query
 
+    @authorize
     @json
     @subscribe_validator
     @Project.expose
@@ -137,6 +144,7 @@ class ProjectController(ModelRestController):
 
         return project
 
+    @authorize
     @json
     @subscribe_validator
     @Project.expose

@@ -1,4 +1,5 @@
 from nanohttp import json, context, HTTPNotFound
+from restfulpy.authorization import authorize
 from restfulpy.orm import DBSession, commit
 from restfulpy.controllers import ModelRestController
 
@@ -9,6 +10,7 @@ from dolphin.validators import assign_manager_validator
 class ManagerController(ModelRestController):
     __model__ = Manager
 
+    @authorize
     @json
     @assign_manager_validator
     @Project.expose
@@ -34,6 +36,7 @@ class ManagerController(ModelRestController):
         project.manager = manager
         return manager
 
+    @authorize
     @json
     @Manager.expose
     def list(self):
