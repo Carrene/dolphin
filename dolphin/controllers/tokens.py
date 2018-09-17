@@ -1,31 +1,53 @@
-
-from nanohttp import RestController, json, context, HTTPBadRequest, validate
+from nanohttp import RestController, json, context, HTTPBadRequest, validate, \
+    settings
 from restfulpy.authorization import authorize
+from restfulpy.orm import DBSession
+
+from ..models import Member
+from ..backends import CASClient
 
 
 class TokenController(RestController):
-
-    @validate(
-        email=dict(
-            required='400 Invalid email or password'
-        ),
-        password=dict(
-            required='400 Invalid email or password'
-        )
-    )
-    @json
-    def create(self):
-        email = context.form.get('email')
-        password = context.form.get('password')
-        principal = context.application.__authenticator__. \
-            login((email, password))
-        if principal is None:
-            raise HTTPBadRequest('Invalid email or password')
-        return dict(token=principal.dump())
 
     @authorize
     @json
     def invalidate(self):
         context.application.__authenticator__.logout()
         return {}
+
+    @json(prevent_form='711 Form Not Allowed')
+    def request(self):
+        return dict(
+            scopes=['email', 'title'],
+            applicationId=settings.oauth['application_id'],
+        )
+
+    @json
+    def obtain(self):
+        access_token, member_id = CASClient() \
+            .get_access_token(context.form.get('authorizationCode'))
+
+        cas_member = CASClient().get_member(member_id, access_token)
+        member = DBSession.query(Member) \
+            .filter(Member.email == cas_member['email']) \
+            .one_or_none()
+
+        if member is None:
+            member = Member(
+                email=cas_member['email'],
+                title=cas_member['title'],
+                access_token=access_token
+            )
+        else:
+            member.access_token = access_token
+
+        DBSession.add(member)
+        DBSession.commit()
+        principal = member.create_jwt_principal()
+        context.response_headers.add_header(
+            'X-New-JWT-Token',
+            principal.dump().decode('utf-8')
+        )
+
+        return dict(token=principal.dump().decode('utf-8'))
 

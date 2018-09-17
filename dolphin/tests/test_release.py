@@ -13,7 +13,7 @@ class TestRelease(LocalApplicationTestCase):
         manager = Manager(
             title='First Manager',
             email='manager1@example.com',
-            password='123456',
+            access_token='access token',
             phone=123456789
         )
 

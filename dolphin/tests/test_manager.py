@@ -14,21 +14,21 @@ class TestManager(LocalApplicationTestCase):
         assigned_manager = Manager(
             title='Assigned Manager',
             email='assigned@example.com',
-            password='123456',
+            access_token='access token',
             phone=123456789
         )
 
         unassigned_manager = Manager(
             title='Unassigned Manager',
             email='unassigned@example.com',
-            password='123456',
+            access_token='access token',
             phone=987654321
         )
 
         manager1 = Manager(
             title='First Manager',
             email='manager1@example.com',
-            password='123456',
+            access_token='access token',
             phone=123987465
         )
         session.add(manager1)
@@ -36,7 +36,7 @@ class TestManager(LocalApplicationTestCase):
         manager2 = Manager(
             title='Second Manager',
             email='manager2@example.com',
-            password='123456',
+            access_token='access token',
             phone=1287465
         )
         session.add(manager2)
