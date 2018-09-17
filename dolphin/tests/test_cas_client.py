@@ -30,8 +30,8 @@ class Profile(RestController):
 
 
 class Root(RestController):
-    token = Token()
-    profile = Profile()
+    tokens = Token()
+    profiles = Profile()
 
 
 @contextmanager
@@ -51,7 +51,7 @@ class TestToken(LocalApplicationTestCase):
         settings.merge(f'''
             oauth:
               application_id: 1
-       ''')
+        ''')
 
         with self.given(
             'Trying to redirect to CAS server',
