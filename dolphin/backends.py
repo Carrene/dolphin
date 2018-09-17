@@ -1,8 +1,7 @@
-import urllib
 import json
 
 import requests
-from nanohttp import settings, HTTPFound, HTTPForbidden
+from nanohttp import settings, HTTPForbidden
 
 
 class CASClient:
