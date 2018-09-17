@@ -34,7 +34,7 @@ class TestIssue(LocalApplicationTestCase):
 
         project = Project(
             manager=manager,
-            releases=[release],
+            release=release,
             title='My first project',
             description='A decription for my project',
             due_date='2020-2-20',

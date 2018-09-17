@@ -4,6 +4,7 @@ from restfulpy.orm import Field, relationship, ModifiedMixin, FilteringMixin, \
     OrderingMixin, PaginationMixin, DeclarativeBase
 
 from .subscribable import Subscribable
+from .project import Project
 
 
 release_statuses = [
@@ -12,13 +13,6 @@ release_statuses = [
     'delayed',
     'complete',
 ]
-
-
-class ReleaseProject(DeclarativeBase):
-    __tablename__ = 'releaseproject'
-
-    release = Field(Integer, ForeignKey('release.id'), primary_key=True)
-    project = Field(Integer, ForeignKey('project.id'), primary_key=True)
 
 
 class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
@@ -36,8 +30,8 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
 
     projects = relationship(
         'Project',
-        secondary='releaseproject',
-        back_populates='releases',
+        primaryjoin=id == Project.release_id,
+        back_populates='release',
         protected=True
     )
 

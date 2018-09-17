@@ -27,7 +27,7 @@ class TestProject(LocalApplicationTestCase):
 
         project = Project(
             manager=manager,
-            releases=[release],
+            release=release,
             title='My first project',
             description='A decription for my project',
             due_date='2020-2-20',
@@ -35,7 +35,7 @@ class TestProject(LocalApplicationTestCase):
 
         hidden_project = Project(
             manager=manager,
-            releases=[release],
+            release=release,
             title='My hidden project',
             description='A decription for my project',
             due_date='2020-2-20',
@@ -155,7 +155,7 @@ class TestProject(LocalApplicationTestCase):
 
         with self.given(
             'Updating a project',
-            '/apiv1/projects/id:1',
+            '/apiv1/projects/id:2',
             'UPDATE',
             form=dict(
                 title='My interesting project',
@@ -258,12 +258,12 @@ class TestProject(LocalApplicationTestCase):
 
         with self.given(
             'Hiding a project',
-            '/apiv1/projects/id:1',
+            '/apiv1/projects/id:2',
             'HIDE'
         ):
             session = self.create_session()
             project = session.query(Project) \
-                .filter(Project.id == 1) \
+                .filter(Project.id == 2) \
                 .one_or_none()
             assert status == 200
             project.assert_is_deleted()

@@ -23,7 +23,9 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     __mapper_args__ = {'polymorphic_identity': __tablename__}
 
     _boarding = ['on-time', 'delayed', 'at-risk']
+
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
+    release_id = Field(Integer, ForeignKey('release.id'), nullable=True)
     manager_id = Field(Integer, ForeignKey('member.id'))
     group_id = Field(Integer, ForeignKey('group.id'), nullable=True)
 
@@ -43,9 +45,9 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         back_populates='project',
         protected=True
     )
-    releases = relationship(
+    release = relationship(
         'Release',
-        secondary='releaseproject',
+        foreign_keys=[release_id],
         back_populates='projects',
         protected=True
     )

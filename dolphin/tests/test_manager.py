@@ -50,7 +50,7 @@ class TestManager(LocalApplicationTestCase):
 
         project = Project(
             manager=assigned_manager,
-            releases=[release],
+            release=release,
             title='My first project',
             description='A decription for my project',
             due_date='2020-2-20',
@@ -65,7 +65,7 @@ class TestManager(LocalApplicationTestCase):
             'Assign a manager to project',
             '/apiv1/managers/id:1',
             'ASSIGN',
-            form=dict(projectId='1')
+            form=dict(projectId='2')
         ):
             assert status == 200
 
