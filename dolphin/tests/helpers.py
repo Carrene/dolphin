@@ -4,7 +4,7 @@ from restfulpy.application import Application
 from restfulpy.testing import ApplicableTestCase
 
 from dolphin import Dolphin
-from ..authentication import Authenticator
+from dolphin.authentication import Authenticator
 
 
 HERE = path.abspath(path.dirname(__file__))
