@@ -1,6 +1,7 @@
 import re
 
 from nanohttp import json, context, HTTPNotFound, HTTPStatus
+from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 from restfulpy.utils import to_camel_case
@@ -13,6 +14,7 @@ from ..validators import release_validator, update_release_validator, \
 class ReleaseController(ModelRestController):
     __model__ = Release
 
+    @authorize
     @json
     @release_validator
     @Release.expose
@@ -28,6 +30,7 @@ class ReleaseController(ModelRestController):
         DBSession.add(new_release)
         return new_release
 
+    @authorize
     @json(prevent_empty_form='708 No Parameter Exists In The Form')
     @update_release_validator
     @Release.expose
@@ -64,6 +67,7 @@ class ReleaseController(ModelRestController):
         release.update_from_request()
         return release
 
+    @authorize
     @json(prevent_form='709 Form Not Allowed')
     @Release.expose
     @commit
@@ -83,6 +87,7 @@ class ReleaseController(ModelRestController):
         DBSession.delete(release)
         return release
 
+    @authorize
     @json
     @Release.expose
     def list(self):
@@ -90,6 +95,7 @@ class ReleaseController(ModelRestController):
         query = DBSession.query(Release)
         return query
 
+    @authorize
     @json
     @subscribe_validator
     @Release.expose
@@ -122,6 +128,7 @@ class ReleaseController(ModelRestController):
 
         return release
 
+    @authorize
     @json
     @subscribe_validator
     @Release.expose

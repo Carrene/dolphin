@@ -16,6 +16,9 @@ class LocalApplicationTestCase(ApplicableTestCase):
     __story_directory__ = path.join(DATA_DIRECTORY, 'stories')
     __api_documentation_directory__ = path.join(DATA_DIRECTORY, 'markdown')
 
+    def login(self, email, url='/apiv1/tokens', verb='CREATE'):
+        super().login(dict(email=email), url=url, verb=verb)
+
 
 class MockupApplication(Application):
 

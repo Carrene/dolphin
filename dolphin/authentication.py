@@ -25,12 +25,8 @@ class Authenticator(StatefulAuthenticator):
         return member.create_refresh_principal()
 
     def validate_credentials(self, credentials):
-        email, password = credentials
+        email = credentials
         member = self.safe_member_lookup(Member.email == email)
-
-        if not member.validate_password(password):
-            return None
-
         return member
 
     def verify_token(self, encoded_token):

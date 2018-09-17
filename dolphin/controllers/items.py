@@ -1,4 +1,5 @@
 from nanohttp import json, context, HTTPNotFound
+from restfulpy.authorization import authorize
 from restfulpy.orm import DBSession, commit
 from restfulpy.controllers import ModelRestController
 
@@ -9,6 +10,7 @@ from dolphin.validators import update_item_validator
 class ItemController(ModelRestController):
     __model__ = Item
 
+    @authorize
     @json
     @update_item_validator
     @Item.expose

@@ -10,6 +10,7 @@ class CASClient:
 
         if authorization_code is None:
             raise HTTPForbidden()
+
         response = requests.request(
             'CREATE',
             settings.oauth.access_token.url,
@@ -20,7 +21,7 @@ class CASClient:
             )
         )
         if response.status_code != 200:
-            raise HTTPForbiden()
+            raise HTTPForbidden()
 
         result = json.loads(response.text)
         return result['accessToken'], result['memberId']

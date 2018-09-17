@@ -87,6 +87,8 @@ class TestIssue(LocalApplicationTestCase):
         session.commit()
 
     def test_define(self):
+        self.login('manager1@example.com')
+
         with self.given(
             'Define an issue',
             '/apiv1/issues',
@@ -208,7 +210,12 @@ class TestIssue(LocalApplicationTestCase):
             assert status == 705
             assert status.text.startswith('Invalid status')
 
+            when('Request is not authorized',authorization=None)
+            assert status == 401
+
     def test_update(self):
+        self.login('manager1@example.com')
+
         with self.given(
             'Update a issue',
             '/apiv1/issues/id:3',
@@ -291,6 +298,9 @@ class TestIssue(LocalApplicationTestCase):
             assert status == 707
             assert status.text.startswith('Invalid field')
 
+            when('Request is not authorized',authorization=None)
+            assert status == 401
+
         with self.given(
             'Updating project with empty form',
             '/apiv1/issues/id:2',
@@ -299,8 +309,9 @@ class TestIssue(LocalApplicationTestCase):
         ):
             assert status == '708 No Parameter Exists In The Form'
 
-
     def test_list(self):
+        self.login('manager1@example.com')
+
         with self.given(
             'List issues',
             '/apiv1/issues',
@@ -351,8 +362,12 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert response.json[0]['title'] == 'New issue'
 
+            when('Request is not authorized',authorization=None)
+            assert status == 401
 
     def test_subscribe(self):
+        self.login('manager1@example.com')
+
         with self.given(
             'Subscribe an issue',
             '/apiv1/issues/id:4',
@@ -401,7 +416,12 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert status == '611 Already Subscribed'
 
+            when('Request is not authorized',authorization=None)
+            assert status == 401
+
     def test_unsubscribe(self):
+        self.login('manager1@example.com')
+
         with self.given(
             'Unsubscribe an issue',
             '/apiv1/issues/id:4',
@@ -450,7 +470,12 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert status == '612 Not Subscribed Yet'
 
+            when('Request is not authorized',authorization=None)
+            assert status == 401
+
     def test_assign(self):
+        self.login('manager1@example.com')
+
         with self.given(
             'Assign an issue to a resource',
             '/apiv1/issues/id:4',
@@ -517,4 +542,7 @@ class TestIssue(LocalApplicationTestCase):
                 form=given | dict(resourceId=2)
             )
             assert status == '602 Already Assigned'
+
+            when('Request is not authorized',authorization=None)
+            assert status == 401
 
