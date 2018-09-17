@@ -45,7 +45,7 @@ def oauth_mockup_server(root_controller):
         yield app
 
 
-class TestTOken(LocalApplicationTestCase):
+class TestToken(LocalApplicationTestCase):
 
     def test_redirect_to_cas(self):
         settings.merge(f'''
