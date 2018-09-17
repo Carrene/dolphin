@@ -10,7 +10,7 @@ class CASClient:
 
         if authorization_code is None:
             raise HTTPForbidden()
-        cas_access_token = requests.request(
+        response = requests.request(
             'CREATE',
             settings.oauth.access_token.url,
             data=dict(
@@ -19,10 +19,10 @@ class CASClient:
                 applicationId=settings.oauth['application_id']
             )
         )
-        if cas_access_token.status_code != 200:
+        if response.status_code != 200:
             raise HTTPForbiden()
 
-        result = json.loads(cas_access_token.text)
+        result = json.loads(response.text)
         return result['accessToken'], result['memberId']
 
     def get_member(self, member_id, access_token):
