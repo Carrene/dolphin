@@ -16,15 +16,14 @@ class ProjectController(ModelRestController):
     @json
     @project_validator
     @Project.expose
-    @commit
     def create(self):
         title = context.form['title']
-        project = DBSession.query(Project) \
-            .filter(Project.title == title) \
-            .one_or_none()
+
         project = Project()
         project.update_from_request()
         DBSession.add(project)
+        project.room_id = 1;
+        DBSession.commit()
         return project
 
     @authorize

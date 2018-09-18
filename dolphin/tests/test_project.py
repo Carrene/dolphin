@@ -31,6 +31,7 @@ class TestProject(LocalApplicationTestCase):
             title='My first project',
             description='A decription for my project',
             due_date='2020-2-20',
+            room_id=1000
         )
 
         hidden_project = Project(
@@ -39,7 +40,8 @@ class TestProject(LocalApplicationTestCase):
             title='My hidden project',
             description='A decription for my project',
             due_date='2020-2-20',
-            removed_at='2020-2-20'
+            removed_at='2020-2-20',
+            room_id=1000
         )
 
         session.add_all([manager, project, hidden_project, release])

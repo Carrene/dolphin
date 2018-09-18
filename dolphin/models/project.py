@@ -28,6 +28,7 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     release_id = Field(Integer, ForeignKey('release.id'), nullable=True)
     manager_id = Field(Integer, ForeignKey('member.id'))
     group_id = Field(Integer, ForeignKey('group.id'), nullable=True)
+    room_id = Field(Integer)
 
     status = Field(
         Enum(*project_statuses, name='project_status'),

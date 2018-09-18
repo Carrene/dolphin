@@ -37,3 +37,11 @@ class CASClient:
 
         return json.loads(response.text)
 
+#
+#class ChatClient:
+#
+#    def create_room(self, title):
+#
+#        response = request.requests(
+#            'CREATE',
+#            settings.chat.
