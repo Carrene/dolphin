@@ -5,6 +5,7 @@ from restfulpy.utils import to_camel_case
 from restfulpy.controllers import ModelRestController
 
 from ..models import Project, Subscription
+from ..backends import ChatClient, CASClient
 from ..validators import project_validator, update_project_validator, \
     subscribe_validator
 
@@ -18,11 +19,14 @@ class ProjectController(ModelRestController):
     @Project.expose
     def create(self):
         title = context.form['title']
+        access_token =  CASClient() \
+            .get_access_token(context.form.get('authorizationCode'))
+        room = ChatClient().create_room(title, 'access_token')
 
         project = Project()
         project.update_from_request()
         DBSession.add(project)
-        project.room_id = 1;
+        project.room_id = room['id']
         DBSession.commit()
         return project
 

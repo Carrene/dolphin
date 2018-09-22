@@ -1,8 +1,12 @@
+from contextlib import contextmanager
 
+from nanohttp import RegexRouteController, json, settings, context
 from bddrest import status, response, Update, when, Remove, Append, given
+from restfulpy.mockup import mockup_http_server
 
-from dolphin.tests.helpers import LocalApplicationTestCase
 from dolphin.models import Project, Manager, Release
+from dolphin.tests.helpers import MockupApplication, LocalApplicationTestCase, \
+    oauth_mockup_server, chat_mockup_server
 
 
 class TestProject(LocalApplicationTestCase):
@@ -52,7 +56,7 @@ class TestProject(LocalApplicationTestCase):
     def test_create(self):
         self.login('manager1@example.com')
 
-        with self.given(
+        with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Createing a project',
             '/apiv1/projects',
             'CREATE',
@@ -60,7 +64,8 @@ class TestProject(LocalApplicationTestCase):
                 managerId=self.manager_id,
                 title='My awesome project',
                 description='A decription for my project',
-                dueDate='2020-2-20'
+                dueDate='2020-2-20',
+                authorizationCode='authorization code'
             )
         ):
             assert status == 200
@@ -258,7 +263,7 @@ class TestProject(LocalApplicationTestCase):
     def test_hide(self):
         self.login('manager1@example.com')
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'Hiding a project',
             '/apiv1/projects/id:2',
             'HIDE'
