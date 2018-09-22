@@ -1,3 +1,4 @@
+from requests import ConnectionError
 from nanohttp import HTTPStatus, json, context, HTTPNotFound
 from restfulpy.authorization import authorize
 from restfulpy.orm import DBSession, commit
@@ -21,7 +22,10 @@ class ProjectController(ModelRestController):
         title = context.form['title']
         access_token =  CASClient() \
             .get_access_token(context.form.get('authorizationCode'))
-        room = ChatClient().create_room(title, 'access_token')
+        try:
+            room = ChatClient().create_room(title, 'access_token')
+        except ConnectionError:
+            raise HTTPStatus('800 Chat Server Not Available')
 
         project = Project()
         project.update_from_request()
@@ -40,7 +44,7 @@ class ProjectController(ModelRestController):
 
         try:
             id = int(id)
-        except:
+        except ValueError:
             raise HTTPNotFound()
 
         project = DBSession.query(Project) \
@@ -73,7 +77,7 @@ class ProjectController(ModelRestController):
 
         try:
             id = int(id)
-        except:
+        except ValueError:
             raise HTTPNotFound()
 
         project = DBSession.query(Project) \
@@ -94,7 +98,7 @@ class ProjectController(ModelRestController):
 
         try:
             id = int(id)
-        except:
+        except ValueError:
             raise HTTPNotFound()
 
         project = DBSession.query(Project) \
@@ -124,7 +128,7 @@ class ProjectController(ModelRestController):
 
         try:
             id = int(id)
-        except:
+        except ValueError:
             raise HTTPNotFound()
 
         project = DBSession.query(Project) \
@@ -157,7 +161,7 @@ class ProjectController(ModelRestController):
 
         try:
             id = int(id)
-        except:
+        except ValueError:
             raise HTTPNotFound()
 
         project = DBSession.query(Project) \
