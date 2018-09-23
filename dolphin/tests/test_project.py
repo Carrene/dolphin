@@ -5,7 +5,7 @@ from bddrest import status, response, Update, when, Remove, Append, given
 from restfulpy.mockup import mockup_http_server
 
 from dolphin.models import Project, Manager, Release
-from dolphin.tests.helpers import MockupApplication, LocalApplicationTestCase, \
+from dolphin.tests.helpers import MockupApplication, LocalApplicationTestCase,\
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
 

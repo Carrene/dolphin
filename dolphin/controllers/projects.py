@@ -1,4 +1,5 @@
 from requests import ConnectionError
+from sqlalchemy.exc import SQLAlchemyError
 from nanohttp import HTTPStatus, json, context, HTTPNotFound
 from restfulpy.authorization import authorize
 from restfulpy.orm import DBSession, commit
@@ -22,16 +23,16 @@ class ProjectController(ModelRestController):
         title = context.form['title']
         access_token =  CASClient() \
             .get_access_token(context.form.get('authorizationCode'))
-        try:
-            room = ChatClient().create_room(title, 'access_token')
-        except ConnectionError:
-            raise HTTPStatus('800 Chat Server Not Available')
+        room = ChatClient().create_room(title, access_token[0])
 
         project = Project()
         project.update_from_request()
         DBSession.add(project)
         project.room_id = room['id']
-        DBSession.commit()
+        try:
+            DBSession.commit()
+        except SQLAlchemyError:
+            ChatClient().delete_room(room['id'], access_token[0])
         return project
 
     @authorize

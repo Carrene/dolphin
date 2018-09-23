@@ -73,3 +73,11 @@ class ChatClient:
             room = json.loads(response.text)
             return room
 
+    def delete_room(self, id, access_token):
+
+        response = requests.request(
+            'DELETE',
+            f'{settings.chat.room.url}/rooms/{id}',
+            headers=dict(access_token=access_token)
+        )
+
