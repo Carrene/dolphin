@@ -54,6 +54,7 @@ class TestManager(LocalApplicationTestCase):
             title='My first project',
             description='A decription for my project',
             due_date='2020-2-20',
+            room_id=1
         )
         session.add(project)
         session.commit()

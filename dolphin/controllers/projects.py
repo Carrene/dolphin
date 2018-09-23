@@ -1,3 +1,5 @@
+from requests import ConnectionError
+from sqlalchemy.exc import SQLAlchemyError
 from nanohttp import HTTPStatus, json, context, HTTPNotFound
 from restfulpy.authorization import authorize
 from restfulpy.orm import DBSession, commit
@@ -5,6 +7,7 @@ from restfulpy.utils import to_camel_case
 from restfulpy.controllers import ModelRestController
 
 from ..models import Project, Subscription
+from ..backends import ChatClient, CASClient
 from ..validators import project_validator, update_project_validator, \
     subscribe_validator
 
@@ -16,15 +19,20 @@ class ProjectController(ModelRestController):
     @json
     @project_validator
     @Project.expose
-    @commit
     def create(self):
         title = context.form['title']
-        project = DBSession.query(Project) \
-            .filter(Project.title == title) \
-            .one_or_none()
+        access_token =  CASClient() \
+            .get_access_token(context.form.get('authorizationCode'))
+        room = ChatClient().create_room(title, access_token[0])
+
         project = Project()
         project.update_from_request()
         DBSession.add(project)
+        project.room_id = room['id']
+        try:
+            DBSession.commit()
+        except SQLAlchemyError:
+            ChatClient().delete_room(room['id'], access_token[0])
         return project
 
     @authorize
@@ -37,7 +45,7 @@ class ProjectController(ModelRestController):
 
         try:
             id = int(id)
-        except:
+        except ValueError:
             raise HTTPNotFound()
 
         project = DBSession.query(Project) \
@@ -58,6 +66,15 @@ class ProjectController(ModelRestController):
                 f'"{", ".join(json_columns)}" is accepted'
             )
 
+        if form['title'] and DBSession.query(Project).filter(
+            Project.id != id,
+            Project.title == form['title']
+        ).one_or_none():
+            raise HTTPStatus(
+                f'600 Another project with title: ' \
+                f'"{form["title"]}" is already exists.'
+            )
+
         project.update_from_request()
         return project
 
@@ -70,7 +87,7 @@ class ProjectController(ModelRestController):
 
         try:
             id = int(id)
-        except:
+        except ValueError:
             raise HTTPNotFound()
 
         project = DBSession.query(Project) \
@@ -91,7 +108,7 @@ class ProjectController(ModelRestController):
 
         try:
             id = int(id)
-        except:
+        except ValueError:
             raise HTTPNotFound()
 
         project = DBSession.query(Project) \
@@ -121,7 +138,7 @@ class ProjectController(ModelRestController):
 
         try:
             id = int(id)
-        except:
+        except ValueError:
             raise HTTPNotFound()
 
         project = DBSession.query(Project) \
@@ -154,7 +171,7 @@ class ProjectController(ModelRestController):
 
         try:
             id = int(id)
-        except:
+        except ValueError:
             raise HTTPNotFound()
 
         project = DBSession.query(Project) \

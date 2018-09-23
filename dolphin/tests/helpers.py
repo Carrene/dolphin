@@ -1,7 +1,10 @@
+from contextlib import contextmanager
 from os import path
 
+from nanohttp import RegexRouteController, json, settings, context, HTTPStatus
 from restfulpy.application import Application
 from restfulpy.testing import ApplicableTestCase
+from restfulpy.mockup import mockup_http_server
 
 from dolphin import Dolphin
 from dolphin.authentication import Authenticator
@@ -9,6 +12,9 @@ from dolphin.authentication import Authenticator
 
 HERE = path.abspath(path.dirname(__file__))
 DATA_DIRECTORY = path.abspath(path.join(HERE, '../../data'))
+
+
+_chat_server_status = 'idle'
 
 
 class LocalApplicationTestCase(ApplicableTestCase):
@@ -43,4 +49,81 @@ class Authorization(Authenticator):
 
     def authenticate_request(self):
         pass
+
+
+@contextmanager
+def oauth_mockup_server():
+    class Root(RegexRouteController):
+        def __init__(self):
+            super().__init__([
+                ('/apiv1/tokens', self.create),
+                ('/apiv1/profiles', self.get),
+            ])
+
+        @json
+        def create(self):
+            code = context.form.get('code')
+            if not code.startswith('authorization code'):
+                return dict(accessToken='token is damage', memberId=1)
+
+            return dict(accessToken='access token', memberId=1)
+
+        @json
+        def get(self, id):
+            access_token = context.environ['HTTP_AUTHORIZATION']
+
+            if access_token.startswith('oauth2-accesstoken access token'):
+                return dict(title='john', email='john@gmail.com')
+
+            raise HTTPForbidden()
+
+    app = MockupApplication('root', Root())
+    with mockup_http_server(app) as (server, url):
+        settings.merge(f'''
+            tokenizer:
+              url: {url}
+            oauth:
+              secret: A1dFVpz4w/qyym+HeXKWYmm6Ocj4X5ZNv1JQ7kgHBEk=\n
+              application_id: 1
+              access_token:
+                url: {url}/apiv1/tokens
+                verb: create
+              member:
+                url: {url}/apiv1/profiles
+                verb: get
+        ''')
+        yield app
+
+
+@contextmanager
+def chat_mockup_server():
+    class Root(RegexRouteController):
+        def __init__(self):
+            super().__init__([
+                ('/apiv1/rooms', self.create),
+            ])
+
+        @json(verbs=['create', 'delete'])
+        def create(self):
+            if _chat_server_status != 'idle':
+                raise HTTPStatus(_chat_server_status)
+
+            return dict(id=1, title='First chat room')
+
+    app = MockupApplication('jaguar-server', Root())
+    with mockup_http_server(app) as (server, url):
+        settings.merge(f'''
+            chat:
+              room:
+                url: {url}
+        ''')
+        yield app
+
+
+@contextmanager
+def chat_server_status(status):
+    global _chat_server_status
+    _chat_server_status = status
+    yield
+    _chat_server_status = 'idle'
 

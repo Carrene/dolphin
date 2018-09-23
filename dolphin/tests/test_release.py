@@ -157,7 +157,6 @@ class TestRelease(LocalApplicationTestCase):
 
             when(
                 'Intended release with string type not found',
-                form=given | dict(title='Another title'),
                 url_parameters=dict(id='Alphabetical')
             )
             assert status == 404
@@ -177,7 +176,7 @@ class TestRelease(LocalApplicationTestCase):
 
             when(
                 'Title is repetitive',
-                form=Update(title='My interesting release')
+                form=given | dict(title='My second release')
             )
             assert status == 600
             assert status.text.startswith('Another release with title')
@@ -186,7 +185,6 @@ class TestRelease(LocalApplicationTestCase):
                 'Description length is less than limit',
                 form=given | dict(
                     description=((512 + 1) * 'a'),
-                    title='Another title'
                 )
             )
             assert status == '703 At Most 512 Characters Are Valid For '\
@@ -196,7 +194,6 @@ class TestRelease(LocalApplicationTestCase):
                 'Due date format is wrong',
                 form=given | dict(
                     dueDate='20-20-20',
-                    title='Another title'
                 )
             )
             assert status == '701 Invalid Due Date Format'
@@ -205,7 +202,6 @@ class TestRelease(LocalApplicationTestCase):
                 'Cutoff format is wrong',
                 form=given | dict(
                     cutoff='30-20-20',
-                    title='Another title'
                 )
             )
             assert status == '702 Invalid Cutoff Format'
@@ -214,7 +210,6 @@ class TestRelease(LocalApplicationTestCase):
                 'Invalid status in form',
                 form=given | dict(
                     status='progressing',
-                    title='Another title'
                 )
             )
             assert status == 705
