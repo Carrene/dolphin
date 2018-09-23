@@ -61,9 +61,15 @@ class ReleaseController(ModelRestController):
                 f'{", ".join(release_statuses)} will be accepted'
             )
 
-        release = DBSession.query(Release) \
-            .filter(Release.id == id) \
-            .one_or_none()
+        if form['title'] and DBSession.query(Release).filter(
+            Release.id != id,
+            Release.title == form['title']
+        ).one_or_none():
+            raise HTTPStatus(
+                f'600 Another release with title: ' \
+                f'"{form["title"]}" is already exists.'
+            )
+
         release.update_from_request()
         return release
 

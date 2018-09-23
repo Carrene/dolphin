@@ -65,6 +65,15 @@ class ProjectController(ModelRestController):
                 f'"{", ".join(json_columns)}" is accepted'
             )
 
+        if form['title'] and DBSession.query(Project).filter(
+            Project.id != id,
+            Project.title == form['title']
+        ).one_or_none():
+            raise HTTPStatus(
+                f'600 Another project with title: ' \
+                f'"{form["title"]}" is already exists.'
+            )
+
         project.update_from_request()
         return project
 

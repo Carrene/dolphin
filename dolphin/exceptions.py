@@ -1,5 +1,14 @@
-from nanohttp import HTTPStatus, HTTPNotFound, HTTPBadRequest
+from nanohttp import HTTPKnownStatus
 
 
-empty_form_http_exception = HTTPStatus('708 Empty form')
+class ChatServerNotFound(HTTPKnownStatus):
+    status = '617 Chat Server Not Found'
+
+
+class ChatServerNotAvailable(HTTPKnownStatus):
+    status = '800 Chat Server Not Available'
+
+
+class ChatInternallError(HTTPKnownStatus):
+    status = '801 Chat Server Internal Error'
 

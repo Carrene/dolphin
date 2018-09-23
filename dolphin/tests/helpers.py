@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 from os import path
 
-from nanohttp import RegexRouteController, json, settings, context
+from nanohttp import RegexRouteController, json, settings, context, HTTPStatus
 from restfulpy.application import Application
 from restfulpy.testing import ApplicableTestCase
 from restfulpy.mockup import mockup_http_server
@@ -12,6 +12,9 @@ from dolphin.authentication import Authenticator
 
 HERE = path.abspath(path.dirname(__file__))
 DATA_DIRECTORY = path.abspath(path.join(HERE, '../../data'))
+
+
+_chat_server_status = 'idle'
 
 
 class LocalApplicationTestCase(ApplicableTestCase):
@@ -102,6 +105,9 @@ def chat_mockup_server():
 
         @json(verbs=['create', 'delete'])
         def create(self):
+            if _chat_server_status != 'idle':
+                raise HTTPStatus(_chat_server_status)
+
             return dict(id=1, title='First chat room')
 
     app = MockupApplication('jaguar-server', Root())
@@ -112,4 +118,12 @@ def chat_mockup_server():
                 url: {url}
         ''')
         yield app
+
+
+@contextmanager
+def chat_server_status(status):
+    global _chat_server_status
+    _chat_server_status = status
+    yield
+    _chat_server_status = 'idle'
 

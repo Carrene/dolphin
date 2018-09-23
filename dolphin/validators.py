@@ -6,7 +6,6 @@ from restfulpy.orm import DBSession, commit
 from dolphin.models import Project, Release, Issue, issue_kinds, Member, \
     issue_statuses, item_statuses, project_statuses, release_statuses, \
     Manager, Resource, Phase
-from dolphin.exceptions import empty_form_http_exception
 
 
 DATE_PATTERN = re.compile(
@@ -216,7 +215,6 @@ release_validator = validate(
 update_release_validator = validate(
     title=dict(
         max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
-        callback=release_not_exists_validator
     ),
     description=dict(
         max_length=(512, '703 At Most 512 Characters Are Valid For Description')
@@ -264,7 +262,6 @@ project_validator = validate(
 
 update_project_validator = validate(
     title=dict(
-        callback=project_not_exists_validator,
         max_length=(50, '704 At Most 50 Characters Are Valid For Title')
     ),
     description=dict(

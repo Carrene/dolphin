@@ -6,7 +6,7 @@ from restfulpy.mockup import mockup_http_server
 
 from dolphin.models import Project, Manager, Release
 from dolphin.tests.helpers import MockupApplication, LocalApplicationTestCase, \
-    oauth_mockup_server, chat_mockup_server
+    oauth_mockup_server, chat_mockup_server, chat_server_status
 
 
 class TestProject(LocalApplicationTestCase):
@@ -157,6 +157,27 @@ class TestProject(LocalApplicationTestCase):
             when('Request is not authorized', authorization=None)
             assert status == 401
 
+            with chat_server_status('404 Not Found'):
+                when(
+                    'Chat server is not found',
+                    form=given | dict(title='Another title')
+                )
+                assert status == '617 Chat Server Not Found'
+
+            with chat_server_status('503 Service Not Available'):
+                when(
+                    'Chat server is not available',
+                    form=given | dict(title='Another title')
+                )
+                assert status == '800 Chat Server Not Available'
+
+            with chat_server_status('500 Internal Service Error'):
+                when(
+                    'Chat server faces with internal error',
+                    form=given | dict(title='Another title')
+                )
+                assert status == '801 Chat Server Internal Error'
+
     def test_update(self):
         self.login('manager1@example.com')
 
@@ -180,21 +201,19 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Intended project with string type not found',
-                form=given | dict(title='Another title'),
                 url_parameters=dict(id='Alphabetical')
             )
             assert status == 404
 
             when(
                 'Intended project with string type not found',
-                form=given | dict(title='Another title'),
                 url_parameters=dict(id=100)
             )
             assert status == 404
 
             when(
                 'Title is repetetive',
-                form=Update(title='My interesting project')
+                form=Update(title='My awesome project')
             )
             assert status == 600
             assert status.text.startswith('Another project with title')
@@ -211,7 +230,6 @@ class TestProject(LocalApplicationTestCase):
                 'Description length is more than limit',
                 form=given | dict(
                     description=((512 + 1) * 'a'),
-                    title='Another title'
                 )
             )
             assert status == '703 At Most 512 Characters Are Valid For ' \
@@ -221,7 +239,6 @@ class TestProject(LocalApplicationTestCase):
                 'Due date format is wrong',
                 form=given | dict(
                     dueDate='2200-2-32',
-                    title='Another title'
                 )
             )
             assert status == '701 Invalid Due Date Format'
@@ -230,7 +247,6 @@ class TestProject(LocalApplicationTestCase):
                 'Status value is invalid',
                 form=given | dict(
                     status='progressing',
-                    title='Another title'
                 )
             )
             assert status == 705
@@ -239,15 +255,13 @@ class TestProject(LocalApplicationTestCase):
             when(
                 'Invalid parameter is in the form',
                 form=given + \
-                    dict(invalid_param='External parameter') | \
-                    dict(title='Another title')
+                    dict(invalid_param='External parameter')
             )
             assert status == 707
             assert status.text.startswith('Invalid field')
 
             when(
                 'Request is not authorized',
-                form=given | dict(title='Another title'),
                 authorization=None
             )
             assert status == 401

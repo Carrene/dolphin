@@ -2,6 +2,13 @@ import json
 
 import requests
 from nanohttp import settings, HTTPForbidden
+from restfulpy.logging_ import get_logger
+
+from .exceptions import ChatServerNotFound, ChatServerNotAvailable, \
+    ChatInternallError
+
+
+logger = get_logger()
 
 
 class CASClient:
@@ -42,12 +49,27 @@ class ChatClient:
 
     def create_room(self, title, access_token):
 
-        response = requests.request(
-            'CREATE',
-            f'{settings.chat.room.url}/rooms',
-            data=dict(title=title),
-            headers=dict(access_token=access_token)
-        )
-        room = json.loads(response.text)
-        return room
+        try:
+            response = requests.request(
+                'CREATE',
+                f'{settings.chat.room.url}/rooms',
+                data=dict(title=title),
+                headers=dict(access_token=access_token)
+            )
+            if response.status_code == 404:
+                raise ChatServerNotFound()
+
+            if response.status_code == 503:
+                raise ChatServerNotAvailable()
+
+            if response.status_code != 200:
+                logger.exception(response.content.decode())
+                raise ChatInternallError()
+
+        except requests.RequestException as e: # pragma: no cover
+            logger.exception(e)
+            raise ChatInternallError()
+        else:
+            room = json.loads(response.text)
+            return room
 
