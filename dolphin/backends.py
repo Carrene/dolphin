@@ -80,4 +80,5 @@ class ChatClient:
             f'{settings.chat.room.url}/rooms/{id}',
             headers=dict(access_token=access_token)
         )
+        return response
 
