@@ -20,6 +20,6 @@ ssh-add travis-wiki_rsa
 
 pip3 install -U pip setuptools wheel
 pip3 install -r requirements-dev.txt
-pip3 install -r requirements.txt
+pip3 install -r git+git://github.com/Carrene/nanohttp.git@master
 pip3 install -e .
 

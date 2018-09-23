@@ -56,8 +56,8 @@ def oauth_mockup_server():
     class Root(RegexRouteController):
         def __init__(self):
             super().__init__([
-                ('/tokens', self.create),
-                ('/profiles', self.get),
+                ('/apiv1/tokens', self.create),
+                ('/apiv1/profiles', self.get),
             ])
 
         @json
@@ -86,10 +86,10 @@ def oauth_mockup_server():
               secret: A1dFVpz4w/qyym+HeXKWYmm6Ocj4X5ZNv1JQ7kgHBEk=\n
               application_id: 1
               access_token:
-                url: {url}/tokens
+                url: {url}/apiv1/tokens
                 verb: create
               member:
-                url: {url}/profiles
+                url: {url}/apiv1/profiles
                 verb: get
         ''')
         yield app
@@ -100,7 +100,7 @@ def chat_mockup_server():
     class Root(RegexRouteController):
         def __init__(self):
             super().__init__([
-                ('/rooms', self.create),
+                ('/apiv1/rooms', self.create),
             ])
 
         @json(verbs=['create', 'delete'])

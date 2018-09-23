@@ -52,7 +52,7 @@ class ChatClient:
         try:
             response = requests.request(
                 'CREATE',
-                f'{settings.chat.room.url}/rooms',
+                f'{settings.chat.room.url}/apiv1/rooms',
                 data=dict(title=title),
                 headers=dict(access_token=access_token)
             )
@@ -77,7 +77,7 @@ class ChatClient:
 
         response = requests.request(
             'DELETE',
-            f'{settings.chat.room.url}/rooms/{id}',
+            f'{settings.chat.room.url}/apiv1/rooms/{id}',
             headers=dict(access_token=access_token)
         )
         return response
