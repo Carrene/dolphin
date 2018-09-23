@@ -408,14 +408,12 @@ class TestProject(LocalApplicationTestCase):
             when(
                 'Intended project with string type not found',
                 url_parameters=dict(id='Alphabetical'),
-                form=given | dict(title='Another issue')
             )
             assert status == 404
 
             when(
                 'Intended project with integer type not found',
                 url_parameters=dict(id=100),
-                form=given | dict(title='Another issue')
             )
             assert status == 404
 
@@ -462,14 +460,12 @@ class TestProject(LocalApplicationTestCase):
             when(
                 'Intended project with string type not found',
                 url_parameters=dict(id='Alphabetical'),
-                form=given | dict(title='Another issue')
             )
             assert status == 404
 
             when(
                 'Intended project with integer type not found',
                 url_parameters=dict(id=100),
-                form=given | dict(title='Another issue')
             )
             assert status == 404
 
