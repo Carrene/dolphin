@@ -158,7 +158,6 @@ class ProjectController(ModelRestController):
             member=form['memberId']
         )
         DBSession.add(subscription)
-
         return project
 
     @authorize

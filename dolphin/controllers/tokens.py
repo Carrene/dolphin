@@ -47,6 +47,7 @@ class TokenController(RestController):
 
         if member is None:
             member = Member(
+                reference_id=cas_member['id'],
                 email=cas_member['email'],
                 title=cas_member['title'],
                 access_token=access_token

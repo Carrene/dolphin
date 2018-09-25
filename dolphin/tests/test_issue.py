@@ -15,14 +15,16 @@ class TestIssue(LocalApplicationTestCase):
             title='First Manager',
             email='manager1@example.com',
             access_token='access token',
-            phone=123456789
+            phone=123456789,
+            reference_id=1
         )
 
         resource = Resource(
             title='First Resource',
             email='resource1@example.com',
             access_token='access token',
-            phone=987654321
+            phone=987654321,
+            reference_id=2
         )
 
         release = Release(
