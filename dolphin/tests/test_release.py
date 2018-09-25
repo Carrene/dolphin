@@ -14,7 +14,8 @@ class TestRelease(LocalApplicationTestCase):
             title='First Manager',
             email='manager1@example.com',
             access_token='access token',
-            phone=123456789
+            phone=123456789,
+            reference_id=1
         )
 
         release1 = Release(

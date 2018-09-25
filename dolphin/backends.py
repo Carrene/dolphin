@@ -82,3 +82,40 @@ class ChatClient:
         )
         return response
 
+    def add_member(self, id, user_id, access_token):
+
+        try:
+            response = requests.request(
+                'ADD',
+                f'{settings.chat.room.url}/apiv1/rooms/{id}',
+                data=dict(user_id=user_id),
+                headers=dict(access_token=access_token)
+            )
+            if response.status_code == 404:
+                raise ChatServerNotFound()
+
+            if response.status_code == 503:
+                raise ChatServerNotAvailable()
+
+            if response.status_code != 200:
+                logger.exception(response.content.decode())
+                raise ChatInternallError()
+
+        except requests.RequestException as e: # pragma: no cover
+            logger.exception(e)
+            raise ChatInternallError()
+        else:
+            room = json.loads(response.text)
+            return room
+
+    def remove_member(self, id, user_id, access_token):
+
+        response = requests.request(
+            'REMOVE',
+            f'{settings.chat.room.url}/apiv1/rooms/{id}',
+            data=dict(user_id=user_id),
+            headers=dict(access_token=access_token)
+        )
+        room = json.loads(response.text)
+        return room
+

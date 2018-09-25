@@ -24,7 +24,7 @@ class Profile(RestController):
         access_token = context.environ['HTTP_AUTHORIZATION']
 
         if access_token.startswith('oauth2-accesstoken access token'):
-            return dict(title='john', email='john@gmail.com')
+            return dict(id=1, title='john', email='john@gmail.com')
 
         raise HTTPForbidden()
 

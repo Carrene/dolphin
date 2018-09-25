@@ -1,8 +1,9 @@
 
 from bddrest import status, response, Update, when, Remove, Append, given
 
-from dolphin.tests.helpers import LocalApplicationTestCase
 from dolphin.models import Project, Manager, Release
+from dolphin.tests.helpers import LocalApplicationTestCase, \
+    oauth_mockup_server, chat_mockup_server, chat_server_status
 
 
 class TestManager(LocalApplicationTestCase):
@@ -15,21 +16,24 @@ class TestManager(LocalApplicationTestCase):
             title='Assigned Manager',
             email='assigned@example.com',
             access_token='access token',
-            phone=123456789
+            phone=123456789,
+            reference_id=1
         )
 
         unassigned_manager = Manager(
             title='Unassigned Manager',
             email='unassigned@example.com',
             access_token='access token',
-            phone=987654321
+            phone=987654321,
+            reference_id=2
         )
 
         manager1 = Manager(
             title='First Manager',
             email='manager1@example.com',
             access_token='access token',
-            phone=123987465
+            phone=123987465,
+            reference_id=3
         )
         session.add(manager1)
 
@@ -37,7 +41,8 @@ class TestManager(LocalApplicationTestCase):
             title='Second Manager',
             email='manager2@example.com',
             access_token='access token',
-            phone=1287465
+            phone=1287465,
+            reference_id=3
         )
         session.add(manager2)
 
@@ -62,11 +67,11 @@ class TestManager(LocalApplicationTestCase):
     def test_assign(self):
         self.login('manager1@example.com')
 
-        with self.given(
+        with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Assign a manager to project',
             '/apiv1/managers/id:1',
             'ASSIGN',
-            form=dict(projectId='2')
+            form=dict(projectId='2', authorizationCode='authorization code')
         ):
             assert status == 200
 
@@ -103,6 +108,27 @@ class TestManager(LocalApplicationTestCase):
 
             when('Request is not authorized', authorization=None)
             assert status == 401
+
+            with chat_server_status('404 Not Found'):
+                when(
+                    'Chat server is not found',
+                    form=given | dict(title='Another title')
+                )
+                assert status == '617 Chat Server Not Found'
+
+            with chat_server_status('503 Service Not Available'):
+                when(
+                    'Chat server is not available',
+                    form=given | dict(title='Another title')
+                )
+                assert status == '800 Chat Server Not Available'
+
+            with chat_server_status('500 Internal Service Error'):
+                when(
+                    'Chat server faces with internal error',
+                    form=given | dict(title='Another title')
+                )
+                assert status == '801 Chat Server Internal Error'
 
     def test_list(self):
         self.login('manager1@example.com')

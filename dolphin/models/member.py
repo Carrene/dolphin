@@ -8,6 +8,7 @@ from restfulpy.principal import JwtPrincipal, JwtRefreshToken
 from restfulpy.orm import DeclarativeBase, Field, TimestampMixin, \
     relationship, DBSession, SoftDeleteMixin, ModifiedMixin, FilteringMixin, \
     PaginationMixin, OrderingMixin
+from cas import CASPrincipal
 
 from .subscribable import Subscription
 
@@ -23,6 +24,7 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         'polymorphic_identity': __tablename__
     }
 
+    reference_id = Field(Integer)
     id = Field(Integer, primary_key=True)
     title = Field(String, max_length=50)
     email = Field(
@@ -45,11 +47,12 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         return []
 
     def create_jwt_principal(self):
-        return JwtPrincipal(dict(
+        return CASPrincipal(dict(
             id=self.id,
             roles=self.roles,
             email=self.email,
-            name=self.title
+            name=self.title,
+            reference_id=self.reference_id,
         ))
 
     def create_refresh_principal(self):

@@ -73,7 +73,7 @@ def oauth_mockup_server():
             access_token = context.environ['HTTP_AUTHORIZATION']
 
             if access_token.startswith('oauth2-accesstoken access token'):
-                return dict(title='john', email='john@gmail.com')
+                return dict(id=1, title='john', email='john@gmail.com')
 
             raise HTTPForbidden()
 
@@ -103,14 +103,14 @@ def chat_mockup_server():
                 ('/apiv1/rooms', self.create),
             ])
 
-        @json(verbs=['create', 'delete'])
+        @json(verbs=['create', 'delete', 'add', 'remove'])
         def create(self):
             if _chat_server_status != 'idle':
                 raise HTTPStatus(_chat_server_status)
 
             return dict(id=1, title='First chat room')
 
-    app = MockupApplication('jaguar-server', Root())
+    app = MockupApplication('chat-server', Root())
     with mockup_http_server(app) as (server, url):
         settings.merge(f'''
             chat:
