@@ -39,46 +39,60 @@ def print_item(i):
         f'"{i.phase.title}".'
 
 
+def insert_member(member, title, email, phone, reference_id,
+                  access_token='access_token'):
+    member_instance = member(
+        title=title,
+        email=email,
+        phone=phone,
+        reference_id=reference_id,
+        access_token=access_token
+    )
+    DBSession.add(member_instance)
+    return member_instance
+
+
 def insert(): # pragma: no cover
-    guest = Guest(
-        title='First Guest',
-        email='guest1@example.com',
-        password='123456',
-        phone=1234556789
-    )
-    DBSession.add(guest)
 
-    manager1 = Manager(
-        title='First Manager',
-        email='manager1@example.com',
-        password='123456',
-        phone=123456789
+    guest = insert_member(
+        Guest,
+        'First Guest',
+        'guest1@example.com',
+        1234556789,
+        1
     )
-    DBSession.add(manager1)
 
-    manager2 = Manager(
-        title='Second Manager',
-        email='manager2@example.com',
-        password='123456',
-        phone=1236789
+    manager1 = insert_member(
+        Manager,
+        'First Manager',
+        'manager1@example.com',
+        1456789,
+        2
     )
-    DBSession.add(manager2)
 
-    manager3 = Manager(
-        title='Third Manager',
-        email='manager3@example.com',
-        password='123456',
-        phone=12456789
+    manager2 = insert_member(
+        Manager,
+        'Second Manager',
+        'manager2@example.com',
+        1236789,
+        3
     )
-    DBSession.add(manager3)
 
-    manager4 = Manager(
-        title='Fourth Manager',
-        email='manager4@example.com',
-        password='123456',
-        phone=12345678
+    manager3 = insert_member(
+        Manager,
+        'Third Manager',
+        'manager3@example.com',
+        12456789,
+        4
     )
-    DBSession.add(manager4)
+
+    manager4 = insert_member(
+        Manager,
+        'Fourth Manager',
+        'manager4@example.com',
+        1245678,
+        5
+    )
 
     team = Team(
         title='Awesome team'
@@ -89,8 +103,9 @@ def insert(): # pragma: no cover
         teams=[team],
         title='First resource',
         email='resource1@example.com',
-        password='123456',
-        phone=987654321
+        phone=987654321,
+        reference_id=6,
+        access_token='access token'
     )
     DBSession.add(resource)
 
@@ -134,44 +149,47 @@ def insert(): # pragma: no cover
     )
     DBSession.add(release5)
 
-
     project1 = Project(
         manager=manager1,
-        releases=[release1],
+        release=release1,
         title='My first project',
         description='This is description for my awesome project.',
         due_date='2020-2-20',
-        status='active'
+        status='active',
+        room_id=1
     )
     DBSession.add(project1)
 
     project2 = Project(
         manager=manager1,
-        releases=[release1],
+        release=release1,
         title='My second project',
         description='A project for facilating your teamwork.',
         due_date='2018-3-30',
-        status='on-hold'
+        status='on-hold',
+        room_id=2
     )
     DBSession.add(project2)
 
     project3 = Project(
         manager=manager1,
-        releases=[release1],
+        release=release1,
         title='My third project',
         description='A project with interesting features.',
         due_date='2024-2-24',
-        status='queued'
+        status='queued',
+        room_id=3
     )
     DBSession.add(project3)
 
     project4 = Project(
         manager=manager1,
-        releases=[release1],
+        release=release1,
         title='My fourth project',
         description='Description of project.',
         due_date='2028-2-28',
-        status='done'
+        status='done',
+        room_id=4
     )
     DBSession.add(project4)
 

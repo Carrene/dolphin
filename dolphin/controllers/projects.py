@@ -8,6 +8,7 @@ from restfulpy.controllers import ModelRestController
 
 from ..models import Project, Subscription
 from ..backends import ChatClient, CASClient
+from ..exceptions import ChatRoomNotFound
 from ..validators import project_validator, update_project_validator, \
     subscribe_validator
 
@@ -15,24 +16,53 @@ from ..validators import project_validator, update_project_validator, \
 class ProjectController(ModelRestController):
     __model__ = Project
 
+    def ensure_room(self, title, access_token):
+        create_room_error = 1
+        room = None
+        while create_room_error is not None:
+            try:
+                room = ChatClient().create_room(
+                    title,
+                    access_token,
+                    context.identity.payload['reference_id']
+                )
+                create_room_error = None
+            except ChatRoomNotFound:
+                # FIXME: Cover here
+                create_room_error = 1
+
+        return room
+
     @authorize
     @json
     @project_validator
     @Project.expose
+    @commit
     def create(self):
+        PENDING = -1
         title = context.form['title']
-        access_token =  CASClient() \
-            .get_access_token(context.form.get('authorizationCode'))
-        room = ChatClient().create_room(title, access_token[0])
 
         project = Project()
         project.update_from_request()
         DBSession.add(project)
-        project.room_id = room['id']
+        project.room_id = PENDING
+        DBSession.flush()
+
+        access_token, ___ =  CASClient() \
+            .get_access_token(context.form.get('authorizationCode'))
+
+        room = self.ensure_room(title, access_token)
+
+        # The exception type is not specified because after consulting with
+        # Mr.Mardani, the result got: there must be no specification on
+        # exception type because nobody knows what exception may be raised
         try:
-            DBSession.commit()
-        except SQLAlchemyError:
-            ChatClient().delete_room(room['id'], access_token[0])
+            project.room_id = room['id']
+            DBSession.flush()
+        except:
+            ChatClient().delete_room(title, access_token)
+            raise
+
         return project
 
     @authorize

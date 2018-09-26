@@ -5,7 +5,7 @@ from nanohttp import settings, HTTPForbidden
 from restfulpy.logging_ import get_logger
 
 from .exceptions import ChatServerNotFound, ChatServerNotAvailable, \
-    ChatInternallError
+    ChatInternallError, ChatRoomNotFound
 
 
 logger = get_logger()
@@ -47,7 +47,7 @@ class CASClient:
 
 class ChatClient:
 
-    def create_room(self, title, access_token):
+    def create_room(self, title, access_token, owner_id=None):
 
         try:
             response = requests.request(
@@ -61,6 +61,19 @@ class ChatClient:
 
             if response.status_code == 503:
                 raise ChatServerNotAvailable()
+
+            if response.status_code == 615:
+                response = requests.request(
+                    'LIST',
+                    f'{settings.chat.room.url}/apiv1/rooms',
+                    headers=dict(access_token=access_token),
+                    params=dict(title=title, owner_id=owner_id)
+                )
+                rooms = json.loads(response.text)
+                if len(rooms) == 1:
+                    return rooms[0]
+
+                raise ChatRoomNotFound()
 
             if response.status_code != 200:
                 logger.exception(response.content.decode())

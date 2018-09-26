@@ -5,6 +5,10 @@ class ChatServerNotFound(HTTPKnownStatus):
     status = '617 Chat Server Not Found'
 
 
+class ChatRoomNotFound(HTTPKnownStatus):
+    status = '618 Chat Room Not Found'
+
+
 class ChatServerNotAvailable(HTTPKnownStatus):
     status = '800 Chat Server Not Available'
 

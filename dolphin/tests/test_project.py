@@ -179,6 +179,13 @@ class TestProject(LocalApplicationTestCase):
                 )
                 assert status == '801 Chat Server Internal Error'
 
+            with chat_server_status('615 Room Already Exists'):
+                when(
+                    'Chat server faces with internal error',
+                    form=given | dict(title='Another title')
+                )
+                assert status == '200 OK'
+
     def test_update(self):
         self.login('manager1@example.com')
 
@@ -347,7 +354,7 @@ class TestProject(LocalApplicationTestCase):
             'LIST',
         ):
             assert status == 200
-            assert len(response.json) == 3
+            assert len(response.json) == 4
 
         with self.given(
             'Sort projects by phases title',
@@ -356,7 +363,7 @@ class TestProject(LocalApplicationTestCase):
             query=dict(sort='title')
         ):
             assert status == 200
-            assert response.json[0]['title'] == 'My awesome project'
+            assert response.json[0]['title'] == 'Another title'
 
             when(
                 'Reverse sorting titles by alphabet',
