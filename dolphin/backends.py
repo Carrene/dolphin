@@ -110,6 +110,9 @@ class ChatClient:
             if response.status_code == 503:
                 raise ChatServerNotAvailable()
 
+            if response.status_code == 604:
+
+
             if response.status_code != 200:
                 logger.exception(response.content.decode())
                 raise ChatInternallError()
