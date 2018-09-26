@@ -69,11 +69,11 @@ class ChatClient:
                     headers=dict(access_token=access_token),
                     params=dict(title=title, owner_id=owner_id)
                 )
-                try:
-                    room = json.loads(response.text)[0]
-                except IndexError:
-                    raise ChatRoomNotFound()
-                return room
+                rooms = json.loads(response.text)
+                if len(rooms) == 1:
+                    return rooms[0]
+
+                raise ChatRoomNotFound()
 
             if response.status_code != 200:
                 logger.exception(response.content.decode())

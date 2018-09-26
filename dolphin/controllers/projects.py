@@ -8,12 +8,30 @@ from restfulpy.controllers import ModelRestController
 
 from ..models import Project, Subscription
 from ..backends import ChatClient, CASClient
+from ..exceptions import ChatRoomNotFound
 from ..validators import project_validator, update_project_validator, \
     subscribe_validator
 
 
 class ProjectController(ModelRestController):
     __model__ = Project
+
+    def ensure_room(self, title, access_token):
+        create_room_error = 1
+        room = None
+        while create_room_error is not None:
+            try:
+                room = ChatClient().create_room(
+                    title,
+                    access_token,
+                    context.identity.payload['reference_id']
+                )
+                create_room_error = None
+            except ChatRoomNotFound:
+                # FIXME: Cover here
+                create_room_error = 1
+
+        return room
 
     @authorize
     @json
@@ -32,20 +50,17 @@ class ProjectController(ModelRestController):
 
         access_token, ___ =  CASClient() \
             .get_access_token(context.form.get('authorizationCode'))
-        room = ChatClient().create_room(
-            title,
-            access_token[0],
-            context.identity.payload['reference_id']
-        )
 
-        # The exception type is not specified because after confulting with
+        room = self.ensure_room(title, access_token)
+
+        # The exception type is not specified because after consulting with
         # Mr.Mardani, the result got: there must be no specification on
         # exception type because nobody knows what exception may be raised
         try:
             project.room_id = room['id']
             DBSession.flush()
         except:
-            ChatClient().delete_room(title, access_token[0])
+            ChatClient().delete_room(title, access_token)
             raise
 
         return project
