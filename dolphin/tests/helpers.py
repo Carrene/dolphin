@@ -103,8 +103,12 @@ def chat_mockup_server():
                 ('/apiv1/rooms', self.create),
             ])
 
-        @json(verbs=['create', 'delete', 'add', 'remove'])
+        @json(verbs=['create', 'delete', 'add', 'remove', 'list'])
         def create(self):
+            if _chat_server_status == '615 Room Already Exists' and \
+                    context.method == 'list':
+                return [dict(id=1, title='First chat room')]
+
             if _chat_server_status != 'idle':
                 raise HTTPStatus(_chat_server_status)
 

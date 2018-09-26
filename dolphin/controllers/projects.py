@@ -32,7 +32,11 @@ class ProjectController(ModelRestController):
 
         access_token =  CASClient() \
             .get_access_token(context.form.get('authorizationCode'))
-        room = ChatClient().create_room(title, access_token[0])
+        room = ChatClient().create_room(
+            title,
+            access_token[0],
+            context.identity.payload['reference_id']
+        )
 
         try:
             project.room_id = room['id']

@@ -47,7 +47,7 @@ class CASClient:
 
 class ChatClient:
 
-    def create_room(self, title, access_token):
+    def create_room(self, title, access_token, owner_id=None):
 
         try:
             response = requests.request(
@@ -67,9 +67,9 @@ class ChatClient:
                     'LIST',
                     f'{settings.chat.room.url}/apiv1/rooms',
                     headers=dict(access_token=access_token),
-                    params=dict(title=title)
+                    params=dict(title=title, owner_id=owner_id)
                 )
-                room = json.loads(response.text)
+                room = json.loads(response.text)[0]
                 return room
 
             if response.status_code != 200:
