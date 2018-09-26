@@ -39,51 +39,60 @@ def print_item(i):
         f'"{i.phase.title}".'
 
 
+def insert_member(member, title, email, phone, reference_id,
+                  access_token='access_token'):
+    member_instance = member(
+        title=title,
+        email=email,
+        phone=phone,
+        reference_id=reference_id,
+        access_token=access_token
+    )
+    DBSession.add(member_instance)
+    return member_instance
+
+
 def insert(): # pragma: no cover
-    guest = Guest(
-        title='First Guest',
-        email='guest1@example.com',
-        phone=1234556789,
-        reference_id=1,
-        access_token='access token'
-    )
-    DBSession.add(guest)
 
-    manager1 = Manager(
-        title='First Manager',
-        email='manager1@example.com',
-        phone=123456789,
-        reference_id=2,
-        access_token='access token'
+    guest = insert_member(
+        Guest,
+        'First Guest',
+        'guest1@example.com',
+        1234556789,
+        1
     )
-    DBSession.add(manager1)
 
-    manager2 = Manager(
-        title='Second Manager',
-        email='manager2@example.com',
-        phone=1236789,
-        reference_id=3,
-        access_token='access token'
+    manager1 = insert_member(
+        Manager,
+        'First Manager',
+        'manager1@example.com',
+        1456789,
+        2
     )
-    DBSession.add(manager2)
 
-    manager3 = Manager(
-        title='Third Manager',
-        email='manager3@example.com',
-        phone=12456789,
-        reference_id=4,
-        access_token='access token'
+    manager2 = insert_member(
+        Manager,
+        'Second Manager',
+        'manager2@example.com',
+        1236789,
+        3
     )
-    DBSession.add(manager3)
 
-    manager4 = Manager(
-        title='Fourth Manager',
-        email='manager4@example.com',
-        phone=12345678,
-        reference_id=5,
-        access_token='access token'
+    manager3 = insert_member(
+        Manager,
+        'Third Manager',
+        'manager3@example.com',
+        12456789,
+        4
     )
-    DBSession.add(manager4)
+
+    manager4 = insert_member(
+        Manager,
+        'Fourth Manager',
+        'manager4@example.com',
+        1245678,
+        5
+    )
 
     team = Team(
         title='Awesome team'

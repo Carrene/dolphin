@@ -30,7 +30,7 @@ class ProjectController(ModelRestController):
         project.room_id = PENDING
         DBSession.flush()
 
-        access_token =  CASClient() \
+        access_token, ___ =  CASClient() \
             .get_access_token(context.form.get('authorizationCode'))
         room = ChatClient().create_room(
             title,
@@ -38,11 +38,15 @@ class ProjectController(ModelRestController):
             context.identity.payload['reference_id']
         )
 
+        # The exception type is not specified because after confulting with
+        # Mr.Mardani, the result got: there must be no specification on
+        # exception type because nobody knows what exception may be raised
         try:
             project.room_id = room['id']
             DBSession.flush()
-        except SQLAlchemyError:
+        except:
             ChatClient().delete_room(title, access_token[0])
+            raise
 
         return project
 
