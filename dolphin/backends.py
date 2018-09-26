@@ -62,6 +62,16 @@ class ChatClient:
             if response.status_code == 503:
                 raise ChatServerNotAvailable()
 
+            if response.status_code == 615:
+                response = requests.request(
+                    'LIST',
+                    f'{settings.chat.room.url}/apiv1/rooms',
+                    headers=dict(access_token=access_token),
+                    params=dict(title=title)
+                )
+                room = json.loads(response.text)
+                return room
+
             if response.status_code != 200:
                 logger.exception(response.content.decode())
                 raise ChatInternallError()

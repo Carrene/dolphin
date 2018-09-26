@@ -19,20 +19,27 @@ class ProjectController(ModelRestController):
     @json
     @project_validator
     @Project.expose
+    @commit
     def create(self):
+        PENDING = -1
         title = context.form['title']
-        access_token =  CASClient() \
-            .get_access_token(context.form.get('authorizationCode'))
-        room = ChatClient().create_room(title, access_token[0])
 
         project = Project()
         project.update_from_request()
         DBSession.add(project)
-        project.room_id = room['id']
+        project.room_id = PENDING
+        DBSession.flush()
+
+        access_token =  CASClient() \
+            .get_access_token(context.form.get('authorizationCode'))
+        room = ChatClient().create_room(title, access_token[0])
+
         try:
-            DBSession.commit()
+            project.room_id = room['id']
+            DBSession.flush()
         except SQLAlchemyError:
-            ChatClient().delete_room(room['id'], access_token[0])
+            ChatClient().delete_room(title, access_token[0])
+
         return project
 
     @authorize
