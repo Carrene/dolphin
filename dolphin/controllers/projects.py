@@ -6,9 +6,10 @@ from restfulpy.orm import DBSession, commit
 from restfulpy.utils import to_camel_case
 from restfulpy.controllers import ModelRestController
 
-from ..models import Project, Subscription
+from ..models import Project, Subscription, Manager
 from ..backends import ChatClient, CASClient
-from ..exceptions import ChatRoomNotFound
+from ..exceptions import ChatServerNotFound, ChatServerNotAvailable, \
+    ChatInternallError, ChatRoomNotFound, RoomMemberAlreadyExist
 from ..validators import project_validator, update_project_validator, \
     subscribe_validator
 
@@ -40,7 +41,7 @@ class ProjectController(ModelRestController):
     @commit
     def create(self):
         PENDING = -1
-        title = context.form['title']
+        form = context.form
 
         project = Project()
         project.update_from_request()
@@ -48,10 +49,23 @@ class ProjectController(ModelRestController):
         project.room_id = PENDING
         DBSession.flush()
 
+        manager = DBSession.query(Manager) \
+            .filter(Manager.id == form['managerId']) \
+            .one_or_none()
+
         access_token, ___ =  CASClient() \
             .get_access_token(context.form.get('authorizationCode'))
 
-        room = self.ensure_room(title, access_token)
+        room = self.ensure_room(form['title'], access_token)
+
+        try:
+            member_room = ChatClient().add_member(
+                project.room_id,
+                manager.reference_id,
+                access_token
+            )
+        except RoomMemberAlreadyExist:
+            pass
 
         # The exception type is not specified because after consulting with
         # Mr.Mardani, the result got: there must be no specification on

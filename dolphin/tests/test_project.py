@@ -186,6 +186,13 @@ class TestProject(LocalApplicationTestCase):
                 )
                 assert status == '200 OK'
 
+            with chat_server_status('604 Already Added To Target'):
+                when(
+                    'Chat server faces with internal error',
+                    form=given | dict(title='Awesome project')
+                )
+                assert status == '200 OK'
+
     def test_update(self):
         self.login('manager1@example.com')
 
@@ -354,7 +361,7 @@ class TestProject(LocalApplicationTestCase):
             'LIST',
         ):
             assert status == 200
-            assert len(response.json) == 4
+            assert len(response.json) == 5
 
         with self.given(
             'Sort projects by phases title',
