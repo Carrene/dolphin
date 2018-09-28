@@ -5,10 +5,11 @@ from restfulpy.orm import DBSession, commit
 from restfulpy.utils import to_camel_case
 
 from ..backends import ChatClient, CASClient
-from ..exceptions import ChatRoomNotFound, RoomMemberAlreadyExist
-from ..models import Project, Subscription, Manager
 from ..validators import project_validator, update_project_validator, \
     subscribe_validator
+from ..exceptions import ChatServerNotFound, ChatServerNotAvailable, \
+    ChatInternallError, ChatRoomNotFound, RoomMemberAlreadyExist, \
+    RoomMemberNotFound
 
 
 class ProjectController(ModelRestController):
@@ -83,6 +84,35 @@ class ProjectController(ModelRestController):
 
         return project
 
+    def manager_replacement(self, manager_id, project, access_token):
+        new_assignee_manager = DBSession.query(Manager) \
+            .filter(Manager.id == manager_id) \
+            .one_or_none()
+        current_assignee_manager = project.managera
+        project.manager = new_assignee_manager
+
+        try:
+            # Add new assignee manager to project chat room
+            room = ChatClient().add_member(
+                project.room_id,
+                new_assignee_manager.reference_id,
+                access_token
+            )
+        except RoomMemberAlreadyExist:
+            pass
+
+        try:
+            # Remove current assignee manager from project chat room
+            room = ChatClient().remove_member(
+                project.room_id,
+                current_assignee_manager.reference_id,
+                access_token
+            )
+        except RoomMemberNotFound:
+            pass
+
+        return room
+
     @authorize
     @json(prevent_empty_form='708 No Parameter Exists In The Form')
     @update_project_validator
@@ -123,7 +153,32 @@ class ProjectController(ModelRestController):
                 f'"{form["title"]}" is already exists.'
             )
 
+        access_token, ___ =  CASClient() \
+            .get_access_token(context.form.get('authorizationCode'))
+
+        current_manager = project.manager
         project.update_from_request()
+
+        if form['managerId'] and project.manager.id != form['managerId']:
+            room = self.manager_replacement(
+                form['managerId'],
+                project,
+                access_token
+            )
+
+        # The exception type is not specified because after consulting with
+        # Mr.Mardani, the result got: there must be no specification on
+        # exception type because nobody knows what exception may be raised
+        try:
+            DBSession.flush()
+        except:
+            room = self.manager_replacement(
+                current_manager.id,
+                project,
+                access_token
+            )
+            raise
+
         return project
 
     @authorize

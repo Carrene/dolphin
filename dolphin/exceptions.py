@@ -5,6 +5,10 @@ class RoomMemberAlreadyExist(HTTPKnownStatus):
     status = '604 Already Added To Target'
 
 
+class RoomMemberNotFound(HTTPKnownStatus):
+    status = '611 User Not Found'
+
+
 class ChatServerNotFound(HTTPKnownStatus):
     status = '617 Chat Server Not Found'
 

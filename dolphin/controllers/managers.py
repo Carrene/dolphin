@@ -6,7 +6,6 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from dolphin.backends import CASClient, ChatClient
 from dolphin.models import Manager, Project
-from dolphin.validators import assign_manager_validator
 
 
 class ManagerController(ModelRestController):
@@ -14,7 +13,7 @@ class ManagerController(ModelRestController):
 
     @authorize
     @json
-    @assign_manager_validator
+#    @assign_manager_validator
     @Project.expose
     @commit
     def assign(self, id):
@@ -26,11 +25,11 @@ class ManagerController(ModelRestController):
         except (TypeError, ValueError):
             raise HTTPNotFound()
 
-        manager = DBSession.query(Manager) \
-            .filter(Manager.id == id) \
-            .one_or_none()
-        if not manager:
-            raise HTTPNotFound()
+#        manager = DBSession.query(Manager) \
+#            .filter(Manager.id == id) \
+#            .one_or_none()
+#        if not manager:
+#            raise HTTPNotFound()
 
         project = DBSession.query(Project) \
             .filter(Project.id == form['projectId']) \
