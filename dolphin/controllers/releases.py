@@ -9,6 +9,7 @@ from restfulpy.utils import to_camel_case
 from ..models import Release, release_statuses, Subscription
 from ..validators import release_validator, update_release_validator, \
     subscribe_validator
+from ..backends import CASClient, ChatClient
 
 
 class ReleaseController(ModelRestController):
@@ -108,6 +109,7 @@ class ReleaseController(ModelRestController):
     @commit
     def subscribe(self, id):
         form = context.form
+        payload = context.identity.payload
 
         try:
             id = int(id)
@@ -132,6 +134,30 @@ class ReleaseController(ModelRestController):
         )
         DBSession.add(subscription)
 
+        access_token, ___ =  CASClient() \
+            .get_access_token(context.form.get('authorizationCode'))
+        try:
+            for project in release.projects:
+
+                room = ChatClient().add_member(
+                    project.room_id,
+                    payload['reference_id'],
+                    access_token
+                )
+        except RoomMemberAlreadyExist:
+            pass
+
+        try:
+            DBSession.flush()
+        except:
+            for project in release.projects:
+                room = ChatClient().remove_member(
+                    project.room_id,
+                    payload['reference_id'],
+                    access_token
+                )
+            raise
+
         return release
 
     @authorize
@@ -141,6 +167,7 @@ class ReleaseController(ModelRestController):
     @commit
     def unsubscribe(self, id):
         form = context.form
+        payload = context.identity.payload
 
         try:
             id = int(id)
@@ -162,6 +189,30 @@ class ReleaseController(ModelRestController):
             raise HTTPStatus('612 Not Subscribed Yet')
 
         DBSession.delete(subscription)
+
+        access_token, ___ =  CASClient() \
+            .get_access_token(context.form.get('authorizationCode'))
+        try:
+            for project in release.projects:
+
+                room = ChatClient().remove_member(
+                    project.room_id,
+                    payload['reference_id'],
+                    access_token
+                )
+        except RoomMemberNotFound:
+            pass
+
+        try:
+            DBSession.flush()
+        except:
+            for project in release.projects:
+                room = ChatClient().add_member(
+                    project.room_id,
+                    payload['reference_id'],
+                    access_token
+                )
+            raise
 
         return release
 
