@@ -278,15 +278,10 @@ update_project_validator = validate(
     ),
     phase=dict(
         callback=project_phase_value_validator
-    )
-)
-
-
-assign_manager_validator = validate(
-    projectId=dict(
-        required='713 Project Id Not In Form',
-        type_=(int, '714 Invalid Project Id Type'),
-        callback=project_exists_validator
+    ),
+    managerId=dict(
+        type_=(int, '745 Invalid Manager Id Type'),
+        callback=manager_exists_validator
     )
 )
 
