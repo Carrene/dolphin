@@ -33,6 +33,35 @@ class ProjectController(ModelRestController):
 
         return room
 
+    def manager_replacement(self, manager_id, project, access_token):
+        new_assignee_manager = DBSession.query(Manager) \
+            .filter(Manager.id == manager_id) \
+            .one_or_none()
+        current_assignee_manager = project.manager
+        project.manager = new_assignee_manager
+
+        try:
+            # Add new assignee manager to project chat room
+            room = ChatClient().add_member(
+                project.room_id,
+                new_assignee_manager.reference_id,
+                access_token
+            )
+        except RoomMemberAlreadyExist:
+            pass
+
+        try:
+            # Remove current assignee manager from project chat room
+            room = ChatClient().remove_member(
+                project.room_id,
+                current_assignee_manager.reference_id,
+                access_token
+            )
+        except RoomMemberNotFound:
+            pass
+
+        return room
+
     @authorize
     @json
     @project_validator
@@ -84,35 +113,6 @@ class ProjectController(ModelRestController):
 
         return project
 
-    def manager_replacement(self, manager_id, project, access_token):
-        new_assignee_manager = DBSession.query(Manager) \
-            .filter(Manager.id == manager_id) \
-            .one_or_none()
-        current_assignee_manager = project.managera
-        project.manager = new_assignee_manager
-
-        try:
-            # Add new assignee manager to project chat room
-            room = ChatClient().add_member(
-                project.room_id,
-                new_assignee_manager.reference_id,
-                access_token
-            )
-        except RoomMemberAlreadyExist:
-            pass
-
-        try:
-            # Remove current assignee manager from project chat room
-            room = ChatClient().remove_member(
-                project.room_id,
-                current_assignee_manager.reference_id,
-                access_token
-            )
-        except RoomMemberNotFound:
-            pass
-
-        return room
-
     @authorize
     @json(prevent_empty_form='708 No Parameter Exists In The Form')
     @update_project_validator
@@ -138,6 +138,7 @@ class ProjectController(ModelRestController):
             c.info.get('json', to_camel_case(c.key)) for c in
             Project.iter_json_columns(include_readonly_columns=False)
         )
+        json_columns.add('authorizationCode')
         if set(form.keys()) - json_columns:
             raise HTTPStatus(
                 f'707 Invalid field, only one of '
@@ -238,6 +239,7 @@ class ProjectController(ModelRestController):
     @commit
     def subscribe(self, id):
         form = context.form
+        payload = context.identity.payload
 
         try:
             id = int(id)
@@ -261,6 +263,28 @@ class ProjectController(ModelRestController):
             member=form['memberId']
         )
         DBSession.add(subscription)
+
+        access_token, ___ =  CASClient() \
+            .get_access_token(context.form.get('authorizationCode'))
+        try:
+            room = ChatClient().add_member(
+                project.room_id,
+                payload['reference_id'],
+                access_token
+            )
+        except RoomMemberAlreadyExist:
+            pass
+
+        try:
+            DBSession.flush()
+        except:
+            room = ChatClient().remove_member(
+                project.room_id,
+                payload['reference_id'],
+                access_token
+            )
+            raise
+
         return project
 
     @authorize
@@ -270,6 +294,7 @@ class ProjectController(ModelRestController):
     @commit
     def unsubscribe(self, id):
         form = context.form
+        payload = context.identity.payload
 
         try:
             id = int(id)
@@ -290,6 +315,27 @@ class ProjectController(ModelRestController):
             raise HTTPStatus('612 Not Subscribed Yet')
 
         DBSession.delete(subscription)
+
+        access_token, ___ =  CASClient() \
+            .get_access_token(context.form.get('authorizationCode'))
+        try:
+            room = ChatClient().remove_member(
+                project.room_id,
+                payload['reference_id'],
+                access_token
+            )
+        except RoomMemberNotFound:
+            pass
+
+        try:
+            DBSession.flush()
+        except:
+            room = ChatClient().add_member(
+                project.room_id,
+                payload['reference_id'],
+                access_token
+            )
+            raise
 
         return project
 

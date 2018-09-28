@@ -5,10 +5,12 @@ from restfulpy.utils import to_camel_case
 from restfulpy.orm import DBSession, commit
 from restfulpy.controllers import ModelRestController
 
-from dolphin.models import Issue, issue_kinds, issue_statuses, Subscription, \
+from ..models import Issue, issue_kinds, issue_statuses, Subscription, \
     Resource, Phase, Item
-from dolphin.validators import issue_validator, update_issue_validator, \
+from ..validators import issue_validator, update_issue_validator, \
     subscribe_validator, assign_issue_validator
+from ..backends import ChatClient, CASClient
+from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound
 
 
 class IssueController(ModelRestController):
@@ -72,6 +74,7 @@ class IssueController(ModelRestController):
     @commit
     def subscribe(self, id):
         form = context.form
+        payload = context.identity.payload
 
         try:
             id = int(id)
@@ -94,6 +97,27 @@ class IssueController(ModelRestController):
         )
         DBSession.add(subscription)
 
+        access_token, ___ =  CASClient() \
+            .get_access_token(context.form.get('authorizationCode'))
+        try:
+            room = ChatClient().add_member(
+                issue.project.room_id,
+                payload['reference_id'],
+                access_token
+            )
+        except RoomMemberAlreadyExist:
+            pass
+
+        try:
+            DBSession.flush()
+        except:
+            room = ChatClient().remove_member(
+                issue.project.room_id,
+                payload['reference_id'],
+                access_token
+            )
+            raise
+
         return issue
 
     @authorize
@@ -103,6 +127,7 @@ class IssueController(ModelRestController):
     @commit
     def unsubscribe(self, id):
         form = context.form
+        payload = context.identity.payload
 
         try:
             id = int(id)
@@ -122,6 +147,27 @@ class IssueController(ModelRestController):
             raise HTTPStatus('612 Not Subscribed Yet')
 
         DBSession.delete(subscription)
+
+        access_token, ___ =  CASClient() \
+            .get_access_token(context.form.get('authorizationCode'))
+        try:
+            room = ChatClient().remove_member(
+                issue.project.room_id,
+                payload['reference_id'],
+                access_token
+            )
+        except RoomMemberNotFound:
+            pass
+
+        try:
+            DBSession.flush()
+        except:
+            room = ChatClient().add_member(
+                issue.project.room_id,
+                payload['reference_id'],
+                access_token
+            )
+            raise
 
         return issue
 

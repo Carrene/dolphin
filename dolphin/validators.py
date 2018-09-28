@@ -280,7 +280,6 @@ update_project_validator = validate(
         callback=project_phase_value_validator
     ),
     managerId=dict(
-        type_=(int, '745 Invalid Manager Id Type'),
         callback=manager_exists_validator
     )
 )

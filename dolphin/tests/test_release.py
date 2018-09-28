@@ -1,8 +1,8 @@
 from bddrest import status, response, Update, when, Remove, Append, given
 
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
-from dolphin.models import Release, Manager
-
+from dolphin.models import Release, Manager, Project
+from dolphin.tests.helpers import LocalApplicationTestCase, \
+    oauth_mockup_server, chat_mockup_server
 
 class TestRelease(LocalApplicationTestCase):
 
@@ -24,6 +24,7 @@ class TestRelease(LocalApplicationTestCase):
             due_date='2020-2-20',
             cutoff='2030-2-20',
         )
+        session.add(release1)
 
         release2 = Release(
             title='My second release',
@@ -31,6 +32,7 @@ class TestRelease(LocalApplicationTestCase):
             due_date='2020-2-20',
             cutoff='2030-2-20',
         )
+        session.add(release2)
 
         release3 = Release(
             title='My third release',
@@ -38,6 +40,7 @@ class TestRelease(LocalApplicationTestCase):
             due_date='2020-2-20',
             cutoff='2030-2-20',
         )
+        session.add(release3)
 
         release4 = Release(
             title='My fourth release',
@@ -45,7 +48,47 @@ class TestRelease(LocalApplicationTestCase):
             due_date='2020-2-20',
             cutoff='2030-2-20',
         )
-        session.add_all([release1, release2, release3, release4, manager])
+        session.add(release4)
+
+        project1 = Project(
+            manager=manager,
+            release=release1,
+            title='My first project',
+            description='A decription for my project',
+            due_date='2020-2-20',
+            room_id=1000
+        )
+        session.add(project1)
+
+        project2 = Project(
+            manager=manager,
+            release=release1,
+            title='My first project',
+            description='A decription for my project',
+            due_date='2020-2-20',
+            room_id=1000
+        )
+        session.add(project2)
+
+        project3 = Project(
+            manager=manager,
+            release=release1,
+            title='My first project',
+            description='A decription for my project',
+            due_date='2020-2-20',
+            room_id=1000
+        )
+        session.add(project3)
+
+        project4 = Project(
+            manager=manager,
+            release=release1,
+            title='My first project',
+            description='A decription for my project',
+            due_date='2020-2-20',
+            room_id=1000
+        )
+        session.add(project4)
         session.commit()
 
     def test_create(self):
@@ -232,7 +275,7 @@ class TestRelease(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             'Aborting a release',
-            '/apiv1/releases/id:1',
+            '/apiv1/releases/id:2',
             'ABORT'
         ):
             assert status == 200
@@ -257,7 +300,7 @@ class TestRelease(LocalApplicationTestCase):
 
             session = self.create_session()
             release = session.query(Release) \
-                .filter(Release.id == 1) \
+                .filter(Release.id == 2) \
                 .one_or_none()
             assert release is None
 
@@ -323,11 +366,11 @@ class TestRelease(LocalApplicationTestCase):
     def test_subscribe(self):
         self.login('manager1@example.com')
 
-        with oauth_mockup_server(), self.given(
+        with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Subscribe release',
-            '/apiv1/releases/id:2',
+            '/apiv1/releases/id:1',
             'SUBSCRIBE',
-            form=dict(memberId=1)
+            form=dict(memberId=1, authorizationCode='authorization code')
         ):
             assert status == 200
 
@@ -364,7 +407,7 @@ class TestRelease(LocalApplicationTestCase):
 
             when(
                 'Issue is already subscribed',
-                url_parameters=dict(id=2),
+                url_parameters=dict(id=1),
                 form=given | dict(memberId=1)
             )
             assert status == '611 Already Subscribed'
@@ -372,14 +415,30 @@ class TestRelease(LocalApplicationTestCase):
             when('Request is not authorized', authorization=None)
             assert status == 401
 
+#            with chat_server_status('404 Not Found'):
+#                when('Chat server is not found')
+#                assert status == '617 Chat Server Not Found'
+#
+#            with chat_server_status('503 Service Not Available'):
+#                when('Chat server is not available')
+#                assert status == '800 Chat Server Not Available'
+#
+#            with chat_server_status('500 Internal Service Error'):
+#                when('Chat server faces with internal error')
+#                assert status == '801 Chat Server Internal Error'
+#
+#            with chat_server_status('604 Already Added To Target'):
+#                when('Member is already added to room')
+#                assert status == '200 OK'
+
     def test_unsubscribe(self):
         self.login('manager1@example.com')
 
-        with oauth_mockup_server(), self.given(
+        with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Unsubscribe release',
-            '/apiv1/releases/id:2',
+            '/apiv1/releases/id:1',
             'UNSUBSCRIBE',
-            form=dict(memberId=1)
+            form=dict(memberId=1, authorizationCode='authorization code')
         ):
             assert status == 200
 
@@ -416,11 +475,27 @@ class TestRelease(LocalApplicationTestCase):
 
             when(
                 'Issue is not subscribed yet',
-                url_parameters=dict(id=2),
+                url_parameters=dict(id=1),
                 form=given | dict(memberId=1)
             )
             assert status == '612 Not Subscribed Yet'
 
             when('Request is not authorized', authorization=None)
             assert status == 401
+
+#            with chat_server_status('404 Not Found'):
+#                when('Chat server is not found')
+#                assert status == '617 Chat Server Not Found'
+#
+#            with chat_server_status('503 Service Not Available'):
+#                when('Chat server is not available')
+#                assert status == '800 Chat Server Not Available'
+#
+#            with chat_server_status('500 Internal Service Error'):
+#                when('Chat server faces with internal error')
+#                assert status == '801 Chat Server Internal Error'
+#
+#            with chat_server_status('611 Member Not Found'):
+#                when('Room member is not found')
+#                assert status == '200 OK'
 
