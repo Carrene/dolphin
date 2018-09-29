@@ -40,7 +40,7 @@ class ReleaseController(ModelRestController):
 
         try:
             id = int(id)
-        except:
+        except (TypeError, ValueError):
             raise HTTPNotFound()
 
         release = DBSession.query(Release) \
@@ -81,7 +81,7 @@ class ReleaseController(ModelRestController):
 
         try:
             id = int(id)
-        except:
+        except (TypeError, ValueError):
             raise HTTPNotFound()
 
         release = DBSession.query(Release) \
@@ -111,7 +111,7 @@ class ReleaseController(ModelRestController):
 
         try:
             id = int(id)
-        except:
+        except (TypeError, ValueError):
             raise HTTPNotFound()
 
         release = DBSession.query(Release) \
@@ -144,7 +144,7 @@ class ReleaseController(ModelRestController):
 
         try:
             id = int(id)
-        except:
+        except (TypeError, ValueError):
             raise HTTPNotFound()
 
         release = DBSession.query(Release) \

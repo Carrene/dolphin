@@ -15,23 +15,25 @@ class TestManager(LocalApplicationTestCase):
         assigned_manager = Manager(
             title='Assigned Manager',
             email='assigned@example.com',
-            access_token='access token',
+            access_token='access token 3',
             phone=123456789,
             reference_id=1
         )
+        session.add(assigned_manager)
 
         unassigned_manager = Manager(
             title='Unassigned Manager',
             email='unassigned@example.com',
-            access_token='access token',
+            access_token='access token 2',
             phone=987654321,
             reference_id=2
         )
+        session.add(unassigned_manager)
 
         manager1 = Manager(
             title='First Manager',
             email='manager1@example.com',
-            access_token='access token',
+            access_token='access token 1',
             phone=123987465,
             reference_id=3
         )
@@ -42,7 +44,7 @@ class TestManager(LocalApplicationTestCase):
             email='manager2@example.com',
             access_token='access token',
             phone=1287465,
-            reference_id=3
+            reference_id=4
         )
         session.add(manager2)
 
@@ -133,15 +135,15 @@ class TestManager(LocalApplicationTestCase):
     def test_list(self):
         self.login('manager1@example.com')
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'List managers',
             '/apiv1/managers',
             'LIST',
         ):
             assert status == 200
-            assert len(response.json) == 3
+            assert len(response.json) == 4
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'Sort managers by title',
             '/apiv1/managers',
             'LIST',
@@ -154,9 +156,9 @@ class TestManager(LocalApplicationTestCase):
                 'Reverse sorting titles by alphabet',
                 query=dict(sort='-title')
             )
-            assert response.json[0]['title'] == 'Second Manager'
+            assert response.json[0]['title'] == 'Unassigned Manager'
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'Filter managers',
             '/apiv1/managers',
             'LIST',
@@ -170,19 +172,19 @@ class TestManager(LocalApplicationTestCase):
             )
             assert response.json[0]['title'] != 'Assigned Manager'
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'Manager pagination',
             '/apiv1/managers',
             'LIST',
             query=dict(sort='id', take=1, skip=2)
         ):
-            assert response.json[0]['title'] == 'Assigned Manager'
+            assert response.json[0]['title'] == 'First Manager'
 
             when(
                 'Manipulate sorting and pagination',
                 query=dict(sort='-title', take=1, skip=2)
             )
-            assert response.json[0]['title'] == 'Assigned Manager'
+            assert response.json[0]['title'] == 'First Manager'
 
             when('Request is not authorized', authorization=None)
             assert status == 401

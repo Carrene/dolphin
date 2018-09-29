@@ -1,6 +1,6 @@
 from bddrest import status, response, Update, when, Remove, Append, given
 
-from dolphin.tests.helpers import LocalApplicationTestCase
+from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 from dolphin.models import Release, Manager
 
 
@@ -13,7 +13,7 @@ class TestRelease(LocalApplicationTestCase):
         manager = Manager(
             title='First Manager',
             email='manager1@example.com',
-            access_token='access token',
+            access_token='access token 1',
             phone=123456789,
             reference_id=1
         )
@@ -51,7 +51,7 @@ class TestRelease(LocalApplicationTestCase):
     def test_create(self):
         self.login('manager1@example.com')
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'Createing a release',
             '/apiv1/releases',
             'CREATE',
@@ -137,7 +137,7 @@ class TestRelease(LocalApplicationTestCase):
     def test_update(self):
         self.login('manager1@example.com')
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'Updating a release',
             '/apiv1/releases/id:1',
             'UPDATE',
@@ -219,7 +219,7 @@ class TestRelease(LocalApplicationTestCase):
             when('Request is not authorized', authorization=None)
             assert status == 401
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'Send HTTP request with empty form parameter',
             '/apiv1/releases/id:1',
             'UPDATE',
@@ -230,7 +230,7 @@ class TestRelease(LocalApplicationTestCase):
     def test_abort(self):
         self.login('manager1@example.com')
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'Aborting a release',
             '/apiv1/releases/id:1',
             'ABORT'
@@ -267,7 +267,7 @@ class TestRelease(LocalApplicationTestCase):
     def test_list(self):
         self.login('manager1@example.com')
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'List releases',
             '/apiv1/releases',
             'LIST'
@@ -275,7 +275,7 @@ class TestRelease(LocalApplicationTestCase):
             assert status == 200
             assert len(response.json) == 4
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'Sort releases by title',
             '/apiv1/releases',
             'LIST',
@@ -289,7 +289,7 @@ class TestRelease(LocalApplicationTestCase):
             )
             assert response.json[0]['title'] == 'My third release'
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'Filter releases',
             '/apiv1/releases',
             'LIST',
@@ -303,7 +303,7 @@ class TestRelease(LocalApplicationTestCase):
             )
             assert response.json[0]['title'] == 'My third release'
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
              'Issues pagination',
              '/apiv1/releases',
              'LIST',
@@ -323,7 +323,7 @@ class TestRelease(LocalApplicationTestCase):
     def test_subscribe(self):
         self.login('manager1@example.com')
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'Subscribe release',
             '/apiv1/releases/id:2',
             'SUBSCRIBE',
@@ -375,7 +375,7 @@ class TestRelease(LocalApplicationTestCase):
     def test_unsubscribe(self):
         self.login('manager1@example.com')
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'Unsubscribe release',
             '/apiv1/releases/id:2',
             'UNSUBSCRIBE',

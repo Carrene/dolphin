@@ -3,7 +3,7 @@ from bddrest import status, response, Update, when, Remove
 
 from dolphin.models import Item, Phase, Issue, Manager, Release, Project, \
     Resource, Team
-from dolphin.tests.helpers import LocalApplicationTestCase
+from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
 class TestItem(LocalApplicationTestCase):
@@ -15,14 +15,16 @@ class TestItem(LocalApplicationTestCase):
         team = Team(
             title='Awesome team'
         )
+        session.add(team)
 
         manager = Manager(
             title='First Manager',
             email='manager1@example.com',
-            access_token='access token',
+            access_token='access token 1',
             phone=123456789,
             reference_id=1
         )
+        session.add(manager)
 
         release = Release(
             title='My first release',
@@ -30,6 +32,7 @@ class TestItem(LocalApplicationTestCase):
             due_date='2020-2-20',
             cutoff='2030-2-20',
         )
+        session.add(release)
 
         project = Project(
             manager=manager,
@@ -39,6 +42,7 @@ class TestItem(LocalApplicationTestCase):
             due_date='2020-2-20',
             room_id=1
         )
+        session.add(project)
 
         issue = Issue(
             project=project,
@@ -48,6 +52,7 @@ class TestItem(LocalApplicationTestCase):
             kind='feature',
             days=2
         )
+        session.add(issue)
 
         resource = Resource(
             teams=[team],
@@ -57,12 +62,14 @@ class TestItem(LocalApplicationTestCase):
             phone=987654321,
             reference_id=2
         )
+        session.add(resource)
 
         phase = Phase(
             project=project,
             title='design',
             order=1,
         )
+        session.add(phase)
 
         item = Item(
             resource=resource,
@@ -77,7 +84,7 @@ class TestItem(LocalApplicationTestCase):
     def test_update(self):
         self.login('manager1@example.com')
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'Update status of an item',
             '/apiv1/items/id:1',
             'UPDATE',

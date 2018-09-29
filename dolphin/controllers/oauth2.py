@@ -1,12 +1,12 @@
 from restfulpy.controllers import RestController
 
-from .tokens import TokenController
+from .member import MemberController
 
 
 class OAUTHController(RestController):
-    _token_controller = TokenController()
+    _member_controller = MemberController()
 
     def __call__(self, *remaining_paths):
-        if len(remaining_paths) == 1 and remaining_paths[0] == 'tokens':
-            return self._token_controller()
+        if len(remaining_paths) == 1 and remaining_paths[0] == 'members':
+            return self._member_controller()
 

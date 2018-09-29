@@ -33,10 +33,10 @@ class CASClient:
         result = json.loads(response.text)
         return result['accessToken'], result['memberId']
 
-    def get_member(self, member_id, access_token):
+    def get_member(self, access_token):
 
         response = requests.get(
-            f'{settings.oauth.member.url}/{member_id}',
+            f'{settings.oauth.member.url}/me',
             headers={'authorization': f'oauth2-accesstoken {access_token}'}
         )
         if response.status_code != 200:
@@ -47,14 +47,16 @@ class CASClient:
 
 class ChatClient:
 
-    def create_room(self, title, access_token, owner_id=None):
-
+    def create_room(self, title, token, x_access_token, owner_id=None):
         try:
             response = requests.request(
                 'CREATE',
                 f'{settings.chat.room.url}/apiv1/rooms',
-                data=dict(title=title),
-                headers=dict(access_token=access_token)
+                data={'title':title},
+                headers={
+                    'authorization': token,
+                    'X-Access-Token': x_access_token
+                }
             )
             if response.status_code == 404:
                 raise ChatServerNotFound()
@@ -66,8 +68,11 @@ class ChatClient:
                 response = requests.request(
                     'LIST',
                     f'{settings.chat.room.url}/apiv1/rooms',
-                    headers=dict(access_token=access_token),
-                    params=dict(title=title, owner_id=owner_id)
+                    headers={
+                        'authorization': token,
+                        'X-Access-Token': x_access_token
+                    },
+                    params={'title':title, 'ownerId':owner_id}
                 )
                 rooms = json.loads(response.text)
                 if len(rooms) == 1:
@@ -86,23 +91,29 @@ class ChatClient:
             room = json.loads(response.text)
             return room
 
-    def delete_room(self, id, access_token):
+    def delete_room(self, id, token, x_access_token):
 
         response = requests.request(
             'DELETE',
             f'{settings.chat.room.url}/apiv1/rooms/{id}',
-            headers=dict(access_token=access_token)
+            headers={
+                'authorization': token,
+                'X-Access-Token': x_access_token
+            }
         )
         return response
 
-    def add_member(self, id, user_id, access_token):
+    def add_member(self, id, user_id, token, x_access_token):
 
         try:
             response = requests.request(
                 'ADD',
                 f'{settings.chat.room.url}/apiv1/rooms/{id}',
-                data=dict(user_id=user_id),
-                headers=dict(access_token=access_token)
+                data={'userId':user_id},
+                headers={
+                    'authorization': token,
+                    'X-Access-Token': x_access_token
+                }
             )
             if response.status_code == 404:
                 raise ChatServerNotFound()
@@ -128,13 +139,16 @@ class ChatClient:
             room = json.loads(response.text)
             return room
 
-    def remove_member(self, id, user_id, access_token):
+    def remove_member(self, id, user_id, token, x_access_token):
 
         response = requests.request(
             'REMOVE',
             f'{settings.chat.room.url}/apiv1/rooms/{id}',
-            data=dict(user_id=user_id),
-            headers=dict(access_token=access_token)
+            data={'userId':user_id},
+            headers={
+                'authorization': token,
+                'X-Access-Token': x_access_token
+            }
         )
         room = json.loads(response.text)
         return room

@@ -1,10 +1,12 @@
 from contextlib import contextmanager
 
+from cas import CASPrincipal
 from bddrest.authoring import status, when, Remove, Update, response
 from nanohttp import RestController, json, settings, context, HTTPForbidden
 from restfulpy.mockup import mockup_http_server
 
 from dolphin.tests.helpers import LocalApplicationTestCase, MockupApplication
+from dolphin.models import Manager
 
 
 class Token(RestController):
@@ -47,24 +49,6 @@ def oauth_mockup_server(root_controller):
 
 class TestToken(LocalApplicationTestCase):
 
-    def test_redirect_to_cas(self):
-        settings.merge(f'''
-            oauth:
-              application_id: 1
-        ''')
-
-        with self.given(
-            'Trying to redirect to CAS server',
-            '/apiv1/oauth2/tokens',
-            'REQUEST',
-        ):
-            assert status == 200
-            assert len(response.json) == 2
-            assert response.json['scopes'] == ['email', 'title']
-
-            when('Trying to pass with the form patameter', form=dict(a='a'))
-            assert status == '711 Form Not Allowed'
-
     def test_get_access_token(self):
         with oauth_mockup_server(Root()):
             settings.merge(f'''
@@ -81,13 +65,11 @@ class TestToken(LocalApplicationTestCase):
 
             with self.given(
                 'Try to get an access token from CAS',
-                '/apiv1/oauth2/tokens',
+                '/apiv1/oauth2/members',
                 'OBTAIN',
                 form=dict(authorizationCode='authorization code')
             ):
                 assert status == 200
-                assert 'token' in response.json
-                assert 'X-New-Jwt-Token' in response.headers
 
                 when(
                     'Trying to pass without the authorization code parameter',
