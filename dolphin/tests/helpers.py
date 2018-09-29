@@ -105,6 +105,7 @@ def chat_mockup_server():
 
         @json(verbs=['create', 'delete', 'add', 'remove', 'list'])
         def create(self):
+            import pudb; pudb.set_trace()  # XXX BREAKPOINT
             if _chat_server_status == '604 Already Added To Target' and \
                     context.method in ('create', 'add'):
                 return dict(id=10, title='New Room')

@@ -1,4 +1,6 @@
-from nanohttp import HTTPStatus, context
+from itsdangerous import BadSignature
+from cas import CASPrincipal
+from nanohttp import HTTPStatus, context, HTTPUnauthorized, HTTPBadRequest
 from restfulpy.authentication import StatefulAuthenticator
 from restfulpy.orm import DBSession
 
@@ -10,7 +12,6 @@ class Authenticator(StatefulAuthenticator):
     @staticmethod
     def safe_member_lookup(condition):
         member = DBSession.query(Member).filter(condition).one_or_none()
-
         if member is None:
             raise HTTPStatus('400 Incorrect Email Or Password')
 
@@ -29,8 +30,18 @@ class Authenticator(StatefulAuthenticator):
         return member
 
     def verify_token(self, encoded_token):
-        if not encoded_token.startswith('oauth2-accesstoken'):
-            return super().verify_token(encoded_token)
+        try:
+            principal = CASPrincipal.load(encoded_token)
+        except BadSignature:
+            raise HTTPBadRequest()
 
-        return AccessToken.load(encoded_token.split(' ')[1])
+        member = DBSession.query(Member) \
+            .filter(Member.reference_id == principal.payload['referenceId']) \
+            .one_or_none()
+        if not member:
+            raise HTTPUnauthorized()
+
+        # TODO: Updating member when any scope attributes are changed
+
+        return principal
 

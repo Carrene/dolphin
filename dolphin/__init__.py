@@ -17,7 +17,16 @@ class Dolphin(Application):
         url: postgresql://postgres:postgres@localhost/dolphin_dev
         test_url: postgresql://postgres:postgres@localhost/dolphin_test
         administrative_url: postgresql://postgres:postgres@localhost/postgres
-    '''
+      oauth:
+        secret: A1dFVpz4w/qyym+HeXKWYmm6Ocj4X5ZNv1JQ7kgHBEk=\n
+        application_id: 1
+        access_token:
+          url: http://localhost:8080/apiv1/accesstokens
+          verb: create
+        member:
+          url: http://localhost:8080/apiv1/members
+          verb: get
+   '''
 
     def __init__(self, application_name='dolphin', root=Root()):
         super().__init__(

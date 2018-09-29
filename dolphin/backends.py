@@ -48,13 +48,12 @@ class CASClient:
 class ChatClient:
 
     def create_room(self, title, access_token, owner_id=None):
-
         try:
             response = requests.request(
                 'CREATE',
                 f'{settings.chat.room.url}/apiv1/rooms',
                 data=dict(title=title),
-                headers=dict(access_token=access_token)
+                headers={'X-Access-Token':access_token}
             )
             if response.status_code == 404:
                 raise ChatServerNotFound()
