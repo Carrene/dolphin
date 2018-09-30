@@ -65,6 +65,10 @@ class ProjectController(ModelRestController):
                 access_token
             )
         except RoomMemberAlreadyExist:
+            # Exception is passed because it means `add_member()` is already
+            # called and `member` successfully added to room. So there is
+            # no need to call `add_member()` API again and re-add the member to
+            # room
             pass
 
         # The exception type is not specified because after consulting with
