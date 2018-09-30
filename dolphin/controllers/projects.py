@@ -59,7 +59,7 @@ class ProjectController(ModelRestController):
         room = self.ensure_room(form['title'], access_token)
 
         try:
-            member_room = ChatClient().add_member(
+            ChatClient().add_member(
                 project.room_id,
                 manager.reference_id,
                 access_token
