@@ -16,6 +16,7 @@ class ManagerController(ModelRestController):
     @json
     @assign_manager_validator
     @Project.expose
+    @commit
     def assign(self, id):
         form = context.form
         try:
@@ -33,19 +34,22 @@ class ManagerController(ModelRestController):
             .filter(Project.id == form['projectId']) \
             .one_or_none()
 
-        access_token =  CASClient() \
+        access_token, ___ =  CASClient() \
             .get_access_token(context.form.get('authorizationCode'))
 
         room = ChatClient().add_member(
             project.room_id,
             manager.reference_id,
-            access_token[0]
+            access_token
         )
 
-        project.manager = manager
+        # The exception type is not specified because after consulting with
+        # Mr.Mardani, the result got: there must be no specification on
+        # exception type because nobody knows what exception may be raised
         try:
-            DBSession.commit()
-        except SQLAlchemyError:
+            project.manager = manager
+            DBSession.flush()
+        except:
             ChatClient().remove_member(
                 project.room_id,
                 manager.reference_id,

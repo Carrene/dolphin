@@ -105,6 +105,14 @@ def chat_mockup_server():
 
         @json(verbs=['create', 'delete', 'add', 'remove', 'list'])
         def create(self):
+            if _chat_server_status == '604 Already Added To Target' and \
+                    context.method in ('create', 'add'):
+                return dict(id=10, title='New Room')
+
+            if _chat_server_status == '615 Room Already Exists' and \
+                    context.method == 'add':
+                return dict(id=10, title='New Room')
+
             if _chat_server_status == '615 Room Already Exists' and \
                     context.method == 'list':
                 return [dict(id=1, title='First chat room')]

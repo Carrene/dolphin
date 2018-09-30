@@ -1,6 +1,10 @@
 from nanohttp import HTTPKnownStatus
 
 
+class RoomMemberAlreadyExist(HTTPKnownStatus):
+    status = '604 Already Added To Target'
+
+
 class ChatServerNotFound(HTTPKnownStatus):
     status = '617 Chat Server Not Found'
 

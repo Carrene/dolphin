@@ -5,7 +5,7 @@ from nanohttp import settings, HTTPForbidden
 from restfulpy.logging_ import get_logger
 
 from .exceptions import ChatServerNotFound, ChatServerNotAvailable, \
-    ChatInternallError, ChatRoomNotFound
+    ChatInternallError, ChatRoomNotFound, RoomMemberAlreadyExist
 
 
 logger = get_logger()
@@ -107,8 +107,15 @@ class ChatClient:
             if response.status_code == 404:
                 raise ChatServerNotFound()
 
-            if response.status_code == 503:
+            # 502: Bad Gateway
+            # 503: Service Unavailbale
+            if response.status_code in (502, 503):
                 raise ChatServerNotAvailable()
+
+            # 604: Already Added To Target
+            # Carrene/jaguar#3
+            if response.status_code == 604:
+                raise RoomMemberAlreadyExist()
 
             if response.status_code != 200:
                 logger.exception(response.content.decode())
