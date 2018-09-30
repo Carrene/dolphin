@@ -30,10 +30,7 @@ class Authenticator(StatefulAuthenticator):
         return member
 
     def verify_token(self, encoded_token):
-        try:
-            principal = CASPrincipal.load(encoded_token)
-        except BadSignature:
-            raise HTTPBadRequest()
+        principal = CASPrincipal.load(encoded_token)
 
         member = DBSession.query(Member) \
             .filter(Member.reference_id == principal.payload['referenceId']) \
@@ -41,7 +38,13 @@ class Authenticator(StatefulAuthenticator):
         if not member:
             raise HTTPUnauthorized()
 
-        # TODO: Updating member when any scope attributes are changed
+        if member.title != principal.payload['name']:
+            member.title = principal.payload['name']
+            DBSession.commit()
+
+        if member.email != principal.payload['email']:
+            member.email = principal.payload['email']
+            DBSession.commit()
 
         return principal
 

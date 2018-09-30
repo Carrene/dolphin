@@ -15,6 +15,7 @@ class TestItem(LocalApplicationTestCase):
         team = Team(
             title='Awesome team'
         )
+        session.add(team)
 
         manager = Manager(
             title='First Manager',
@@ -23,6 +24,7 @@ class TestItem(LocalApplicationTestCase):
             phone=123456789,
             reference_id=1
         )
+        session.add(manager)
 
         release = Release(
             title='My first release',
@@ -30,6 +32,7 @@ class TestItem(LocalApplicationTestCase):
             due_date='2020-2-20',
             cutoff='2030-2-20',
         )
+        session.add(release)
 
         project = Project(
             manager=manager,
@@ -39,6 +42,7 @@ class TestItem(LocalApplicationTestCase):
             due_date='2020-2-20',
             room_id=1
         )
+        session.add(project)
 
         issue = Issue(
             project=project,
@@ -48,6 +52,7 @@ class TestItem(LocalApplicationTestCase):
             kind='feature',
             days=2
         )
+        session.add(issue)
 
         resource = Resource(
             teams=[team],
@@ -57,12 +62,14 @@ class TestItem(LocalApplicationTestCase):
             phone=987654321,
             reference_id=2
         )
+        session.add(resource)
 
         phase = Phase(
             project=project,
             title='design',
             order=1,
         )
+        session.add(phase)
 
         item = Item(
             resource=resource,

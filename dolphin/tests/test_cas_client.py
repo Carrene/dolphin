@@ -49,25 +49,6 @@ def oauth_mockup_server(root_controller):
 
 class TestToken(LocalApplicationTestCase):
 
-#    def test_redirect_to_cas(self):
-#        settings.merge(f'''
-#            oauth:
-#              application_id: 1
-#        ''')
-#
-#        with self.given(
-#            'Trying to redirect to CAS server',
-#            '/apiv1/oauth2/tokens',
-#            'REQUEST',
-#        ):
-#            import pudb; pudb.set_trace()  # XXX BREAKPOINT
-#            assert status == 200
-#            assert len(response.json) == 2
-#            assert response.json['scopes'] == ['email', 'title']
-#
-#            when('Trying to pass with the form patameter', form=dict(a='a'))
-#            assert status == '711 Form Not Allowed'
-
     def test_get_access_token(self):
         with oauth_mockup_server(Root()):
             settings.merge(f'''
@@ -81,27 +62,6 @@ class TestToken(LocalApplicationTestCase):
                     url: {settings.tokenizer.url}/profiles
                     verb: get
             ''')
-
-            principal = CASPrincipal(dict(
-                id=1,
-                roles='manager',
-                email='manager1@example.com',
-                name='manager1',
-                referenceId=1,
-            ))
-
-            with self.given(
-                'Try to reach an authorized resource for the first time',
-                '/apiv2/index',
-                authorization=principal.dump().decode('utf-8')
-            ):
-                assert status == 401
-
-                when(
-                    'Token is invalid',
-                    authorization='Invalid token'
-                )
-                assert status == 400
 
             with self.given(
                 'Try to get an access token from CAS',
@@ -122,5 +82,4 @@ class TestToken(LocalApplicationTestCase):
                     form=Update(authorizationCode='token is damage')
                 )
                 assert status == 403
-
 
