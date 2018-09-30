@@ -1,15 +1,12 @@
-from requests import ConnectionError
-from sqlalchemy.exc import SQLAlchemyError
 from nanohttp import HTTPStatus, json, context, HTTPNotFound
 from restfulpy.authorization import authorize
+from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 from restfulpy.utils import to_camel_case
-from restfulpy.controllers import ModelRestController
 
-from ..models import Project, Subscription, Manager
 from ..backends import ChatClient, CASClient
-from ..exceptions import ChatServerNotFound, ChatServerNotAvailable, \
-    ChatInternallError, ChatRoomNotFound, RoomMemberAlreadyExist
+from ..exceptions import ChatRoomNotFound, RoomMemberAlreadyExist
+from ..models import Project, Subscription, Manager
 from ..validators import project_validator, update_project_validator, \
     subscribe_validator
 
@@ -25,7 +22,7 @@ class ProjectController(ModelRestController):
                 room = ChatClient().create_room(
                     title,
                     access_token,
-                    context.identity.payload['reference_id']
+                    context.identity.payload['referenceId']
                 )
                 create_room_error = None
             except ChatRoomNotFound:

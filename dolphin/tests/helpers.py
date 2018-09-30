@@ -1,13 +1,16 @@
 from contextlib import contextmanager
 from os import path
 
-from nanohttp import RegexRouteController, json, settings, context, HTTPStatus
+from cas import CASPrincipal
+from nanohttp import RegexRouteController, json, settings, context, \
+    HTTPStatus, HTTPUnauthorized
 from restfulpy.application import Application
-from restfulpy.testing import ApplicableTestCase
 from restfulpy.mockup import mockup_http_server
+from restfulpy.testing import ApplicableTestCase
 
 from dolphin import Dolphin
 from dolphin.authentication import Authenticator
+from dolphin.models import Member
 
 
 HERE = path.abspath(path.dirname(__file__))
@@ -23,7 +26,19 @@ class LocalApplicationTestCase(ApplicableTestCase):
     __api_documentation_directory__ = path.join(DATA_DIRECTORY, 'markdown')
 
     def login(self, email, url='/apiv1/tokens', verb='CREATE'):
-        super().login(dict(email=email), url=url, verb=verb)
+        session = self.create_session()
+        member = session.query(Member).filter(Member.email == email).one_or_none()
+        if member is None:
+            raise HTTPUnauthorized()
+
+        token = CASPrincipal({
+            'id':member.id,
+            'referenceId':member.id,
+            'email':member.email,
+            'roles':['member'],
+            'name':member.title
+        })
+        self._authentication_token = token.dump().decode('utf-8')
 
 
 class MockupApplication(Application):
@@ -105,7 +120,6 @@ def chat_mockup_server():
 
         @json(verbs=['create', 'delete', 'add', 'remove', 'list'])
         def create(self):
-            import pudb; pudb.set_trace()  # XXX BREAKPOINT
             if _chat_server_status == '604 Already Added To Target' and \
                     context.method in ('create', 'add'):
                 return dict(id=10, title='New Room')

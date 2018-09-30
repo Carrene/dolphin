@@ -52,7 +52,7 @@ class ChatClient:
             response = requests.request(
                 'CREATE',
                 f'{settings.chat.room.url}/apiv1/rooms',
-                data=dict(title=title),
+                data={'title':title},
                 headers={'X-Access-Token':access_token}
             )
             if response.status_code == 404:
@@ -65,8 +65,8 @@ class ChatClient:
                 response = requests.request(
                     'LIST',
                     f'{settings.chat.room.url}/apiv1/rooms',
-                    headers=dict(access_token=access_token),
-                    params=dict(title=title, owner_id=owner_id)
+                    headers={'X-Access-Token':access_token},
+                    params={'title':title, 'ownerId':owner_id}
                 )
                 rooms = json.loads(response.text)
                 if len(rooms) == 1:
@@ -90,7 +90,7 @@ class ChatClient:
         response = requests.request(
             'DELETE',
             f'{settings.chat.room.url}/apiv1/rooms/{id}',
-            headers=dict(access_token=access_token)
+            headers={'X-Access-Token':access_token}
         )
         return response
 
@@ -100,8 +100,8 @@ class ChatClient:
             response = requests.request(
                 'ADD',
                 f'{settings.chat.room.url}/apiv1/rooms/{id}',
-                data=dict(user_id=user_id),
-                headers=dict(access_token=access_token)
+                data={'userId':user_id},
+                headers={'X-Access-Token':access_token}
             )
             if response.status_code == 404:
                 raise ChatServerNotFound()
@@ -132,8 +132,8 @@ class ChatClient:
         response = requests.request(
             'REMOVE',
             f'{settings.chat.room.url}/apiv1/rooms/{id}',
-            data=dict(user_id=user_id),
-            headers=dict(access_token=access_token)
+            data={'userId':user_id},
+            headers={'X-Access-Token':access_token}
         )
         room = json.loads(response.text)
         return room
