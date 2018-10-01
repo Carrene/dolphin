@@ -33,10 +33,10 @@ class CASClient:
         result = json.loads(response.text)
         return result['accessToken'], result['memberId']
 
-    def get_member(self, member_id, access_token):
+    def get_member(self, access_token):
 
         response = requests.get(
-            f'{settings.oauth.member.url}/{member_id}',
+            f'{settings.oauth.member.url}/me',
             headers={'authorization': f'oauth2-accesstoken {access_token}'}
         )
         if response.status_code != 200:

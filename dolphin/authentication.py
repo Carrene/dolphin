@@ -5,6 +5,7 @@ from restfulpy.authentication import StatefulAuthenticator
 from restfulpy.orm import DBSession
 
 from .models import Member
+from .backends import CASClient
 
 
 class Authenticator(StatefulAuthenticator):
@@ -37,6 +38,8 @@ class Authenticator(StatefulAuthenticator):
             .one_or_none()
         if not member:
             raise HTTPUnauthorized()
+
+        cas_member = CASClient().get_member(member.access_token)
 
         if member.title != principal.payload['name']:
             member.title = principal.payload['name']

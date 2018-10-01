@@ -1,7 +1,7 @@
 
 from bddrest import status, response, Update, when, Remove, Append, given
 
-from dolphin.tests.helpers import LocalApplicationTestCase
+from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 from dolphin.models import Issue, Project, Manager, Release, Phase, Resource
 
 
@@ -14,7 +14,7 @@ class TestIssue(LocalApplicationTestCase):
         manager = Manager(
             title='First Manager',
             email='manager1@example.com',
-            access_token='access token',
+            access_token='access token 1',
             phone=123456789,
             reference_id=1
         )
@@ -22,7 +22,7 @@ class TestIssue(LocalApplicationTestCase):
         resource = Resource(
             title='First Resource',
             email='resource1@example.com',
-            access_token='access token',
+            access_token='access token 2',
             phone=987654321,
             reference_id=2
         )
@@ -92,7 +92,7 @@ class TestIssue(LocalApplicationTestCase):
     def test_define(self):
         self.login('manager1@example.com')
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'Define an issue',
             '/apiv1/issues',
             'DEFINE',
@@ -219,7 +219,7 @@ class TestIssue(LocalApplicationTestCase):
     def test_update(self):
         self.login('manager1@example.com')
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'Update a issue',
             '/apiv1/issues/id:3',
             'UPDATE',
@@ -304,7 +304,7 @@ class TestIssue(LocalApplicationTestCase):
             when('Request is not authorized',authorization=None)
             assert status == 401
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'Updating project with empty form',
             '/apiv1/issues/id:2',
             'UPDATE',
@@ -315,7 +315,7 @@ class TestIssue(LocalApplicationTestCase):
     def test_list(self):
         self.login('manager1@example.com')
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'List issues',
             '/apiv1/issues',
             'LIST',
@@ -323,7 +323,7 @@ class TestIssue(LocalApplicationTestCase):
             assert status == 200
             assert len(response.json) == 5
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'Sort issues by title',
             '/apiv1/issues',
             'LIST',
@@ -337,7 +337,7 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert response.json[0]['title'] == 'Third issue'
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'Filter issues',
             '/apiv1/issues',
             'LIST',
@@ -351,7 +351,7 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert response.json[0]['title'] == 'Second issue'
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
              'Issues pagination',
              '/apiv1/issues',
              'LIST',
@@ -371,7 +371,7 @@ class TestIssue(LocalApplicationTestCase):
     def test_subscribe(self):
         self.login('manager1@example.com')
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'Subscribe an issue',
             '/apiv1/issues/id:4',
             'SUBSCRIBE',
@@ -425,7 +425,7 @@ class TestIssue(LocalApplicationTestCase):
     def test_unsubscribe(self):
         self.login('manager1@example.com')
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'Unsubscribe an issue',
             '/apiv1/issues/id:4',
             'UNSUBSCRIBE',
@@ -479,7 +479,7 @@ class TestIssue(LocalApplicationTestCase):
     def test_assign(self):
         self.login('manager1@example.com')
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'Assign an issue to a resource',
             '/apiv1/issues/id:4',
             'ASSIGN',

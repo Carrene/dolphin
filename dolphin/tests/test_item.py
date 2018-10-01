@@ -3,7 +3,7 @@ from bddrest import status, response, Update, when, Remove
 
 from dolphin.models import Item, Phase, Issue, Manager, Release, Project, \
     Resource, Team
-from dolphin.tests.helpers import LocalApplicationTestCase
+from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
 class TestItem(LocalApplicationTestCase):
@@ -20,7 +20,7 @@ class TestItem(LocalApplicationTestCase):
         manager = Manager(
             title='First Manager',
             email='manager1@example.com',
-            access_token='access token',
+            access_token='access token 1',
             phone=123456789,
             reference_id=1
         )
@@ -84,7 +84,7 @@ class TestItem(LocalApplicationTestCase):
     def test_update(self):
         self.login('manager1@example.com')
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'Update status of an item',
             '/apiv1/items/id:1',
             'UPDATE',

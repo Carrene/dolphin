@@ -13,7 +13,7 @@ class MemberController(RestController):
         access_token, member_id = CASClient() \
             .get_access_token(context.form.get('authorizationCode'))
 
-        cas_member = CASClient().get_member(member_id, access_token)
+        cas_member = CASClient().get_member(access_token)
         member = DBSession.query(Member) \
             .filter(Member.email == cas_member['email']) \
             .one_or_none()
