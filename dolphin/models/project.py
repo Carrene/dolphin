@@ -66,9 +66,14 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     @property
     def boardings(self):
-        raise NotImplementedError
+        for issue in self.issues:
+            if issue.status == 'delayed':
+                return self._boarding['delayed']
 
-    @property
-    def boardings(self):
-        raise NotImplementedError
+        return 'on-time'
+
+    def to_dict(self):
+        project_dict = super().to_dict()
+        project_dict['boarding'] = self.boarding
+        return project_dict
 
