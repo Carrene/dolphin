@@ -159,6 +159,11 @@ class ChatClient:
 
             # 611: User Not Found
             # Carrene/jaguar#13
+            if response.status_code == 611:
+                raise RoomMemberNotFound()
+
+            # 604: Already Added To Target
+            # Carrene/jaguar#3
             if response.status_code == 604:
                 raise RoomMemberAlreadyExist()
 
