@@ -33,7 +33,7 @@ class LocalApplicationTestCase(ApplicableTestCase):
 
         token = CASPrincipal({
             'id':member.id,
-            'referenceId':member.id,
+            'referenceId':member.reference_id,
             'email':member.email,
             'roles':['member'],
             'name':member.title
@@ -87,8 +87,17 @@ def oauth_mockup_server():
         def get(self, id):
             access_token = context.environ['HTTP_AUTHORIZATION']
 
-            if access_token.startswith('oauth2-accesstoken access token'):
-                return dict(id=1, title='john', email='john@gmail.com')
+            if access_token == 'access token 1':
+                return dict(id=1, title='manager1', email='manager1@example.com')
+
+            if access_token == 'access token 2':
+                return dict(id=2, title='manager2', email='manager2@example.com')
+
+            if access_token == 'access token 3':
+                return dict(id=3, title='manager3', email='manager3@example.com')
+
+            if access_token == 'access token 4':
+                return dict(id=4, title='manager4', email='manager4@example.com')
 
             raise HTTPForbidden()
 

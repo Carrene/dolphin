@@ -14,9 +14,9 @@ class TestProject(LocalApplicationTestCase):
         manager = Manager(
             title='First Manager',
             email='manager1@example.com',
-            access_token='access token',
+            access_token='access token 2',
             phone=123456789,
-            reference_id=1
+            reference_id=2
         )
 
         release = Release(
