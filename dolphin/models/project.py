@@ -1,3 +1,4 @@
+from datetime import datetime
 
 from sqlalchemy import Integer, Time, ForeignKey, Enum
 from sqlalchemy.orm import backref
@@ -67,6 +68,9 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     @property
     def boardings(self):
         for issue in self.issues:
+            if issue.due_date > self.release.due_date:
+                return self._boarding['at-risk']
+
             if issue.status == 'delayed':
                 return self._boarding['delayed']
 
@@ -74,6 +78,6 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     def to_dict(self):
         project_dict = super().to_dict()
-        project_dict['boarding'] = self.boarding
+        project_dict['boarding'] = self.boardings
         return project_dict
 
