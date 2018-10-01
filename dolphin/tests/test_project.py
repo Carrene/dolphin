@@ -1,8 +1,9 @@
 from bddrest import status, response, Update, when, Remove, given
 
 from dolphin.models import Project, Manager, Release
-from dolphin.tests.helpers import LocalApplicationTestCase, \
-    oauth_mockup_server, chat_mockup_server, chat_server_status
+from dolphin.tests.helpers import MockupApplication, LocalApplicationTestCase,\
+    oauth_mockup_server, chat_mockup_server, chat_server_status, \
+    room_mockup_server
 
 
 class TestProject(LocalApplicationTestCase):
@@ -18,14 +19,35 @@ class TestProject(LocalApplicationTestCase):
             phone=123456789,
             reference_id=2
         )
+        session.add(manager1)
 
         manager2 = Manager(
             title='Second Manager',
             email='manager2@example.com',
-            access_token='access token',
+            access_token='access token 2',
             phone=123457689,
             reference_id=2
         )
+        session.add(manager2)
+
+        manager3 = Manager(
+            title='Third Manager',
+            email='manager3@example.com',
+            access_token='access token 3',
+            phone=123467859,
+            reference_id=3
+        )
+        session.add(manager3)
+
+        manager4 = Manager(
+            title='Fourth Manager',
+            email='manager4@example.com',
+            access_token='access token 4',
+            phone=142573689,
+            reference_id=4
+        )
+        session.add(manager4)
+
 
         release = Release(
             title='My first release',
@@ -33,15 +55,27 @@ class TestProject(LocalApplicationTestCase):
             due_date='2020-2-20',
             cutoff='2030-2-20',
         )
+        session.add(release)
 
-        project = Project(
+        project1 = Project(
             manager=manager1,
             release=release,
             title='My first project',
             description='A decription for my project',
             due_date='2020-2-20',
-            room_id=1000
+            room_id=1001
         )
+        session.add(project1)
+
+        project2 = Project(
+            manager=manager1,
+            release=release,
+            title='My second project',
+            description='A decription for my project',
+            due_date='2020-2-20',
+            room_id=1002
+        )
+        session.add(project2)
 
         hidden_project = Project(
             manager=manager1,
@@ -52,8 +86,7 @@ class TestProject(LocalApplicationTestCase):
             removed_at='2020-2-20',
             room_id=1000
         )
-
-        session.add_all([manager1, manager2, project, hidden_project, release])
+        session.add(hidden_project)
         session.commit()
         cls.manager_id = manager1.id
         cls.release = release
@@ -197,130 +230,142 @@ class TestProject(LocalApplicationTestCase):
                 )
                 assert status == '200 OK'
 
-#    def test_update(self):
-#        self.login('manager1@example.com')
-#
-#        with oauth_mockup_server(), chat_mockup_server(), self.given(
-#            'Updating a project',
-#            '/apiv1/projects/id:2',
-#            'UPDATE',
-#            form=dict(
-#                title='My interesting project',
-#                description='A updated project description',
-#                dueDate='2200-2-20',
-#                status='active',
-#                managerId=2,
-#                authorizationCode='authorization code'
-#            )
-#        ):
-#            assert status == 200
-#            assert response.json['title'] == 'My interesting project'
-#            assert response.json['description'] == 'A updated project ' \
-#                'description'
-#            assert response.json['dueDate'] == '2200-02-20T00:00:00'
-#            assert response.json['status'] == 'active'
-#
-#            when(
-#                'Intended project with string type not found',
-#                url_parameters=dict(id='Alphabetical')
-#            )
-#            assert status == 404
-#
-#            when(
-#                'Intended project with string type not found',
-#                url_parameters=dict(id=100)
-#            )
-#            assert status == 404
-#
-#            when(
-#                'Manager not found with string type',
-#                form=given | dict(managerId='Alphabetical', title='1')
-#            )
-#            assert status == 608
-#            assert status.text.startswith('Manager not found')
-#
-#            when(
-#                'Manager is not found',
-#                form=Update(managerId=100)
-#            )
-#            assert status == 608
-#            assert status.text.startswith('Manager not found')
-#
-#            when(
-#                'Title is repetetive',
-#                form=Update(title='My hidden project')
-#            )
-#            assert status == 600
-#            assert status.text.startswith('Another project with title')
-#
-#            when(
-#                'Title length is more than limit',
-#                form=Update(
-#                    title=((50 + 1) * 'a')
-#                )
-#            )
-#            assert status == '704 At Most 50 Characters Are Valid For Title'
-#
-#            when(
-#                'Description length is more than limit',
-#                form=given | dict(
-#                    description=((512 + 1) * 'a'),
-#                )
-#            )
-#            assert status == '703 At Most 512 Characters Are Valid For ' \
-#                'Description'
-#
-#            when(
-#                'Due date format is wrong',
-#                form=given | dict(
-#                    dueDate='2200-2-32',
-#                )
-#            )
-#            assert status == '701 Invalid Due Date Format'
-#
-#            when(
-#                'Status value is invalid',
-#                form=given | dict(
-#                    status='progressing',
-#                )
-#            )
-#            assert status == 705
-#            assert status.text.startswith('Invalid status')
-#
-#            when(
-#                'Invalid parameter is in the form',
-#                form=given + \
-#                    dict(invalid_param='External parameter')
-#            )
-#            assert status == 707
-#            assert status.text.startswith('Invalid field')
-#
-#            when('Request is not authorized', authorization=None)
-#            assert status == 401
-#
-#            with chat_server_status('404 Not Found'):
-#                when('Chat server is not found')
-#                assert status == '617 Chat Server Not Found'
+    def test_update(self):
+        self.login('manager1@example.com')
 
-#            with chat_server_status('503 Service Not Available'):
-#                when('Chat server is not available')
-#                assert status == '800 Chat Server Not Available'
-#
-#            with chat_server_status('500 Internal Service Error'):
-#                when('Chat server faces with internal error')
-#                assert status == '801 Chat Server Internal Error'
-#
-#            with chat_server_status('604 Already Added To Target'):
-#                when('Chat server faces with internal error')
-#                assert status == '200 OK'
-#
-#        with self.given(
-#            'Updating project with empty form',
-#            '/apiv1/projects/id:2',
-#            'UPDATE',
-#            form=dict()
-#        ):
-#            assert status == '708 No Parameter Exists In The Form'
+        with oauth_mockup_server(), chat_mockup_server(), self.given(
+            'Updating a project',
+            '/apiv1/projects/id:2',
+            'UPDATE',
+            form=dict(
+                title='My interesting project',
+                description='A updated project description',
+                dueDate='2200-2-20',
+                status='active',
+                managerId=2,
+                authorizationCode='authorization code'
+            )
+        ):
+            assert status == 200
+            assert response.json['title'] == 'My interesting project'
+            assert response.json['description'] == 'A updated project ' \
+                'description'
+            assert response.json['dueDate'] == '2200-02-20T00:00:00'
+            assert response.json['status'] == 'active'
+
+            when(
+                'Intended project with string type not found',
+                url_parameters=dict(id='Alphabetical')
+            )
+            assert status == 404
+
+            when(
+                'Intended project with string type not found',
+                url_parameters=dict(id=100)
+            )
+            assert status == 404
+
+            when(
+                'Manager not found with string type',
+                form=given | dict(managerId='Alphabetical', title='1')
+            )
+            assert status == 608
+            assert status.text.startswith('Manager not found')
+
+            when(
+                'Manager is not found',
+                form=Update(managerId=100)
+            )
+            assert status == 608
+            assert status.text.startswith('Manager not found')
+
+            when(
+                'Title is repetetive',
+                form=Update(title='My hidden project')
+            )
+            assert status == 600
+            assert status.text.startswith('Another project with title')
+
+            when(
+                'Title length is more than limit',
+                form=Update(
+                    title=((50 + 1) * 'a')
+                )
+            )
+            assert status == '704 At Most 50 Characters Are Valid For Title'
+
+            when(
+                'Description length is more than limit',
+                form=given | dict(
+                    description=((512 + 1) * 'a'),
+                )
+            )
+            assert status == '703 At Most 512 Characters Are Valid For ' \
+                'Description'
+
+            when(
+                'Due date format is wrong',
+                form=given | dict(
+                    dueDate='2200-2-32',
+                )
+            )
+            assert status == '701 Invalid Due Date Format'
+
+            when(
+                'Status value is invalid',
+                form=given | dict(
+                    status='progressing',
+                )
+            )
+            assert status == 705
+            assert status.text.startswith('Invalid status')
+
+            when(
+                'Invalid parameter is in the form',
+                form=given + \
+                    dict(invalid_param='External parameter')
+            )
+            assert status == 707
+            assert status.text.startswith('Invalid field')
+
+            when('Request is not authorized', authorization=None)
+            assert status == 401
+
+            with chat_server_status('404 Not Found'):
+                when(
+                    'Chat server is not found',
+                    form=given | dict(managerId=3)
+                )
+                assert status == '617 Chat Server Not Found'
+
+            with chat_server_status('503 Service Not Available'):
+                when(
+                    'Chat server is not available',
+                    form=given | dict(managerId=3)
+                )
+                assert status == '800 Chat Server Not Available'
+
+            with chat_server_status('500 Internal Service Error'):
+                when(
+                    'Chat server faces with internal error',
+                    form=given | dict(managerId=3)
+                )
+                assert status == '801 Chat Server Internal Error'
+
+            with room_mockup_server():
+                when(
+                    'Room member is already added to room',
+                    form=given | dict(managerId=3)
+                )
+                assert status == '200 OK'
+
+        with self.given(
+            'Updating project with empty form',
+            '/apiv1/projects/id:2',
+            'UPDATE',
+            form=dict()
+        ):
+            assert status == '708 No Parameter Exists In The Form'
 
 
     def test_hide(self):
@@ -361,7 +406,7 @@ class TestProject(LocalApplicationTestCase):
 
         with self.given(
             'Showing a unhidden project',
-            '/apiv1/projects/id:3',
+            '/apiv1/projects/id:4',
             'SHOW'
         ):
             session = self.create_session()
@@ -395,7 +440,7 @@ class TestProject(LocalApplicationTestCase):
             'LIST',
         ):
             assert status == 200
-            assert len(response.json) == 5
+            assert len(response.json) == 6
 
         with self.given(
             'Sort projects by phases title',
@@ -410,7 +455,7 @@ class TestProject(LocalApplicationTestCase):
                 'Reverse sorting titles by alphabet',
                 query=dict(sort='-title')
             )
-            assert response.json[0]['title'] == 'My hidden project'
+            assert response.json[0]['title'] == 'My second project'
 
         with self.given(
             'Filter projects',
@@ -424,7 +469,7 @@ class TestProject(LocalApplicationTestCase):
                 'List projects except one of them',
                 query=dict(sort='id', title='!My awesome project')
             )
-            assert response.json[0]['title'] == 'My first project'
+            assert response.json[0]['title'] == 'My interesting project'
 
         with self.given(
             'Project pagination',
@@ -432,13 +477,13 @@ class TestProject(LocalApplicationTestCase):
             'LIST',
             query=dict(sort='id', take=1, skip=2)
         ):
-            assert response.json[0]['title'] == 'My awesome project'
+            assert response.json[0]['title'] == 'My hidden project'
 
             when(
                 'Manipulate sorting and pagination',
                 query=dict(sort='-title', take=1, skip=2)
             )
-            assert response.json[0]['title'] == 'My awesome project'
+            assert response.json[0]['title'] == 'My hidden project'
 
             when('Request is not authorized', authorization=None)
             assert status == 401
@@ -495,6 +540,7 @@ class TestProject(LocalApplicationTestCase):
             when('Request is not authorized', authorization=None)
             assert status == 401
 
+<<<<<<< HEAD
             when(
                 'Updating project with empty form',
                 form=dict()
@@ -739,6 +785,35 @@ class TestProject(LocalApplicationTestCase):
 #            with chat_server_status('604 Already Added To Target'):
 #                when('Member is already added to room')
 #                assert status == '200 OK'
+=======
+            with chat_server_status('404 Not Found'):
+                when(
+                    'Chat server is not found',
+                    url_parameters=dict(id=2)
+                )
+                assert status == '617 Chat Server Not Found'
+
+            with chat_server_status('503 Service Not Available'):
+                when(
+                    'Chat server is not available',
+                    url_parameters=dict(id=2)
+                )
+                assert status == '800 Chat Server Not Available'
+
+            with chat_server_status('500 Internal Service Error'):
+                when(
+                    'Chat server faces with internal error',
+                    url_parameters=dict(id=2)
+                )
+                assert status == '801 Chat Server Internal Error'
+
+            with chat_server_status('604 Already Added To Target'):
+                when(
+                    'Member is already added to room',
+                    url_parameters=dict(id=2)
+                )
+                assert status == '200 OK'
+>>>>>>> Impelement manager replacement
 
     def test_unsubscribe(self):
         self.login('manager1@example.com')
@@ -792,19 +867,31 @@ class TestProject(LocalApplicationTestCase):
             when('Request is not authorized', authorization=None)
             assert status == 401
 
-#            with chat_server_status('404 Not Found'):
-#                when('Chat server is not found')
-#                assert status == '617 Chat Server Not Found'
-#
-#            with chat_server_status('503 Service Not Available'):
-#                when('Chat server is not available')
-#                assert status == '800 Chat Server Not Available'
-#
-#            with chat_server_status('500 Internal Service Error'):
-#                when('Chat server faces with internal error')
-#                assert status == '801 Chat Server Internal Error'
-#
-#            with chat_server_status('611 Room Member Not Found'):
-#                when('Room member not found')
-#                assert status == '200 OK'
+            with chat_server_status('404 Not Found'):
+                when(
+                    'Chat server is not found',
+                    url_parameters=dict(id=2)
+                )
+                assert status == '617 Chat Server Not Found'
+
+            with chat_server_status('503 Service Not Available'):
+                when(
+                    'Chat server is not available',
+                    url_parameters=dict(id=2)
+                )
+                assert status == '800 Chat Server Not Available'
+
+            with chat_server_status('500 Internal Service Error'):
+                when(
+                    'Chat server faces with internal error',
+                    url_parameters=dict(id=2)
+                )
+                assert status == '801 Chat Server Internal Error'
+
+            with chat_server_status('611 Room Member Not Found'):
+                when(
+                    'Room member not found',
+                    url_parameters=dict(id=2)
+                )
+                assert status == '200 OK'
 

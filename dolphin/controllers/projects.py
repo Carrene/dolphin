@@ -33,34 +33,38 @@ class ProjectController(ModelRestController):
 
         return room
 
-    def manager_replacement(self, manager_id, project, access_token):
+    def replace_manager(self, manager_id, project, access_token):
         new_assignee_manager = DBSession.query(Manager) \
             .filter(Manager.id == manager_id) \
             .one_or_none()
         current_assignee_manager = project.manager
         project.manager = new_assignee_manager
 
+        room_members_modified = True
+
         try:
             # Add new assignee manager to project chat room
-            room = ChatClient().add_member(
+            ChatClient().add_member(
                 project.room_id,
                 new_assignee_manager.reference_id,
                 access_token
             )
         except RoomMemberAlreadyExist:
+            room_members_modified = False
             pass
 
         try:
             # Remove current assignee manager from project chat room
-            room = ChatClient().remove_member(
+            ChatClient().remove_member(
                 project.room_id,
                 current_assignee_manager.reference_id,
                 access_token
             )
         except RoomMemberNotFound:
+            room_members_modified = False
             pass
 
-        return room
+        return room_members_modified
 
     @authorize
     @json
@@ -161,7 +165,7 @@ class ProjectController(ModelRestController):
         project.update_from_request()
 
         if form['managerId'] and project.manager.id != form['managerId']:
-            room = self.manager_replacement(
+            self.replace_manager(
                 form['managerId'],
                 project,
                 access_token
@@ -173,7 +177,7 @@ class ProjectController(ModelRestController):
         try:
             DBSession.flush()
         except:
-            room = self.manager_replacement(
+            self.replace_manager(
                 current_manager.id,
                 project,
                 access_token
