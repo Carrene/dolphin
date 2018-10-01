@@ -1,15 +1,12 @@
-from requests import ConnectionError
-from sqlalchemy.exc import SQLAlchemyError
 from nanohttp import HTTPStatus, json, context, HTTPNotFound
 from restfulpy.authorization import authorize
+from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 from restfulpy.utils import to_camel_case
-from restfulpy.controllers import ModelRestController
 
-from ..models import Project, Subscription, Manager
 from ..backends import ChatClient, CASClient
-from ..exceptions import ChatServerNotFound, ChatServerNotAvailable, \
-    ChatInternallError, ChatRoomNotFound, RoomMemberAlreadyExist
+from ..exceptions import ChatRoomNotFound, RoomMemberAlreadyExist
+from ..models import Project, Subscription, Manager
 from ..validators import project_validator, update_project_validator, \
     subscribe_validator
 
@@ -17,15 +14,16 @@ from ..validators import project_validator, update_project_validator, \
 class ProjectController(ModelRestController):
     __model__ = Project
 
-    def ensure_room(self, title, access_token):
+    def ensure_room(self, title, token, access_token):
         create_room_error = 1
         room = None
         while create_room_error is not None:
             try:
                 room = ChatClient().create_room(
                     title,
+                    token,
                     access_token,
-                    context.identity.payload['reference_id']
+                    context.identity.payload['referenceId']
                 )
                 create_room_error = None
             except ChatRoomNotFound:
@@ -42,6 +40,7 @@ class ProjectController(ModelRestController):
     def create(self):
         PENDING = -1
         form = context.form
+        token = context.environ['HTTP_AUTHORIZATION']
 
         project = Project()
         project.update_from_request()
@@ -56,19 +55,20 @@ class ProjectController(ModelRestController):
         access_token, ___ =  CASClient() \
             .get_access_token(context.form.get('authorizationCode'))
 
-        room = self.ensure_room(form['title'], access_token)
+        room = self.ensure_room(form['title'], token, access_token)
 
         try:
             ChatClient().add_member(
                 project.room_id,
                 manager.reference_id,
+                token,
                 access_token
             )
         except RoomMemberAlreadyExist:
             # Exception is passed because it means `add_member()` is already
             # called and `member` successfully added to room. So there is
             # no need to call `add_member()` API again and re-add the member to
-            # room
+            # room.
             pass
 
         # The exception type is not specified because after consulting with
@@ -78,7 +78,7 @@ class ProjectController(ModelRestController):
             project.room_id = room['id']
             DBSession.flush()
         except:
-            ChatClient().delete_room(title, access_token)
+            ChatClient().delete_room(title, token, access_token)
             raise
 
         return project

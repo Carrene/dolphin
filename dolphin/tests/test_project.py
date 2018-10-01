@@ -1,11 +1,7 @@
-from contextlib import contextmanager
-
-from nanohttp import RegexRouteController, json, settings, context
-from bddrest import status, response, Update, when, Remove, Append, given
-from restfulpy.mockup import mockup_http_server
+from bddrest import status, response, Update, when, Remove, given
 
 from dolphin.models import Project, Manager, Release
-from dolphin.tests.helpers import MockupApplication, LocalApplicationTestCase,\
+from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
 
@@ -18,9 +14,9 @@ class TestProject(LocalApplicationTestCase):
         manager = Manager(
             title='First Manager',
             email='manager1@example.com',
-            access_token='access token',
+            access_token='access token 1',
             phone=123456789,
-            reference_id=1
+            reference_id=2
         )
 
         release = Release(
@@ -196,7 +192,7 @@ class TestProject(LocalApplicationTestCase):
     def test_update(self):
         self.login('manager1@example.com')
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'Updating a project',
             '/apiv1/projects/id:2',
             'UPDATE',
@@ -281,13 +277,13 @@ class TestProject(LocalApplicationTestCase):
             )
             assert status == 401
 
-        with self.given(
-            'Updating project with empty form',
-            '/apiv1/projects/id:2',
-            'UPDATE',
-            form=dict()
-        ):
-            assert status == '708 No Parameter Exists In The Form'
+            with self.given(
+                'Updating project with empty form',
+                '/apiv1/projects/id:2',
+                'UPDATE',
+                form=dict()
+            ):
+                assert status == '708 No Parameter Exists In The Form'
 
     def test_hide(self):
         self.login('manager1@example.com')
@@ -325,7 +321,7 @@ class TestProject(LocalApplicationTestCase):
     def test_show(self):
         self.login('manager1@example.com')
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'Showing a unhidden project',
             '/apiv1/projects/id:3',
             'SHOW'
@@ -355,7 +351,7 @@ class TestProject(LocalApplicationTestCase):
     def test_list(self):
         self.login('manager1@example.com')
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'List projects',
             '/apiv1/projects',
             'LIST',
@@ -363,7 +359,7 @@ class TestProject(LocalApplicationTestCase):
             assert status == 200
             assert len(response.json) == 5
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'Sort projects by phases title',
             '/apiv1/projects',
             'LIST',
@@ -378,7 +374,7 @@ class TestProject(LocalApplicationTestCase):
             )
             assert response.json[0]['title'] == 'My interesting project'
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'Filter projects',
             '/apiv1/projects',
             'LIST',
@@ -392,7 +388,7 @@ class TestProject(LocalApplicationTestCase):
             )
             assert response.json[0]['title'] == 'My interesting project'
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'Project pagination',
             '/apiv1/projects',
             'LIST',
@@ -412,7 +408,7 @@ class TestProject(LocalApplicationTestCase):
     def test_subscribe(self):
         self.login('manager1@example.com')
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'Subscribe project',
             '/apiv1/projects/id:4',
             'SUBSCRIBE',
@@ -464,7 +460,7 @@ class TestProject(LocalApplicationTestCase):
     def test_unsubscribe(self):
         self.login('manager1@example.com')
 
-        with self.given(
+        with oauth_mockup_server(), self.given(
             'Unsubscribe an project',
             '/apiv1/projects/id:4',
             'UNSUBSCRIBE',

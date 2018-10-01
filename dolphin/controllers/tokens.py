@@ -35,33 +35,3 @@ class TokenController(RestController):
             applicationId=settings.oauth['application_id'],
         )
 
-    @json
-    def obtain(self):
-        access_token, member_id = CASClient() \
-            .get_access_token(context.form.get('authorizationCode'))
-
-        cas_member = CASClient().get_member(member_id, access_token)
-        member = DBSession.query(Member) \
-            .filter(Member.email == cas_member['email']) \
-            .one_or_none()
-
-        if member is None:
-            member = Member(
-                reference_id=cas_member['id'],
-                email=cas_member['email'],
-                title=cas_member['title'],
-                access_token=access_token
-            )
-        else:
-            member.access_token = access_token
-
-        DBSession.add(member)
-        DBSession.commit()
-        principal = member.create_jwt_principal()
-        context.response_headers.add_header(
-            'X-New-JWT-Token',
-            principal.dump().decode('utf-8')
-        )
-
-        return dict(token=principal.dump().decode('utf-8'))
-

@@ -1,13 +1,16 @@
 from contextlib import contextmanager
 from os import path
 
-from nanohttp import RegexRouteController, json, settings, context, HTTPStatus
+from cas import CASPrincipal
+from nanohttp import RegexRouteController, json, settings, context, \
+    HTTPStatus, HTTPUnauthorized
 from restfulpy.application import Application
-from restfulpy.testing import ApplicableTestCase
 from restfulpy.mockup import mockup_http_server
+from restfulpy.testing import ApplicableTestCase
 
 from dolphin import Dolphin
 from dolphin.authentication import Authenticator
+from dolphin.models import Member
 
 
 HERE = path.abspath(path.dirname(__file__))
@@ -23,7 +26,19 @@ class LocalApplicationTestCase(ApplicableTestCase):
     __api_documentation_directory__ = path.join(DATA_DIRECTORY, 'markdown')
 
     def login(self, email, url='/apiv1/tokens', verb='CREATE'):
-        super().login(dict(email=email), url=url, verb=verb)
+        session = self.create_session()
+        member = session.query(Member).filter(Member.email == email).one_or_none()
+        if member is None:
+            raise HTTPUnauthorized()
+
+        token = CASPrincipal({
+            'id':member.id,
+            'referenceId':member.reference_id,
+            'email':member.email,
+            'roles':['member'],
+            'name':member.title
+        })
+        self._authentication_token = token.dump().decode('utf-8')
 
 
 class MockupApplication(Application):
@@ -57,7 +72,7 @@ def oauth_mockup_server():
         def __init__(self):
             super().__init__([
                 ('/apiv1/tokens', self.create),
-                ('/apiv1/profiles', self.get),
+                ('/apiv1/profiles/me', self.get),
             ])
 
         @json
@@ -69,11 +84,20 @@ def oauth_mockup_server():
             return dict(accessToken='access token', memberId=1)
 
         @json
-        def get(self, id):
+        def get(self):
             access_token = context.environ['HTTP_AUTHORIZATION']
 
-            if access_token.startswith('oauth2-accesstoken access token'):
-                return dict(id=1, title='john', email='john@gmail.com')
+            if 'access token 1' in access_token:
+                return dict(id=1, title='manager1', email='manager1@example.com')
+
+            if 'access token 2' in access_token:
+                return dict(id=2, title='manager2', email='manager2@example.com')
+
+            if 'access token 3' in access_token:
+                return dict(id=3, title='manager3', email='manager3@example.com')
+
+            if 'access token 4' in access_token:
+                return dict(id=4, title='manager4', email='manager4@example.com')
 
             raise HTTPForbidden()
 

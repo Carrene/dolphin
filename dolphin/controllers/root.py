@@ -1,5 +1,6 @@
 from nanohttp import Controller, json, text
 from restfulpy.controllers import RootController
+from restfulpy.authorization import authorize
 
 import dolphin
 from .releases import ReleaseController
@@ -9,6 +10,7 @@ from .issues import IssueController
 from .items import ItemController
 from .tokens import TokenController
 from .oauth2 import OAUTHController
+from .member import MemberController
 
 
 class Apiv1(Controller):
@@ -20,6 +22,7 @@ class Apiv1(Controller):
     items = ItemController()
     tokens = TokenController()
     oauth2 = OAUTHController()
+    members = MemberController()
 
     @json
     def version(self):

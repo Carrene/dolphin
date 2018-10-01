@@ -19,6 +19,8 @@ class ManagerController(ModelRestController):
     @commit
     def assign(self, id):
         form = context.form
+        token = context.environ['HTTP_AUTHORIZATION']
+
         try:
             id = int(id)
         except:
@@ -40,6 +42,7 @@ class ManagerController(ModelRestController):
         room = ChatClient().add_member(
             project.room_id,
             manager.reference_id,
+            token,
             access_token
         )
 
@@ -53,7 +56,8 @@ class ManagerController(ModelRestController):
             ChatClient().remove_member(
                 project.room_id,
                 manager.reference_id,
-                access_token[0]
+                token,
+                access_token
             )
         return manager
 
