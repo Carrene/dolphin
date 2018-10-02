@@ -45,5 +45,5 @@ class Authenticator(StatefulAuthenticator):
             member.title = principal.payload['name']
             DBSession.commit()
 
-       return principal
+        return principal
 
