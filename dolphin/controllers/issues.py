@@ -75,6 +75,7 @@ class IssueController(ModelRestController):
     def subscribe(self, id):
         form = context.form
         payload = context.identity.payload
+        token = context.environ['HTTP_AUTHORIZATION']
 
         try:
             id = int(id)
@@ -99,10 +100,12 @@ class IssueController(ModelRestController):
 
         access_token, ___ =  CASClient() \
             .get_access_token(context.form.get('authorizationCode'))
+        chat_client = ChatClient()
         try:
-            room = ChatClient().add_member(
+            chat_client.add_member(
                 issue.project.room_id,
-                payload['reference_id'],
+                payload['referenceId'],
+                token,
                 access_token
             )
         except RoomMemberAlreadyExist:
@@ -111,9 +114,10 @@ class IssueController(ModelRestController):
         try:
             DBSession.flush()
         except:
-            room = ChatClient().remove_member(
+            chat_client.remove_member(
                 issue.project.room_id,
-                payload['reference_id'],
+                payload['referenceId'],
+                token,
                 access_token
             )
             raise
@@ -128,6 +132,7 @@ class IssueController(ModelRestController):
     def unsubscribe(self, id):
         form = context.form
         payload = context.identity.payload
+        token = context.environ['HTTP_AUTHORIZATION']
 
         try:
             id = int(id)
@@ -150,10 +155,12 @@ class IssueController(ModelRestController):
 
         access_token, ___ =  CASClient() \
             .get_access_token(context.form.get('authorizationCode'))
+        chat_client = ChatClient()
         try:
-            room = ChatClient().remove_member(
+            chat_client.remove_member(
                 issue.project.room_id,
-                payload['reference_id'],
+                payload['referenceId'],
+                token,
                 access_token
             )
         except RoomMemberNotFound:
@@ -162,9 +169,10 @@ class IssueController(ModelRestController):
         try:
             DBSession.flush()
         except:
-            room = ChatClient().add_member(
+            chat_client.add_member(
                 issue.project.room_id,
-                payload['reference_id'],
+                payload['referenceId'],
+                token,
                 access_token
             )
             raise

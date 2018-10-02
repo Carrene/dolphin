@@ -146,8 +146,8 @@ class ChatClient:
             response = requests.request(
                 'REMOVE',
                 f'{settings.chat.room.url}/apiv1/rooms/{id}',
-                data=dict(user_id=user_id),
-                headers=dict(access_token=access_token)
+                data={'userId':user_id},
+                headers={'X-Access-Token':x_access_token}
             )
             if response.status_code == 404:
                 raise ChatServerNotFound()
