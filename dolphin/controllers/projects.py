@@ -55,7 +55,7 @@ class ProjectController(ModelRestController):
         access_token, ___ =  CASClient() \
             .get_access_token(context.form.get('authorizationCode'))
 
-        room = self.ensure_room(form['title'], token, access_token)
+        room = self._ensure_room(form['title'], token, access_token)
 
         try:
             ChatClient().add_member(
