@@ -14,7 +14,7 @@ from ..validators import project_validator, update_project_validator, \
 class ProjectController(ModelRestController):
     __model__ = Project
 
-    def ensure_room(self, title, token, access_token):
+    def _ensure_room(self, title, token, access_token):
         create_room_error = 1
         room = None
         while create_room_error is not None:

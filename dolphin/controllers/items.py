@@ -20,7 +20,7 @@ class ItemController(ModelRestController):
 
         try:
             id = int(id)
-        except:
+        except (TypeError, ValueError):
             raise HTTPNotFound()
 
         item = DBSession.query(Item) \

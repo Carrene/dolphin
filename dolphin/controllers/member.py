@@ -10,10 +10,12 @@ class MemberController(RestController):
     @json
     @commit
     def obtain(self):
-        access_token, member_id = CASClient() \
+        cas_client = CASClient()
+
+        access_token, ___ = cas_client \
             .get_access_token(context.form.get('authorizationCode'))
 
-        cas_member = CASClient().get_member(access_token)
+        cas_member = cas_client.get_member(access_token)
         member = DBSession.query(Member) \
             .filter(Member.email == cas_member['email']) \
             .one_or_none()

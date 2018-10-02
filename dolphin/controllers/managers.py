@@ -23,7 +23,7 @@ class ManagerController(ModelRestController):
 
         try:
             id = int(id)
-        except:
+        except (TypeError, ValueError):
             raise HTTPNotFound()
 
         manager = DBSession.query(Manager) \
@@ -39,7 +39,8 @@ class ManagerController(ModelRestController):
         access_token, ___ =  CASClient() \
             .get_access_token(context.form.get('authorizationCode'))
 
-        room = ChatClient().add_member(
+        chat_client = ChatClient()
+        room = chat_client.add_member(
             project.room_id,
             manager.reference_id,
             token,
@@ -53,7 +54,7 @@ class ManagerController(ModelRestController):
             project.manager = manager
             DBSession.flush()
         except:
-            ChatClient().remove_member(
+            chat_client.remove_member(
                 project.room_id,
                 manager.reference_id,
                 token,

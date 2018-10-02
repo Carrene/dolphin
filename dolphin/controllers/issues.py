@@ -35,7 +35,7 @@ class IssueController(ModelRestController):
 
         try:
             id = int(id)
-        except:
+        except (TypeError, ValueError):
             raise HTTPNotFound()
 
         issue = DBSession.query(Issue).filter(Issue.id == id).one_or_none()
@@ -75,7 +75,7 @@ class IssueController(ModelRestController):
 
         try:
             id = int(id)
-        except:
+        except (TypeError, ValueError):
             raise HTTPNotFound()
 
         issue = DBSession.query(Issue).filter(Issue.id == id).one_or_none()
@@ -106,7 +106,7 @@ class IssueController(ModelRestController):
 
         try:
             id = int(id)
-        except:
+        except (TypeError, ValueError):
             raise HTTPNotFound()
 
         issue = DBSession.query(Issue).filter(Issue.id == id).one_or_none()
@@ -135,7 +135,7 @@ class IssueController(ModelRestController):
 
         try:
             id = int(id)
-        except:
+        except (TypeError, ValueError):
             raise HTTPNotFound()
 
         issue = DBSession.query(Issue).filter(Issue.id == id).one_or_none()
