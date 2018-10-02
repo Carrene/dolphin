@@ -45,9 +45,5 @@ class Authenticator(StatefulAuthenticator):
             member.title = principal.payload['name']
             DBSession.commit()
 
-        if member.email != principal.payload['email']:
-            member.email = principal.payload['email']
-            DBSession.commit()
-
-        return principal
+       return principal
 
