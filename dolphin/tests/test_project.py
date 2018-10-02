@@ -277,13 +277,11 @@ class TestProject(LocalApplicationTestCase):
             )
             assert status == 401
 
-            with self.given(
+            when(
                 'Updating project with empty form',
-                '/apiv1/projects/id:2',
-                'UPDATE',
                 form=dict()
-            ):
-                assert status == '708 No Parameter Exists In The Form'
+            )
+            assert status == '708 No Parameter Exists In The Form'
 
     def test_hide(self):
         self.login('manager1@example.com')
