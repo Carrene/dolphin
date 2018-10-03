@@ -17,7 +17,7 @@ def release_exists_validator(releaseId, container, field):
     form = context.form
     try:
         releaseId = int(releaseId)
-    except:
+    except (TypeError, ValueError):
         raise HTTPStatus(
             f'607 Release not found with id: {context.form["releaseId"]}'
         )
@@ -151,7 +151,7 @@ def manager_exists_validator(managerId, container, field):
     form = context.form
     try:
         managerId = int(managerId)
-    except:
+    except (TypeError, ValueError):
         raise HTTPStatus(
             f'608 Manager not found with id: {context.form["managerId"]}'
         )
@@ -278,15 +278,9 @@ update_project_validator = validate(
     ),
     phase=dict(
         callback=project_phase_value_validator
-    )
-)
-
-
-assign_manager_validator = validate(
-    projectId=dict(
-        required='713 Project Id Not In Form',
-        type_=(int, '714 Invalid Project Id Type'),
-        callback=project_exists_validator
+    ),
+    managerId=dict(
+        callback=manager_exists_validator
     )
 )
 
