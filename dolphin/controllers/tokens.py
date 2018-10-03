@@ -3,7 +3,7 @@ from nanohttp import RestController, json, context, HTTPBadRequest, validate, \
 from restfulpy.authorization import authorize
 from restfulpy.orm import DBSession
 
-from ..models import Member
+from ..models import Manager
 from ..backends import CASClient
 
 
@@ -43,23 +43,23 @@ class TokenController(RestController):
             .get_access_token(context.form.get('authorizationCode'))
 
         cas_member = cas_client.get_member(access_token)
-        member = DBSession.query(Member) \
-            .filter(Member.email == cas_member['email']) \
+        manager = DBSession.query(Manager) \
+            .filter(Manager.email == cas_member['email']) \
             .one_or_none()
 
-        if member is None:
-            member = Member(
+        if manager is None:
+            manager = Manager(
                 reference_id=cas_member['id'],
                 email=cas_member['email'],
                 title=cas_member['title'],
                 access_token=access_token
             )
         else:
-            member.access_token = access_token
+            manager.access_token = access_token
 
-        DBSession.add(member)
+        DBSession.add(manager)
         DBSession.commit()
-        principal = member.create_jwt_principal()
+        principal = manager.create_jwt_principal()
         context.response_headers.add_header(
             'X-New-JWT-Token',
             principal.dump().decode('utf-8')
