@@ -150,6 +150,10 @@ class ReleaseController(ModelRestController):
                     access_token
                 )
         except RoomMemberAlreadyExist:
+            # Exception is passed because it means `add_member()` is already
+            # called and `member` successfully added to room. So there is
+            # no need to call `add_member()` API again and re-add the member to
+            # room.
             pass
 
         try:
@@ -210,6 +214,10 @@ class ReleaseController(ModelRestController):
                     access_token
                 )
         except RoomMemberNotFound:
+            # Exception is passed because it means `remove_member()` is already
+            # called and `member` successfully removed from room. So there is
+            # no need to call `remove_member()` API again and re-add the member
+            # to room.
             pass
 
         try:

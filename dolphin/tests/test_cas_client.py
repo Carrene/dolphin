@@ -65,7 +65,7 @@ class TestToken(LocalApplicationTestCase):
 
             with self.given(
                 'Try to get an access token from CAS',
-                '/apiv1/oauth2/members',
+                '/apiv1/oauth2/tokens',
                 'OBTAIN',
                 form=dict(authorizationCode='authorization code')
             ):

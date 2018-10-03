@@ -1,14 +1,9 @@
 from bddrest import status, response, Update, when, Remove, given
 
 from dolphin.models import Project, Manager, Release
-<<<<<<< HEAD
-from dolphin.tests.helpers import LocalApplicationTestCase, \
-    oauth_mockup_server, chat_mockup_server, chat_server_status
-=======
 from dolphin.tests.helpers import MockupApplication, LocalApplicationTestCase,\
     oauth_mockup_server, chat_mockup_server, chat_server_status, \
     room_mockup_server
->>>>>>> 683999e5d30630f1a23f95bd700149b58508f26e
 
 
 class TestProject(LocalApplicationTestCase):
@@ -23,8 +18,6 @@ class TestProject(LocalApplicationTestCase):
             access_token='access token 1',
             phone=123456789,
             reference_id=2
-<<<<<<< HEAD
-=======
         )
         session.add(manager1)
 
@@ -52,7 +45,6 @@ class TestProject(LocalApplicationTestCase):
             access_token='access token 4',
             phone=142573689,
             reference_id=5
->>>>>>> 683999e5d30630f1a23f95bd700149b58508f26e
         )
         session.add(manager4)
 
@@ -241,11 +233,7 @@ class TestProject(LocalApplicationTestCase):
     def test_update(self):
         self.login('manager1@example.com')
 
-<<<<<<< HEAD
-        with oauth_mockup_server(), self.given(
-=======
         with oauth_mockup_server(), chat_mockup_server(), self.given(
->>>>>>> 683999e5d30630f1a23f95bd700149b58508f26e
             'Updating a project',
             '/apiv1/projects/id:2',
             'UPDATE',
@@ -343,8 +331,6 @@ class TestProject(LocalApplicationTestCase):
             when('Request is not authorized', authorization=None)
             assert status == 401
 
-<<<<<<< HEAD
-=======
             with chat_server_status('404 Not Found'):
                 when(
                     'Chat server is not found',
@@ -373,7 +359,6 @@ class TestProject(LocalApplicationTestCase):
                 )
                 assert status == '200 OK'
 
->>>>>>> 683999e5d30630f1a23f95bd700149b58508f26e
             with self.given(
                 'Updating project with empty form',
                 '/apiv1/projects/id:2',
@@ -381,10 +366,6 @@ class TestProject(LocalApplicationTestCase):
                 form=dict()
             ):
                 assert status == '708 No Parameter Exists In The Form'
-<<<<<<< HEAD
-=======
-
->>>>>>> 683999e5d30630f1a23f95bd700149b58508f26e
 
     def test_hide(self):
         self.login('manager1@example.com')
@@ -460,16 +441,6 @@ class TestProject(LocalApplicationTestCase):
             assert status == 200
             assert len(response.json) == 6
 
-<<<<<<< HEAD
-        with oauth_mockup_server(), self.given(
-            'Sort projects by phases title',
-            '/apiv1/projects',
-            'LIST',
-            query=dict(sort='title')
-        ):
-            assert status == 200
-            assert response.json[0]['title'] == 'Another title'
-=======
             with self.given(
                 'Sort projects by phases title',
                 '/apiv1/projects',
@@ -478,7 +449,6 @@ class TestProject(LocalApplicationTestCase):
             ):
                 assert status == 200
                 assert response.json[0]['title'] == 'Another title'
->>>>>>> 683999e5d30630f1a23f95bd700149b58508f26e
 
                 when(
                     'Reverse sorting titles by alphabet',
@@ -486,15 +456,6 @@ class TestProject(LocalApplicationTestCase):
                 )
                 assert response.json[0]['title'] == 'My second project'
 
-<<<<<<< HEAD
-        with oauth_mockup_server(), self.given(
-            'Filter projects',
-            '/apiv1/projects',
-            'LIST',
-            query=dict(sort='id', title='My awesome project')
-        ):
-            assert response.json[0]['title'] == 'My awesome project'
-=======
             with self.given(
                 'Filter projects',
                 '/apiv1/projects',
@@ -502,7 +463,6 @@ class TestProject(LocalApplicationTestCase):
                 query=dict(sort='id', title='My awesome project')
             ):
                 assert response.json[0]['title'] == 'My awesome project'
->>>>>>> 683999e5d30630f1a23f95bd700149b58508f26e
 
                 when(
                     'List projects except one of them',
@@ -510,15 +470,6 @@ class TestProject(LocalApplicationTestCase):
                 )
                 assert response.json[0]['title'] == 'My interesting project'
 
-<<<<<<< HEAD
-        with oauth_mockup_server(), self.given(
-            'Project pagination',
-            '/apiv1/projects',
-            'LIST',
-            query=dict(sort='id', take=1, skip=2)
-        ):
-            assert response.json[0]['title'] == 'My awesome project'
-=======
             with self.given(
                 'Project pagination',
                 '/apiv1/projects',
@@ -526,7 +477,6 @@ class TestProject(LocalApplicationTestCase):
                 query=dict(sort='id', take=1, skip=2)
             ):
                 assert response.json[0]['title'] == 'My hidden project'
->>>>>>> 683999e5d30630f1a23f95bd700149b58508f26e
 
                 when(
                     'Manipulate sorting and pagination',
@@ -540,11 +490,7 @@ class TestProject(LocalApplicationTestCase):
     def test_subscribe(self):
         self.login('manager1@example.com')
 
-<<<<<<< HEAD
-        with oauth_mockup_server(), self.given(
-=======
         with oauth_mockup_server(), chat_mockup_server(), self.given(
->>>>>>> 683999e5d30630f1a23f95bd700149b58508f26e
             'Subscribe project',
             '/apiv1/projects/id:4',
             'SUBSCRIBE',
@@ -624,11 +570,7 @@ class TestProject(LocalApplicationTestCase):
     def test_unsubscribe(self):
         self.login('manager1@example.com')
 
-<<<<<<< HEAD
-        with oauth_mockup_server(), self.given(
-=======
         with oauth_mockup_server(), chat_mockup_server(), self.given(
->>>>>>> 683999e5d30630f1a23f95bd700149b58508f26e
             'Unsubscribe an project',
             '/apiv1/projects/id:4',
             'UNSUBSCRIBE',

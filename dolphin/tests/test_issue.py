@@ -1,10 +1,6 @@
 
 from bddrest import status, response, Update, when, Remove, Append, given
 
-<<<<<<< HEAD
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
-=======
->>>>>>> 683999e5d30630f1a23f95bd700149b58508f26e
 from dolphin.models import Issue, Project, Manager, Release, Phase, Resource
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
@@ -376,11 +372,7 @@ class TestIssue(LocalApplicationTestCase):
     def test_subscribe(self):
         self.login('manager1@example.com')
 
-<<<<<<< HEAD
-        with oauth_mockup_server(), self.given(
-=======
         with oauth_mockup_server(), chat_mockup_server(), self.given(
->>>>>>> 683999e5d30630f1a23f95bd700149b58508f26e
             'Subscribe an issue',
             '/apiv1/issues/id:4',
             'SUBSCRIBE',
@@ -462,11 +454,7 @@ class TestIssue(LocalApplicationTestCase):
     def test_unsubscribe(self):
         self.login('manager1@example.com')
 
-<<<<<<< HEAD
-        with oauth_mockup_server(), self.given(
-=======
         with oauth_mockup_server(), chat_mockup_server(), self.given(
->>>>>>> 683999e5d30630f1a23f95bd700149b58508f26e
             'Unsubscribe an issue',
             '/apiv1/issues/id:4',
             'UNSUBSCRIBE',
