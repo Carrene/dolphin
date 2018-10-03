@@ -36,7 +36,7 @@ branches
 
 
 ### Installing Project by pip
-        
+
 You can install by 'pip install' and use https by the following way:
       
       $ pip install git+https://github.com/Carrene/dolphin.git
@@ -61,13 +61,32 @@ So, your changes will affect instantly on the installed version
 
       $ echo "eval \"\$(register-python-argcomplete dolphin)\"" >> $VIRTUAL_ENV/bin/postactivate    
       $ deactivate && workon dolphin\
-      
+
 ### Setup Database
 
 #### Configuration
 
 Dolphin is zero configuration application and there is no extra configuration file needed, but if you want to have your own 
-configuration file, you can make a `dolphin.yml` in the following  path: `~/.config/dolphin.yml`
+configuration file, you can make a `dolphin.yml` in the following  path: `~/.config/dolphin.yml` such as following format:
+
+```yml
+db:
+  url: postgresql://postgres:postgres@localhost/dolphin_dev
+  test_url: postgresql://postgres:postgres@localhost/dolphin_test
+  administrative_url: postgresql://postgres:postgres@localhost/postgres
+oauth:
+  secret: <Secret Key>
+  application_id: <1>
+  access_token:
+    url: <CAS server address>/apiv1/accesstokens
+    verb: create
+  member:
+    url: <CAS server address>/apiv1/members
+    verb: get
+chat:
+  room:
+    url: <Chat server address>  
+```
 
 #### Remove old abd create a new database **TAKE CARE ABOUT USING THAT**
 
@@ -84,11 +103,11 @@ configuration file, you can make a `dolphin.yml` in the following  path: `~/.con
 Or, you can add `--drop` to drop the previously created database: **TAKE CARE ABOUT USING THAT**
 
     $ dolphin [-c path/to/config.yml] db create --drop
-    
+
 #### Create schema
 
     $ dolphin [-c path/to/config.yml] db schema      
-      
+
 ### Serving
 
 - Using python builtin http server
