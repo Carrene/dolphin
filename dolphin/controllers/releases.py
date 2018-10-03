@@ -10,6 +10,9 @@ from ..models import Release, release_statuses, Subscription
 from ..validators import release_validator, update_release_validator, \
     subscribe_validator
 from ..backends import CASClient, ChatClient
+from ..exceptions import ChatServerNotFound, ChatServerNotAvailable, \
+    ChatInternallError, ChatRoomNotFound, RoomMemberAlreadyExist, \
+    RoomMemberNotFound
 
 
 class ReleaseController(ModelRestController):
@@ -110,6 +113,7 @@ class ReleaseController(ModelRestController):
     def subscribe(self, id):
         form = context.form
         payload = context.identity.payload
+        token = context.environ['HTTP_AUTHORIZATION']
 
         try:
             id = int(id)
@@ -136,12 +140,13 @@ class ReleaseController(ModelRestController):
 
         access_token, ___ =  CASClient() \
             .get_access_token(context.form.get('authorizationCode'))
+        chat_client = ChatClient()
         try:
             for project in release.projects:
-
-                room = ChatClient().add_member(
+                chat_client.add_member(
                     project.room_id,
-                    payload['reference_id'],
+                    payload['referenceId'],
+                    token,
                     access_token
                 )
         except RoomMemberAlreadyExist:
@@ -151,9 +156,10 @@ class ReleaseController(ModelRestController):
             DBSession.flush()
         except:
             for project in release.projects:
-                room = ChatClient().remove_member(
+                chat_client.remove_member(
                     project.room_id,
-                    payload['reference_id'],
+                    payload['referenceId'],
+                    token,
                     access_token
                 )
             raise
@@ -168,6 +174,7 @@ class ReleaseController(ModelRestController):
     def unsubscribe(self, id):
         form = context.form
         payload = context.identity.payload
+        token = context.environ['HTTP_AUTHORIZATION']
 
         try:
             id = int(id)
@@ -192,12 +199,14 @@ class ReleaseController(ModelRestController):
 
         access_token, ___ =  CASClient() \
             .get_access_token(context.form.get('authorizationCode'))
+        chat_client = ChatClient()
         try:
             for project in release.projects:
 
-                room = ChatClient().remove_member(
+                chat_client.remove_member(
                     project.room_id,
-                    payload['reference_id'],
+                    payload['referenceId'],
+                    token,
                     access_token
                 )
         except RoomMemberNotFound:
@@ -207,9 +216,10 @@ class ReleaseController(ModelRestController):
             DBSession.flush()
         except:
             for project in release.projects:
-                room = ChatClient().add_member(
+                chat_client.add_member(
                     project.room_id,
-                    payload['reference_id'],
+                    payload['referenceId'],
+                    token,
                     access_token
                 )
             raise

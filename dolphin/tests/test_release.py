@@ -2,7 +2,8 @@ from bddrest import status, response, Update, when, Remove, Append, given
 
 from dolphin.models import Release, Manager, Project
 from dolphin.tests.helpers import LocalApplicationTestCase, \
-    oauth_mockup_server, chat_mockup_server
+    oauth_mockup_server, chat_mockup_server, chat_server_status
+
 
 class TestRelease(LocalApplicationTestCase):
 
@@ -62,7 +63,7 @@ class TestRelease(LocalApplicationTestCase):
 
         project2 = Project(
             manager=manager,
-            release=release1,
+            release=release3,
             title='My first project',
             description='A decription for my project',
             due_date='2020-2-20',
@@ -415,21 +416,33 @@ class TestRelease(LocalApplicationTestCase):
             when('Request is not authorized', authorization=None)
             assert status == 401
 
-#            with chat_server_status('404 Not Found'):
-#                when('Chat server is not found')
-#                assert status == '617 Chat Server Not Found'
-#
-#            with chat_server_status('503 Service Not Available'):
-#                when('Chat server is not available')
-#                assert status == '800 Chat Server Not Available'
-#
-#            with chat_server_status('500 Internal Service Error'):
-#                when('Chat server faces with internal error')
-#                assert status == '801 Chat Server Internal Error'
-#
-#            with chat_server_status('604 Already Added To Target'):
-#                when('Member is already added to room')
-#                assert status == '200 OK'
+            with chat_server_status('404 Not Found'):
+                when(
+                    'Chat server is not found',
+                    url_parameters=dict(id=3)
+                )
+                assert status == '617 Chat Server Not Found'
+
+            with chat_server_status('503 Service Not Available'):
+                when(
+                    'Chat server is not available',
+                    url_parameters=dict(id=3)
+                )
+                assert status == '800 Chat Server Not Available'
+
+            with chat_server_status('500 Internal Service Error'):
+                when(
+                    'Chat server faces with internal error',
+                    url_parameters=dict(id=3)
+                )
+                assert status == '801 Chat Server Internal Error'
+
+            with chat_server_status('604 Already Added To Target'):
+                when(
+                    'Member is already added to room',
+                    url_parameters=dict(id=3)
+                )
+                assert status == '200 OK'
 
     def test_unsubscribe(self):
         self.login('manager1@example.com')
@@ -483,19 +496,31 @@ class TestRelease(LocalApplicationTestCase):
             when('Request is not authorized', authorization=None)
             assert status == 401
 
-#            with chat_server_status('404 Not Found'):
-#                when('Chat server is not found')
-#                assert status == '617 Chat Server Not Found'
-#
-#            with chat_server_status('503 Service Not Available'):
-#                when('Chat server is not available')
-#                assert status == '800 Chat Server Not Available'
-#
-#            with chat_server_status('500 Internal Service Error'):
-#                when('Chat server faces with internal error')
-#                assert status == '801 Chat Server Internal Error'
-#
-#            with chat_server_status('611 Member Not Found'):
-#                when('Room member is not found')
-#                assert status == '200 OK'
+            with chat_server_status('404 Not Found'):
+                when(
+                    'Chat server is not found',
+                    url_parameters=dict(id=3)
+                )
+                assert status == '617 Chat Server Not Found'
+
+            with chat_server_status('503 Service Not Available'):
+                when(
+                    'Chat server is not available',
+                    url_parameters=dict(id=3)
+                )
+                assert status == '800 Chat Server Not Available'
+
+            with chat_server_status('500 Internal Service Error'):
+                when(
+                    'Chat server faces with internal error',
+                    url_parameters=dict(id=3)
+                )
+                assert status == '801 Chat Server Internal Error'
+
+            with chat_server_status('611 Member Not Found'):
+                when(
+                    'Room member is not found',
+                    url_parameters=dict(id=3)
+                )
+                assert status == '200 OK'
 
