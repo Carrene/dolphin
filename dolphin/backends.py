@@ -68,7 +68,7 @@ class ChatClient:
             if response.status_code == 615:
                 response = requests.request(
                     'LIST',
-                    f'{settings.chat.room.url}/apiv1/rooms',
+                    f'{settings.chat.room.url}/apiv1/targets',
                     headers={
                         'authorization': token,
                         'X-Access-Token': x_access_token

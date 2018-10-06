@@ -52,7 +52,7 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             roles=self.roles,
             email=self.email,
             name=self.title,
-            reference_id=self.reference_id,
+            referenceId=self.reference_id,
         ))
 
     def create_refresh_principal(self):
