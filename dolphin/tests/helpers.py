@@ -125,6 +125,7 @@ def chat_mockup_server():
         def __init__(self):
             super().__init__([
                 ('/apiv1/rooms', self.create),
+                ('/apiv1/targets', self.list_)
             ])
 
         @json(verbs=['create', 'delete', 'add', 'remove', 'list'])
@@ -137,12 +138,16 @@ def chat_mockup_server():
                     context.method == 'add':
                 return dict(id=10, title='New Room')
 
+            if _chat_server_status != 'idle':
+                raise HTTPStatus(_chat_server_status)
+
+            return dict(id=1, title='First chat room')
+
+        @json
+        def list_(self):
             if _chat_server_status == '615 Room Already Exists' and \
                     context.method == 'list':
                 return [dict(id=1, title='First chat room')]
-
-            if _chat_server_status != 'idle':
-                raise HTTPStatus(_chat_server_status)
 
             return dict(id=1, title='First chat room')
 
