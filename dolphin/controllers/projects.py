@@ -4,7 +4,7 @@ from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 from restfulpy.utils import to_camel_case
 
-from ..models import Project, Manager, Subscription
+from ..models import Project, Manager, Subscription, Member
 from ..backends import ChatClient, CASClient
 from ..validators import project_validator, update_project_validator, \
     subscribe_validator
@@ -129,6 +129,7 @@ class ProjectController(ModelRestController):
     @commit
     def update(self, id):
         form = context.form
+        payload = context.identity.payload
         token = context.environ['HTTP_AUTHORIZATION']
 
         try:
@@ -164,8 +165,9 @@ class ProjectController(ModelRestController):
                 f'"{form["title"]}" is already exists.'
             )
 
-        access_token, ___ =  CASClient() \
-            .get_access_token(context.form.get('authorizationCode'))
+        member = DBSession.query(Member) \
+            .filter(Member.reference_id == payload['referenceId']) \
+            .one()
 
         current_manager = project.manager
         project.update_from_request()
@@ -178,7 +180,7 @@ class ProjectController(ModelRestController):
                 form['managerId'],
                 project,
                 token,
-                access_token
+                member.access_token
             )
 
         # The exception type is not specified because after consulting with
@@ -279,15 +281,16 @@ class ProjectController(ModelRestController):
         )
         DBSession.add(subscription)
 
-        access_token, ___ =  CASClient() \
-            .get_access_token(context.form.get('authorizationCode'))
+        member = DBSession.query(Member) \
+            .filter(Member.reference_id == payload['referenceId']) \
+            .one()
         chat_client = ChatClient()
         try:
             chat_client.add_member(
                 project.room_id,
                 payload['referenceId'],
                 token,
-                access_token
+                member.access_token
             )
         except RoomMemberAlreadyExist:
             # Exception is passed because it means `add_member()` is already
@@ -339,15 +342,16 @@ class ProjectController(ModelRestController):
 
         DBSession.delete(subscription)
 
-        access_token, ___ =  CASClient() \
-            .get_access_token(context.form.get('authorizationCode'))
+        member = DBSession.query(Member) \
+            .filter(Member.reference_id == payload['referenceId']) \
+            .one()
         chat_client = ChatClient()
         try:
             chat_client.remove_member(
                 project.room_id,
                 payload['referenceId'],
                 token,
-                access_token
+                member.access_token
             )
         except RoomMemberNotFound:
             # Exception is passed because it means `remove_member()` is already

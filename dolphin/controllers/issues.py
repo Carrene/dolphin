@@ -6,7 +6,7 @@ from restfulpy.orm import DBSession, commit
 from restfulpy.controllers import ModelRestController
 
 from ..models import Issue, issue_kinds, issue_statuses, Subscription, \
-    Resource, Phase, Item
+    Resource, Phase, Item, Member
 from ..validators import issue_validator, update_issue_validator, \
     subscribe_validator, assign_issue_validator
 from ..backends import ChatClient, CASClient
@@ -98,15 +98,16 @@ class IssueController(ModelRestController):
         )
         DBSession.add(subscription)
 
-        access_token, ___ =  CASClient() \
-            .get_access_token(context.form.get('authorizationCode'))
+        member = DBSession.query(Member) \
+            .filter(Member.reference_id == payload['referenceId']) \
+            .one()
         chat_client = ChatClient()
         try:
             chat_client.add_member(
                 issue.project.room_id,
                 payload['referenceId'],
                 token,
-                access_token
+                member.access_token
             )
         except RoomMemberAlreadyExist:
             # Exception is passed because it means `add_member()` is already
@@ -157,15 +158,16 @@ class IssueController(ModelRestController):
 
         DBSession.delete(subscription)
 
-        access_token, ___ =  CASClient() \
-            .get_access_token(context.form.get('authorizationCode'))
+        member = DBSession.query(Member) \
+            .filter(Member.reference_id == payload['referenceId']) \
+            .one()
         chat_client = ChatClient()
         try:
             chat_client.remove_member(
                 issue.project.room_id,
                 payload['referenceId'],
                 token,
-                access_token
+                member.access_token
             )
         except RoomMemberNotFound:
             # Exception is passed because it means `remove_member()` is already

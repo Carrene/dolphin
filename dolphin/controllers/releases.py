@@ -6,7 +6,7 @@ from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 from restfulpy.utils import to_camel_case
 
-from ..models import Release, release_statuses, Subscription
+from ..models import Release, release_statuses, Subscription, Member
 from ..validators import release_validator, update_release_validator, \
     subscribe_validator
 from ..backends import CASClient, ChatClient
@@ -138,8 +138,9 @@ class ReleaseController(ModelRestController):
         )
         DBSession.add(subscription)
 
-        access_token, ___ =  CASClient() \
-            .get_access_token(context.form.get('authorizationCode'))
+        member = DBSession.query(Member) \
+            .filter(Member.reference_id == payload['referenceId']) \
+            .one()
         chat_client = ChatClient()
         try:
             for project in release.projects:
@@ -147,7 +148,7 @@ class ReleaseController(ModelRestController):
                     project.room_id,
                     payload['referenceId'],
                     token,
-                    access_token
+                    member.access_token
                 )
         except RoomMemberAlreadyExist:
             # Exception is passed because it means `add_member()` is already
@@ -201,8 +202,9 @@ class ReleaseController(ModelRestController):
 
         DBSession.delete(subscription)
 
-        access_token, ___ =  CASClient() \
-            .get_access_token(context.form.get('authorizationCode'))
+        member = DBSession.query(Member) \
+            .filter(Member.reference_id == payload['referenceId']) \
+            .one()
         chat_client = ChatClient()
         try:
             for project in release.projects:
@@ -211,7 +213,7 @@ class ReleaseController(ModelRestController):
                     project.room_id,
                     payload['referenceId'],
                     token,
-                    access_token
+                    member.access_token
                 )
         except RoomMemberNotFound:
             # Exception is passed because it means `remove_member()` is already
