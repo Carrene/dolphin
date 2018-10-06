@@ -37,7 +37,7 @@ class ProjectController(ModelRestController):
     def _replace_manager(self, manager_id, project, token, access_token):
         new_assignee_manager = DBSession.query(Manager) \
             .filter(Manager.id == manager_id) \
-            .one_or_none()
+            .one()
         current_assignee_manager = project.manager
         project.manager = new_assignee_manager
 
@@ -87,7 +87,7 @@ class ProjectController(ModelRestController):
 
         manager = DBSession.query(Manager) \
             .filter(Manager.id == form['managerId']) \
-            .one_or_none()
+            .one()
 
         room = self._ensure_room(form['title'], token, manager.access_token)
 
