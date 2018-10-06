@@ -376,7 +376,7 @@ class TestIssue(LocalApplicationTestCase):
             'Subscribe an issue',
             '/apiv1/issues/id:4',
             'SUBSCRIBE',
-            form=dict(memberId=1, authorizationCode='authorization code')
+            form=dict(memberId=1)
         ):
             assert status == 200
 
@@ -458,7 +458,7 @@ class TestIssue(LocalApplicationTestCase):
             'Unsubscribe an issue',
             '/apiv1/issues/id:4',
             'UNSUBSCRIBE',
-            form=dict(memberId=1, authorizationCode='authorization code')
+            form=dict(memberId=1)
         ):
             assert status == 200
 
