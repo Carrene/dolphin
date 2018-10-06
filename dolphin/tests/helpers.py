@@ -149,6 +149,9 @@ def chat_mockup_server():
                     context.method == 'list':
                 return [dict(id=1, title='First chat room')]
 
+            if _chat_server_status != 'idle':
+                raise HTTPStatus(_chat_server_status)
+
             return dict(id=1, title='First chat room')
 
     app = MockupApplication('chat-server', Root())
