@@ -157,6 +157,33 @@ def chat_mockup_server():
 
 
 @contextmanager
+def room_mockup_server():
+    class Root(RegexRouteController):
+        _status = '604 Already Added To Target'
+
+        def __init__(self):
+            super().__init__([
+                ('/apiv1/rooms', self.add),
+            ])
+
+        @json(verbs=['add', 'remove'])
+        def add(self):
+            temp_status = self._status
+            self._status = '611 User Not Found'
+            raise HTTPStatus(temp_status)
+
+
+    app = MockupApplication('chat-server', Root())
+    with mockup_http_server(app) as (server, url):
+        settings.merge(f'''
+            chat:
+              room:
+                url: {url}
+        ''')
+        yield app
+
+
+@contextmanager
 def chat_server_status(status):
     global _chat_server_status
     _chat_server_status = status

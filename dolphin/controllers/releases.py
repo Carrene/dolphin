@@ -9,6 +9,10 @@ from restfulpy.utils import to_camel_case
 from ..models import Release, release_statuses, Subscription
 from ..validators import release_validator, update_release_validator, \
     subscribe_validator
+from ..backends import CASClient, ChatClient
+from ..exceptions import ChatServerNotFound, ChatServerNotAvailable, \
+    ChatInternallError, ChatRoomNotFound, RoomMemberAlreadyExist, \
+    RoomMemberNotFound
 
 
 class ReleaseController(ModelRestController):
@@ -108,6 +112,8 @@ class ReleaseController(ModelRestController):
     @commit
     def subscribe(self, id):
         form = context.form
+        payload = context.identity.payload
+        token = context.environ['HTTP_AUTHORIZATION']
 
         try:
             id = int(id)
@@ -132,6 +138,36 @@ class ReleaseController(ModelRestController):
         )
         DBSession.add(subscription)
 
+        access_token, ___ =  CASClient() \
+            .get_access_token(context.form.get('authorizationCode'))
+        chat_client = ChatClient()
+        try:
+            for project in release.projects:
+                chat_client.add_member(
+                    project.room_id,
+                    payload['referenceId'],
+                    token,
+                    access_token
+                )
+        except RoomMemberAlreadyExist:
+            # Exception is passed because it means `add_member()` is already
+            # called and `member` successfully added to room. So there is
+            # no need to call `add_member()` API again and re-add the member to
+            # room.
+            pass
+
+        try:
+            DBSession.flush()
+        except:
+            for project in release.projects:
+                chat_client.remove_member(
+                    project.room_id,
+                    payload['referenceId'],
+                    token,
+                    access_token
+                )
+            raise
+
         return release
 
     @authorize
@@ -141,6 +177,8 @@ class ReleaseController(ModelRestController):
     @commit
     def unsubscribe(self, id):
         form = context.form
+        payload = context.identity.payload
+        token = context.environ['HTTP_AUTHORIZATION']
 
         try:
             id = int(id)
@@ -162,6 +200,37 @@ class ReleaseController(ModelRestController):
             raise HTTPStatus('612 Not Subscribed Yet')
 
         DBSession.delete(subscription)
+
+        access_token, ___ =  CASClient() \
+            .get_access_token(context.form.get('authorizationCode'))
+        chat_client = ChatClient()
+        try:
+            for project in release.projects:
+
+                chat_client.remove_member(
+                    project.room_id,
+                    payload['referenceId'],
+                    token,
+                    access_token
+                )
+        except RoomMemberNotFound:
+            # Exception is passed because it means `remove_member()` is already
+            # called and `member` successfully removed from room. So there is
+            # no need to call `remove_member()` API again and re-add the member
+            # to room.
+            pass
+
+        try:
+            DBSession.flush()
+        except:
+            for project in release.projects:
+                chat_client.add_member(
+                    project.room_id,
+                    payload['referenceId'],
+                    token,
+                    access_token
+                )
+            raise
 
         return release
 

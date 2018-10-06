@@ -5,10 +5,12 @@ from restfulpy.utils import to_camel_case
 from restfulpy.orm import DBSession, commit
 from restfulpy.controllers import ModelRestController
 
-from dolphin.models import Issue, issue_kinds, issue_statuses, Subscription, \
+from ..models import Issue, issue_kinds, issue_statuses, Subscription, \
     Resource, Phase, Item
-from dolphin.validators import issue_validator, update_issue_validator, \
+from ..validators import issue_validator, update_issue_validator, \
     subscribe_validator, assign_issue_validator
+from ..backends import ChatClient, CASClient
+from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound
 
 
 class IssueController(ModelRestController):
@@ -72,6 +74,8 @@ class IssueController(ModelRestController):
     @commit
     def subscribe(self, id):
         form = context.form
+        payload = context.identity.payload
+        token = context.environ['HTTP_AUTHORIZATION']
 
         try:
             id = int(id)
@@ -94,6 +98,34 @@ class IssueController(ModelRestController):
         )
         DBSession.add(subscription)
 
+        access_token, ___ =  CASClient() \
+            .get_access_token(context.form.get('authorizationCode'))
+        chat_client = ChatClient()
+        try:
+            chat_client.add_member(
+                issue.project.room_id,
+                payload['referenceId'],
+                token,
+                access_token
+            )
+        except RoomMemberAlreadyExist:
+            # Exception is passed because it means `add_member()` is already
+            # called and `member` successfully added to room. So there is
+            # no need to call `add_member()` API again and re-add the member to
+            # room.
+            pass
+
+        try:
+            DBSession.flush()
+        except:
+            chat_client.remove_member(
+                issue.project.room_id,
+                payload['referenceId'],
+                token,
+                access_token
+            )
+            raise
+
         return issue
 
     @authorize
@@ -103,6 +135,8 @@ class IssueController(ModelRestController):
     @commit
     def unsubscribe(self, id):
         form = context.form
+        payload = context.identity.payload
+        token = context.environ['HTTP_AUTHORIZATION']
 
         try:
             id = int(id)
@@ -122,6 +156,34 @@ class IssueController(ModelRestController):
             raise HTTPStatus('612 Not Subscribed Yet')
 
         DBSession.delete(subscription)
+
+        access_token, ___ =  CASClient() \
+            .get_access_token(context.form.get('authorizationCode'))
+        chat_client = ChatClient()
+        try:
+            chat_client.remove_member(
+                issue.project.room_id,
+                payload['referenceId'],
+                token,
+                access_token
+            )
+        except RoomMemberNotFound:
+            # Exception is passed because it means `remove_member()` is already
+            # called and `member` successfully removed from room. So there is
+            # no need to call `remove_member()` API again and re-add the member
+            # to room.
+            pass
+
+        try:
+            DBSession.flush()
+        except:
+            chat_client.add_member(
+                issue.project.room_id,
+                payload['referenceId'],
+                token,
+                access_token
+            )
+            raise
 
         return issue
 
