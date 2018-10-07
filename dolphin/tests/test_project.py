@@ -48,7 +48,6 @@ class TestProject(LocalApplicationTestCase):
         )
         session.add(manager4)
 
-
         release = Release(
             title='My first release',
             description='A decription for my release',
@@ -365,7 +364,6 @@ class TestProject(LocalApplicationTestCase):
             ):
                 assert status == '708 No Parameter Exists In The Form'
 
-
     def test_hide(self):
         self.login('manager1@example.com')
 
@@ -493,7 +491,7 @@ class TestProject(LocalApplicationTestCase):
             'Subscribe project',
             '/apiv1/projects/id:4',
             'SUBSCRIBE',
-            form=dict(memberId=1)
+            form=dict(memberId=1, authorizationCode='authorization code')
         ):
             assert status == 200
 
@@ -573,7 +571,7 @@ class TestProject(LocalApplicationTestCase):
             'Unsubscribe an project',
             '/apiv1/projects/id:4',
             'UNSUBSCRIBE',
-            form=dict(memberId=1)
+            form=dict(memberId=1, authorizationCode='authorization code')
         ):
             assert status == 200
 

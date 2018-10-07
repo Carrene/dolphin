@@ -112,7 +112,6 @@ class ReleaseController(ModelRestController):
     @commit
     def subscribe(self, id):
         form = context.form
-        payload = context.identity.payload
         token = context.environ['HTTP_AUTHORIZATION']
 
         try:
@@ -139,14 +138,14 @@ class ReleaseController(ModelRestController):
         DBSession.add(subscription)
 
         member = DBSession.query(Member) \
-            .filter(Member.reference_id == payload['referenceId']) \
+            .filter(Member.reference_id == context.identity.reference_id) \
             .one()
         chat_client = ChatClient()
         try:
             for project in release.projects:
                 chat_client.add_member(
                     project.room_id,
-                    payload['referenceId'],
+                    context.identity.reference_id,
                     token,
                     member.access_token
                 )
@@ -163,9 +162,9 @@ class ReleaseController(ModelRestController):
             for project in release.projects:
                 chat_client.remove_member(
                     project.room_id,
-                    payload['referenceId'],
+                    context.identity.reference_id,
                     token,
-                    access_token
+                    member.access_token
                 )
             raise
 
@@ -178,7 +177,6 @@ class ReleaseController(ModelRestController):
     @commit
     def unsubscribe(self, id):
         form = context.form
-        payload = context.identity.payload
         token = context.environ['HTTP_AUTHORIZATION']
 
         try:
@@ -203,7 +201,7 @@ class ReleaseController(ModelRestController):
         DBSession.delete(subscription)
 
         member = DBSession.query(Member) \
-            .filter(Member.reference_id == payload['referenceId']) \
+            .filter(Member.reference_id == context.identity.reference_id) \
             .one()
         chat_client = ChatClient()
         try:
@@ -211,7 +209,7 @@ class ReleaseController(ModelRestController):
 
                 chat_client.remove_member(
                     project.room_id,
-                    payload['referenceId'],
+                    context.identity.reference_id,
                     token,
                     member.access_token
                 )
@@ -228,9 +226,9 @@ class ReleaseController(ModelRestController):
             for project in release.projects:
                 chat_client.add_member(
                     project.room_id,
-                    payload['referenceId'],
+                    context.identity.reference_id,
                     token,
-                    access_token
+                    member.access_token
                 )
             raise
 

@@ -25,7 +25,7 @@ class ProjectController(ModelRestController):
                     title,
                     token,
                     access_token,
-                    context.identity.payload['referenceId']
+                    context.identity.reference_id
                 )
                 create_room_error = None
             except ChatRoomNotFound:
@@ -38,6 +38,7 @@ class ProjectController(ModelRestController):
         new_assignee_manager = DBSession.query(Manager) \
             .filter(Manager.id == manager_id) \
             .one()
+
         current_assignee_manager = project.manager
         project.manager = new_assignee_manager
 
@@ -130,7 +131,6 @@ class ProjectController(ModelRestController):
     @commit
     def update(self, id):
         form = context.form
-        payload = context.identity.payload
         token = context.environ['HTTP_AUTHORIZATION']
 
         try:
@@ -167,7 +167,7 @@ class ProjectController(ModelRestController):
             )
 
         member = DBSession.query(Member) \
-            .filter(Member.reference_id == payload['referenceId']) \
+            .filter(Member.reference_id == context.identity.reference_id) \
             .one()
 
         current_manager = project.manager
@@ -193,7 +193,8 @@ class ProjectController(ModelRestController):
             self.replace_manager(
                 current_manager.id,
                 project,
-                access_token
+                token,
+                member.access_token
             )
             raise
 
@@ -257,7 +258,6 @@ class ProjectController(ModelRestController):
     def subscribe(self, id):
         form = context.form
         token = context.environ['HTTP_AUTHORIZATION']
-        payload = context.identity.payload
 
         try:
             id = int(id)
@@ -283,13 +283,14 @@ class ProjectController(ModelRestController):
         DBSession.add(subscription)
 
         member = DBSession.query(Member) \
-            .filter(Member.reference_id == payload['referenceId']) \
+            .filter(Member.reference_id == context.identity.reference_id) \
             .one()
+
         chat_client = ChatClient()
         try:
             chat_client.add_member(
                 project.room_id,
-                payload['referenceId'],
+                context.identity.reference_id,
                 token,
                 member.access_token
             )
@@ -305,9 +306,9 @@ class ProjectController(ModelRestController):
         except:
             chat_client.remove_member(
                 project.room_id,
-                payload['referenceId'],
+                context.identity.reference_id,
                 token,
-                access_token
+                member.access_token
             )
             raise
 
@@ -320,7 +321,6 @@ class ProjectController(ModelRestController):
     @commit
     def unsubscribe(self, id):
         form = context.form
-        payload = context.identity.payload
         token = context.environ['HTTP_AUTHORIZATION']
 
         try:
@@ -344,13 +344,13 @@ class ProjectController(ModelRestController):
         DBSession.delete(subscription)
 
         member = DBSession.query(Member) \
-            .filter(Member.reference_id == payload['referenceId']) \
+            .filter(Member.reference_id == context.identity.reference_id) \
             .one()
         chat_client = ChatClient()
         try:
             chat_client.remove_member(
                 project.room_id,
-                payload['referenceId'],
+                context.identity.reference_id,
                 token,
                 member.access_token
             )
@@ -366,7 +366,7 @@ class ProjectController(ModelRestController):
         except:
             chat_client.add_member(
                 project.room_id,
-                payload['referenceId'],
+                context.identity.reference_id,
                 token,
                 access_token
             )

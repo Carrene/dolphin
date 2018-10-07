@@ -371,7 +371,7 @@ class TestRelease(LocalApplicationTestCase):
             'Subscribe release',
             '/apiv1/releases/id:1',
             'SUBSCRIBE',
-            form=dict(memberId=1)
+            form=dict(memberId=1, authorizationCode='authorization code')
         ):
             assert status == 200
 
@@ -451,7 +451,7 @@ class TestRelease(LocalApplicationTestCase):
             'Unsubscribe release',
             '/apiv1/releases/id:1',
             'UNSUBSCRIBE',
-            form=dict(memberId=1)
+            form=dict(memberId=1, authorizationCode='authorization code')
         ):
             assert status == 200
 

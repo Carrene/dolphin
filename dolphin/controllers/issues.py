@@ -74,7 +74,6 @@ class IssueController(ModelRestController):
     @commit
     def subscribe(self, id):
         form = context.form
-        payload = context.identity.payload
         token = context.environ['HTTP_AUTHORIZATION']
 
         try:
@@ -101,14 +100,16 @@ class IssueController(ModelRestController):
         member = DBSession.query(Member) \
             .filter(Member.reference_id == payload['referenceId']) \
             .one()
+
         chat_client = ChatClient()
         try:
             chat_client.add_member(
                 issue.project.room_id,
-                payload['referenceId'],
+                context.identity.reference_id,
                 token,
                 member.access_token
             )
+
         except RoomMemberAlreadyExist:
             # Exception is passed because it means `add_member()` is already
             # called and `member` successfully added to room. So there is
@@ -121,9 +122,9 @@ class IssueController(ModelRestController):
         except:
             chat_client.remove_member(
                 issue.project.room_id,
-                payload['referenceId'],
+                context.identity.reference_id,
                 token,
-                access_token
+                member.access_token
             )
             raise
 
@@ -136,7 +137,6 @@ class IssueController(ModelRestController):
     @commit
     def unsubscribe(self, id):
         form = context.form
-        payload = context.identity.payload
         token = context.environ['HTTP_AUTHORIZATION']
 
         try:
@@ -165,7 +165,7 @@ class IssueController(ModelRestController):
         try:
             chat_client.remove_member(
                 issue.project.room_id,
-                payload['referenceId'],
+                context.identity.reference_id,
                 token,
                 member.access_token
             )
@@ -181,9 +181,9 @@ class IssueController(ModelRestController):
         except:
             chat_client.add_member(
                 issue.project.room_id,
-                payload['referenceId'],
+                context.identity.reference_id,
                 token,
-                access_token
+                member.access_token
             )
             raise
 
