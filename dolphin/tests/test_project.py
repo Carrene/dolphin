@@ -48,7 +48,6 @@ class TestProject(LocalApplicationTestCase):
         )
         session.add(manager4)
 
-
         release = Release(
             title='My first release',
             description='A decription for my release',
