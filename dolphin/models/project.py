@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from sqlalchemy import Integer, Time, ForeignKey, Enum
 from sqlalchemy.orm import backref
 from restfulpy.orm import Field, relationship, SoftDeleteMixin, \
@@ -71,8 +69,11 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             if issue.due_date > self.release.due_date:
                 return self._boarding['at-risk']
 
-            if issue.status == 'delayed':
+            if issue.boardings == 'delayed':
                 return self._boarding['delayed']
+
+            if self.status != 'in-progress':
+                return None
 
         return 'on-time'
 

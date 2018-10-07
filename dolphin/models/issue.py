@@ -1,3 +1,4 @@
+from datetime import datetime
 
 from sqlalchemy import Integer, Time, ForeignKey, DateTime, Enum, String,\
     Column, Table
@@ -50,6 +51,8 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     __tablename__ = 'issue'
     __mapper_args__ = {'polymorphic_identity': __tablename__}
 
+    _boarding = ['on-time', 'delayed']
+
     project_id = Field(Integer, ForeignKey('project.id'))
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
 
@@ -86,4 +89,17 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         back_populates='issue',
         protected=True
     )
+
+    @property
+    def boardings(self):
+        for issue in self.issues:
+            if issue.due_date > datetime.now():
+                return self._boarding['delayed']
+
+        return 'on-time'
+
+    def to_dict(self):
+        project_dict = super().to_dict()
+        project_dict['boarding'] = self.boardings
+        return project_dict
 
