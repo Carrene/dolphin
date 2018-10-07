@@ -98,7 +98,7 @@ class IssueController(ModelRestController):
         DBSession.add(subscription)
 
         member = DBSession.query(Member) \
-            .filter(Member.reference_id == payload['referenceId']) \
+            .filter(Member.reference_id == context.identity.reference_id) \
             .one()
 
         chat_client = ChatClient()
@@ -159,7 +159,7 @@ class IssueController(ModelRestController):
         DBSession.delete(subscription)
 
         member = DBSession.query(Member) \
-            .filter(Member.reference_id == payload['referenceId']) \
+            .filter(Member.reference_id == context.identity.reference_id) \
             .one()
         chat_client = ChatClient()
         try:
