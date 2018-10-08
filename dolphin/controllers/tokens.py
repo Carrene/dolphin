@@ -55,8 +55,8 @@ class TokenController(RestController):
                 access_token=access_token
             )
             DBSession.add(member)
-        elif member.title != principal.payload['name']:
-            member.title = principal.payload['name']
+        elif member.title != cas_member['title']:
+            member.title = cas_member['title']
 
         DBSession.commit()
         principal = member.create_jwt_principal()

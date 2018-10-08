@@ -86,8 +86,8 @@ class ProjectController(ModelRestController):
         project.room_id = PENDING
         DBSession.flush()
 
-        manager = DBSession.query(Manager) \
-            .filter(Manager.id == form['managerId']) \
+        manager = DBSession.query(Member) \
+            .filter(Member.id == form['managerId']) \
             .one()
 
         room = self._ensure_room(form['title'], token, manager.access_token)

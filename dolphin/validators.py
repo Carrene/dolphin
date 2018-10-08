@@ -156,8 +156,8 @@ def manager_exists_validator(managerId, container, field):
             f'608 Manager not found with id: {context.form["managerId"]}'
         )
 
-    if 'managerId' in form and not DBSession.query(Manager) \
-            .filter(Manager.id == managerId) \
+    if 'managerId' in form and not DBSession.query(Member) \
+            .filter(Member.id == managerId) \
             .one_or_none():
         raise HTTPStatus(
             f'608 Manager not found with id: {context.form["managerId"]}'
