@@ -90,15 +90,6 @@ def oauth_mockup_server():
             if 'access token 1' in access_token:
                 return dict(id=1, title='manager1', email='manager1@example.com')
 
-            if 'access token 2' in access_token:
-                return dict(id=2, title='manager2', email='manager2@example.com')
-
-            if 'access token 3' in access_token:
-                return dict(id=3, title='manager3', email='manager3@example.com')
-
-            if 'access token 4' in access_token:
-                return dict(id=4, title='manager4', email='manager4@example.com')
-
             raise HTTPForbidden()
 
     app = MockupApplication('root', Root())
