@@ -1,7 +1,6 @@
-
 from bddrest import status, response, Update, when, Remove, Append, given
 
-from dolphin.models import Project, Manager, Release
+from dolphin.models import Project, Manager, Release, Member
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
@@ -11,6 +10,16 @@ class TestManager(LocalApplicationTestCase):
     @classmethod
     def mockup(cls):
         session = cls.create_session()
+
+        cls.member1 = Member(
+            title='First member',
+            email='member1@example.com',
+            access_token='access token 1',
+            phone=123457869,
+            reference_id=5
+        )
+        session.add(cls.member1)
+
 
         assigned_manager = Manager(
             title='Assigned Manager',
@@ -120,4 +129,16 @@ class TestManager(LocalApplicationTestCase):
 
             when('Request is not authorized', authorization=None)
             assert status == 401
+
+    def test_make(self):
+        self.login('manager1@example.com')
+
+        with oauth_mockup_server(), self.given(
+            'Make a manager',
+            f'/apiv1/members/{self.member1.id}/managers',
+            'MAKE',
+        ):
+            assert status == 200
+
+
 

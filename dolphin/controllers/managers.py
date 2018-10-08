@@ -1,11 +1,9 @@
-from nanohttp import json, context, HTTPNotFound
+from nanohttp import json
 from restfulpy.authorization import authorize
-from restfulpy.orm import DBSession, commit
 from restfulpy.controllers import ModelRestController
-from sqlalchemy.exc import SQLAlchemyError
+from restfulpy.orm import DBSession, commit
 
-from dolphin.backends import CASClient, ChatClient
-from dolphin.models import Manager, Project
+from dolphin.models import Manager, Member
 
 
 class ManagerController(ModelRestController):
@@ -17,4 +15,23 @@ class ManagerController(ModelRestController):
     def list(self):
         query = DBSession.query(Manager)
         return query
+
+    @authorize
+    @json
+    @Member.expose
+    @commit
+    def make(self, id):
+
+        try:
+            id = int(id)
+        except (TypeError, ValueError):
+            raise HTTPNotFound()
+
+
+        member = DBSession.query(Member).filter(Member.id == id).one_or_none()
+        if member is None:
+            raise HTTPNotFound()
+
+        member.role = 'manager'
+        return member
 
