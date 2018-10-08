@@ -87,7 +87,7 @@ def oauth_mockup_server():
         def get(self):
             access_token = context.environ['HTTP_AUTHORIZATION']
 
-            if 'access token 1' in access_token:
+            if 'access token' in access_token:
                 return dict(id=1, title='manager1', email='manager1@example.com')
 
             raise HTTPForbidden()
