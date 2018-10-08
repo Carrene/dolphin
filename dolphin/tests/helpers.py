@@ -148,8 +148,7 @@ def chat_mockup_server():
     with mockup_http_server(app) as (server, url):
         settings.merge(f'''
             chat:
-              room:
-                url: {url}
+              url: {url}
         ''')
         yield app
 
