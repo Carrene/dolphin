@@ -71,8 +71,8 @@ def oauth_mockup_server():
     class Root(RegexRouteController):
         def __init__(self):
             super().__init__([
-                ('/apiv1/tokens', self.create),
-                ('/apiv1/profiles/me', self.get),
+                ('/apiv1/accesstokens', self.create),
+                ('/apiv1/members/me', self.get),
             ])
 
         @json
@@ -98,14 +98,9 @@ def oauth_mockup_server():
             tokenizer:
               url: {url}
             oauth:
-              secret: A1dFVpz4w/qyym+HeXKWYmm6Ocj4X5ZNv1JQ7kgHBEk=\n
+              secret: oauth2-secret
               application_id: 1
-              access_token:
-                url: {url}/apiv1/tokens
-                verb: create
-              member:
-                url: {url}/apiv1/profiles
-                verb: get
+              url: {url}
         ''')
         yield app
 

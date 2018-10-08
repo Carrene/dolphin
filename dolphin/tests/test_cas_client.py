@@ -56,10 +56,10 @@ class TestToken(LocalApplicationTestCase):
                   secret: A1dFVpz4w/qyym+HeXKWYmm6Ocj4X5ZNv1JQ7kgHBEk=\n
                   application_id: 1
                   access_token:
-                    url: {settings.tokenizer.url}/tokens
+                    url: {settings.tokenizer.url}/apiv1/accesstokens
                     verb: create
                   member:
-                    url: {settings.tokenizer.url}/profiles
+                    url: {settings.tokenizer.url}/apiv1/members/
                     verb: get
             ''')
 
