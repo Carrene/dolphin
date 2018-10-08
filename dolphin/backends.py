@@ -56,7 +56,7 @@ class ChatClient:
                 data={'title':title},
                 headers={
                     'authorization': token,
-                    'X-Access-Token': x_access_token
+                    'X-Oauth2-Access-Token': x_access_token
                 }
             )
             if response.status_code == 404:
@@ -71,7 +71,7 @@ class ChatClient:
                     f'{settings.chat.room.url}/apiv1/targets',
                     headers={
                         'authorization': token,
-                        'X-Access-Token': x_access_token
+                        'X-Oauth2-Access-Token': x_access_token
                     },
                     params={'title':title, 'ownerId':owner_id}
                 )
@@ -99,7 +99,7 @@ class ChatClient:
             f'{settings.chat.room.url}/apiv1/rooms/{id}',
             headers={
                 'authorization': token,
-                'X-Access-Token': x_access_token
+                'X-Oauth2-Access-Token': x_access_token
             }
         )
         return response
@@ -113,7 +113,7 @@ class ChatClient:
                 data={'userId':user_id},
                 headers={
                     'authorization': token,
-                    'X-Access-Token': x_access_token
+                    'X-Oauth2-Access-Token': x_access_token
                 }
             )
             if response.status_code == 404:
@@ -147,7 +147,7 @@ class ChatClient:
                 'REMOVE',
                 f'{settings.chat.room.url}/apiv1/rooms/{id}',
                 data={'userId':user_id},
-                headers={'X-Access-Token':x_access_token}
+                headers={'X-Oauth2-Access-Token':x_access_token}
             )
             if response.status_code == 404:
                 raise ChatServerNotFound()
