@@ -52,7 +52,7 @@ class ChatClient:
         try:
             response = requests.request(
                 'CREATE',
-                f'{settings.chat.room.url}/apiv1/rooms',
+                f'{settings.chat.url}/apiv1/rooms',
                 data={'title':title},
                 headers={
                     'authorization': token,
@@ -68,7 +68,7 @@ class ChatClient:
             if response.status_code == 615:
                 response = requests.request(
                     'LIST',
-                    f'{settings.chat.room.url}/apiv1/targets',
+                    f'{settings.chat.url}/apiv1/targets',
                     headers={
                         'authorization': token,
                         'X-Oauth2-Access-Token': x_access_token
@@ -96,7 +96,7 @@ class ChatClient:
 
         response = requests.request(
             'DELETE',
-            f'{settings.chat.room.url}/apiv1/rooms/{id}',
+            f'{settings.chat.url}/apiv1/rooms/{id}',
             headers={
                 'authorization': token,
                 'X-Oauth2-Access-Token': x_access_token
@@ -109,7 +109,7 @@ class ChatClient:
         try:
             response = requests.request(
                 'ADD',
-                f'{settings.chat.room.url}/apiv1/rooms/{id}',
+                f'{settings.chat.url}/apiv1/rooms/{id}',
                 data={'userId':user_id},
                 headers={
                     'authorization': token,
@@ -145,7 +145,7 @@ class ChatClient:
         try:
             response = requests.request(
                 'REMOVE',
-                f'{settings.chat.room.url}/apiv1/rooms/{id}',
+                f'{settings.chat.url}/apiv1/rooms/{id}',
                 data={'userId':user_id},
                 headers={'X-Oauth2-Access-Token':x_access_token}
             )
