@@ -137,9 +137,7 @@ class ReleaseController(ModelRestController):
         )
         DBSession.add(subscription)
 
-        member = DBSession.query(Member) \
-            .filter(Member.reference_id == context.identity.reference_id) \
-            .one()
+        member = Member.current()
         chat_client = ChatClient()
         try:
             for project in release.projects:
@@ -200,9 +198,7 @@ class ReleaseController(ModelRestController):
 
         DBSession.delete(subscription)
 
-        member = DBSession.query(Member) \
-            .filter(Member.reference_id == context.identity.reference_id) \
-            .one()
+        member = Member.current()
         chat_client = ChatClient()
         try:
             for project in release.projects:

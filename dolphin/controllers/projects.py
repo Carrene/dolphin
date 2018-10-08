@@ -166,10 +166,7 @@ class ProjectController(ModelRestController):
                 f'"{form["title"]}" is already exists.'
             )
 
-        member = DBSession.query(Member) \
-            .filter(Member.reference_id == context.identity.reference_id) \
-            .one()
-
+        member = Member.current()
         current_manager = project.manager
         project.update_from_request()
 
@@ -282,10 +279,7 @@ class ProjectController(ModelRestController):
         )
         DBSession.add(subscription)
 
-        member = DBSession.query(Member) \
-            .filter(Member.reference_id == context.identity.reference_id) \
-            .one()
-
+        member = Member.current()
         chat_client = ChatClient()
         try:
             chat_client.add_member(
@@ -343,9 +337,7 @@ class ProjectController(ModelRestController):
 
         DBSession.delete(subscription)
 
-        member = DBSession.query(Member) \
-            .filter(Member.reference_id == context.identity.reference_id) \
-            .one()
+        member = Member.current()
         chat_client = ChatClient()
         try:
             chat_client.remove_member(

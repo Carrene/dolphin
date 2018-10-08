@@ -17,6 +17,15 @@ class Dolphin(Application):
         url: postgresql://postgres:postgres@localhost/dolphin_dev
         test_url: postgresql://postgres:postgres@localhost/dolphin_test
         administrative_url: postgresql://postgres:postgres@localhost/postgres
+
+      oauth:
+        secret: oauth2-secret
+        application_id: 1
+        url: http://nightly.cas.carrene.com
+
+      chat:
+        url: http://nightly.cucumber.carrene.com
+
    '''
 
     def __init__(self, application_name='dolphin', root=Root()):
