@@ -44,7 +44,7 @@ class TokenController(RestController):
 
         cas_member = cas_client.get_member(access_token)
         member = DBSession.query(Member) \
-            .filter(Member.email == cas_member['email']) \
+            .filter(Member.reference_id == cas_member['id']) \
             .one_or_none()
 
         if member is None:
@@ -54,10 +54,10 @@ class TokenController(RestController):
                 title=cas_member['title'],
                 access_token=access_token
             )
-        else:
-            member.access_token = access_token
+            DBSession.add(member)
+        elif member.title != principal.payload['name']:
+            member.title = principal.payload['name']
 
-        DBSession.add(member)
         DBSession.commit()
         principal = member.create_jwt_principal()
         context.response_headers.add_header(

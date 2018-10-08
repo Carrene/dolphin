@@ -24,7 +24,7 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         'polymorphic_identity': __tablename__
     }
 
-    reference_id = Field(Integer)
+    reference_id = Field(Integer, unique=True)
     id = Field(Integer, primary_key=True)
     title = Field(String, max_length=50)
     email = Field(

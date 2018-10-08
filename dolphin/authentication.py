@@ -4,7 +4,7 @@ from nanohttp import HTTPStatus, context, HTTPUnauthorized, HTTPBadRequest
 from restfulpy.authentication import StatefulAuthenticator
 from restfulpy.orm import DBSession
 
-from .models import Member, Manager
+from .models import Member
 from .backends import CASClient
 
 
@@ -33,16 +33,18 @@ class Authenticator(StatefulAuthenticator):
     def verify_token(self, encoded_token):
         principal = CASPrincipal.load(encoded_token)
 
-        manager = DBSession.query(Manager) \
-            .filter(Manager.reference_id == principal.reference_id) \
+        member = DBSession.query(Member) \
+            .filter(Member.reference_id == principal.reference_id) \
             .one_or_none()
-        if not manager:
+        if not member:
             raise HTTPUnauthorized()
 
-        cas_member = CASClient().get_member(manager.access_token)
+        cas_member = CASClient().get_member(member.access_token)
 
-        if manager.title != principal.payload['name']:
-            manager.title = principal.payload['name']
+        # FIXME: If any item added to scopes, the additional scopes item must
+        # be considered here
+        if member.title != principal.payload['name']:
+            member.title = principal.payload['name']
             DBSession.commit()
 
         return principal
