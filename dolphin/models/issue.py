@@ -84,12 +84,6 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         protected=True
     )
 
-    items = relationship(
-        'Item',
-        back_populates='issue',
-        protected=True
-    )
-
     @property
     def boardings(self):
         if self.due_date > datetime.now():
