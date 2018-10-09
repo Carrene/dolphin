@@ -75,7 +75,11 @@ class ChatClient:
                     },
                     params={'title':title, 'ownerId':owner_id}
                 )
-                rooms = json.loads(response.text)
+                try:
+                    rooms = json.loads(response.text)
+                except ValueError:
+                    raise ChatInternallError()
+
                 if len(rooms) == 1:
                     return rooms[0]
 
