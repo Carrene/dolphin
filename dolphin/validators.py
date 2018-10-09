@@ -198,10 +198,6 @@ release_validator = validate(
     description=dict(
         max_length=(512, '703 At Most 512 Characters Are Valid For Description')
     ),
-    dueDate=dict(
-        pattern=(DATE_PATTERN, '701 Invalid Due Date Format'),
-        required='711 Due Date Not In Form'
-    ),
     cutoff=dict(
         pattern=(DATE_PATTERN, '702 Invalid Cutoff Format'),
         required='712 Cutoff Not In Form'
@@ -218,9 +214,6 @@ update_release_validator = validate(
     ),
     description=dict(
         max_length=(512, '703 At Most 512 Characters Are Valid For Description')
-    ),
-    dueDate=dict(
-        pattern=(DATE_PATTERN, '701 Invalid Due Date Format'),
     ),
     cutoff=dict(
         pattern=(DATE_PATTERN, '702 Invalid Cutoff Format'),
@@ -239,10 +232,6 @@ project_validator = validate(
     ),
     description=dict(
         max_length=(512, '703 At Most 512 Characters Are Valid For Description')
-    ),
-    dueDate=dict(
-        pattern=(DATE_PATTERN, '701 Invalid Due Date Format'),
-        required='711 Due Date Not In Form'
     ),
     status=dict(
         callback=project_status_value_validator
@@ -266,12 +255,6 @@ update_project_validator = validate(
     ),
     description=dict(
         max_length=(512, '703 At Most 512 Characters Are Valid For Description')
-    ),
-    dueDate=dict(
-        pattern=(DATE_PATTERN, '701 Invalid Due Date Format'),
-    ),
-    cutoff=dict(
-        pattern=(DATE_PATTERN, '702 Invalid Cutoff Format'),
     ),
     status=dict(
         callback=project_status_value_validator

@@ -1,8 +1,5 @@
-
-from sqlalchemy import Integer, String, ForeignKey, Table, Enum, Column,\
-    DateTime
-from sqlalchemy.ext.declarative import declared_attr
 from restfulpy.orm import DeclarativeBase, Field, TimestampMixin, relationship
+from sqlalchemy import Integer, String, ForeignKey
 
 
 class Subscription(DeclarativeBase):
@@ -29,7 +26,6 @@ class Subscribable(TimestampMixin, DeclarativeBase):
         nullable=True,
         watermark='This is a description of summary'
     )
-    due_date = Field(DateTime)
 
     members = relationship(
         'Member',

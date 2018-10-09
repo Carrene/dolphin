@@ -51,7 +51,6 @@ class TestManager(LocalApplicationTestCase):
         release = Release(
             title='My first release',
             description='A decription for my release',
-            due_date='2020-2-20',
             cutoff='2030-2-20',
         )
 
@@ -60,7 +59,6 @@ class TestManager(LocalApplicationTestCase):
             release=release,
             title='My first project',
             description='A decription for my project',
-            due_date='2020-2-20',
             room_id=1
         )
         session.add(project)

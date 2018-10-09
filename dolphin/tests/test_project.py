@@ -51,7 +51,6 @@ class TestProject(LocalApplicationTestCase):
         release = Release(
             title='My first release',
             description='A decription for my release',
-            due_date='2020-2-20',
             cutoff='2030-2-20',
         )
         session.add(release)
@@ -61,7 +60,6 @@ class TestProject(LocalApplicationTestCase):
             release=release,
             title='My first project',
             description='A decription for my project',
-            due_date='2020-2-20',
             room_id=1001
         )
         session.add(project1)
@@ -71,7 +69,6 @@ class TestProject(LocalApplicationTestCase):
             release=release,
             title='My second project',
             description='A decription for my project',
-            due_date='2020-2-20',
             room_id=1002
         )
         session.add(project2)
@@ -81,7 +78,6 @@ class TestProject(LocalApplicationTestCase):
             release=release,
             title='My hidden project',
             description='A decription for my project',
-            due_date='2020-2-20',
             removed_at='2020-2-20',
             room_id=1000
         )
@@ -101,14 +97,14 @@ class TestProject(LocalApplicationTestCase):
                 managerId=self.manager_id,
                 title='My awesome project',
                 description='A decription for my project',
-                dueDate='2020-2-20',
             )
         ):
             assert status == 200
             assert response.json['title'] == 'My awesome project'
             assert response.json['description'] == 'A decription for my project'
-            assert response.json['dueDate'] == '2020-02-20T00:00:00'
             assert response.json['status'] == 'queued'
+            assert response.json['boarding'] == 'on-time'
+            assert response.json['dueDate'] == None
 
             when(
                 'Manager id not in form',
@@ -165,20 +161,6 @@ class TestProject(LocalApplicationTestCase):
             )
             assert status == '703 At Most 512 Characters Are Valid For '\
                 'Description'
-
-            when(
-                'Due date format is wrong',
-                form=given | dict(
-                    dueDate='20-20-20',
-                    title='Another title'
-                )
-            )
-            assert status == '701 Invalid Due Date Format'
-
-            when(
-                'Due date is not in form',
-                form=given - ['dueDate'] | dict(title='Another title')
-            )
 
             when(
                 'Status value is invalid',
@@ -238,7 +220,6 @@ class TestProject(LocalApplicationTestCase):
             form=dict(
                 title='My interesting project',
                 description='A updated project description',
-                dueDate='2200-2-20',
                 status='active',
                 managerId=2,
             )
@@ -247,7 +228,6 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['title'] == 'My interesting project'
             assert response.json['description'] == 'A updated project ' \
                 'description'
-            assert response.json['dueDate'] == '2200-02-20T00:00:00'
             assert response.json['status'] == 'active'
 
             when(
@@ -299,14 +279,6 @@ class TestProject(LocalApplicationTestCase):
             )
             assert status == '703 At Most 512 Characters Are Valid For ' \
                 'Description'
-
-            when(
-                'Due date format is wrong',
-                form=given | dict(
-                    dueDate='2200-2-32',
-                )
-            )
-            assert status == '701 Invalid Due Date Format'
 
             when(
                 'Status value is invalid',

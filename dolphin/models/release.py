@@ -1,10 +1,10 @@
-
-from sqlalchemy import Integer, Enum, DateTime, Time, ForeignKey
 from restfulpy.orm import Field, relationship, ModifiedMixin, FilteringMixin, \
-    OrderingMixin, PaginationMixin, DeclarativeBase
+    OrderingMixin, PaginationMixin
+from sqlalchemy import Integer, Enum, DateTime, ForeignKey, select, func
+from sqlalchemy.orm import column_property
 
-from .subscribable import Subscribable
 from .project import Project
+from .subscribable import Subscribable
 
 
 release_statuses = [
@@ -32,6 +32,18 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
         'Project',
         primaryjoin=id == Project.release_id,
         back_populates='release',
-        protected=True
+        protected=True,
+        lazy='selectin'
     )
+
+    due_date = column_property(
+        select([func.max(Project.due_date)]).\
+            where(Project.release_id == id).\
+            correlate_except(Project)
+    )
+
+    def to_dict(self):
+        project_dict = super().to_dict()
+        project_dict['dueDate'] = self.due_date
+        return project_dict
 
