@@ -1,10 +1,9 @@
 from datetime import datetime
 
-from sqlalchemy import Integer, Time, ForeignKey, DateTime, Enum, String,\
-    Column, Table
-from restfulpy.orm import Field, DeclarativeBase, TimestampMixin, \
-    relationship, ModifiedMixin, OrderingMixin, FilteringMixin,\
-    PaginationMixin
+from restfulpy.orm import Field, DeclarativeBase, relationship, \
+    ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin
+from sqlalchemy import Integer, ForeignKey, DateTime, Enum, String, Column, \
+    Table
 
 from .subscribable import Subscribable
 
@@ -54,8 +53,9 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     _boarding = ['on-time', 'delayed']
 
     project_id = Field(Integer, ForeignKey('project.id'))
-    id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
 
+    id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
+    due_date = Field(DateTime)
     kind = Field(Enum(*issue_kinds, name='kind'))
     days = Field(Integer)
     status = Field(
@@ -92,11 +92,10 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     @property
     def boardings(self):
-        for issue in self.issues:
-            if issue.due_date > datetime.now():
-                return self._boarding['delayed']
+        if self.due_date > datetime.now():
+            return self._boarding[1]
 
-        return 'on-time'
+        return self._boarding[0]
 
     def to_dict(self):
         project_dict = super().to_dict()

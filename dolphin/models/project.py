@@ -1,7 +1,7 @@
-from sqlalchemy import Integer, Time, ForeignKey, Enum
-from sqlalchemy.orm import backref
 from restfulpy.orm import Field, relationship, SoftDeleteMixin, \
     ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin
+from sqlalchemy import Integer, ForeignKey, Enum, select, func
+from sqlalchemy.orm import column_property
 
 from .issue import Issue
 from .subscribable import Subscribable
@@ -63,22 +63,29 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         protected=True
     )
 
+    due_date = column_property(
+        select([func.max(Issue.due_date)]).\
+            where(Issue.project_id == id).\
+            correlate_except(Issue)
+    )
+
     @property
     def boardings(self):
         for issue in self.issues:
             if issue.due_date > self.release.due_date:
-                return self._boarding['at-risk']
+                return self._boarding[2]
 
             if issue.boardings == 'delayed':
-                return self._boarding['delayed']
+                return self._boarding[1]
 
             if self.status != 'in-progress':
                 return None
 
-        return 'on-time'
+        return self._boarding[0]
 
     def to_dict(self):
         project_dict = super().to_dict()
         project_dict['boarding'] = self.boardings
+        project_dict['dueDate'] = self.due_date
         return project_dict
 

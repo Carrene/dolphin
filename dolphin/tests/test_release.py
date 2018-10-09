@@ -22,7 +22,6 @@ class TestRelease(LocalApplicationTestCase):
         release1 = Release(
             title='My first release',
             description='A decription for my first release',
-            due_date='2020-2-20',
             cutoff='2030-2-20',
         )
         session.add(release1)
@@ -30,7 +29,6 @@ class TestRelease(LocalApplicationTestCase):
         release2 = Release(
             title='My second release',
             description='A decription for my second release',
-            due_date='2020-2-20',
             cutoff='2030-2-20',
         )
         session.add(release2)
@@ -38,7 +36,6 @@ class TestRelease(LocalApplicationTestCase):
         release3 = Release(
             title='My third release',
             description='A decription for my third release',
-            due_date='2020-2-20',
             cutoff='2030-2-20',
         )
         session.add(release3)
@@ -46,7 +43,6 @@ class TestRelease(LocalApplicationTestCase):
         release4 = Release(
             title='My fourth release',
             description='A decription for my fourth release',
-            due_date='2020-2-20',
             cutoff='2030-2-20',
         )
         session.add(release4)
@@ -56,7 +52,6 @@ class TestRelease(LocalApplicationTestCase):
             release=release1,
             title='My first project',
             description='A decription for my project',
-            due_date='2020-2-20',
             room_id=1000
         )
         session.add(project1)
@@ -66,7 +61,6 @@ class TestRelease(LocalApplicationTestCase):
             release=release3,
             title='My first project',
             description='A decription for my project',
-            due_date='2020-2-20',
             room_id=1000
         )
         session.add(project2)
@@ -76,7 +70,6 @@ class TestRelease(LocalApplicationTestCase):
             release=release1,
             title='My first project',
             description='A decription for my project',
-            due_date='2020-2-20',
             room_id=1000
         )
         session.add(project3)
@@ -86,7 +79,6 @@ class TestRelease(LocalApplicationTestCase):
             release=release1,
             title='My first project',
             description='A decription for my project',
-            due_date='2020-2-20',
             room_id=1000
         )
         session.add(project4)
@@ -102,14 +94,12 @@ class TestRelease(LocalApplicationTestCase):
             form=dict(
                 title='My awesome release',
                 description='Decription for my release',
-                dueDate='2020-2-20',
                 cutoff='2030-2-20'
             )
         ):
             assert status == 200
             assert response.json['title'] == 'My awesome release'
             assert response.json['description'] == 'Decription for my release'
-            assert response.json['dueDate'] == '2020-02-20T00:00:00'
             assert response.json['cutoff'] == '2030-02-20T00:00:00'
             assert response.json['status'] is None
 
@@ -134,21 +124,6 @@ class TestRelease(LocalApplicationTestCase):
             )
             assert status == '703 At Most 512 Characters Are Valid For '\
                 'Description'
-
-            when(
-                'Due date format is wrong',
-                form=given | dict(
-                    dueDate='20-20-20',
-                    title='Another title'
-                )
-            )
-            assert status == '701 Invalid Due Date Format'
-
-            when(
-                'Due date is not in form',
-                form=given - 'dueDate' | dict(title='Another title')
-            )
-            assert status == '711 Due Date Not In Form'
 
             when(
                 'Cutoff format is wrong',
@@ -188,7 +163,6 @@ class TestRelease(LocalApplicationTestCase):
             form=dict(
                 title='My interesting release',
                 description='This is my new awesome release',
-                dueDate='2200-2-2',
                 cutoff='2300-2-2',
                 status='in-progress'
             )
@@ -196,7 +170,6 @@ class TestRelease(LocalApplicationTestCase):
             assert status == 200
             assert response.json['title'] == 'My interesting release'
             assert response.json['description'] == 'This is my new awesome release'
-            assert response.json['dueDate'] == '2200-02-02T00:00:00'
             assert response.json['cutoff'] == '2300-02-02T00:00:00'
             assert response.json['status'] == 'in-progress'
 
@@ -234,14 +207,6 @@ class TestRelease(LocalApplicationTestCase):
             )
             assert status == '703 At Most 512 Characters Are Valid For '\
                 'Description'
-
-            when(
-                'Due date format is wrong',
-                form=given | dict(
-                    dueDate='20-20-20',
-                )
-            )
-            assert status == '701 Invalid Due Date Format'
 
             when(
                 'Cutoff format is wrong',
