@@ -20,12 +20,12 @@ class Dolphin(Application):
 
       oauth:
 
-        secret: A1dFVpz4w/qyym+HeXKWYmm6Ocj4X5ZNv1JQ7kgHBEk=
+        secret: A1dFVpz4w/qyym+HeXKWYmm6Ocj4X5ZNv1JQ7kgHBEk=\n
         application_id: 1
-        url: http://localhost:8082
+        url: http://localhost:8081
 
       chat:
-        url: http://localhost:8081
+        url: http://localhost:8082
 
    '''
 
