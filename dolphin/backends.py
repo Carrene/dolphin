@@ -9,7 +9,7 @@ from .exceptions import ChatServerNotFound, ChatServerNotAvailable, \
     RoomMemberNotFound
 
 
-logger = get_logger()
+logger = get_logger('backend-jaguar')
 
 
 class CASClient:
@@ -96,21 +96,26 @@ class ChatClient:
             room = json.loads(response.text)
             return room
 
-    def delete_room(self, id, token, x_access_token):
-
-        response = requests.request(
-            'DELETE',
-            f'{settings.chat.url}/apiv1/rooms/{id}',
-            headers={
-                'authorization': token,
-                'X-Oauth2-Access-Token': x_access_token
-            }
-        )
-        return response
+# TODO: This API is not implemented in jaguar yet
+#    def delete_room(self, id, token, x_access_token):
+#
+#        url = f'{settings.chat.url}/apiv1/rooms/{id}'
+#        logger.debug(f'DELETE {url}')
+#        response = requests.request(
+#            'DELETE',
+#            url,
+#            headers={
+#                'authorization': token,
+#                'X-Oauth2-Access-Token': x_access_token
+#            }
+#        )
+#        return response
 
     def add_member(self, id, user_id, token, x_access_token):
 
         try:
+            url = f'{settings.chat.url}/apiv1/rooms/{id}'
+            logger.debug(f'DELETE {url}')
             response = requests.request(
                 'ADD',
                 f'{settings.chat.url}/apiv1/rooms/{id}',
