@@ -103,7 +103,7 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['title'] == 'My awesome project'
             assert response.json['description'] == 'A decription for my project'
             assert response.json['status'] == 'queued'
-            assert response.json['boarding'] == 'on-time'
+            assert response.json['boarding'] == None
             assert response.json['dueDate'] == None
 
             when(
