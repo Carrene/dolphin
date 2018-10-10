@@ -25,7 +25,6 @@ def insert(): # pragma: no cover
     release1 = Release(
         title='My first release',
         description='This is an awesome product.',
-        due_date='2020-2-20',
         cutoff='2030-2-20',
     )
     DBSession.add(release1)
@@ -33,7 +32,6 @@ def insert(): # pragma: no cover
     release2 = Release(
         title='My second release',
         description='A decription for my release.',
-        due_date='2018-2-20',
         cutoff='2022-2-20',
     )
     DBSession.add(release2)
@@ -41,7 +39,6 @@ def insert(): # pragma: no cover
     release3 = Release(
         title='My third release',
         description='One of the most interesting releases.',
-        due_date='2025-2-20',
         cutoff='2027-2-20',
     )
     DBSession.add(release3)
@@ -49,7 +46,6 @@ def insert(): # pragma: no cover
     release4 = Release(
         title='My fourth release',
         description='A description for fourth release.',
-        due_date='2028-2-20',
         cutoff='2030-2-20',
     )
     DBSession.add(release4)
@@ -57,7 +53,6 @@ def insert(): # pragma: no cover
     release5 = Release(
         title='My fifth release',
         description='This release has awesome projects.',
-        due_date='2032-2-20',
         cutoff='2034-2-20',
     )
     DBSession.add(release5)

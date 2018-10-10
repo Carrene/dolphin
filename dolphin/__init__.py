@@ -19,12 +19,13 @@ class Dolphin(Application):
         administrative_url: postgresql://postgres:postgres@localhost/postgres
 
       oauth:
-        secret: oauth2-secret
+
+        secret: A1dFVpz4w/qyym+HeXKWYmm6Ocj4X5ZNv1JQ7kgHBEk=\n
         application_id: 1
-        url: http://nightly.cas.carrene.com
+        url: http://localhost:8081
 
       chat:
-        url: http://nightly.cucumber.carrene.com
+        url: http://localhost:8082
 
    '''
 

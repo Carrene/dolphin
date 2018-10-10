@@ -1,11 +1,9 @@
-from nanohttp import json, context, HTTPNotFound
+from nanohttp import json
 from restfulpy.authorization import authorize
-from restfulpy.orm import DBSession, commit
 from restfulpy.controllers import ModelRestController
-from sqlalchemy.exc import SQLAlchemyError
+from restfulpy.orm import DBSession, commit
 
-from dolphin.backends import CASClient, ChatClient
-from dolphin.models import Manager, Project
+from ..models import Manager, Member
 
 
 class ManagerController(ModelRestController):

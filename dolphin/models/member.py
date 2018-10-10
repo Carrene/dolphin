@@ -63,6 +63,6 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     @classmethod
     def current(cls):
         return DBSession.query(cls) \
-            .filter(cls.email == context.identity.email) \
+            .filter(cls.reference_id == context.identity.reference_id) \
             .one()
 

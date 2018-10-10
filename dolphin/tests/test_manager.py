@@ -1,7 +1,6 @@
-
 from bddrest import status, response, Update, when, Remove, Append, given
 
-from dolphin.models import Project, Manager, Release
+from dolphin.models import Project, Manager, Release, Member
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
@@ -90,14 +89,6 @@ class TestManager(LocalApplicationTestCase):
             )
             assert response.json[0]['title'] == 'Unassigned Manager'
 
-        with oauth_mockup_server(), self.given(
-            'Filter managers',
-            '/apiv1/managers',
-            'LIST',
-            query=dict(sort='id', title='First Manager')
-        ):
-            assert response.json[0]['title'] == 'First Manager'
-
             when(
                 'List managers except one of them',
                 query=dict(title='!Assigned Manager')
@@ -110,13 +101,13 @@ class TestManager(LocalApplicationTestCase):
             'LIST',
             query=dict(sort='id', take=1, skip=2)
         ):
-            assert response.json[0]['title'] == 'First Manager'
+            assert response.json[0]['title'] == 'manager1'
 
             when(
                 'Manipulate sorting and pagination',
                 query=dict(sort='-title', take=1, skip=2)
             )
-            assert response.json[0]['title'] == 'First Manager'
+            assert response.json[0]['title'] == 'manager1'
 
             when('Request is not authorized', authorization=None)
             assert status == 401

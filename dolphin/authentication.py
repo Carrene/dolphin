@@ -43,8 +43,8 @@ class Authenticator(StatefulAuthenticator):
 
         # FIXME: If any item added to scopes, the additional scopes item must
         # be considered here
-        if member.title != principal.payload['name']:
-            member.title = principal.payload['name']
+        if member.title != cas_member['title']:
+            member.title = cas_member['title']
             DBSession.commit()
 
         return principal
