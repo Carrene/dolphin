@@ -115,11 +115,11 @@ class ChatClient:
 
         try:
             url = f'{settings.chat.url}/apiv1/rooms/{id}'
-            logger.debug(f'DELETE {url}')
+            logger.debug(f'DELETE {url} userId={user_id}')
             response = requests.request(
                 'ADD',
                 f'{settings.chat.url}/apiv1/rooms/{id}',
-                data={'userId':user_id},
+                data={'userId': user_id},
                 headers={
                     'authorization': token,
                     'X-Oauth2-Access-Token': x_access_token
