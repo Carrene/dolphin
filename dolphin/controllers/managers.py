@@ -3,7 +3,7 @@ from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 
-from dolphin.models import Manager, Member
+from ..models import Manager, Member
 
 
 class ManagerController(ModelRestController):
