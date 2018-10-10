@@ -11,16 +11,6 @@ class TestManager(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        cls.member1 = Member(
-            title='First member',
-            email='member1@example.com',
-            access_token='access token 1',
-            phone=123457869,
-            reference_id=5
-        )
-        session.add(cls.member1)
-
-
         assigned_manager = Manager(
             title='Assigned Manager',
             email='assigned@example.com',
@@ -121,16 +111,4 @@ class TestManager(LocalApplicationTestCase):
 
             when('Request is not authorized', authorization=None)
             assert status == 401
-
-    def test_make(self):
-        self.login('manager1@example.com')
-
-        with oauth_mockup_server(), self.given(
-            'Make a manager',
-            f'/apiv1/members/{self.member1.id}/managers',
-            'MAKE',
-        ):
-            assert status == 200
-
-
 

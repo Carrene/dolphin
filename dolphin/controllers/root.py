@@ -10,7 +10,6 @@ from .issues import IssueController
 from .items import ItemController
 from .tokens import TokenController
 from .oauth2 import OAUTHController
-from .members import MemberController
 
 
 class Apiv1(Controller):
@@ -22,7 +21,6 @@ class Apiv1(Controller):
     items = ItemController()
     tokens = TokenController()
     oauth2 = OAUTHController()
-    members = MemberController()
 
     @json
     def version(self):

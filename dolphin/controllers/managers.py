@@ -16,22 +16,3 @@ class ManagerController(ModelRestController):
         query = DBSession.query(Manager)
         return query
 
-    @authorize
-    @json
-    @Member.expose
-    @commit
-    def make(self, id):
-
-        try:
-            id = int(id)
-        except (TypeError, ValueError):
-            raise HTTPNotFound()
-
-
-        member = DBSession.query(Member).filter(Member.id == id).one_or_none()
-        if member is None:
-            raise HTTPNotFound()
-
-        member.role = 'manager'
-        return member
-
