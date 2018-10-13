@@ -9,7 +9,7 @@ from .exceptions import ChatServerNotFound, ChatServerNotAvailable, \
     RoomMemberNotFound
 
 
-logger = get_logger('backend-jaguar')
+logger = get_logger('backends')
 
 
 class CASClient:
@@ -49,16 +49,18 @@ class CASClient:
 class ChatClient:
 
     def create_room(self, title, token, x_access_token, owner_id=None):
+        url = f'{settings.chat.url}/apiv1/rooms'
         try:
             response = requests.request(
                 'CREATE',
-                f'{settings.chat.url}/apiv1/rooms',
+                url,
                 data={'title':title},
                 headers={
                     'authorization': token,
                     'X-Oauth2-Access-Token': x_access_token
                 }
             )
+            logger.debug(f'CREATE {url} title={title}')
             if response.status_code == 404:
                 raise ChatServerNotFound()
 
@@ -113,18 +115,18 @@ class ChatClient:
 
     def add_member(self, id, user_id, token, x_access_token):
 
+        url = f'{settings.chat.url}/apiv1/rooms/{id}'
         try:
-            url = f'{settings.chat.url}/apiv1/rooms/{id}'
-            logger.debug(f'DELETE {url} userId={user_id}')
             response = requests.request(
                 'ADD',
-                f'{settings.chat.url}/apiv1/rooms/{id}',
+                url,
                 data={'userId': user_id},
                 headers={
                     'authorization': token,
                     'X-Oauth2-Access-Token': x_access_token
                 }
             )
+            logger.debug(f'ADD {url} userId={user_id}')
             if response.status_code == 404:
                 raise ChatServerNotFound()
 
@@ -151,13 +153,15 @@ class ChatClient:
 
     def remove_member(self, id, user_id, token, x_access_token):
 
+        url = f'{settings.chat.url}/apiv1/rooms/{id}'
         try:
             response = requests.request(
                 'REMOVE',
-                f'{settings.chat.url}/apiv1/rooms/{id}',
+                url,
                 data={'userId':user_id},
                 headers={'X-Oauth2-Access-Token':x_access_token}
             )
+            logger.debug(f'REMOVE {url} userId={user_id}')
             if response.status_code == 404:
                 raise ChatServerNotFound()
 
