@@ -11,6 +11,7 @@ from .exceptions import ChatServerNotFound, ChatServerNotAvailable, \
 
 logger = get_logger('backends')
 
+
 class CASClient:
 
     def __init__(self):
@@ -52,10 +53,7 @@ class CASClient:
             url,
             headers={'authorization': f'oauth2-accesstoken {access_token}'}
         )
-        logger.debug(
-            f'GET {url} - ' \
-            f'authorization:=oauth2-accesstoken {access_token} - ' \
-        )
+        logger.debug(f'GET {url}')
         if response.status_code != 200:
             raise HTTPForbidden()
 
@@ -126,7 +124,7 @@ class ChatClient:
             room = json.loads(response.text)
             return room
 
-# TODO: This API is not implemented in jaguar yet
+# TODO: This API is not implemented in Jaguar yet
 #    def delete_room(self, id, token, x_access_token):
 #
 #        url = f'{settings.chat.url}/apiv1/rooms/{id}'

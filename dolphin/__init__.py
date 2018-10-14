@@ -25,7 +25,6 @@ class Dolphin(Application):
             level: debug
             handlers:
               - backend_handler
-            type: file
 
         handlers:
           backend_handler:
