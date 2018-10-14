@@ -20,19 +20,19 @@ class Dolphin(Application):
 
       logging:
         loggers:
-           cackends:
-             level: debug
-             handlers:
-               backend_handler
-             type: file
+          backends:
+            propagate: false
+            level: debug
+            handlers:
+              - backend_handler
+            type: file
 
         handlers:
           backend_handler:
             type: file
-            filename: /var/log/dolphin/dolphin-backends.log
+            filename: /tmp/dolphin-backends.log
 
       oauth:
-
         secret: A1dFVpz4w/qyym+HeXKWYmm6Ocj4X5ZNv1JQ7kgHBEk=\n
         application_id: 1
         url: http://localhost:8080

@@ -11,7 +11,6 @@ from .exceptions import ChatServerNotFound, ChatServerNotAvailable, \
 
 logger = get_logger('backends')
 
-
 class CASClient:
 
     def get_access_token(self, authorization_code):
@@ -47,6 +46,8 @@ class CASClient:
 
 
 class ChatClient:
+    def __init__(self):
+        self._server_name = self.__class__.__name__.replace('Client', '')
 
     def create_room(self, title, token, x_access_token, owner_id=None):
         url = f'{settings.chat.url}/apiv1/rooms'
@@ -60,7 +61,12 @@ class ChatClient:
                     'X-Oauth2-Access-Token': x_access_token
                 }
             )
-            logger.debug(f'CREATE {url} title={title}')
+            logger.debug(
+                f'CREATE {url} - ' \
+                f'title="{title}" - ' \
+                f'response-HTTP-code={response.status_code} - ' \
+                f'target-application={self._server_name}'
+            )
             if response.status_code == 404:
                 raise ChatServerNotFound()
 
@@ -70,12 +76,17 @@ class ChatClient:
             if response.status_code == 615:
                 response = requests.request(
                     'LIST',
-                    f'{settings.chat.url}/apiv1/rooms',
+                    url,
                     headers={
                         'authorization': token,
                         'X-Oauth2-Access-Token': x_access_token
                     },
                     params={'title':title, 'ownerId':owner_id}
+                )
+                logger.debug(
+                    f'LIST {url}?title={title}&ownerId={owner_id} - ' \
+                    f'response-HTTP-code={response.status_code} - ' \
+                    f'target-application={self._server_name}'
                 )
                 try:
                     rooms = json.loads(response.text)
@@ -126,7 +137,12 @@ class ChatClient:
                     'X-Oauth2-Access-Token': x_access_token
                 }
             )
-            logger.debug(f'ADD {url} userId={user_id}')
+            logger.debug(
+                f'ADD {url} - ' \
+                f'userId={user_id} - ' \
+                f'response-HTTP-code={response.status_code} - ' \
+                f'target-application={self._server_name}'
+            )
             if response.status_code == 404:
                 raise ChatServerNotFound()
 
@@ -161,7 +177,12 @@ class ChatClient:
                 data={'userId':user_id},
                 headers={'X-Oauth2-Access-Token':x_access_token}
             )
-            logger.debug(f'REMOVE {url} userId={user_id}')
+            logger.debug(
+                f'REMOVE {url} - ' \
+                f'userId={user_id} - ' \
+                f'response-HTTP-code={response.status_code} - ' \
+                f'target-application={self._server_name}'
+            )
             if response.status_code == 404:
                 raise ChatServerNotFound()
 
