@@ -4,13 +4,12 @@ from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 from restfulpy.utils import to_camel_case
 
-from ..models import Project, Manager, Subscription, Member
-from ..backends import ChatClient, CASClient
+from ..backends import ChatClient
+from ..exceptions import ChatRoomNotFound, RoomMemberAlreadyExist, \
+    RoomMemberNotFound
+from ..models import Project, Member, Subscription
 from ..validators import project_validator, update_project_validator, \
     subscribe_validator
-from ..exceptions import ChatServerNotFound, ChatServerNotAvailable, \
-    ChatInternallError, ChatRoomNotFound, RoomMemberAlreadyExist, \
-    RoomMemberNotFound
 
 
 class ProjectController(ModelRestController):
@@ -34,21 +33,21 @@ class ProjectController(ModelRestController):
 
         return room
 
-    def _replace_manager(self, manager_id, project, token, access_token):
-        new_assignee_manager = DBSession.query(Manager) \
-            .filter(Manager.id == manager_id) \
+    def _replace_member(self, member_id, project, token, access_token):
+        new_assignee_member = DBSession.query(Member) \
+            .filter(Member.id == member_id) \
             .one()
 
-        current_assignee_manager = project.manager
-        project.manager = new_assignee_manager
+        current_assignee_member = project.member
+        project.member = new_assignee_member
 
         room_members_modified = True
 
         try:
-            # Add new assignee manager to project chat room
+            # Add new assignee member to project chat room
             ChatClient().add_member(
                 project.room_id,
-                new_assignee_manager.reference_id,
+                new_assignee_member.reference_id,
                 token,
                 access_token
             )
@@ -57,10 +56,10 @@ class ProjectController(ModelRestController):
             pass
 
         try:
-            # Remove current assignee manager from project chat room
+            # Remove current assignee member from project chat room
             ChatClient().remove_member(
                 project.room_id,
-                current_assignee_manager.reference_id,
+                current_assignee_member.reference_id,
                 token,
                 access_token
             )
@@ -86,20 +85,20 @@ class ProjectController(ModelRestController):
         project.room_id = PENDING
         DBSession.flush()
 
-        manager = DBSession.query(Member) \
-            .filter(Member.id == form['managerId']) \
+        member = DBSession.query(Member) \
+            .filter(Member.id == form['memberId']) \
             .one()
 
-        room = self._ensure_room(form['title'], token, manager.access_token)
+        room = self._ensure_room(form['title'], token, member.access_token)
 
         chat_client = ChatClient()
         project.room_id = room['id']
         try:
             chat_client.add_member(
                 project.room_id,
-                manager.reference_id,
+                member.reference_id,
                 token,
-                manager.access_token
+                member.access_token
             )
         except RoomMemberAlreadyExist:
             # Exception is passed because it means `add_member()` is already
@@ -118,7 +117,7 @@ class ProjectController(ModelRestController):
             chat_client.delete_room(
                 project.room_id,
                 token,
-                manager.access_token
+                member.access_token
             )
             raise
 
@@ -167,15 +166,15 @@ class ProjectController(ModelRestController):
             )
 
         member = Member.current()
-        current_manager = project.manager
+        current_member = project.member
         project.update_from_request()
 
-        if 'managerId' in form and project.manager.id != form['managerId']:
-            manager = DBSession.query(Manager) \
-                .filter(Manager.id == form['managerId']) \
+        if 'memberId' in form and project.member.id != form['memberId']:
+            member = DBSession.query(Member) \
+                .filter(Member.id == form['memberId']) \
                 .one_or_none()
-            self._replace_manager(
-                form['managerId'],
+            self._replace_member(
+                form['memberId'],
                 project,
                 token,
                 member.access_token
@@ -187,8 +186,8 @@ class ProjectController(ModelRestController):
         try:
             DBSession.flush()
         except:
-            self.replace_manager(
-                current_manager.id,
+            self.replace_member(
+                current_member.id,
                 project,
                 token,
                 member.access_token

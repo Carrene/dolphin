@@ -1,9 +1,9 @@
 from nanohttp import json, context, HTTPNotFound
 from restfulpy.authorization import authorize
-from restfulpy.orm import DBSession, commit
 from restfulpy.controllers import ModelRestController
+from restfulpy.orm import DBSession, commit
 
-from dolphin.models import Item, item_statuses
+from dolphin.models import Item
 from dolphin.validators import update_item_validator
 
 

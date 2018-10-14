@@ -1,7 +1,6 @@
-
-from sqlalchemy import DateTime, Integer, ForeignKey, Enum
 from restfulpy.orm import Field, DeclarativeBase, relationship
 from restfulpy.orm.mixins import TimestampMixin
+from sqlalchemy import DateTime, Integer, ForeignKey, Enum
 
 
 item_statuses = [

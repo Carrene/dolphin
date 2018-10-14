@@ -1,5 +1,5 @@
-from sqlalchemy import Integer, ForeignKey
 from restfulpy.orm import DeclarativeBase, Field, relationship
+from sqlalchemy import Integer, ForeignKey
 
 from .member import Member
 

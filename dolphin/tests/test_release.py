@@ -1,6 +1,6 @@
-from bddrest import status, response, Update, when, Remove, Append, given
+from bddrest import status, response, when, Remove, given
 
-from dolphin.models import Release, Manager, Project
+from dolphin.models import Release, Member, Project
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
@@ -11,9 +11,9 @@ class TestRelease(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        manager = Manager(
-            title='First Manager',
-            email='manager1@example.com',
+        member = Member(
+            title='First Member',
+            email='member1@example.com',
             access_token='access token 1',
             phone=123456789,
             reference_id=1
@@ -48,7 +48,7 @@ class TestRelease(LocalApplicationTestCase):
         session.add(release4)
 
         project1 = Project(
-            manager=manager,
+            member=member,
             release=release1,
             title='My first project',
             description='A decription for my project',
@@ -57,7 +57,7 @@ class TestRelease(LocalApplicationTestCase):
         session.add(project1)
 
         project2 = Project(
-            manager=manager,
+            member=member,
             release=release3,
             title='My first project',
             description='A decription for my project',
@@ -66,7 +66,7 @@ class TestRelease(LocalApplicationTestCase):
         session.add(project2)
 
         project3 = Project(
-            manager=manager,
+            member=member,
             release=release1,
             title='My first project',
             description='A decription for my project',
@@ -75,7 +75,7 @@ class TestRelease(LocalApplicationTestCase):
         session.add(project3)
 
         project4 = Project(
-            manager=manager,
+            member=member,
             release=release1,
             title='My first project',
             description='A decription for my project',
@@ -85,7 +85,7 @@ class TestRelease(LocalApplicationTestCase):
         session.commit()
 
     def test_create(self):
-        self.login('manager1@example.com')
+        self.login('member1@example.com')
 
         with oauth_mockup_server(), self.given(
             'Createing a release',
@@ -154,7 +154,7 @@ class TestRelease(LocalApplicationTestCase):
             assert status == 401
 
     def test_update(self):
-        self.login('manager1@example.com')
+        self.login('member1@example.com')
 
         with oauth_mockup_server(), self.given(
             'Updating a release',
@@ -237,7 +237,7 @@ class TestRelease(LocalApplicationTestCase):
             assert status == '708 No Parameter Exists In The Form'
 
     def test_abort(self):
-        self.login('manager1@example.com')
+        self.login('member1@example.com')
 
         with oauth_mockup_server(), self.given(
             'Aborting a release',
@@ -274,7 +274,7 @@ class TestRelease(LocalApplicationTestCase):
             assert status == 401
 
     def test_list(self):
-        self.login('manager1@example.com')
+        self.login('member1@example.com')
 
         with oauth_mockup_server(), self.given(
             'List releases',
@@ -330,7 +330,7 @@ class TestRelease(LocalApplicationTestCase):
             assert status == 401
 
     def test_subscribe(self):
-        self.login('manager1@example.com')
+        self.login('member1@example.com')
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Subscribe release',
@@ -410,7 +410,7 @@ class TestRelease(LocalApplicationTestCase):
                 assert status == '200 OK'
 
     def test_unsubscribe(self):
-        self.login('manager1@example.com')
+        self.login('member1@example.com')
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Unsubscribe release',

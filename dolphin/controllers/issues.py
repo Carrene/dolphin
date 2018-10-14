@@ -1,16 +1,14 @@
-
 from nanohttp import HTTPStatus, json, context, HTTPNotFound
 from restfulpy.authorization import authorize
-from restfulpy.utils import to_camel_case
-from restfulpy.orm import DBSession, commit
 from restfulpy.controllers import ModelRestController
+from restfulpy.orm import DBSession, commit
+from restfulpy.utils import to_camel_case
 
-from ..models import Issue, issue_kinds, issue_statuses, Subscription, \
-    Resource, Phase, Item, Member
+from ..backends import ChatClient
+from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound
+from ..models import Issue, Subscription, Resource, Phase, Item, Member
 from ..validators import issue_validator, update_issue_validator, \
     subscribe_validator, assign_issue_validator
-from ..backends import ChatClient, CASClient
-from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound
 
 
 class IssueController(ModelRestController):

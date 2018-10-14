@@ -1,13 +1,6 @@
-from contextlib import contextmanager
+from bddrest.authoring import status, when, Remove, Update
 
-from cas import CASPrincipal
-from bddrest.authoring import status, when, Remove, Update, response
-from nanohttp import RestController, json, settings, context, HTTPForbidden
-from restfulpy.mockup import mockup_http_server
-
-from dolphin.models import Manager
-from dolphin.tests.helpers import LocalApplicationTestCase, MockupApplication, \
-    oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
 class TestToken(LocalApplicationTestCase):

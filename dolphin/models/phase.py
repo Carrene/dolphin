@@ -1,6 +1,5 @@
-
-from sqlalchemy import Integer, String, ForeignKey
 from restfulpy.orm import DeclarativeBase, Field, relationship
+from sqlalchemy import Integer, String, ForeignKey
 
 
 class Phase(DeclarativeBase):

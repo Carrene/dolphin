@@ -1,7 +1,7 @@
 from bddrest import status, response, Update, when, Remove, given
 
-from dolphin.models import Project, Manager, Release
-from dolphin.tests.helpers import MockupApplication, LocalApplicationTestCase,\
+from dolphin.models import Project, Member, Release
+from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status, \
     room_mockup_server
 
@@ -12,41 +12,41 @@ class TestProject(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        manager1 = Manager(
-            title='First Manager',
-            email='manager1@example.com',
+        member1 = Member(
+            title='First Member',
+            email='member1@example.com',
             access_token='access token 1',
             phone=123456789,
             reference_id=2
         )
-        session.add(manager1)
+        session.add(member1)
 
-        manager2 = Manager(
-            title='Second Manager',
-            email='manager2@example.com',
+        member2 = Member(
+            title='Second Member',
+            email='member2@example.com',
             access_token='access token 2',
             phone=123457689,
             reference_id=3
         )
-        session.add(manager2)
+        session.add(member2)
 
-        manager3 = Manager(
-            title='Third Manager',
-            email='manager3@example.com',
+        member3 = Member(
+            title='Third Member',
+            email='member3@example.com',
             access_token='access token 3',
             phone=123467859,
             reference_id=4
         )
-        session.add(manager3)
+        session.add(member3)
 
-        manager4 = Manager(
-            title='Fourth Manager',
-            email='manager4@example.com',
+        member4 = Member(
+            title='Fourth Member',
+            email='member4@example.com',
             access_token='access token 4',
             phone=142573689,
             reference_id=5
         )
-        session.add(manager4)
+        session.add(member4)
 
         release = Release(
             title='My first release',
@@ -56,7 +56,7 @@ class TestProject(LocalApplicationTestCase):
         session.add(release)
 
         project1 = Project(
-            manager=manager1,
+            member=member1,
             release=release,
             title='My first project',
             description='A decription for my project',
@@ -65,7 +65,7 @@ class TestProject(LocalApplicationTestCase):
         session.add(project1)
 
         project2 = Project(
-            manager=manager1,
+            member=member1,
             release=release,
             title='My second project',
             description='A decription for my project',
@@ -74,7 +74,7 @@ class TestProject(LocalApplicationTestCase):
         session.add(project2)
 
         hidden_project = Project(
-            manager=manager1,
+            member=member1,
             release=release,
             title='My hidden project',
             description='A decription for my project',
@@ -83,18 +83,18 @@ class TestProject(LocalApplicationTestCase):
         )
         session.add(hidden_project)
         session.commit()
-        cls.manager_id = manager1.id
+        cls.member_id = member1.id
         cls.release = release
 
     def test_create(self):
-        self.login('manager1@example.com')
+        self.login('member1@example.com')
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Createing a project',
             '/apiv1/projects',
             'CREATE',
             form=dict(
-                managerId=self.manager_id,
+                memberId=self.member_id,
                 title='My awesome project',
                 description='A decription for my project',
             )
@@ -107,24 +107,24 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['dueDate'] == None
 
             when(
-                'Manager id not in form',
-                form=given - 'managerId' | dict(title='1')
+                'Member id not in form',
+                form=given - 'memberId' | dict(title='1')
             )
-            assert status == '734 Manager Id Not In Form'
+            assert status == '739 Member Id Not In Form'
 
             when(
-                'Manager not found with string type',
-                form=given | dict(managerId='Alphabetical', title='1')
+                'Member not found with string type',
+                form=given | dict(memberId='Alphabetical', title='1')
             )
-            assert status == 608
-            assert status.text.startswith('Manager not found')
+            assert status == 610
+            assert status.text.startswith('Member not found')
 
             when(
-                'Manager not found with integer type',
-                form=given | dict(managerId=100, title='1')
+                'Member not found with integer type',
+                form=given | dict(memberId=100, title='1')
             )
-            assert status == 608
-            assert status.text.startswith('Manager not found')
+            assert status == 610
+            assert status.text.startswith('Member not found')
 
             when(
                 'Release not found with string type',
@@ -211,7 +211,7 @@ class TestProject(LocalApplicationTestCase):
                 assert status == '200 OK'
 
     def test_update(self):
-        self.login('manager1@example.com')
+        self.login('member1@example.com')
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Updating a project',
@@ -221,7 +221,7 @@ class TestProject(LocalApplicationTestCase):
                 title='My interesting project',
                 description='A updated project description',
                 status='active',
-                managerId=2,
+                memberId=2,
             )
         ):
             assert status == 200
@@ -243,18 +243,18 @@ class TestProject(LocalApplicationTestCase):
             assert status == 404
 
             when(
-                'Manager not found with string type',
-                form=given | dict(managerId='Alphabetical', title='1')
+                'Member not found with string type',
+                form=given | dict(memberId='Alphabetical', title='1')
             )
-            assert status == 608
-            assert status.text.startswith('Manager not found')
+            assert status == 610
+            assert status.text.startswith('Member not found')
 
             when(
-                'Manager is not found',
-                form=Update(managerId=100)
+                'Member is not found',
+                form=Update(memberId=100)
             )
-            assert status == 608
-            assert status.text.startswith('Manager not found')
+            assert status == 610
+            assert status.text.startswith('Member not found')
 
             when(
                 'Title is repetetive',
@@ -303,28 +303,28 @@ class TestProject(LocalApplicationTestCase):
             with chat_server_status('404 Not Found'):
                 when(
                     'Chat server is not found',
-                    form=given | dict(managerId=3)
+                    form=given | dict(memberId=3)
                 )
                 assert status == '617 Chat Server Not Found'
 
             with chat_server_status('503 Service Not Available'):
                 when(
                     'Chat server is not available',
-                    form=given | dict(managerId=3)
+                    form=given | dict(memberId=3)
                 )
                 assert status == '800 Chat Server Not Available'
 
             with chat_server_status('500 Internal Service Error'):
                 when(
                     'Chat server faces with internal error',
-                    form=given | dict(managerId=3)
+                    form=given | dict(memberId=3)
                 )
                 assert status == '801 Chat Server Internal Error'
 
             with room_mockup_server():
                 when(
                     'Room member is already added to room',
-                    form=given | dict(managerId=3)
+                    form=given | dict(memberId=3)
                 )
                 assert status == '200 OK'
 
@@ -337,7 +337,7 @@ class TestProject(LocalApplicationTestCase):
                 assert status == '708 No Parameter Exists In The Form'
 
     def test_hide(self):
-        self.login('manager1@example.com')
+        self.login('member1@example.com')
 
         with oauth_mockup_server(), self.given(
             'Hiding a project',
@@ -370,7 +370,7 @@ class TestProject(LocalApplicationTestCase):
             assert status == 401
 
     def test_show(self):
-        self.login('manager1@example.com')
+        self.login('member1@example.com')
 
         with oauth_mockup_server(), self.given(
             'Showing a unhidden project',
@@ -400,7 +400,7 @@ class TestProject(LocalApplicationTestCase):
             assert status == 401
 
     def test_list(self):
-        self.login('manager1@example.com')
+        self.login('member1@example.com')
 
         with oauth_mockup_server(), self.given(
             'List projects',
@@ -457,7 +457,7 @@ class TestProject(LocalApplicationTestCase):
                 assert status == 401
 
     def test_subscribe(self):
-        self.login('manager1@example.com')
+        self.login('member1@example.com')
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Subscribe project',
@@ -537,7 +537,7 @@ class TestProject(LocalApplicationTestCase):
                 assert status == '200 OK'
 
     def test_unsubscribe(self):
-        self.login('manager1@example.com')
+        self.login('member1@example.com')
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Unsubscribe an project',

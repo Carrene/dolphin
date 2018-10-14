@@ -1,11 +1,10 @@
-from itsdangerous import BadSignature
 from cas import CASPrincipal
-from nanohttp import HTTPStatus, context, HTTPUnauthorized, HTTPBadRequest
+from nanohttp import HTTPStatus, HTTPUnauthorized
 from restfulpy.authentication import StatefulAuthenticator
 from restfulpy.orm import DBSession
 
-from .models import Member
 from .backends import CASClient
+from .models import Member
 
 
 class Authenticator(StatefulAuthenticator):

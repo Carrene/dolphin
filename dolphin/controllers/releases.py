@@ -1,18 +1,14 @@
-import re
-
 from nanohttp import json, context, HTTPNotFound, HTTPStatus
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 from restfulpy.utils import to_camel_case
 
+from ..backends import ChatClient
+from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound
 from ..models import Release, release_statuses, Subscription, Member
 from ..validators import release_validator, update_release_validator, \
     subscribe_validator
-from ..backends import CASClient, ChatClient
-from ..exceptions import ChatServerNotFound, ChatServerNotAvailable, \
-    ChatInternallError, ChatRoomNotFound, RoomMemberAlreadyExist, \
-    RoomMemberNotFound
 
 
 class ReleaseController(ModelRestController):

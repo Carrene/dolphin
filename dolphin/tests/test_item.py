@@ -1,7 +1,6 @@
-
 from bddrest import status, response, Update, when, Remove
 
-from dolphin.models import Item, Phase, Issue, Manager, Release, Project, \
+from dolphin.models import Item, Phase, Issue, Member, Release, Project, \
     Resource, Team
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
@@ -17,14 +16,14 @@ class TestItem(LocalApplicationTestCase):
         )
         session.add(team)
 
-        manager = Manager(
-            title='First Manager',
-            email='manager1@example.com',
+        member = Member(
+            title='First Member',
+            email='member1@example.com',
             access_token='access token 1',
             phone=123456789,
             reference_id=1
         )
-        session.add(manager)
+        session.add(member)
 
         release = Release(
             title='My first release',
@@ -34,7 +33,7 @@ class TestItem(LocalApplicationTestCase):
         session.add(release)
 
         project = Project(
-            manager=manager,
+            member=member,
             release=release,
             title='My first project',
             description='A decription for my project',
@@ -80,7 +79,7 @@ class TestItem(LocalApplicationTestCase):
         session.commit()
 
     def test_update(self):
-        self.login('manager1@example.com')
+        self.login('member1@example.com')
 
         with oauth_mockup_server(), self.given(
             'Update status of an item',

@@ -25,7 +25,7 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
     release_id = Field(Integer, ForeignKey('release.id'), nullable=True)
-    manager_id = Field(Integer, ForeignKey('member.id'))
+    member_id = Field(Integer, ForeignKey('member.id'))
     group_id = Field(Integer, ForeignKey('group.id'), nullable=True)
     room_id = Field(Integer)
 
@@ -34,9 +34,9 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         default='queued'
     )
 
-    manager = relationship(
-        'Manager',
-        foreign_keys=[manager_id],
+    member = relationship(
+        'Member',
+        foreign_keys=[member_id],
         back_populates='projects',
         protected=True
     )

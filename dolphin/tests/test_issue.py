@@ -1,7 +1,6 @@
+from bddrest import status, response, Update, when, given
 
-from bddrest import status, response, Update, when, Remove, Append, given
-
-from dolphin.models import Issue, Project, Manager, Release, Phase, Resource
+from dolphin.models import Issue, Project, Member, Release, Phase, Resource
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
@@ -12,9 +11,9 @@ class TestIssue(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        manager = Manager(
-            title='First Manager',
-            email='manager1@example.com',
+        member = Member(
+            title='First Member',
+            email='member1@example.com',
             access_token='access token 1',
             phone=123456789,
             reference_id=1
@@ -35,7 +34,7 @@ class TestIssue(LocalApplicationTestCase):
         )
 
         project = Project(
-            manager=manager,
+            member=member,
             release=release,
             title='My first project',
             description='A decription for my project',
@@ -89,7 +88,7 @@ class TestIssue(LocalApplicationTestCase):
         session.commit()
 
     def test_define(self):
-        self.login('manager1@example.com')
+        self.login('member1@example.com')
 
         with oauth_mockup_server(), self.given(
             'Define an issue',
@@ -216,7 +215,7 @@ class TestIssue(LocalApplicationTestCase):
             assert status == 401
 
     def test_update(self):
-        self.login('manager1@example.com')
+        self.login('member1@example.com')
 
         with oauth_mockup_server(), self.given(
             'Update a issue',
@@ -312,7 +311,7 @@ class TestIssue(LocalApplicationTestCase):
             assert status == '708 No Parameter Exists In The Form'
 
     def test_list(self):
-        self.login('manager1@example.com')
+        self.login('member1@example.com')
 
         with oauth_mockup_server(), self.given(
             'List issues',
@@ -368,7 +367,7 @@ class TestIssue(LocalApplicationTestCase):
             assert status == 401
 
     def test_subscribe(self):
-        self.login('manager1@example.com')
+        self.login('member1@example.com')
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Subscribe an issue',
@@ -450,7 +449,7 @@ class TestIssue(LocalApplicationTestCase):
                 assert status == '200 OK'
 
     def test_unsubscribe(self):
-        self.login('manager1@example.com')
+        self.login('member1@example.com')
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Unsubscribe an issue',
@@ -532,7 +531,7 @@ class TestIssue(LocalApplicationTestCase):
                 assert status == '200 OK'
 
     def test_assign(self):
-        self.login('manager1@example.com')
+        self.login('member1@example.com')
 
         with oauth_mockup_server(), self.given(
             'Assign an issue to a resource',

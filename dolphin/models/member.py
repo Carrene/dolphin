@@ -1,16 +1,10 @@
-import os
-from hashlib import sha256
-
-from nanohttp import context
-from sqlalchemy import Integer, String, Unicode, BigInteger
-from sqlalchemy.orm import synonym
-from restfulpy.principal import JwtPrincipal, JwtRefreshToken
-from restfulpy.orm import DeclarativeBase, Field, TimestampMixin, \
-    relationship, DBSession, SoftDeleteMixin, ModifiedMixin, FilteringMixin, \
-    PaginationMixin, OrderingMixin
 from cas import CASPrincipal
-
-from .subscribable import Subscription
+from nanohttp import context
+from restfulpy.orm import DeclarativeBase, Field, relationship, DBSession, \
+    SoftDeleteMixin, ModifiedMixin, FilteringMixin, PaginationMixin, \
+    OrderingMixin
+from restfulpy.principal import JwtRefreshToken
+from sqlalchemy import Integer, String, Unicode, BigInteger
 
 
 class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
@@ -41,6 +35,8 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         secondary='subscription',
         back_populates='members',
     )
+
+    projects = relationship('Project', back_populates='member', protected=True)
 
     @property
     def roles(self):
