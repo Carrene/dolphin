@@ -13,19 +13,31 @@ logger = get_logger('backends')
 
 class CASClient:
 
+    def __init__(self):
+        self._server_name = self.__class__.__name__.replace('Client', '')
+
     def get_access_token(self, authorization_code):
 
         if authorization_code is None:
             raise HTTPForbidden()
 
+        url = f'{settings.oauth.url}/apiv1/accesstokens'
         response = requests.request(
             'CREATE',
-            f'{settings.oauth.url}/apiv1/accesstokens',
+            url,
             data=dict(
                 code=authorization_code,
                 secret=settings.oauth['secret'],
                 applicationId=settings.oauth['application_id']
             )
+        )
+        logger.debug(
+            f'CREATE {url} - ' \
+            f'authorizationCode="{authorization_code}" - ' \
+            f'secret={settings.oauth["secret"]} - ' \
+            f'applicationId={settings.oauth["application_id"]} - ' \
+            f'response-HTTP-code={response.status_code} - ' \
+            f'target-application={self._server_name}'
         )
         if response.status_code != 200:
             raise HTTPForbidden()
@@ -35,9 +47,14 @@ class CASClient:
 
     def get_member(self, access_token):
 
+        url = f'{settings.oauth.url}/apiv1/members/me'
         response = requests.get(
-            f'{settings.oauth.url}/apiv1/members/me',
+            url,
             headers={'authorization': f'oauth2-accesstoken {access_token}'}
+        )
+        logger.debug(
+            f'GET {url} - ' \
+            f'authorization:=oauth2-accesstoken {access_token} - ' \
         )
         if response.status_code != 200:
             raise HTTPForbidden()
