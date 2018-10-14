@@ -73,7 +73,7 @@ class ChatClient:
             response = requests.request(
                 'CREATE',
                 url,
-                data={'title':title},
+                data={'title': title},
                 headers={
                     'authorization': token,
                     'X-Oauth2-Access-Token': x_access_token
@@ -99,7 +99,7 @@ class ChatClient:
                         'authorization': token,
                         'X-Oauth2-Access-Token': x_access_token
                     },
-                    params={'title':title, 'ownerId':owner_id}
+                    params={'title': title, 'ownerId': owner_id}
                 )
                 logger.debug(
                     f'LIST {url}?title={title}&ownerId={owner_id} - ' \
@@ -192,8 +192,8 @@ class ChatClient:
             response = requests.request(
                 'REMOVE',
                 url,
-                data={'userId':user_id},
-                headers={'X-Oauth2-Access-Token':x_access_token}
+                data={'userId': user_id},
+                headers={'X-Oauth2-Access-Token': x_access_token}
             )
             logger.debug(
                 f'REMOVE {url} - ' \
