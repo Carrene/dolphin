@@ -157,7 +157,7 @@ class ProjectController(ModelRestController):
                 f'"{", ".join(json_columns)}" is accepted'
             )
 
-        if form['title'] and DBSession.query(Project).filter(
+        if 'title' in form and DBSession.query(Project).filter(
             Project.id != id,
             Project.title == form['title']
         ).one_or_none():
@@ -170,7 +170,7 @@ class ProjectController(ModelRestController):
         current_manager = project.manager
         project.update_from_request()
 
-        if form['managerId'] and project.manager.id != form['managerId']:
+        if 'managerId' in form and project.manager.id != form['managerId']:
             manager = DBSession.query(Manager) \
                 .filter(Manager.id == form['managerId']) \
                 .one_or_none()
