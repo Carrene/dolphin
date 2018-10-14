@@ -53,7 +53,10 @@ class CASClient:
             url,
             headers={'authorization': f'oauth2-accesstoken {access_token}'}
         )
-        logger.debug(f'GET {url}')
+        logger.debug(
+            f'GET {url} - ' \
+            f'target-application={self._server_name}'
+        )
         if response.status_code != 200:
             raise HTTPForbidden()
 
