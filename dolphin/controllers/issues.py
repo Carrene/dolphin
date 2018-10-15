@@ -54,6 +54,15 @@ class IssueController(ModelRestController):
                 f'"{", ".join(json_columns)}" is accepted'
             )
 
+        if 'title' in form and DBSession.query(Issue).filter(
+            Issue.id != id,
+            Issue.title == form['title']
+        ).one_or_none():
+            raise HTTPStatus(
+                f'600 Another issue with title: ' \
+                f'"{form["title"]}" is already exists.'
+            )
+
         issue.update_from_request()
         return issue
 
