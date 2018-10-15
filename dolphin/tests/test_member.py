@@ -64,9 +64,9 @@ class TestMember(LocalApplicationTestCase):
 
             when(
                 'List members except one of them',
-                query=dict(title='!Assigned Member')
+                query=dict(title='!Second Member')
             )
-            assert response.json[0]['title'] != 'Assigned Member'
+            assert len(response.json) == 2
 
             when(
                 'Member pagination',
