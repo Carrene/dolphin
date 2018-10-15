@@ -3,8 +3,8 @@ from nanohttp import RestController, json, context, HTTPBadRequest, validate, \
 from restfulpy.authorization import authorize
 from restfulpy.orm import DBSession
 
-from ..models import Manager, Member
 from ..backends import CASClient
+from ..models import Member
 
 
 class TokenController(RestController):

@@ -1,8 +1,6 @@
+from restfulpy.orm import DBSession
 
-from restfulpy.orm import DBSession, commit
-
-from .models import Subscribable, Member, Project, Release, Issue, Tag,\
-    Phase, Manager, Resource, Guest, Team, Item
+from .models import Release
 
 
 def indented(n): # pragma: no cover

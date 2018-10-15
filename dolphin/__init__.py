@@ -18,14 +18,26 @@ class Dolphin(Application):
         test_url: postgresql://postgres:postgres@localhost/dolphin_test
         administrative_url: postgresql://postgres:postgres@localhost/postgres
 
-      oauth:
+      logging:
+        loggers:
+          backends:
+            propagate: false
+            level: debug
+            handlers:
+              - backend_handler
 
+        handlers:
+          backend_handler:
+            type: file
+            filename: /tmp/dolphin-backends.log
+
+      oauth:
         secret: A1dFVpz4w/qyym+HeXKWYmm6Ocj4X5ZNv1JQ7kgHBEk=\n
         application_id: 1
-        url: http://localhost:8081
+        url: http://localhost:8080
 
       chat:
-        url: http://localhost:8082
+        url: http://localhost:8081
 
    '''
 

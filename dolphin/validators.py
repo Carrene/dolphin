@@ -1,11 +1,11 @@
 import re
 
 from nanohttp import validate, HTTPStatus, context
-from restfulpy.orm import DBSession, commit
+from restfulpy.orm import DBSession
 
 from dolphin.models import Project, Release, Issue, issue_kinds, Member, \
     issue_statuses, item_statuses, project_statuses, release_statuses, \
-    Manager, Resource, Phase
+    Resource, Phase
 
 
 DATE_PATTERN = re.compile(
@@ -147,32 +147,21 @@ def item_status_value_validator(status, container, field):
     return form['status']
 
 
-def manager_exists_validator(managerId, container, field):
-    form = context.form
-    try:
-        managerId = int(managerId)
-    except (TypeError, ValueError):
-        raise HTTPStatus(
-            f'608 Manager not found with id: {context.form["managerId"]}'
-        )
-
-    if 'managerId' in form and not DBSession.query(Member) \
-            .filter(Member.id == managerId) \
-            .one_or_none():
-        raise HTTPStatus(
-            f'608 Manager not found with id: {context.form["managerId"]}'
-        )
-
-    return managerId
-
-
 def member_exists_validator(memberId, container, field):
     form = context.form
-    member = DBSession.query(Member) \
-        .filter(Member.id == form['memberId']) \
-        .one_or_none()
-    if not member:
-        raise HTTPStatus(f'610 Member not found with id: {form["memberId"]}')
+    try:
+        memberId = int(memberId)
+    except (TypeError, ValueError):
+        raise HTTPStatus(
+            f'610 Member not found with id: {context.form["memberId"]}'
+        )
+
+    if 'memberId' in form and not DBSession.query(Member) \
+            .filter(Member.id == memberId) \
+            .one_or_none():
+        raise HTTPStatus(
+            f'610 Member not found with id: {context.form["memberId"]}'
+        )
 
     return memberId
 
@@ -242,9 +231,9 @@ project_validator = validate(
     releaseId=dict(
         callback=release_exists_validator
     ),
-    managerId=dict(
-        required='734 Manager Id Not In Form',
-        callback=manager_exists_validator
+    memberId=dict(
+        required='739 Member Id Not In Form',
+        callback=member_exists_validator
     )
 )
 
@@ -262,8 +251,8 @@ update_project_validator = validate(
     phase=dict(
         callback=project_phase_value_validator
     ),
-    managerId=dict(
-        callback=manager_exists_validator
+    memberId=dict(
+        callback=member_exists_validator
     )
 )
 

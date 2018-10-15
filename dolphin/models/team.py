@@ -1,5 +1,5 @@
-from sqlalchemy import Integer, String
 from restfulpy.orm import Field, DeclarativeBase, relationship
+from sqlalchemy import Integer, String
 
 
 class Team(DeclarativeBase):

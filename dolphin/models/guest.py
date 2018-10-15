@@ -1,7 +1,3 @@
-
-from sqlalchemy import Integer, ForeignKey
-from restfulpy.orm import Field
-
 from .member import Member
 
 
