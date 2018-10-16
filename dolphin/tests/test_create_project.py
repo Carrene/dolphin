@@ -145,12 +145,12 @@ class TestProject(LocalApplicationTestCase):
                     'Chat server faces with internal error',
                     form=given | dict(title='Another title')
                 )
-                assert status == '200 OK'
+                assert status == 200
 
             with chat_server_status('604 Already Added To Target'):
                 when(
                     'Chat server faces with internal error',
                     form=given | dict(title='Awesome project')
                 )
-                assert status == '200 OK'
+                assert status == 200
 

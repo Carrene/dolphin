@@ -144,5 +144,5 @@ class TestIssue(LocalApplicationTestCase):
                     'Room member not found',
                     url_parameters=dict(id=3)
                 )
-                assert status == '200 OK'
+                assert status == 200
 

@@ -163,7 +163,7 @@ class TestProject(LocalApplicationTestCase):
                     'Room member is already added to room',
                     form=given | dict(memberId=2)
                 )
-                assert status == '200 OK'
+                assert status == 200
 
             with self.given(
                 'Updating project with empty form',

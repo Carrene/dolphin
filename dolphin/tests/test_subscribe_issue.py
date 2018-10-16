@@ -128,5 +128,5 @@ class TestIssue(LocalApplicationTestCase):
                     'Member is already added to room',
                     url_parameters=dict(id=3)
                 )
-                assert status == '200 OK'
+                assert status == 200
 
