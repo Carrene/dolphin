@@ -19,32 +19,54 @@ class TestRelease(LocalApplicationTestCase):
             reference_id=1
         )
         session.add(member)
+
+        release1 = Release(
+            title='My first release',
+            description='A decription for my first release',
+            cutoff='2030-2-20',
+        )
+        session.add(release1)
+
+        release2 = Release(
+            title='My second release',
+            description='A decription for my second release',
+            cutoff='2030-2-20',
+        )
+        session.add(release2)
         session.commit()
 
-    def test_create(self):
+    def test_update(self):
         self.login('member1@example.com')
 
         with oauth_mockup_server(), self.given(
-            'Createing a release',
-            '/apiv1/releases',
-            'CREATE',
+            'Updating a release',
+            '/apiv1/releases/id:1',
+            'UPDATE',
             form=dict(
-                title='My awesome release',
-                description='Decription for my release',
-                cutoff='2030-2-20'
+                title='My interesting release',
+                description='This is my new awesome release',
+                cutoff='2300-2-2',
+                status='in-progress'
             )
         ):
             assert status == 200
-            assert response.json['title'] == 'My awesome release'
-            assert response.json['description'] == 'Decription for my release'
-            assert response.json['cutoff'] == '2030-02-20T00:00:00'
-            assert response.json['status'] is None
+            assert response.json['title'] == 'My interesting release'
+            assert response.json['description'] == 'This is my new awesome release'
+            assert response.json['cutoff'] == '2300-02-02T00:00:00'
+            assert response.json['status'] == 'in-progress'
 
             when(
-                'Title is not in form',
-                form=Remove('title')
+                'Intended release with string type not found',
+                url_parameters=dict(id='Alphabetical')
             )
-            assert status == '710 Title Not In Form'
+            assert status == 404
+
+            when(
+                'Intended release with integer type not found',
+                form=given | dict(title='Another title'),
+                url_parameters=dict(id=100)
+            )
+            assert status == 404
 
             when(
                 'Title length is more than limit',
@@ -53,10 +75,16 @@ class TestRelease(LocalApplicationTestCase):
             assert status == '704 At Most 50 Characters Are Valid For Title'
 
             when(
+                'Title is repetitive',
+                form=given | dict(title='My second release')
+            )
+            assert status == 600
+            assert status.text.startswith('Another release with title')
+
+            when(
                 'Description length is less than limit',
                 form=given | dict(
                     description=((512 + 1) * 'a'),
-                    title='Another title'
                 )
             )
             assert status == '703 At Most 512 Characters Are Valid For '\
@@ -66,22 +94,14 @@ class TestRelease(LocalApplicationTestCase):
                 'Cutoff format is wrong',
                 form=given | dict(
                     cutoff='30-20-20',
-                    title='Another title'
                 )
             )
             assert status == '702 Invalid Cutoff Format'
 
             when(
-                'Due date is not in form',
-                form=given - 'cutoff' | dict(title='Another title')
-            )
-            assert status == '712 Cutoff Not In Form'
-
-            when(
                 'Invalid status in form',
                 form=given | dict(
                     status='progressing',
-                    title='Another title'
                 )
             )
             assert status == 705
@@ -89,4 +109,12 @@ class TestRelease(LocalApplicationTestCase):
 
             when('Request is not authorized', authorization=None)
             assert status == 401
+
+        with oauth_mockup_server(), self.given(
+            'Send HTTP request with empty form parameter',
+            '/apiv1/releases/id:1',
+            'UPDATE',
+            form=dict()
+        ):
+            assert status == '708 No Parameter Exists In The Form'
 
