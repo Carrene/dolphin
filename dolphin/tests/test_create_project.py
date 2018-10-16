@@ -1,9 +1,8 @@
 from bddrest import status, response, when, Remove, given
 
-from dolphin.models import Project, Member, Release
+from dolphin.models import Project, Member
 from dolphin.tests.helpers import LocalApplicationTestCase, \
-    oauth_mockup_server, chat_mockup_server, chat_server_status, \
-    room_mockup_server
+    oauth_mockup_server, chat_mockup_server, chat_server_status
 
 
 class TestProject(LocalApplicationTestCase):

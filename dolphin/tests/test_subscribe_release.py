@@ -1,4 +1,4 @@
-from bddrest import status, response, when, Remove, given
+from bddrest import status, when, given
 
 from dolphin.models import Release, Member, Project
 from dolphin.tests.helpers import LocalApplicationTestCase, \

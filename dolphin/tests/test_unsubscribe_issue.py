@@ -1,8 +1,5 @@
-from bddrest import status, when, given
-
 from dolphin.models import Issue, Project, Member, Subscription
-from dolphin.tests.helpers import LocalApplicationTestCase, \
-    oauth_mockup_server, chat_mockup_server, chat_server_status
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestIssue(LocalApplicationTestCase):
