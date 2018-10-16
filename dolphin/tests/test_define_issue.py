@@ -24,7 +24,6 @@ class TestIssue(LocalApplicationTestCase):
             description='A decription for my project',
             room_id=1
         )
-        session.add(project)
 
         issue1 = Issue(
             project=project,
@@ -162,6 +161,6 @@ class TestIssue(LocalApplicationTestCase):
             assert status == 705
             assert status.text.startswith('Invalid status')
 
-            when('Request is not authorized',authorization=None)
+            when('Request is not authorized', authorization=None)
             assert status == 401
 

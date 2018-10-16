@@ -17,7 +17,6 @@ class TestProject(LocalApplicationTestCase):
             phone=123456789,
             reference_id=2
         )
-        session.add(member1)
 
         project1 = Project(
             member=member1,

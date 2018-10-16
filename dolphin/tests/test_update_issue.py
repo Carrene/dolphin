@@ -134,7 +134,7 @@ class TestIssue(LocalApplicationTestCase):
             assert status == 707
             assert status.text.startswith('Invalid field')
 
-            when('Request is not authorized',authorization=None)
+            when('Request is not authorized', authorization=None)
             assert status == 401
 
         with oauth_mockup_server(), self.given(

@@ -111,6 +111,6 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert response.json[0]['title'] == 'First issue'
 
-            when('Request is not authorized',authorization=None)
+            when('Request is not authorized', authorization=None)
             assert status == 401
 

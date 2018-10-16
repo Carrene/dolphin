@@ -24,7 +24,6 @@ class TestIssue(LocalApplicationTestCase):
             description='A decription for my project',
             room_id=1
         )
-        session.add(project)
 
         phase = Phase(
             title='development',
@@ -125,6 +124,6 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert status == '602 Already Assigned'
 
-            when('Request is not authorized',authorization=None)
+            when('Request is not authorized', authorization=None)
             assert status == 401
 
