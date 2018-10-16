@@ -48,6 +48,7 @@ class TestProject(LocalApplicationTestCase):
             form=dict(memberId=1)
         ):
             assert status == 200
+            assert response.json['id'] == 1
 
             when(
                 'Intended project with string type not found',

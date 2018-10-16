@@ -1,4 +1,4 @@
-from bddrest import status, when, given
+from bddrest import status, when, given, response
 
 from dolphin.models import Release, Member, Project
 from dolphin.tests.helpers import LocalApplicationTestCase, \
@@ -63,6 +63,7 @@ class TestRelease(LocalApplicationTestCase):
             form=dict(memberId=1)
         ):
             assert status == 200
+            assert response.json['id'] == 1
 
             when(
                 'Intended release with string type not found',

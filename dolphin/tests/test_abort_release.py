@@ -1,4 +1,4 @@
-from bddrest import status, when
+from bddrest import status, when, response
 
 from dolphin.models import Release, Member
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
@@ -36,6 +36,7 @@ class TestRelease(LocalApplicationTestCase):
             'ABORT'
         ):
             assert status == 200
+            assert response.json['id'] == 1
 
             when(
                 'Intended release with string type not found',

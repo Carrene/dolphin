@@ -1,4 +1,4 @@
-from bddrest import status, when, given
+from bddrest import status, when, given, response
 
 from dolphin.models import Issue, Project, Member
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
@@ -64,6 +64,7 @@ class TestIssue(LocalApplicationTestCase):
             )
         ):
             assert status == 200
+            assert response.json['id'] == 2
 
             when(
                 'Intended issue with string type not found',
