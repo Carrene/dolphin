@@ -1,7 +1,7 @@
 from nanohttp import RestController, json, context, HTTPBadRequest, validate, \
     settings
 from restfulpy.authorization import authorize
-from restfulpy.orm import DBSession, commit
+from restfulpy.orm import DBSession
 
 from ..backends import CASClient
 from ..models import Member
