@@ -45,6 +45,15 @@ class TestProject(LocalApplicationTestCase):
             room_id=1002
         )
         session.add(project2)
+
+        hidden_project = Project(
+            member=member1,
+            title='My hidden project',
+            description='A decription for my project',
+            removed_at='2020-2-20',
+            room_id=1000
+        )
+        session.add(hidden_project)
         session.commit()
 
     def test_update(self):
@@ -136,6 +145,12 @@ class TestProject(LocalApplicationTestCase):
 
             when('Request is not authorized', authorization=None)
             assert status == 401
+
+            when(
+                'Update a hidden project',
+                url_parameters=dict(id=3)
+            )
+            assert status == '746 Hidden Project Is Not Editable'
 
             with chat_server_status('404 Not Found'):
                 when(
