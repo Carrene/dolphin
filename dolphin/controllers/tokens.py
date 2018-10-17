@@ -1,7 +1,7 @@
 from nanohttp import RestController, json, context, HTTPBadRequest, validate, \
     settings
 from restfulpy.authorization import authorize
-from restfulpy.orm import DBSession
+from restfulpy.orm import DBSession, commit
 
 from ..backends import CASClient
 from ..models import Member
@@ -59,7 +59,7 @@ class TokenController(RestController):
             member.title = cas_member['title']
 
         DBSession.commit()
-        principal = member.create_jwt_principal()
+        principal = context.application.__authenticator__.login(member.email)
         context.response_headers.add_header(
             'X-New-JWT-Token',
             principal.dump().decode('utf-8')
