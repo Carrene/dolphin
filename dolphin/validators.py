@@ -13,6 +13,9 @@ DATE_PATTERN = re.compile(
 )
 
 
+TITLE_PATTERN = re.compile(r'^[^\s].+[^\s]$', re.MULTILINE)
+
+
 def release_exists_validator(releaseId, container, field):
     form = context.form
     try:

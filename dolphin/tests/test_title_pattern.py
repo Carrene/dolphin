@@ -1,0 +1,18 @@
+from dolphin.validators import TITLE_PATTERN as pattern
+
+
+def test_date_pattern():
+    assert pattern.match('First Project')
+    assert pattern.match('First-Project')
+    assert pattern.match('First Sample-Project')
+    assert pattern.match('Title with ?><!:; and ...')
+
+    assert not pattern.match(' Title with Space in starting')
+    assert not pattern.match('  Title with more than one Space in starting')
+    assert not pattern.match('      Title with Tab in starting')
+    assert not pattern.match('\nTitle with Enter in starting')
+    assert not pattern.match('Title with Space in ending ')
+    assert not pattern.match('Title with more than one Space in ending  ')
+    assert not pattern.match('Title with Tab in ending      ')
+    assert not pattern.match('Title with Enter in ending \n')
+
