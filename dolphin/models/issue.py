@@ -86,7 +86,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     @property
     def boardings(self):
-        if self.due_date > datetime.now():
+        if self.due_date < datetime.now():
             return self._boarding[1]
 
         return self._boarding[0]

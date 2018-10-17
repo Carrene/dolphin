@@ -71,11 +71,12 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     @property
     def boardings(self):
+        release = self.release
         if not self.issues:
             return None
 
         for issue in self.issues:
-            if issue.due_date > self.release.due_date:
+            if release is not None and issue.due_date > release.cutoff:
                 return self._boarding[2]
 
             if issue.boardings == 'delayed':

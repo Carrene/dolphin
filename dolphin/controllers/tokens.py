@@ -59,7 +59,7 @@ class TokenController(RestController):
             member.title = cas_member['title']
 
         DBSession.commit()
-        principal = member.create_jwt_principal()
+        principal = context.application.__authenticator__.login(member.email)
         context.response_headers.add_header(
             'X-New-JWT-Token',
             principal.dump().decode('utf-8')

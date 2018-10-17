@@ -143,6 +143,9 @@ class ProjectController(ModelRestController):
         if not project:
             raise HTTPNotFound()
 
+        if project.is_deleted:
+            raise HTTPStatus('746 Hidden Project Is Not Editable')
+
         # FIXME: these lines should be removed and replaced by Project.validate
         # decorator
         json_columns = set(
