@@ -51,34 +51,47 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Member id not in form',
-                form=given - 'memberId' | dict(title='1')
+                form=given - 'memberId' | dict(title='New title')
             )
             assert status == '739 Member Id Not In Form'
 
             when(
                 'Member not found with string type',
-                form=given | dict(memberId='Alphabetical', title='1')
+                form=given | dict(memberId='Alphabetical', title='New title')
             )
             assert status == 610
             assert status.text.startswith('Member not found')
 
             when(
                 'Member not found with integer type',
-                form=given | dict(memberId=100, title='1')
+                form=given | dict(memberId=100, title='New title')
             )
             assert status == 610
             assert status.text.startswith('Member not found')
 
             when(
+                'Title format is wrong',
+                form=given | dict(title=' Invalid Format ')
+            )
+            assert status == '747 Invalid Title Format'
+
+            when(
+                'Title is repetetive',
+                form=given | dict(title='My first project')
+            )
+            assert status == 600
+            assert status.text.startswith('Another project with title')
+
+            when(
                 'Release not found with string type',
-                form=given | dict(releaseId='Alphabetical', title='1')
+                form=given | dict(releaseId='Alphabetical', title='New title')
             )
             assert status == 607
             assert status.text.startswith('Release not found')
 
             when(
                 'Release not found with integer type',
-                form=given | dict(releaseId=100, title='1')
+                form=given | dict(releaseId=100, title='New title')
             )
             assert status == 607
             assert status.text.startswith('Release not found')

@@ -64,19 +64,19 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Project id not in form',
-                form=given - 'projectId' | dict(title='1')
+                form=given - 'projectId' | dict(title='New title')
             )
             assert status == '713 Project Id Not In Form'
 
             when(
                 'Project not found with string type',
-                form=given | dict(projectId='Alphabetical', title='1')
+                form=given | dict(projectId='Alphabetical', title='New title')
             )
             assert status == '714 Invalid Project Id Type'
 
             when(
                 'Project not found with integer type',
-                form=given | dict(projectId=100, title='1')
+                form=given | dict(projectId=100, title='New title')
             )
             assert status == 601
             assert status.text.startswith('Project not found')
@@ -86,6 +86,12 @@ class TestIssue(LocalApplicationTestCase):
                 form=given - 'title'
             )
             assert status == '710 Title Not In Form'
+
+            when(
+                'Title format is wrong',
+                form=given | dict(title=' Invalid Format ')
+            )
+            assert status == '747 Invalid Title Format'
 
             when(
                 'Title is repetitive',
