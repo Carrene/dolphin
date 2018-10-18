@@ -1,6 +1,6 @@
 from bddrest import status, response, when, Remove, given
 
-from dolphin.models import Member
+from dolphin.models import Member, Release
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -18,6 +18,12 @@ class TestRelease(LocalApplicationTestCase):
             reference_id=1
         )
         session.add(member)
+        release1 = Release(
+            title='My first release',
+            description='A decription for my first release',
+            cutoff='2030-2-20',
+        )
+        session.add(release1)
         session.commit()
 
     def test_create(self):
@@ -50,6 +56,19 @@ class TestRelease(LocalApplicationTestCase):
                 form=given | dict(title=((50 + 1) * 'a'))
             )
             assert status == '704 At Most 50 Characters Are Valid For Title'
+
+            when(
+                'Title format is wrong',
+                form=given | dict(title=' Invalid Format ')
+            )
+            assert status == '747 Invalid Title Format'
+
+            when(
+                'Title is repetetive',
+                form=given | dict(title='My first release')
+            )
+            assert status == 600
+            assert status.text.startswith('Another release with title')
 
             when(
                 'Description length is less than limit',

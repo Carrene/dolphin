@@ -86,6 +86,13 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert status == 600
             assert status.text.startswith('Another issue with title')
+
+            when(
+                'Title format is wrong',
+                form=given | dict(title=' Invalid Format ')
+            )
+            assert status == '747 Invalid Title Format'
+
             when(
                 'Title length is more than limit',
                 form=given | dict(title=((50 + 1) * 'a'))

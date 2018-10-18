@@ -81,6 +81,12 @@ class TestRelease(LocalApplicationTestCase):
             assert status.text.startswith('Another release with title')
 
             when(
+                'Title format is wrong',
+                form=given | dict(title=' Invalid Format ')
+            )
+            assert status == '747 Invalid Title Format'
+
+            when(
                 'Description length is less than limit',
                 form=given | dict(
                     description=((512 + 1) * 'a'),

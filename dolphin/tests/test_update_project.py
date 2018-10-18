@@ -90,7 +90,7 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Member not found with string type',
-                form=given | dict(memberId='Alphabetical', title='1')
+                form=given | dict(memberId='Alphabetical', title='New title')
             )
             assert status == 610
             assert status.text.startswith('Member not found')
@@ -108,6 +108,12 @@ class TestProject(LocalApplicationTestCase):
             )
             assert status == 600
             assert status.text.startswith('Another project with title')
+
+            when(
+                'Title format is wrong',
+                form=given | dict(title=' Invalid Format ')
+            )
+            assert status == '747 Invalid Title Format'
 
             when(
                 'Title length is more than limit',

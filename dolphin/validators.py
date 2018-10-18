@@ -185,6 +185,7 @@ release_validator = validate(
     title=dict(
         required='710 Title Not In Form',
         max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
+        pattern=(TITLE_PATTERN, '747 Invalid Title Format'),
         callback=release_not_exists_validator
     ),
     description=dict(
@@ -203,6 +204,7 @@ release_validator = validate(
 update_release_validator = validate(
     title=dict(
         max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
+        pattern=(TITLE_PATTERN, '747 Invalid Title Format'),
     ),
     description=dict(
         max_length=(512, '703 At Most 512 Characters Are Valid For Description')
@@ -220,7 +222,8 @@ project_validator = validate(
     title=dict(
         required='710 Title Not In Form',
         callback=project_not_exists_validator,
-        max_length=(50, '704 At Most 50 Characters Are Valid For Title')
+        max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
+        pattern=(TITLE_PATTERN, '747 Invalid Title Format'),
     ),
     description=dict(
         max_length=(512, '703 At Most 512 Characters Are Valid For Description')
@@ -243,7 +246,8 @@ project_validator = validate(
 
 update_project_validator = validate(
     title=dict(
-        max_length=(50, '704 At Most 50 Characters Are Valid For Title')
+        max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
+        pattern=(TITLE_PATTERN, '747 Invalid Title Format'),
     ),
     description=dict(
         max_length=(512, '703 At Most 512 Characters Are Valid For Description')
@@ -264,6 +268,7 @@ issue_validator = validate(
     title=dict(
         required='710 Title Not In Form',
         max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
+        pattern=(TITLE_PATTERN, '747 Invalid Title Format'),
         callback=issue_not_exists_validator
     ),
     description=dict(
@@ -295,6 +300,7 @@ issue_validator = validate(
 update_issue_validator = validate(
     title=dict(
         max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
+        pattern=(TITLE_PATTERN, '747 Invalid Title Format'),
         callback=issue_not_exists_validator
     ),
     description=dict(
