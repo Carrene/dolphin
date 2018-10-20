@@ -185,18 +185,18 @@ class ChatClient:
             room = json.loads(response.text)
             return room
 
-    def remove_member(self, id, user_id, token, x_access_token):
+    def kick_member(self, id, user_id, token, x_access_token):
 
         url = f'{settings.chat.url}/apiv1/rooms/{id}'
         try:
             response = requests.request(
-                'REMOVE',
+                'KICK',
                 url,
                 data={'userId': user_id},
                 headers={'X-Oauth2-Access-Token': x_access_token}
             )
             logger.debug(
-                f'REMOVE {url} - ' \
+                f'KICK {url} - ' \
                 f'userId={user_id} - ' \
                 f'response-HTTP-code={response.status_code} - ' \
                 f'target-application={self._server_name}'

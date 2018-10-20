@@ -57,7 +57,7 @@ class ProjectController(ModelRestController):
 
         try:
             # Remove current assignee member from project chat room
-            ChatClient().remove_member(
+            ChatClient().kick_member(
                 project.room_id,
                 current_assignee_member.reference_id,
                 token,
@@ -300,7 +300,7 @@ class ProjectController(ModelRestController):
         try:
             DBSession.flush()
         except:
-            chat_client.remove_member(
+            chat_client.kick_member(
                 project.room_id,
                 context.identity.reference_id,
                 token,
@@ -342,16 +342,16 @@ class ProjectController(ModelRestController):
         member = Member.current()
         chat_client = ChatClient()
         try:
-            chat_client.remove_member(
+            chat_client.kick_member(
                 project.room_id,
                 context.identity.reference_id,
                 token,
                 member.access_token
             )
         except RoomMemberNotFound:
-            # Exception is passed because it means `remove_member()` is already
+            # Exception is passed because it means `kick_member()` is already
             # called and `member` successfully removed from room. So there is
-            # no need to call `remove_member()` API again and re-add the member
+            # no need to call `kick_member()` API again and re-add the member
             # to room.
             pass
 

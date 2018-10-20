@@ -114,7 +114,7 @@ def chat_mockup_server():
                 ('/apiv1/targets', self.list_)
             ])
 
-        @json(verbs=['create', 'delete', 'add', 'remove', 'list'])
+        @json(verbs=['create', 'delete', 'add', 'kick', 'list'])
         def create(self):
             if _chat_server_status == '615 Room Already Exists' and \
                     context.method == 'list':
@@ -163,7 +163,7 @@ def room_mockup_server():
                 ('/apiv1/rooms', self.add),
             ])
 
-        @json(verbs=['add', 'remove'])
+        @json(verbs=['add', 'kick'])
         def add(self):
             temp_status = self._status
             self._status = '611 User Not Found'
