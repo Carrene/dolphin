@@ -25,20 +25,11 @@ class LocalApplicationTestCase(ApplicableTestCase):
     __story_directory__ = path.join(DATA_DIRECTORY, 'stories')
     __api_documentation_directory__ = path.join(DATA_DIRECTORY, 'markdown')
 
-    def login(self, email, url='/apiv1/tokens', verb='CREATE'):
+    def login(self, email):
         session = self.create_session()
-        member = session.query(Member).filter(Member.email == email).one_or_none()
-        if member is None:
-            raise HTTPUnauthorized()
-
-        token = CASPrincipal({
-            'id':member.id,
-            'referenceId':member.reference_id,
-            'email':member.email,
-            'roles':['member'],
-            'name':member.title
-        })
-        self._authentication_token = token.dump().decode('utf-8')
+        member = session.query(Member).filter(Member.email == email).one()
+        token = member.create_jwt_principal().dump()
+        self._authentication_token = token.decode('utf-8')
 
 
 class MockupApplication(Application):
