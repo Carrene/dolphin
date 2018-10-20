@@ -1,10 +1,11 @@
+from nanohttp import context
 from restfulpy.orm import Field, relationship, SoftDeleteMixin, \
     ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin
-from sqlalchemy import Integer, ForeignKey, Enum, select, func
+from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam
 from sqlalchemy.orm import column_property
 
 from .issue import Issue
-from .subscribable import Subscribable
+from .subscribable import Subscribable, Subscription
 
 
 project_statuses = [
@@ -64,9 +65,20 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     )
 
     due_date = column_property(
-        select([func.max(Issue.due_date)]).\
-            where(Issue.project_id == id).\
-            correlate_except(Issue)
+        select([func.max(Issue.due_date)]) \
+        .where(Issue.project_id == id) \
+        .correlate_except(Issue)
+    )
+
+    is_subscribed = column_property(
+        select([func.count(Subscription.member)]) \
+        .where(Subscription.subscribable == id) \
+        .where(Subscription.member == bindparam(
+                'member_id',
+                callable_=lambda: context.identity.id
+            )
+        ) \
+        .correlate_except(Subscription)
     )
 
     @property
@@ -91,5 +103,6 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         project_dict = super().to_dict()
         project_dict['boarding'] = self.boardings
         project_dict['dueDate'] = self.due_date
+        project_dict['isSubscribed'] = True if self.is_subscribed else False
         return project_dict
 
