@@ -1,4 +1,4 @@
-from bddrest import status, when
+from bddrest import status, when, response
 
 from dolphin.models import Project, Member
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
@@ -44,12 +44,8 @@ class TestProject(LocalApplicationTestCase):
             '/apiv1/projects/id:1',
             'HIDE'
         ):
-            session = self.create_session()
-            project = session.query(Project) \
-                .filter(Project.id == 1) \
-                .one_or_none()
             assert status == 200
-            project.assert_is_deleted()
+            assert response.json['removedAt'] != None
 
             when(
                 'Intended Project With String Type Not Found',
