@@ -9,3 +9,4 @@ from .guest import Guest
 from .team import Team
 from .item import Item, item_statuses
 from .group import Group
+from .workflow import Workflow

@@ -1,6 +1,6 @@
 from bddrest import status, when, given, response
 
-from dolphin.models import Project, Member, Release, Subscription
+from dolphin.models import Project, Member, Release, Subscription, Workflow
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
@@ -20,8 +20,11 @@ class TestProject(LocalApplicationTestCase):
         )
         session.add(member)
 
+        workflow1 = Workflow(title='First Workflow')
+
         project1 = Project(
             member=member,
+            workflow=workflow1,
             title='My first project',
             description='A decription for my project',
             room_id=1001
@@ -31,6 +34,7 @@ class TestProject(LocalApplicationTestCase):
 
         project2 = Project(
             member=member,
+            workflow=workflow1,
             title='My second project',
             description='A decription for my project',
             room_id=1002
@@ -62,6 +66,7 @@ class TestProject(LocalApplicationTestCase):
         ):
             assert status == 200
             assert response.json['id'] == 1
+            assert response.json['isSubscribed'] == False
 
             when(
                 'Intended project with string type not found',
