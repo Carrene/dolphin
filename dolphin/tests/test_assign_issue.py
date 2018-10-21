@@ -31,7 +31,7 @@ class TestIssue(LocalApplicationTestCase):
         phase = Phase(
             title='development',
             order=2,
-            project=project
+            workflow=workflow1
         )
         session.add(phase)
 

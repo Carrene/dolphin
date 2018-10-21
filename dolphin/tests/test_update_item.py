@@ -65,9 +65,9 @@ class TestItem(LocalApplicationTestCase):
         session.add(resource)
 
         phase = Phase(
-            project=project,
             title='design',
             order=1,
+            workflow=workflow1,
         )
         session.add(phase)
 
