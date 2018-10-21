@@ -1,7 +1,7 @@
 from bddrest import status, response, Update, when, Remove
 
 from dolphin.models import Item, Phase, Issue, Member, Release, Project, \
-    Resource, Team
+    Resource, Team, Workflow
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -25,6 +25,8 @@ class TestItem(LocalApplicationTestCase):
         )
         session.add(member)
 
+        workflow1 = Workflow(title='First Workflow')
+
         release = Release(
             title='My first release',
             description='A decription for my release',
@@ -34,6 +36,7 @@ class TestItem(LocalApplicationTestCase):
 
         project = Project(
             member=member,
+            workflow=workflow1,
             release=release,
             title='My first project',
             description='A decription for my project',

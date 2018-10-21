@@ -1,6 +1,6 @@
 from bddrest import status, response, when, Remove, given
 
-from dolphin.models import Project, Member
+from dolphin.models import Project, Member, Workflow
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
@@ -19,8 +19,11 @@ class TestProject(LocalApplicationTestCase):
             reference_id=2
         )
 
+        workflow1 = Workflow(title='First Workflow')
+
         project1 = Project(
             member=member1,
+            workflow=workflow1,
             title='My first project',
             description='A decription for my project',
             room_id=1001
@@ -28,6 +31,7 @@ class TestProject(LocalApplicationTestCase):
         session.add(project1)
         session.commit()
         cls.member = member1
+        cls.workflow = workflow1
 
     def test_create(self):
         self.login('member1@example.com')
@@ -38,6 +42,7 @@ class TestProject(LocalApplicationTestCase):
             'CREATE',
             form=dict(
                 memberId=self.member.id,
+                workflowId=self.workflow.id,
                 title='My awesome project',
                 description='A decription for my project',
             )

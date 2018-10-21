@@ -24,12 +24,13 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     _boarding = ['on-time', 'delayed', 'at-risk']
 
-    id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
+    workflow_id = Field(Integer, ForeignKey('workflow.id'))
     release_id = Field(Integer, ForeignKey('release.id'), nullable=True)
     member_id = Field(Integer, ForeignKey('member.id'))
     group_id = Field(Integer, ForeignKey('group.id'), nullable=True)
     room_id = Field(Integer)
 
+    id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
     status = Field(
         Enum(*project_statuses, name='project_status'),
         default='queued'
@@ -60,6 +61,11 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     )
     group = relationship(
         'Group',
+        back_populates='projects',
+        protected=True
+    )
+    workflow = relationship(
+        'Workflow',
         back_populates='projects',
         protected=True
     )
