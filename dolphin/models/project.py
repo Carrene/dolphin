@@ -42,11 +42,6 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         back_populates='projects',
         protected=True
     )
-    phases = relationship(
-        'Phase',
-        back_populates='project',
-        protected=True
-    )
     release = relationship(
         'Release',
         foreign_keys=[release_id],

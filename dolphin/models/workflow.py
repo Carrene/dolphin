@@ -13,4 +13,9 @@ class Workflow(DeclarativeBase):
         back_populates='workflow',
         protected=True
     )
+    phases = relationship(
+        'Phase',
+        back_populates='workflow',
+        protected=True
+    )
 
