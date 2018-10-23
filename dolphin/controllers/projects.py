@@ -368,3 +368,19 @@ class ProjectController(ModelRestController):
 
         return project
 
+    @authorize
+    @json(prevent_form='709 Form Not Allowed')
+    @Project.expose
+    def get(self, id):
+
+        try:
+            id = int(id)
+        except (ValueError, TypeError):
+            raise HTTPNotFound()
+
+        project = DBSession.query(Project).filter(Project.id == id).one_or_none()
+        if not project:
+            raise HTTPNotFound()
+
+        return project
+
