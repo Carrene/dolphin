@@ -19,12 +19,19 @@ class Subscribable(TimestampMixin, DeclarativeBase):
     }
 
     id = Field(Integer, primary_key=True)
-    title = Field(String, max_length=50)
+    title = Field(
+        String,
+        max_length=50,
+        min_length=1,
+        pattern='^[^\s].+[^\s]$',
+        nullable=False,
+        required=False,
+    )
     description = Field(
         String,
         min_length=20,
         nullable=True,
-        watermark='This is a description of summary'
+        watermark='This is a description of summary',
     )
 
     members = relationship(
