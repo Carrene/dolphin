@@ -301,7 +301,6 @@ update_issue_validator = validate(
     title=dict(
         max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
         pattern=(TITLE_PATTERN, '747 Invalid Title Format'),
-        callback=issue_not_exists_validator
     ),
     description=dict(
         max_length=(512, '703 At Most 512 Characters Are Valid For Description')
