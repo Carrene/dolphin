@@ -84,6 +84,12 @@ class TestIssue(LocalApplicationTestCase):
             assert status == 404
 
             when(
+                'Title is the same of it already is',
+                form=given | dict(title='New issue')
+            )
+            assert status == 200
+
+            when(
                 'Title is repetitive',
                 form=given | dict(title='Second issue')
             )
