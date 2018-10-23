@@ -226,3 +226,19 @@ class ReleaseController(ModelRestController):
 
         return release
 
+    @authorize
+    @json(prevent_form='709 Form Not Allowed')
+    @Release.expose
+    def get(self, id):
+
+        try:
+            id = int(id)
+        except (ValueError, TypeError):
+            raise HTTPNotFound()
+
+        release = DBSession.query(Release).filter(Release.id == id).one_or_none()
+        if not release:
+            raise HTTPNotFound()
+
+        return release
+

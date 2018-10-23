@@ -1,6 +1,6 @@
 from bddrest import status, response, when
 
-from dolphin.models import Project, Member, Workflow
+from dolphin.models import Release, Member, Workflow
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -10,37 +10,34 @@ class TestProject(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        member1 = Member(
+        member = Member(
             title='First Member',
             email='member1@example.com',
             access_token='access token 1',
             phone=123456789,
             reference_id=2
         )
+        session.add(member)
 
-        workflow1 = Workflow(title='First Workflow')
-
-        project1 = Project(
-            member=member1,
-            workflow=workflow1,
-            title='My first project',
-            description='A decription for my project',
-            room_id=1001
+        release = Release(
+            title='My first release',
+            description='A decription for my first release',
+            cutoff='2030-2-20',
         )
-        session.add(project1)
+        session.add(release)
         session.commit()
 
     def test_get(self):
         self.login('member1@example.com')
 
         with oauth_mockup_server(), self.given(
-            'Getting a project',
-            '/apiv1/projects/id:1',
+            'Getting a release',
+            '/apiv1/releases/id:1',
             'GET'
         ):
             assert status == 200
             assert response.json['id'] == 1
-            assert response.json['title'] == 'My first project'
+            assert response.json['title'] == 'My first release'
 
             when(
                 'Intended project with string type not found',
@@ -60,9 +57,3 @@ class TestProject(LocalApplicationTestCase):
             )
             assert status == 709
 
-<<<<<<< HEAD
-            when('Request is not authorized', authorization=None)
-            assert status == 401
-
-=======
->>>>>>> Add verb get to Project, closes #178
