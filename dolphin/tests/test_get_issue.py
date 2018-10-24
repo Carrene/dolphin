@@ -71,3 +71,6 @@ class TestProject(LocalApplicationTestCase):
             )
             assert status == 709
 
+            when('Request is not authorized', authorization=None)
+            assert status == 401
+
