@@ -60,9 +60,6 @@ class TestProject(LocalApplicationTestCase):
             )
             assert status == 709
 
-<<<<<<< HEAD
             when('Request is not authorized', authorization=None)
             assert status == 401
 
-=======
->>>>>>> Add verb get to Project, closes #178
