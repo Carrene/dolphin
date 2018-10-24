@@ -233,3 +233,19 @@ class IssueController(ModelRestController):
         DBSession.add(item)
         return issue
 
+    @authorize
+    @json(prevent_form='709 Form Not Allowed')
+    @Issue.expose
+    def get(self, id):
+
+        try:
+            id = int(id)
+        except (ValueError, TypeError):
+            raise HTTPNotFound()
+
+        issue = DBSession.query(Issue).filter(Issue.id == id).one_or_none()
+        if not issue:
+            raise HTTPNotFound()
+
+        return issue
+
