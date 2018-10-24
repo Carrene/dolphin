@@ -20,15 +20,38 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     reference_id = Field(Integer, unique=True)
     id = Field(Integer, primary_key=True)
-    title = Field(String, max_length=50)
+    title = Field(
+        String,
+        max_length=50,
+        min_length=1,
+        label='Title',
+        watermark='Enter the title',
+        nullable=False,
+        not_none=False,
+        required=False,
+        python_type=str
+    )
     email = Field(
         Unicode(100),
+        label='Email',
+        watermark='Enter you email',
         unique=True,
+        not_none=False,
+        required=False,
         index=True,
-        pattern=r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'
+        pattern=r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)',
+        example='member@example.com'
     )
     access_token = Field(Unicode(200), protected=True)
-    phone = Field(BigInteger, unique=True, nullable=True)
+    phone = Field(
+        BigInteger,
+        label='Phone',
+        watermark='Enter your phone number',
+        nullable=True,
+        not_none=False,
+        required=False,
+        unique=True,
+    )
 
     subscribables = relationship(
         'Subscribable',
