@@ -30,7 +30,6 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
         required=False,
         default='queued'
     )
-
     cutoff = Field(
         DateTime,
         label='Cutoff',

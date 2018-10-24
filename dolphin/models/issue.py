@@ -35,8 +35,17 @@ class Tag(DeclarativeBase):
     __tablename__ = 'tag'
 
     id = Field(Integer, primary_key=True)
-    title = Field(String, max_length=40, unique=True, example='feature')
-
+    title = Field(
+        String,
+        max_length=50,
+        min_length=1,
+        label='Title',
+        watermark='Enter the title',
+        nullable=False,
+        not_none=False,
+        required=False,
+        python_type=str
+    )
     issues = relationship(
         'Issue',
         secondary=association_table,
@@ -55,8 +64,24 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     project_id = Field(Integer, ForeignKey('project.id'))
 
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
-    due_date = Field(DateTime)
-    kind = Field(Enum(*issue_kinds, name='kind'))
+    due_date = Field(
+        DateTime,
+        label='Cutoff',
+        pattern=r'^(\d{4})-(0[1-9]|1[012]|[1-9])-(0[1-9]|[12]\d{1}|3[01]|[1-9])$',
+        example='2018-02-02',
+        watermark='Enter a due date',
+        nullable=False,
+        not_none=True,
+        required=False,
+    )
+    kind = Field(
+        Enum(*issue_kinds, name='kind'),
+        label='Status',
+        watermark='Choose a status',
+        not_none=True,
+        required=False,
+        default='queued'
+    )
     days = Field(Integer)
     status = Field(
         Enum(*issue_statuses, name='issues_status'),
