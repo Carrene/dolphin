@@ -66,7 +66,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
     due_date = Field(
         DateTime,
-        label='Cutoff',
+        label='Due Date',
         pattern=r'^(\d{4})-(0[1-9]|1[012]|[1-9])-(0[1-9]|[12]\d{1}|3[01]|[1-9])$',
         example='2018-02-02',
         watermark='Enter a due date',
@@ -78,14 +78,25 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         Enum(*issue_kinds, name='kind'),
         label='Status',
         watermark='Choose a status',
+        nullable=False,
         not_none=True,
         required=False,
-        default='queued'
     )
-    days = Field(Integer)
+    days = Field(
+        Integer,
+        label='Days',
+        watermark='How many days do you estimate?',
+        minimum=1,
+        nullable=False,
+        not_none=False,
+        required=False
+    )
     status = Field(
         Enum(*issue_statuses, name='issues_status'),
-        nullable=True,
+        label='Status',
+        watermark='Choose a status',
+        not_none=True,
+        required=False,
         default='triage'
     )
 
