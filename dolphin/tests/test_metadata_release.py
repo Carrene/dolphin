@@ -8,7 +8,7 @@ class TestApplication(LocalApplicationTestCase):
     def test_metadata(self):
         with self.given(
             'Test metadata verb',
-            '/apiv1/projects',
+            '/apiv1/releases',
             'METADATA'
         ):
             fields = response.json['fields']
@@ -39,4 +39,12 @@ class TestApplication(LocalApplicationTestCase):
             assert fields['status']['not_none'] is not None
             assert fields['status']['required'] is not None
             assert fields['status']['default'] is not None
+
+            assert fields['cutoff']['label'] is not None
+            assert fields['cutoff']['watermark'] is not None
+            assert fields['cutoff']['name'] is not None
+            assert fields['cutoff']['not_none'] is not None
+            assert fields['cutoff']['required'] is not None
+            assert fields['cutoff']['pattern'] is not None
+            assert fields['cutoff']['example'] is not None
 

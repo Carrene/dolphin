@@ -23,15 +23,25 @@ class Subscribable(TimestampMixin, DeclarativeBase):
         String,
         max_length=50,
         min_length=1,
-        pattern='^[^\s].+[^\s]$',
+        label='Title',
+        watermark='Enter the title',
+        pattern=r'^[^\s].+[^\s]$',
+        example='Sample Title',
         nullable=False,
+        not_none=False,
         required=False,
+        python_type=str
     )
     description = Field(
         String,
         min_length=20,
+        max_length=512,
+        label='Description',
+        watermark='Enter the description',
+        not_none=False,
         nullable=True,
-        watermark='This is a description of summary',
+        required=False,
+        python_type=str
     )
 
     members = relationship(

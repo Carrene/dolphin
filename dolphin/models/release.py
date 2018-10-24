@@ -24,9 +24,23 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
     status = Field(
         Enum(*release_statuses, name='release_status'),
-        nullable=True
+        label='Status',
+        watermark='Choose a status',
+        not_none=True,
+        required=False,
+        default='queued'
     )
-    cutoff = Field(DateTime)
+
+    cutoff = Field(
+        DateTime,
+        label='Cutoff',
+        pattern=r'^(\d{4})-(0[1-9]|1[012]|[1-9])-(0[1-9]|[12]\d{1}|3[01]|[1-9])$',
+        example='2018-02-02',
+        watermark='Enter a cutoff date',
+        nullable=False,
+        not_none=True,
+        required=False,
+    )
 
     projects = relationship(
         'Project',
