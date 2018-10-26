@@ -26,9 +26,8 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
         Enum(*release_statuses, name='release_status'),
         label='Status',
         watermark='Choose a status',
-        not_none=True,
+        nullable=True,
         required=False,
-        default='queued'
     )
     cutoff = Field(
         DateTime,

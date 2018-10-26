@@ -34,6 +34,5 @@ class TestMember(LocalApplicationTestCase):
             assert fields['phone']['label'] is not None
             assert fields['phone']['watermark'] is not None
             assert fields['phone']['name'] is not None
-            assert fields['phone']['not_none'] is not None
             assert fields['phone']['required'] is not None
 

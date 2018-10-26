@@ -18,13 +18,11 @@ class TestItem(LocalApplicationTestCase):
             assert fields['status']['label'] is not None
             assert fields['status']['watermark'] is not None
             assert fields['status']['name'] is not None
-            assert fields['status']['not_none'] is not None
             assert fields['status']['required'] is not None
 
             assert fields['end']['label'] is not None
             assert fields['end']['watermark'] is not None
             assert fields['end']['name'] is not None
-            assert fields['end']['not_none'] is not None
             assert fields['end']['required'] is not None
             assert fields['end']['pattern'] is not None
             assert fields['end']['example'] is not None

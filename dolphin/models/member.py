@@ -48,7 +48,6 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         label='Phone',
         watermark='Enter your phone number',
         nullable=True,
-        not_none=False,
         required=False,
         unique=True,
     )

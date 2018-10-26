@@ -36,9 +36,7 @@ class TestRelease(LocalApplicationTestCase):
             assert fields['status']['label'] is not None
             assert fields['status']['watermark'] is not None
             assert fields['status']['name'] is not None
-            assert fields['status']['not_none'] is not None
             assert fields['status']['required'] is not None
-            assert fields['status']['default'] is not None
 
             assert fields['cutoff']['label'] is not None
             assert fields['cutoff']['watermark'] is not None
