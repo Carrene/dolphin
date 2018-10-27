@@ -128,35 +128,6 @@ class ReleaseController(ModelRestController):
         )
         DBSession.add(subscription)
 
-        member = Member.current()
-        chat_client = ChatClient()
-        try:
-            for project in release.projects:
-                chat_client.add_member(
-                    project.room_id,
-                    context.identity.reference_id,
-                    token,
-                    member.access_token
-                )
-        except RoomMemberAlreadyExist:
-            # Exception is passed because it means `add_member()` is already
-            # called and `member` successfully added to room. So there is
-            # no need to call `add_member()` API again and re-add the member to
-            # room.
-            pass
-
-        try:
-            DBSession.flush()
-        except:
-            for project in release.projects:
-                chat_client.kick_member(
-                    project.room_id,
-                    context.identity.reference_id,
-                    token,
-                    member.access_token
-                )
-            raise
-
         return release
 
     @authorize
@@ -188,36 +159,6 @@ class ReleaseController(ModelRestController):
             raise HTTPStatus('612 Not Subscribed Yet')
 
         DBSession.delete(subscription)
-
-        member = Member.current()
-        chat_client = ChatClient()
-        try:
-            for project in release.projects:
-
-                chat_client.kick_member(
-                    project.room_id,
-                    context.identity.reference_id,
-                    token,
-                    member.access_token
-                )
-        except RoomMemberNotFound:
-            # Exception is passed because it means `kick_member()` is already
-            # called and `member` successfully removed from room. So there is
-            # no need to call `kick_member()` API again and re-add the member
-            # to room.
-            pass
-
-        try:
-            DBSession.flush()
-        except:
-            for project in release.projects:
-                chat_client.add_member(
-                    project.room_id,
-                    context.identity.reference_id,
-                    token,
-                    member.access_token
-                )
-            raise
 
         return release
 
