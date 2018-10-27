@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from restfulpy.orm.metadata import MetadataField
 from restfulpy.orm import Field, DeclarativeBase, relationship, \
     ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin
 from sqlalchemy import Integer, ForeignKey, DateTime, Enum, String, Column, \
@@ -66,6 +67,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
     due_date = Field(
         DateTime,
+        python_type=DateTime,
         label='Due Date',
         pattern=r'^(\d{4})-(0[1-9]|1[012]|[1-9])-(0[1-9]|[12]\d{1}|3[01]|[1-9])$',
         example='2018-02-02',
@@ -76,6 +78,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     )
     kind = Field(
         Enum(*issue_kinds, name='kind'),
+        python_type=str,
         label='Status',
         watermark='Choose a status',
         nullable=False,
@@ -84,6 +87,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     )
     days = Field(
         Integer,
+        python_type=int,
         label='Days',
         watermark='How many days do you estimate?',
         minimum=1,
@@ -126,6 +130,17 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             return self._boarding[1]
 
         return self._boarding[0]
+
+    @classmethod
+    def iter_metadata_fields(cls):
+        yield from super().iter_metadata_fields()
+        yield MetadataField(
+            'boardings',
+            'boardings',
+            label='Boarding',
+            required=False,
+            readonly=True
+        )
 
     def to_dict(self):
         project_dict = super().to_dict()

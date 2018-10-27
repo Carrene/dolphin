@@ -20,10 +20,11 @@ class Item(TimestampMixin, DeclarativeBase):
     id = Field(Integer, primary_key=True)
     status = Field(
         Enum(*item_statuses, name='item_status'),
+        python_type=str,
         label='Status',
         watermark='Choose a status',
         nullable=True,
-        required=False,
+        required=False
     )
     end = Field(
         DateTime,
