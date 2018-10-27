@@ -62,6 +62,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     _boarding = ['on-time', 'delayed']
 
     project_id = Field(Integer, ForeignKey('project.id'))
+    room_id = Field(Integer)
 
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
     due_date = Field(

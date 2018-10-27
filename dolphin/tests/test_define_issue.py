@@ -1,7 +1,8 @@
 from bddrest import status, response, Update, when, given
 
 from dolphin.models import Issue, Project, Member, Workflow
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase, \
+    oauth_mockup_server, chat_mockup_server, chat_server_status
 
 
 class TestIssue(LocalApplicationTestCase):
@@ -34,7 +35,8 @@ class TestIssue(LocalApplicationTestCase):
             description='This is description of first issue',
             due_date='2020-2-20',
             kind='feature',
-            days=1
+            days=1,
+            room_id=2
         )
         session.add(issue1)
         session.commit()
@@ -43,7 +45,7 @@ class TestIssue(LocalApplicationTestCase):
     def test_define(self):
         self.login('member1@example.com')
 
-        with oauth_mockup_server(), self.given(
+        with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Define an issue',
             '/apiv1/issues',
             'DEFINE',
@@ -172,4 +174,39 @@ class TestIssue(LocalApplicationTestCase):
 
             when('Request is not authorized', authorization=None)
             assert status == 401
+
+            with chat_server_status('404 Not Found'):
+                when(
+                    'Chat server is not found',
+                    form=given | dict(title='Another title')
+                )
+                assert status == '617 Chat Server Not Found'
+
+            with chat_server_status('503 Service Not Available'):
+                when(
+                    'Chat server is not available',
+                    form=given | dict(title='Another title')
+                )
+                assert status == '800 Chat Server Not Available'
+
+            with chat_server_status('500 Internal Service Error'):
+                when(
+                    'Chat server faces with internal error',
+                    form=given | dict(title='Another title')
+                )
+                assert status == '801 Chat Server Internal Error'
+
+            with chat_server_status('615 Room Already Exists'):
+                when(
+                    'Chat server faces with internal error',
+                    form=given | dict(title='Another title')
+                )
+                assert status == 200
+
+            with chat_server_status('604 Already Added To Target'):
+                when(
+                    'Chat server faces with internal error',
+                    form=given | dict(title='Awesome project')
+                )
+                assert status == 200
 
