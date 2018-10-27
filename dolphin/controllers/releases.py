@@ -31,7 +31,14 @@ class ReleaseController(ModelRestController):
         return new_release
 
     @authorize
-    @json(prevent_empty_form='708 No Parameter Exists In The Form')
+    @json(
+        prevent_empty_form='708 No Parameter Exists In The Form',
+        form_whitelist=(
+            ['title', 'description', 'status', 'cutoff'],
+            '707 Invalid field, only following fields are accepted: ' \
+            'title, description, status, cutoff' \
+        )
+    )
     @update_release_validator
     @Release.expose
     @commit
@@ -48,18 +55,6 @@ class ReleaseController(ModelRestController):
             .one_or_none()
         if not release:
             raise HTTPNotFound()
-
-        # FIXME: these lines should be removed and replaced by Release.validate
-        # decorator
-        json_columns = set(
-            c.info.get('json', to_camel_case(c.key)) for c in
-            Release.iter_json_columns(include_readonly_columns=False)
-        )
-        if set(form.keys()) - json_columns:
-            raise HTTPStatus(
-                f'707 Invalid field, only one of '
-                f'{", ".join(release_statuses)} will be accepted'
-            )
 
         if 'title' in form and DBSession.query(Release).filter(
             Release.id != id,
