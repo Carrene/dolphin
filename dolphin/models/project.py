@@ -33,6 +33,10 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
     status = Field(
         Enum(*project_statuses, name='project_status'),
+        label='Status',
+        watermark='Choose a status',
+        not_none=True,
+        required=False,
         default='queued'
     )
 
