@@ -89,7 +89,7 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     @property
     def boardings(self):
         release = self.release
-        if not self.issues:
+        if not self.issues or self.status == 'queued':
             return None
 
         for issue in self.issues:
