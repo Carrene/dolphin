@@ -26,7 +26,14 @@ class IssueController(ModelRestController):
         return issue
 
     @authorize
-    @json(prevent_empty_form='708 No Parameter Exists In The Form')
+    @json(
+        prevent_empty_form='708 No Parameter Exists In The Form',
+        form_whitelist=(
+            ['title', 'days', 'dueDate', 'kind', 'description', 'status'],
+            '707 Invalid field, only following fields are accepted: ' \
+            'title, days, dueDate, kind, description, status' \
+        )
+    )
     @update_issue_validator
     @Issue.expose
     @commit
@@ -41,18 +48,6 @@ class IssueController(ModelRestController):
         issue = DBSession.query(Issue).filter(Issue.id == id).one_or_none()
         if not issue:
             raise HTTPNotFound()
-
-        # FIXME: these lines should be removed and replaced by Project.validate
-        # decorator
-        json_columns = set(
-            c.info.get('json', to_camel_case(c.key)) for c in
-            Issue.iter_json_columns(include_readonly_columns=False)
-        )
-        if set(form.keys()) - json_columns:
-            raise HTTPStatus(
-                f'707 Invalid field, only one of '
-                f'"{", ".join(json_columns)}" is accepted'
-            )
 
         if 'title' in form and DBSession.query(Issue).filter(
             Issue.id != id,
