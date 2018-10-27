@@ -99,13 +99,17 @@ def project_phase_value_validator(status, container, field):
 
 
 def issue_not_exists_validator(title, container, field):
+    form = context.form
+    project = DBSession.query(Project) \
+        .filter(Project.id == form['projectId']) \
+        .one()
 
-    issue = DBSession.query(Issue).filter(Issue.title == title) \
-        .one_or_none()
-    if issue is not None:
-        raise HTTPStatus(
-            f'600 Another issue with title: "{title}" is already exists.'
-        )
+    for issue in project.issues:
+        if issue.title == title:
+            raise HTTPStatus(
+                f'600 Another issue with title: "{title}" is already exists.'
+            )
+
     return title
 
 
@@ -265,6 +269,11 @@ update_project_validator = validate(
 
 
 issue_validator = validate(
+    projectId=dict(
+        required='713 Project Id Not In Form',
+        type_=(int, '714 Invalid Project Id Type'),
+        callback=project_exists_validator
+    ),
     title=dict(
         required='710 Title Not In Form',
         max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
@@ -289,11 +298,6 @@ issue_validator = validate(
         type_=(int, '721 Invalid Days Type'),
         required='720 Days Not In Form'
     ),
-    projectId=dict(
-        required='713 Project Id Not In Form',
-        type_=(int, '714 Invalid Project Id Type'),
-        callback=project_exists_validator
-    )
 )
 
 
