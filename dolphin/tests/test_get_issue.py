@@ -36,7 +36,8 @@ class TestProject(LocalApplicationTestCase):
             description='This is description of first issue',
             due_date='2020-2-20',
             kind='feature',
-            days=1
+            days=1,
+            room_id=2
         )
         session.add(issue1)
         session.commit()

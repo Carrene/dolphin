@@ -2,10 +2,10 @@ from nanohttp import HTTPStatus, json, context, HTTPNotFound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
-from restfulpy.utils import to_camel_case
 
 from ..backends import ChatClient
-from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound
+from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound, \
+    ChatRoomNotFound
 from ..models import Issue, Subscription, Resource, Phase, Item, Member
 from ..validators import issue_validator, update_issue_validator, \
     subscribe_validator, assign_issue_validator
@@ -14,15 +14,73 @@ from ..validators import issue_validator, update_issue_validator, \
 class IssueController(ModelRestController):
     __model__ = Issue
 
+    def _ensure_room(self, title, token, access_token):
+        create_room_error = 1
+        room = None
+        while create_room_error is not None:
+            try:
+                room = ChatClient().create_room(
+                    title,
+                    token,
+                    access_token,
+                    context.identity.reference_id
+                )
+                create_room_error = None
+            except ChatRoomNotFound:
+                # FIXME: Cover here
+                create_room_error = 1
+
+        return room
+
     @authorize
     @json
     @issue_validator
     @Issue.expose
     @commit
     def define(self):
+        PENDING = -1
+        form = context.form
+        token = context.environ['HTTP_AUTHORIZATION']
+
         issue = Issue()
         issue.update_from_request()
         DBSession.add(issue)
+        issue.room_id = PENDING
+        DBSession.flush()
+
+        member = Member.current()
+        room = self._ensure_room(form['title'], token, member.access_token)
+
+        chat_client = ChatClient()
+        issue.room_id = room['id']
+        try:
+            chat_client.add_member(
+                issue.room_id,
+                member.reference_id,
+                token,
+                member.access_token
+            )
+        except RoomMemberAlreadyExist:
+            # Exception is passed because it means `add_member()` is already
+            # called and `member` successfully added to room. So there is
+            # no need to call `add_member()` API again and re-add the member to
+            # room.
+            pass
+
+        # The exception type is not specified because after consulting with
+        # Mr.Mardani, the result got: there must be no specification on
+        # exception type because nobody knows what exception may be raised
+        try:
+            issue.room_id = room['id']
+            DBSession.flush()
+        except:
+            chat_client.delete_room(
+                issue.room_id,
+                token,
+                member.access_token
+            )
+            raise
+
         return issue
 
     @authorize
