@@ -107,14 +107,14 @@ class IssueController(ModelRestController):
         if not issue:
             raise HTTPNotFound()
 
-        if 'title' in form and DBSession.query(Issue).filter(
-            Issue.id != id,
-            Issue.title == form['title']
-        ).one_or_none():
-            raise HTTPStatus(
-                f'600 Another issue with title: ' \
-                f'"{form["title"]}" is already exists.'
-            )
+        project = issue.project
+        if 'title' in form:
+            for i in project.issues:
+                if i.title == form['title'] and i.id != id:
+                    raise HTTPStatus(
+                    f'600 Another issue with title: ' \
+                    f'"{form["title"]}" is already exists.'
+                )
 
         issue.update_from_request()
         return issue
