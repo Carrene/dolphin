@@ -1,16 +1,15 @@
 from contextlib import contextmanager
 from os import path
 
-from cas import CASPrincipal
-from nanohttp import RegexRouteController, json, settings, context, \
-    HTTPStatus, HTTPUnauthorized
+from nanohttp import RegexRouteController, json, settings, context, HTTPStatus
 from restfulpy.application import Application
 from restfulpy.mockup import mockup_http_server
 from restfulpy.testing import ApplicableTestCase
+from restfulpy.orm.metadata import FieldInfo
 
 from dolphin import Dolphin
 from dolphin.authentication import Authenticator
-from dolphin.models import Member
+from dolphin.models import Member, Project, Release, Issue, Item
 
 
 HERE = path.abspath(path.dirname(__file__))
@@ -20,10 +19,37 @@ DATA_DIRECTORY = path.abspath(path.join(HERE, '../../data'))
 _chat_server_status = 'idle'
 
 
+member_id = FieldInfo(type_=int, not_none=True, required=True).to_json()
+workflow_id = FieldInfo(type_=int, not_none=True, required=True).to_json()
+resource_id = FieldInfo(type_=int, not_none=True, required=True).to_json()
+phase_id = FieldInfo(type_=int, not_none=True, required=True).to_json()
+project_id = FieldInfo(type_=int, not_none=True, required=True).to_json()
+
+release_fields = Release.json_metadata()['fields']
+project_fields = Project.json_metadata()['fields']
+issue_fields = Issue.json_metadata()['fields']
+
+issue_fields.update({
+    'resourceId': resource_id,
+    'phaseId': phase_id,
+    'projectId': project_id,
+    'memberId': member_id
+})
+project_fields.update({'memberId': member_id, 'workflowId': workflow_id})
+release_fields.update({'memberId': member_id})
+
+
 class LocalApplicationTestCase(ApplicableTestCase):
     __application_factory__ = Dolphin
     __story_directory__ = path.join(DATA_DIRECTORY, 'stories')
     __api_documentation_directory__ = path.join(DATA_DIRECTORY, 'markdown')
+    __metadata__ = {
+        r'^/apiv1/releases.*': release_fields,
+        r'^/apiv1/projects.*': project_fields,
+        r'^/apiv1/issues.*': issue_fields,
+        r'^/apiv1/items.*': Item.json_metadata()['fields'],
+        r'^/apiv1/members.*': Member.json_metadata()['fields'],
+    }
 
     def login(self, email):
         session = self.create_session()
