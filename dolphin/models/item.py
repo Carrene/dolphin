@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from restfulpy.orm import Field, DeclarativeBase, relationship
 from restfulpy.orm.mixins import TimestampMixin
 from sqlalchemy import DateTime, Integer, ForeignKey, Enum
@@ -28,6 +30,7 @@ class Item(TimestampMixin, DeclarativeBase):
     )
     end = Field(
         DateTime,
+        python_type=datetime,
         label='End',
         pattern=r'^(\d{4})-(0[1-9]|1[012]|[1-9])-(0[1-9]|[12]\d{1}|3[01]|[1-9])$',
         example='2018-02-02',
