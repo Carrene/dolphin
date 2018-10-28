@@ -24,7 +24,7 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     _boarding = ['on-time', 'delayed', 'at-risk']
 
-    workflow_id = Field(Integer, ForeignKey('workflow.id'))
+    workflow_id = Field(Integer, ForeignKey('workflow.id'), nullable=True)
     release_id = Field(Integer, ForeignKey('release.id'), nullable=True)
     member_id = Field(Integer, ForeignKey('member.id'))
     group_id = Field(Integer, ForeignKey('group.id'), nullable=True)
