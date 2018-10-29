@@ -13,7 +13,7 @@ DATE_PATTERN = re.compile(
 )
 
 
-TITLE_PATTERN = re.compile(r'^[^\s].+[^\s]$', re.MULTILINE)
+TITLE_PATTERN = re.compile(r'^(?!\s).*[^\s]$')
 
 
 def release_exists_validator(releaseId, container, field):
