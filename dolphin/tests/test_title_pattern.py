@@ -15,4 +15,5 @@ def test_date_pattern():
     assert not pattern.match('Title with more than one Space in ending  ')
     assert not pattern.match('Title with Tab in ending      ')
     assert not pattern.match('Title with Enter in ending \n')
+    assert not pattern.match('1')
 
