@@ -44,7 +44,7 @@ class Tag(DeclarativeBase):
         watermark='Enter the title',
         nullable=False,
         not_none=False,
-        required=False,
+        required=True,
         python_type=str
     )
     issues = relationship(
@@ -75,7 +75,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         watermark='Enter a due date',
         nullable=False,
         not_none=True,
-        required=False,
+        required=True,
     )
     kind = Field(
         Enum(*issue_kinds, name='kind'),
@@ -84,7 +84,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         watermark='Choose a status',
         nullable=False,
         not_none=True,
-        required=False,
+        required=True,
     )
     days = Field(
         Integer,

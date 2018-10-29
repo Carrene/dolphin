@@ -29,7 +29,7 @@ class Subscribable(TimestampMixin, DeclarativeBase):
         example='Sample Title',
         nullable=False,
         not_none=False,
-        required=False,
+        required=True,
         python_type=str
     )
     description = Field(

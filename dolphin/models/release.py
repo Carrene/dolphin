@@ -41,7 +41,7 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
         watermark='Enter a cutoff date',
         nullable=False,
         not_none=True,
-        required=False,
+        required=True,
     )
 
     projects = relationship(

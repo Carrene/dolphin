@@ -28,7 +28,7 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         watermark='Enter the title',
         nullable=False,
         not_none=False,
-        required=False,
+        required=True,
         python_type=str
     )
     email = Field(
@@ -37,7 +37,7 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         watermark='Enter you email',
         unique=True,
         not_none=False,
-        required=False,
+        required=True,
         index=True,
         pattern=r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)',
         example='member@example.com'
