@@ -136,8 +136,8 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     def iter_metadata_fields(cls):
         yield from super().iter_metadata_fields()
         yield MetadataField(
-            'boardings',
-            'boardings',
+            'boarding',
+            'boarding',
             label='Boarding',
             required=False,
             readonly=True
