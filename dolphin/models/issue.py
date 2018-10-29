@@ -125,6 +125,17 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         protected=True
     )
 
+    is_subscribed = column_property(
+        select([func.count(Subscription.member)]) \
+        .where(Subscription.subscribable == id) \
+        .where(Subscription.member == bindparam(
+                'member_id',
+                callable_=lambda: context.identity.id
+            )
+        ) \
+        .correlate_except(Subscription)
+    )
+
     @property
     def boardings(self):
         if self.due_date < datetime.now():
@@ -144,7 +155,8 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         )
 
     def to_dict(self):
-        project_dict = super().to_dict()
-        project_dict['boarding'] = self.boardings
-        return project_dict
+        issue_dict = super().to_dict()
+        issue_dict['boarding'] = self.boardings
+        issue_dict['isSubscribed'] = True if self.is_subscribed else False
+        return issue_dict
 
