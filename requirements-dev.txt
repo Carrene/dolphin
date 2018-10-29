@@ -2,3 +2,4 @@
 pytest-pudb
 sqlalchemy-schemadisplay
 ipython
+git+https://github.com/Carrene/cas-common.git

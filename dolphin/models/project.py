@@ -1,7 +1,7 @@
 from nanohttp import context
-from restfulpy.orm.metadata import MetadataField
 from restfulpy.orm import Field, relationship, SoftDeleteMixin, \
     ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin
+from restfulpy.orm.metadata import MetadataField
 from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam
 from sqlalchemy.orm import column_property
 

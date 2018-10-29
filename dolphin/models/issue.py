@@ -1,12 +1,14 @@
 from datetime import datetime
 
-from restfulpy.orm.metadata import MetadataField
+from nanohttp import context
 from restfulpy.orm import Field, DeclarativeBase, relationship, \
     ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin
-from sqlalchemy import Integer, ForeignKey, DateTime, Enum, String, Column, \
-    Table
+from restfulpy.orm.metadata import MetadataField
+from sqlalchemy.orm import column_property
+from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
+    DateTime, String, Column, Table
 
-from .subscribable import Subscribable
+from .subscribable import Subscribable, Subscription
 
 
 association_table = Table('issue_tag', DeclarativeBase.metadata,
@@ -125,6 +127,17 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         protected=True
     )
 
+    is_subscribed = column_property(
+        select([func.count(Subscription.member)]) \
+        .where(Subscription.subscribable == id) \
+        .where(Subscription.member == bindparam(
+                'member_id',
+                callable_=lambda: context.identity.id
+            )
+        ) \
+        .correlate_except(Subscription)
+    )
+
     @property
     def boardings(self):
         if self.due_date < datetime.now():
@@ -144,7 +157,8 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         )
 
     def to_dict(self):
-        project_dict = super().to_dict()
-        project_dict['boarding'] = self.boardings
-        return project_dict
+        issue_dict = super().to_dict()
+        issue_dict['boarding'] = self.boardings
+        issue_dict['isSubscribed'] = True if self.is_subscribed else False
+        return issue_dict
 
