@@ -1,4 +1,5 @@
 from nanohttp import context
+from restfulpy.orm.metadata import MetadataField
 from restfulpy.orm import Field, relationship, SoftDeleteMixin, \
     ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin
 from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam
@@ -104,6 +105,17 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
                 return None
 
         return self._boarding[0]
+
+    @classmethod
+    def iter_metadata_fields(cls):
+        yield from super().iter_metadata_fields()
+        yield MetadataField(
+            'boarding',
+            'boarding',
+            label='Boarding',
+            required=False,
+            readonly=True
+        )
 
     def to_dict(self):
         project_dict = super().to_dict()

@@ -40,3 +40,7 @@ class TestProject(LocalApplicationTestCase):
             assert fields['status']['required'] is not None
             assert fields['status']['default'] is not None
 
+            assert fields['boarding']['label'] is not None
+            assert fields['boarding']['required'] is not None
+            assert fields['boarding']['readonly'] is not None
+
