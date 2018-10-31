@@ -34,7 +34,7 @@ class Subscribable(TimestampMixin, DeclarativeBase):
     )
     description = Field(
         String,
-        min_length=20,
+        min_length=1,
         max_length=512,
         label='Description',
         watermark='Enter the description',

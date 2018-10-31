@@ -8,8 +8,9 @@ from dolphin.models import Project, Release, Issue, issue_kinds, Member, \
     Resource, Phase
 
 
-DATE_PATTERN = re.compile(
-    r'^(\d{4})-(0[1-9]|1[012]|[1-9])-(0[1-9]|[12]\d{1}|3[01]|[1-9])$'
+DATETIME_PATTERN = re.compile(
+    r'^(\d{4})-(0[1-9]|1[012]|[1-9])-(0[1-9]|[12]\d{1}|3[01]|[1-9])' \
+    r'(T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z)?)?$'
 )
 
 
@@ -196,7 +197,7 @@ release_validator = validate(
         max_length=(512, '703 At Most 512 Characters Are Valid For Description')
     ),
     cutoff=dict(
-        pattern=(DATE_PATTERN, '702 Invalid Cutoff Format'),
+        pattern=(DATETIME_PATTERN, '702 Invalid Cutoff Format'),
         required='712 Cutoff Not In Form'
     ),
     status=dict(
@@ -214,7 +215,7 @@ update_release_validator = validate(
         max_length=(512, '703 At Most 512 Characters Are Valid For Description')
     ),
     cutoff=dict(
-        pattern=(DATE_PATTERN, '702 Invalid Cutoff Format'),
+        pattern=(DATETIME_PATTERN, '702 Invalid Cutoff Format'),
     ),
     status=dict(
         callback=release_status_value_validator
@@ -284,7 +285,7 @@ issue_validator = validate(
         max_length=(512, '703 At Most 512 Characters Are Valid For Description')
     ),
     dueDate=dict(
-        pattern=(DATE_PATTERN, '701 Invalid Due Date Format'),
+        pattern=(DATETIME_PATTERN, '701 Invalid Due Date Format'),
         required='711 Due Date Not In Form'
     ),
     kind=dict(
@@ -310,7 +311,7 @@ update_issue_validator = validate(
         max_length=(512, '703 At Most 512 Characters Are Valid For Description')
     ),
     dueDate=dict(
-        pattern=(DATE_PATTERN, '701 Invalid Due Date Format'),
+        pattern=(DATETIME_PATTERN, '701 Invalid Due Date Format'),
     ),
     kind=dict(
         callback=kind_value_validator
