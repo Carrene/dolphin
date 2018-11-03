@@ -52,6 +52,12 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['removedAt'] != None
 
             when(
+                'Intended issue with string type not found',
+                url_parameters=dict(id='Alphabetical'),
+            )
+            assert status == 404
+
+            when(
                 'Intended Project With String Type Not Found',
                 url_parameters=dict(id=100)
             )

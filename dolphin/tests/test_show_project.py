@@ -59,6 +59,12 @@ class TestProject(LocalApplicationTestCase):
             assert status == 404
 
             when(
+                'Intended issue with string type not found',
+                url_parameters=dict(id='Alphabetical'),
+            )
+            assert status == 404
+
+            when(
                 'There is parameter is form',
                 form=dict(any_parameter='A parameter in the form')
             )
