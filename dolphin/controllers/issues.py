@@ -8,7 +8,7 @@ from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound, \
     ChatRoomNotFound
 from ..models import Issue, Subscription, Resource, Phase, Item, Member
 from ..validators import issue_validator, update_issue_validator, \
-    subscribe_validator, assign_issue_validator
+    assign_issue_validator
 
 
 class IssueController(ModelRestController):
@@ -128,12 +128,10 @@ class IssueController(ModelRestController):
         return query
 
     @authorize
-    @json
-    @subscribe_validator
+    @json(prevent_form='709 Form Not Allowed')
     @Issue.expose
     @commit
     def subscribe(self, id):
-        form = context.form
         token = context.environ['HTTP_AUTHORIZATION']
 
         try:
@@ -145,15 +143,16 @@ class IssueController(ModelRestController):
         if not issue:
             raise HTTPNotFound()
 
+        member = Member.current()
         if DBSession.query(Subscription).filter(
             Subscription.subscribable == id,
-            Subscription.member == form['memberId']
+            Subscription.member == member.id
         ).one_or_none():
             raise HTTPStatus('611 Already Subscribed')
 
         subscription = Subscription(
             subscribable=issue.id,
-            member=form['memberId']
+            member=member.id
         )
         DBSession.add(subscription)
 
@@ -189,12 +188,10 @@ class IssueController(ModelRestController):
         return issue
 
     @authorize
-    @json
-    @subscribe_validator
+    @json(prevent_form='709 Form Not Allowed')
     @Issue.expose
     @commit
     def unsubscribe(self, id):
-        form = context.form
         token = context.environ['HTTP_AUTHORIZATION']
 
         try:
@@ -206,9 +203,10 @@ class IssueController(ModelRestController):
         if not issue:
             raise HTTPNotFound()
 
+        member = Member.current()
         subscription = DBSession.query(Subscription).filter(
             Subscription.subscribable == id,
-            Subscription.member == form['memberId']
+            Subscription.member == member.id
         ).one_or_none()
 
         if not subscription:
@@ -216,7 +214,6 @@ class IssueController(ModelRestController):
 
         DBSession.delete(subscription)
 
-        member = Member.current()
         chat_client = ChatClient()
         try:
             chat_client.kick_member(

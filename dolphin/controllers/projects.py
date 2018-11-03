@@ -8,8 +8,7 @@ from ..backends import ChatClient
 from ..exceptions import ChatRoomNotFound, RoomMemberAlreadyExist, \
     RoomMemberNotFound
 from ..models import Project, Member, Subscription
-from ..validators import project_validator, update_project_validator, \
-    subscribe_validator
+from ..validators import project_validator, update_project_validator
 
 
 class ProjectController(ModelRestController):
@@ -244,13 +243,12 @@ class ProjectController(ModelRestController):
         return query
 
     @authorize
-    @json
-    @subscribe_validator
+    @json(prevent_form='709 Form Not Allowed')
     @Project.expose
     @commit
     def subscribe(self, id):
-        form = context.form
         token = context.environ['HTTP_AUTHORIZATION']
+        identity = context.identity
 
         try:
             id = int(id)
@@ -263,24 +261,24 @@ class ProjectController(ModelRestController):
         if not project:
             raise HTTPNotFound()
 
+        member = Member.current()
         if DBSession.query(Subscription).filter(
             Subscription.subscribable == id,
-            Subscription.member == form['memberId']
+            Subscription.member == member.id
         ).one_or_none():
             raise HTTPStatus('611 Already Subscribed')
 
         subscription = Subscription(
             subscribable=id,
-            member=form['memberId']
+            member=member.id
         )
         DBSession.add(subscription)
 
-        member = Member.current()
         chat_client = ChatClient()
         try:
             chat_client.add_member(
                 project.room_id,
-                context.identity.reference_id,
+                identity.reference_id,
                 token,
                 member.access_token
             )
@@ -296,7 +294,7 @@ class ProjectController(ModelRestController):
         except:
             chat_client.kick_member(
                 project.room_id,
-                context.identity.reference_id,
+                identity.reference_id,
                 token,
                 member.access_token
             )
@@ -305,13 +303,12 @@ class ProjectController(ModelRestController):
         return project
 
     @authorize
-    @json
-    @subscribe_validator
+    @json(prevent_form='709 Form Not Allowed')
     @Project.expose
     @commit
     def unsubscribe(self, id):
-        form = context.form
         token = context.environ['HTTP_AUTHORIZATION']
+        identity = context.identity
 
         try:
             id = int(id)
@@ -324,21 +321,21 @@ class ProjectController(ModelRestController):
         if not project:
             raise HTTPNotFound()
 
+        member = Member.current()
         subscription = DBSession.query(Subscription).filter(
             Subscription.subscribable == id,
-            Subscription.member == form['memberId']
+            Subscription.member == member.id
         ).one_or_none()
         if not subscription:
             raise HTTPStatus('612 Not Subscribed Yet')
 
         DBSession.delete(subscription)
 
-        member = Member.current()
         chat_client = ChatClient()
         try:
             chat_client.kick_member(
                 project.room_id,
-                context.identity.reference_id,
+                identity.reference_id,
                 token,
                 member.access_token
             )
@@ -354,7 +351,7 @@ class ProjectController(ModelRestController):
         except:
             chat_client.add_member(
                 project.room_id,
-                context.identity.reference_id,
+                identity.reference_id,
                 token,
                 access_token
             )
