@@ -333,15 +333,6 @@ update_item_validator = validate(
 )
 
 
-subscribe_validator = validate(
-    memberId=dict(
-        required='735 Member Id Not In Form',
-        type_=(int, '736 Invalid Member Id Type'),
-        callback=member_exists_validator
-    )
-)
-
-
 assign_issue_validator = validate(
     resourceId=dict(
         required='715 Resource Id Not In Form',

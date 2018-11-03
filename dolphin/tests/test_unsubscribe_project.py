@@ -62,7 +62,6 @@ class TestProject(LocalApplicationTestCase):
             'Unsubscribe an project',
             '/apiv1/projects/id:1',
             'UNSUBSCRIBE',
-            form=dict(memberId=1)
         ):
             assert status == 200
             assert response.json['id'] == 1
@@ -81,30 +80,16 @@ class TestProject(LocalApplicationTestCase):
             assert status == 404
 
             when(
-                'Member id not in form',
-                form=given - 'memberId'
-            )
-            assert status == '735 Member Id Not In Form'
-
-            when(
-                'Member not found',
-                form=given | dict(memberId=100)
-            )
-            assert status == 610
-            assert status.text.startswith('Member not found')
-
-            when(
-                'Member id type is invalid',
-                form=given | dict(memberId='Alphabetical')
-            )
-            assert status == '736 Invalid Member Id Type'
-
-            when(
                 'Issue is not subscribed yet',
                 url_parameters=dict(id=1),
-                form=given | dict(memberId=1)
             )
             assert status == '612 Not Subscribed Yet'
+
+            when(
+                'There is parameter in form',
+                form=dict(parameter='Any parameter')
+            )
+            assert status == '709 Form Not Allowed'
 
             when('Request is not authorized', authorization=None)
             assert status == 401

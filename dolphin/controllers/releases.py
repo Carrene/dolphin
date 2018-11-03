@@ -7,8 +7,7 @@ from restfulpy.utils import to_camel_case
 from ..backends import ChatClient
 from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound
 from ..models import Release, release_statuses, Subscription, Member
-from ..validators import release_validator, update_release_validator, \
-    subscribe_validator
+from ..validators import release_validator, update_release_validator
 
 
 class ReleaseController(ModelRestController):
@@ -97,12 +96,10 @@ class ReleaseController(ModelRestController):
         return query
 
     @authorize
-    @json
-    @subscribe_validator
+    @json(prevent_form='709 Form Not Allowed')
     @Release.expose
     @commit
     def subscribe(self, id):
-        form = context.form
         token = context.environ['HTTP_AUTHORIZATION']
 
         try:
@@ -116,27 +113,26 @@ class ReleaseController(ModelRestController):
         if not release:
             raise HTTPNotFound()
 
+        member = Member.current()
         if DBSession.query(Subscription).filter(
             Subscription.subscribable == id,
-            Subscription.member == form['memberId']
+            Subscription.member == member.id
         ).one_or_none():
             raise HTTPStatus('611 Already Subscribed')
 
         subscription = Subscription(
             subscribable=id,
-            member=form['memberId']
+            member=member.id
         )
         DBSession.add(subscription)
 
         return release
 
     @authorize
-    @json
-    @subscribe_validator
+    @json(prevent_form='709 Form Not Allowed')
     @Release.expose
     @commit
     def unsubscribe(self, id):
-        form = context.form
         token = context.environ['HTTP_AUTHORIZATION']
 
         try:
@@ -150,9 +146,10 @@ class ReleaseController(ModelRestController):
         if not release:
             raise HTTPNotFound()
 
+        member = Member.current()
         subscription = DBSession.query(Subscription).filter(
             Subscription.subscribable == id,
-            Subscription.member == form['memberId']
+            Subscription.member == member.id
         ).one_or_none()
 
         if not subscription:
