@@ -120,7 +120,7 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     def to_dict(self):
         project_dict = super().to_dict()
         project_dict['boarding'] = self.boardings
-        project_dict['dueDate'] = self.due_date.isoformat()
+        project_dict['dueDate'] = self.due_date.isoformat() if self.due_date else None
         project_dict['isSubscribed'] = True if self.is_subscribed else False
         return project_dict
 
