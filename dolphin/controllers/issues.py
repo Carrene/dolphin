@@ -117,7 +117,6 @@ class IssueController(ModelRestController):
                 )
 
         issue.update_from_request()
-        project.to_dict()
         return issue
 
     @authorize
