@@ -94,6 +94,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         label='Days',
         watermark='How many days do you estimate?',
         minimum=1,
+        maximum=1000,
         nullable=False,
         not_none=False,
         required=False
