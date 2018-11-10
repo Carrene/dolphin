@@ -155,11 +155,6 @@ class TestIssue(LocalApplicationTestCase):
             when('Request is not authorized', authorization=None)
             assert status == 401
 
-        with oauth_mockup_server(), self.given(
-            'Updating project with empty form',
-            '/apiv1/issues/id:2',
-            'UPDATE',
-            form=dict()
-        ):
+            when('Updating project with empty form', form=dict())
             assert status == '708 No Parameter Exists In The Form'
 
