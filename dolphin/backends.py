@@ -1,12 +1,10 @@
 import json
 
 import requests
-from nanohttp import settings, HTTPForbidden
+from nanohttp import settings, HTTPForbidden, HTTPUnauthorized, HTTPNotFound
 from restfulpy.logging_ import get_logger
 
-from .exceptions import ChatServerNotFound, ChatServerNotAvailable, \
-    ChatInternallError, ChatRoomNotFound, RoomMemberAlreadyExist, \
-    RoomMemberNotFound
+from .exceptions import *
 
 
 logger = get_logger('backends')
@@ -40,8 +38,24 @@ class CASClient:
             f'response-HTTP-code={response.status_code} - ' \
             f'target-application={self._server_name}'
         )
+        if response.status_code == 404:
+            raise CASServerNotFound()
+
+        if response.status_code == 503:
+            raise CASServerNotAvailable()
+
+        if response.status_code == 605:
+            raise InvalidApplicationID()
+
+        if response.status_code == 608:
+            raise InvalidSecret()
+
+        if response.status_code in (609, 610):
+            raise HTTPUnauthorized
+
         if response.status_code != 200:
-            raise HTTPForbidden()
+            logger.exception(response.content.decode())
+            raise CASServerInternalError()
 
         result = json.loads(response.text)
         return result['accessToken'], result['memberId']
@@ -57,6 +71,12 @@ class CASClient:
             f'GET {url} - ' \
             f'target-application={self._server_name}'
         )
+        if response.status_code == 401:
+            raise HTTPUnauthorized()
+
+        if response.status_code == 404:
+            raise HTTPNotFound()
+
         if response.status_code != 200:
             raise HTTPForbidden()
 

@@ -17,6 +17,7 @@ DATA_DIRECTORY = path.abspath(path.join(HERE, '../../data'))
 
 
 _chat_server_status = 'idle'
+_oauth_server_status = 'idle'
 
 
 member_id = FieldInfo(type_=int, not_none=True, required=True).to_json()
@@ -97,6 +98,9 @@ def oauth_mockup_server():
             code = context.form.get('code')
             if not code.startswith('authorization code'):
                 return dict(accessToken='token is damage', memberId=1)
+
+            if _oauth_server_status != 'idle':
+                raise HTTPStatus(_oauth_server_status)
 
             return dict(accessToken='access token', memberId=1)
 
@@ -203,4 +207,12 @@ def chat_server_status(status):
     _chat_server_status = status
     yield
     _chat_server_status = 'idle'
+
+
+@contextmanager
+def oauth_server_status(status):
+    global _oauth_server_status
+    _oauth_server_status = status
+    yield
+    _oauth_server_status = 'idle'
 

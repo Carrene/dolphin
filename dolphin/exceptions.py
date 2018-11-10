@@ -24,3 +24,23 @@ class ChatServerNotAvailable(HTTPKnownStatus):
 class ChatInternallError(HTTPKnownStatus):
     status = '801 Chat Server Internal Error'
 
+
+class CASServerNotFound(HTTPKnownStatus):
+    status = '619 CAS Server Not Found'
+
+
+class CASServerNotAvailable(HTTPKnownStatus):
+    status = '802 CAS Server Not Available'
+
+
+class CASServerInternalError(HTTPKnownStatus):
+    status = '803 CAS Server Internall Error'
+
+
+class InvalidApplicationID(HTTPKnownStatus):
+    status = '620 Invalid Application ID'
+
+
+class InvalidSecret(HTTPKnownStatus):
+    status = '621 Invalid Secret'
+
