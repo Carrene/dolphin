@@ -41,7 +41,6 @@ class TestProject(LocalApplicationTestCase):
             '/apiv1/projects',
             'CREATE',
             form=dict(
-                memberId=self.member.id,
                 workflowId=self.workflow.id,
                 title='My awesome project',
                 description='A decription for my project',
@@ -53,26 +52,6 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['status'] == 'queued'
             assert response.json['boarding'] == None
             assert response.json['dueDate'] == None
-
-            when(
-                'Member id not in form',
-                form=given - 'memberId' | dict(title='New title')
-            )
-            assert status == '739 Member Id Not In Form'
-
-            when(
-                'Member not found with string type',
-                form=given | dict(memberId='Alphabetical', title='New title')
-            )
-            assert status == 610
-            assert status.text.startswith('Member not found')
-
-            when(
-                'Member not found with integer type',
-                form=given | dict(memberId=100, title='New title')
-            )
-            assert status == 610
-            assert status.text.startswith('Member not found')
 
             when(
                 'Title format is wrong',

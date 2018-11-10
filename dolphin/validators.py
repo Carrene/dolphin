@@ -242,10 +242,6 @@ project_validator = validate(
     releaseId=dict(
         callback=release_exists_validator
     ),
-    memberId=dict(
-        required='739 Member Id Not In Form',
-        callback=member_exists_validator
-    )
 )
 
 

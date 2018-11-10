@@ -77,16 +77,14 @@ class ProjectController(ModelRestController):
         PENDING = -1
         form = context.form
         token = context.environ['HTTP_AUTHORIZATION']
+        member = Member.current()
 
         project = Project()
         project.update_from_request()
+        project.member_id = member.id
         DBSession.add(project)
         project.room_id = PENDING
         DBSession.flush()
-
-        member = DBSession.query(Member) \
-            .filter(Member.id == form['memberId']) \
-            .one()
 
         room = self._ensure_room(form['title'], token, member.access_token)
 
