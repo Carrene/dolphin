@@ -26,7 +26,16 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     _boarding = ['on-time', 'delayed', 'at-risk']
 
     workflow_id = Field(Integer, ForeignKey('workflow.id'), nullable=True)
-    release_id = Field(Integer, ForeignKey('release.id'), nullable=True)
+    release_id = Field(
+        Integer,
+        ForeignKey('release.id'),
+        python_type=int,
+        nullable=True,
+        watermark='Choose a release',
+        label='Release',
+        not_none=False,
+        required=False
+    )
     member_id = Field(Integer, ForeignKey('member.id'))
     group_id = Field(Integer, ForeignKey('group.id'), nullable=True)
     room_id = Field(Integer)
@@ -115,6 +124,14 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             label='Boarding',
             required=False,
             readonly=True
+        )
+        yield MetadataField(
+            'dueDate',
+            'due date',
+            label='Target',
+            required=False,
+            readonly=True,
+            watermark='This will be calculated by its Nuggets automaticaly.',
         )
 
     def to_dict(self):

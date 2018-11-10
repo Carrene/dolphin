@@ -44,3 +44,17 @@ class TestProject(LocalApplicationTestCase):
             assert fields['boarding']['required'] is not None
             assert fields['boarding']['readonly'] is not None
 
+            assert fields['dueDate']['label'] is not None
+            assert fields['dueDate']['name'] is not None
+            assert fields['dueDate']['type'] is not None
+            assert fields['dueDate']['required'] is not None
+            assert fields['dueDate']['readonly'] is not None
+
+            assert fields['releaseId']['label'] is not None
+            assert fields['releaseId']['name'] is not None
+            assert fields['releaseId']['type'] is not None
+            assert fields['releaseId']['required'] is not None
+            assert fields['releaseId']['watermark'] is not None
+            assert fields['releaseId']['not_none'] is not None
+            assert fields['releaseId']['watermark'] is not None
+
