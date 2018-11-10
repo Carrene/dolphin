@@ -51,6 +51,7 @@ class TestIssue(LocalApplicationTestCase):
             'DEFINE',
             form=dict(
                 title='Defined issue',
+                status='in-progress',
                 description='A description for defined issue',
                 dueDate='2200-2-20',
                 kind='enhancement',
@@ -65,7 +66,7 @@ class TestIssue(LocalApplicationTestCase):
             assert response.json['dueDate'] == '2200-02-20T00:00:00'
             assert response.json['kind'] == 'enhancement'
             assert response.json['days'] == 3
-            assert response.json['status'] == 'triage'
+            assert response.json['status'] == 'in-progress'
 
             when(
                 'Project id not in form',
@@ -166,7 +167,7 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Invalid status value is in form',
-                form=given + dict(status='progressing') | \
+                form=given | dict(status='progressing') | \
                     dict(title='Another title')
             )
             assert status == 705
