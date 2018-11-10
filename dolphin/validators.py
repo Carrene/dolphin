@@ -3,9 +3,7 @@ import re
 from nanohttp import validate, HTTPStatus, context
 from restfulpy.orm import DBSession
 
-from dolphin.models import Project, Release, Issue, issue_kinds, Member, \
-    issue_statuses, item_statuses, project_statuses, release_statuses, \
-    Resource, Phase
+from dolphin.models import *
 
 
 DATETIME_PATTERN = re.compile(
@@ -89,16 +87,6 @@ def project_status_value_validator(status, container, field):
     return form['status']
 
 
-def project_phase_value_validator(status, container, field):
-    form = context.form
-    if 'phase' in form and form['phase'] not in project_phases:
-        raise HTTPStatus(
-            f'706 Invalid phase value, only one of ' \
-            f'"{", ".join(project_phases)}" will be accepted'
-        )
-    return form['phase']
-
-
 def issue_not_exists_validator(title, container, field):
     form = context.form
     project = DBSession.query(Project) \
@@ -143,6 +131,17 @@ def phase_exists_validator(phaseId, container, field):
         raise HTTPStatus(f'613 Phase not found with id: {form["phaseId"]}')
 
     return phaseId
+
+
+def workflow_exists_validator(workflowId, container, field):
+    form = context.form
+
+    if 'workflowId' in form and not DBSession.query(Workflow) \
+            .filter(Workflow.id == form['workflowId']) \
+            .one_or_none():
+        raise HTTPStatus(f'616 Workflow not found with id: {form["workflowId"]}')
+
+    return workflowId
 
 
 def item_status_value_validator(status, container, field):
@@ -236,8 +235,8 @@ project_validator = validate(
     status=dict(
         callback=project_status_value_validator
     ),
-    phase=dict(
-        callback=project_phase_value_validator
+    workflowId=dict(
+        callback=workflow_exists_validator
     ),
     releaseId=dict(
         callback=release_exists_validator
@@ -255,9 +254,6 @@ update_project_validator = validate(
     ),
     status=dict(
         callback=project_status_value_validator
-    ),
-    phase=dict(
-        callback=project_phase_value_validator
     ),
     memberId=dict(
         callback=member_exists_validator

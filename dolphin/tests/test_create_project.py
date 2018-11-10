@@ -1,6 +1,6 @@
 from bddrest import status, response, when, Remove, given
 
-from dolphin.models import Project, Member, Workflow
+from dolphin.models import Project, Member, Workflow, Release
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
@@ -21,7 +21,15 @@ class TestProject(LocalApplicationTestCase):
 
         workflow1 = Workflow(title='First Workflow')
 
+        release1 = Release(
+            title='My first release',
+            description='A decription for my first release',
+            cutoff='2030-2-20',
+        )
+        session.add(release1)
+
         project1 = Project(
+            release=release1,
             member=member1,
             workflow=workflow1,
             title='My first project',
@@ -30,6 +38,7 @@ class TestProject(LocalApplicationTestCase):
         )
         session.add(project1)
         session.commit()
+
         cls.member = member1
         cls.workflow = workflow1
 
@@ -41,15 +50,17 @@ class TestProject(LocalApplicationTestCase):
             '/apiv1/projects',
             'CREATE',
             form=dict(
+                releaseId=1,
                 workflowId=self.workflow.id,
                 title='My awesome project',
                 description='A decription for my project',
+                status='active'
             )
         ):
             assert status == 200
             assert response.json['title'] == 'My awesome project'
             assert response.json['description'] == 'A decription for my project'
-            assert response.json['status'] == 'queued'
+            assert response.json['status'] == 'active'
             assert response.json['boarding'] == None
             assert response.json['dueDate'] == None
 

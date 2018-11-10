@@ -69,7 +69,11 @@ class ProjectController(ModelRestController):
         return room_members_modified
 
     @authorize
-    @json
+    @json(form_whitelist=(
+        ['title', 'description', 'status', 'releaseId', 'workflowId', 'groupId'],
+        '707 Invalid field, only following fields are accepted: ' \
+        'title, description, status, releaseId, workflowId and groupId' \
+    ))
     @project_validator
     @Project.expose
     @commit
