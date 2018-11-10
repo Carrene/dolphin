@@ -45,3 +45,11 @@ class TestToken(LocalApplicationTestCase):
                     when('Application Secret is manipulated')
                     assert status == '621 Invalid Secret'
 
+                with oauth_server_status('609 Token Expired'):
+                    when('Token is expired')
+                    assert status == 401
+
+                with oauth_server_status('610 Malformed Access Token'):
+                    when('Access token is manipulated')
+                    assert status == 401
+

@@ -50,6 +50,9 @@ class CASClient:
         if response.status_code == 608:
             raise InvalidSecret()
 
+        if response.status_code in (609, 610):
+            raise HTTPUnauthorized
+
         if response.status_code != 200:
             logger.exception(response.content.decode())
             raise CASServerInternalError()
