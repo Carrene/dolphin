@@ -29,6 +29,7 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     release_id = Field(
         Integer,
         ForeignKey('release.id'),
+        python_type=int,
         nullable=True,
         watermark='Choose a release',
         label='Release',
@@ -125,7 +126,7 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             readonly=True
         )
         yield MetadataField(
-            'due date',
+            'dueDate',
             'due date',
             label='Target',
             required=False,
