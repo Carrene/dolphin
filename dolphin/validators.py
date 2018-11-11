@@ -132,17 +132,16 @@ def phase_exists_validator(phaseId, container, field):
 
 
 def workflow_exists_validator(workflowId, container, field):
-    form = context.form
 
     try:
         workflowId = int(workflowId)
     except (TypeError, ValueError):
         raise HTTPStatus('743 Invalid Workflow Id Type')
 
-    if 'workflowId' in form and not DBSession.query(Workflow) \
-            .filter(Workflow.id == form['workflowId']) \
+    if not DBSession.query(Workflow) \
+            .filter(Workflow.id == workflowId) \
             .one_or_none():
-        raise HTTPStatus(f'616 Workflow not found with id: {form["workflowId"]}')
+        raise HTTPStatus(f'616 Workflow not found with id: {workflowId}')
 
     return workflowId
 
