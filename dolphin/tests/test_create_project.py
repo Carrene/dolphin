@@ -77,7 +77,7 @@ class TestProject(LocalApplicationTestCase):
             assert status.text.startswith('Another project with title')
 
             when(
-                'Workflow not found with string type',
+                'Workflow ID type is wrong',
                 form=given | dict(workflowId='Alphabetical', title='New title')
             )
             assert status == '743 Invalid Workflow Id Type'
@@ -90,7 +90,7 @@ class TestProject(LocalApplicationTestCase):
             assert status.text.startswith('Workflow not found')
 
             when(
-                'Release not found with string type',
+                'Release ID type is wrong',
                 form=given | dict(releaseId='Alphabetical', title='New title')
             )
             assert status == '750 Invalid Release Id Type'
