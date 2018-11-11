@@ -160,12 +160,10 @@ class IssueController(ModelRestController):
         )
         DBSession.add(subscription)
 
-        member = Member.current()
-
         chat_client = ChatClient()
         try:
             chat_client.add_member(
-                issue.project.room_id,
+                issue.room_id,
                 context.identity.reference_id,
                 token,
                 member.access_token
@@ -182,7 +180,7 @@ class IssueController(ModelRestController):
             DBSession.flush()
         except:
             chat_client.kick_member(
-                issue.project.room_id,
+                issue.room_id,
                 context.identity.reference_id,
                 token,
                 member.access_token
@@ -221,7 +219,7 @@ class IssueController(ModelRestController):
         chat_client = ChatClient()
         try:
             chat_client.kick_member(
-                issue.project.room_id,
+                issue.room_id,
                 context.identity.reference_id,
                 token,
                 member.access_token
@@ -237,7 +235,7 @@ class IssueController(ModelRestController):
             DBSession.flush()
         except:
             chat_client.add_member(
-                issue.project.room_id,
+                issue.room_id,
                 context.identity.reference_id,
                 token,
                 member.access_token
