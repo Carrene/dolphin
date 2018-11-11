@@ -26,7 +26,6 @@ class TestProject(LocalApplicationTestCase):
             description='A decription for my first release',
             cutoff='2030-2-20',
         )
-        session.add(release1)
 
         project1 = Project(
             release=release1,
