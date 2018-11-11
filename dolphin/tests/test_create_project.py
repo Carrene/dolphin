@@ -1,6 +1,6 @@
 from bddrest import status, response, when, Remove, given
 
-from dolphin.models import Project, Member, Workflow
+from dolphin.models import Project, Member, Workflow, Release
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
@@ -21,7 +21,14 @@ class TestProject(LocalApplicationTestCase):
 
         workflow1 = Workflow(title='First Workflow')
 
+        release1 = Release(
+            title='My first release',
+            description='A decription for my first release',
+            cutoff='2030-2-20',
+        )
+
         project1 = Project(
+            release=release1,
             member=member1,
             workflow=workflow1,
             title='My first project',
@@ -30,6 +37,7 @@ class TestProject(LocalApplicationTestCase):
         )
         session.add(project1)
         session.commit()
+
         cls.member = member1
         cls.workflow = workflow1
 
@@ -41,15 +49,17 @@ class TestProject(LocalApplicationTestCase):
             '/apiv1/projects',
             'CREATE',
             form=dict(
-                workflowId=self.workflow.id,
+                releaseId=1,
+                workflowId=1,
                 title='My awesome project',
                 description='A decription for my project',
+                status='active'
             )
         ):
             assert status == 200
             assert response.json['title'] == 'My awesome project'
             assert response.json['description'] == 'A decription for my project'
-            assert response.json['status'] == 'queued'
+            assert response.json['status'] == 'active'
             assert response.json['boarding'] == None
             assert response.json['dueDate'] == None
 
@@ -67,11 +77,23 @@ class TestProject(LocalApplicationTestCase):
             assert status.text.startswith('Another project with title')
 
             when(
-                'Release not found with string type',
+                'Workflow ID type is wrong',
+                form=given | dict(workflowId='Alphabetical', title='New title')
+            )
+            assert status == '743 Invalid Workflow Id Type'
+
+            when(
+                'Workflow not found with integer type',
+                form=given | dict(workflowId=100, title='New title')
+            )
+            assert status == 616
+            assert status.text.startswith('Workflow not found')
+
+            when(
+                'Release ID type is wrong',
                 form=given | dict(releaseId='Alphabetical', title='New title')
             )
-            assert status == 607
-            assert status.text.startswith('Release not found')
+            assert status == '750 Invalid Release Id Type'
 
             when(
                 'Release not found with integer type',
