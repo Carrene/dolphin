@@ -20,9 +20,7 @@ def release_exists_validator(releaseId, container, field):
     try:
         releaseId = int(releaseId)
     except (TypeError, ValueError):
-        raise HTTPStatus(
-            f'607 Release not found with id: {context.form["releaseId"]}'
-        )
+        raise HTTPStatus('750 Invalid Release Id Type')
 
     if 'releaseId' in form and not DBSession.query(Release) \
             .filter(Release.id == releaseId) \
@@ -135,6 +133,11 @@ def phase_exists_validator(phaseId, container, field):
 
 def workflow_exists_validator(workflowId, container, field):
     form = context.form
+
+    try:
+        workflowId = int(workflowId)
+    except (TypeError, ValueError):
+        raise HTTPStatus('743 Invalid Workflow Id Type')
 
     if 'workflowId' in form and not DBSession.query(Workflow) \
             .filter(Workflow.id == form['workflowId']) \

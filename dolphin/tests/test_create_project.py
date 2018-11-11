@@ -50,7 +50,7 @@ class TestProject(LocalApplicationTestCase):
             'CREATE',
             form=dict(
                 releaseId=1,
-                workflowId=self.workflow.id,
+                workflowId=1,
                 title='My awesome project',
                 description='A decription for my project',
                 status='active'
@@ -77,11 +77,23 @@ class TestProject(LocalApplicationTestCase):
             assert status.text.startswith('Another project with title')
 
             when(
+                'Workflow not found with string type',
+                form=given | dict(workflowId='Alphabetical', title='New title')
+            )
+            assert status == '743 Invalid Workflow Id Type'
+
+            when(
+                'Workflow not found with integer type',
+                form=given | dict(workflowId=100, title='New title')
+            )
+            assert status == 616
+            assert status.text.startswith('Workflow not found')
+
+            when(
                 'Release not found with string type',
                 form=given | dict(releaseId='Alphabetical', title='New title')
             )
-            assert status == 607
-            assert status.text.startswith('Release not found')
+            assert status == '750 Invalid Release Id Type'
 
             when(
                 'Release not found with integer type',
