@@ -33,7 +33,11 @@ class IssueController(ModelRestController):
         return room
 
     @authorize
-    @json
+    @json(form_whitelist=(
+        ['title', 'description', 'kind', 'days', 'status', 'projectId', 'dueDate'],
+        '707 Invalid field, only following fields are accepted: ' \
+        'title, description, kind, days, status, projectId and dueDate'
+    ))
     @issue_validator
     @Issue.expose
     @commit

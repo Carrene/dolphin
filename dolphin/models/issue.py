@@ -101,6 +101,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     )
     status = Field(
         Enum(*issue_statuses, name='issues_status'),
+        python_type=str,
         label='Status',
         watermark='Choose a status',
         not_none=True,
