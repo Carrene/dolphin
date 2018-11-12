@@ -46,5 +46,9 @@ class Authenticator(StatefulAuthenticator):
             member.title = cas_member['title']
             DBSession.commit()
 
+        if member.avatar != cas_member['avatar']:
+            member.avatar = cas_member['avatar']
+            DBSession.commit()
+
         return principal
 
