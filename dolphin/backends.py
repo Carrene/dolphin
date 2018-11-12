@@ -205,19 +205,22 @@ class ChatClient:
             room = json.loads(response.text)
             return room
 
-    def kick_member(self, id, user_id, token, x_access_token):
+    def kick_member(self, id, member_id, token, x_access_token):
 
         url = f'{settings.chat.url}/apiv1/rooms/{id}'
         try:
             response = requests.request(
                 'KICK',
                 url,
-                data={'userId': user_id},
-                headers={'X-Oauth2-Access-Token': x_access_token}
+                data={'memberId': member_id},
+                headers={
+                    'authorization': token,
+                    'X-Oauth2-Access-Token': x_access_token
+                }
             )
             logger.debug(
                 f'KICK {url} - ' \
-                f'userId={user_id} - ' \
+                f'memberId={member_id} - ' \
                 f'response-HTTP-code={response.status_code} - ' \
                 f'target-application={self._server_name}'
             )
