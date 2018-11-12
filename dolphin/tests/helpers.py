@@ -109,7 +109,12 @@ def oauth_mockup_server():
             access_token = context.environ['HTTP_AUTHORIZATION']
 
             if 'access token' in access_token:
-                return dict(id=1, title='member1', email='member1@example.com')
+                return dict(
+                    id=1,
+                    title='member1',
+                    email='member1@example.com',
+                    avatar='avatar1'
+                )
 
             raise HTTPForbidden()
 
@@ -189,7 +194,6 @@ def room_mockup_server():
             temp_status = self._status
             self._status = '611 User Not Found'
             raise HTTPStatus(temp_status)
-
 
     app = MockupApplication('chat-server', Root())
     with mockup_http_server(app) as (server, url):

@@ -51,6 +51,14 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         required=False,
         unique=True,
     )
+    avatar = Field(
+        Unicode(200),
+        label='Avatar',
+        nullable=True,
+        unique=False,
+        not_none=False,
+        required=False,
+    )
 
     subscribables = relationship(
         'Subscribable',
