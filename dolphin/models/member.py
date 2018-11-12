@@ -54,6 +54,7 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     avatar = Field(
         Unicode(200),
         label='Avatar',
+        nullable=True,
         unique=False,
         not_none=False,
         required=False,
