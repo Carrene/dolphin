@@ -4,7 +4,7 @@ from restfulpy import Application
 
 from .authentication import Authenticator
 from .controllers.root import Root
-from . import mockup
+from . import basedata
 
 
 __version__ = '0.9.0'
@@ -49,8 +49,8 @@ class Dolphin(Application):
             version=__version__
         )
 
-    def insert_mockup(self, *args):
-        mockup.insert()
+    def insert_basedata(self, *args):
+        basedata.insert()
 
 
 dolphin = Dolphin()
