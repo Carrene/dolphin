@@ -7,7 +7,7 @@ from .controllers.root import Root
 from . import basedata
 
 
-__version__ = '0.9.0'
+__version__ = '0.9.1nightly'
 
 
 class Dolphin(Application):
