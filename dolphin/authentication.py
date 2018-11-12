@@ -40,10 +40,10 @@ class Authenticator(StatefulAuthenticator):
 
         cas_member = CASClient().get_member(member.access_token)
 
-        self.update_member_if_needed()
+        self.update_member_if_needed(member, cas_member)
         return principal
 
-    def update_member_if_needed(self):
+    def update_member_if_needed(self, member, cas_member):
 
         # FIXME: If any item added to scopes, the additional scopes item must
         # be considered here
