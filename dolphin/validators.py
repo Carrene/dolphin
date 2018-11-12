@@ -257,9 +257,6 @@ update_project_validator = validate(
     status=dict(
         callback=project_status_value_validator
     ),
-    memberId=dict(
-        callback=member_exists_validator
-    )
 )
 
 

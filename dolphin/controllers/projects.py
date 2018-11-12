@@ -32,42 +32,6 @@ class ProjectController(ModelRestController):
 
         return room
 
-    def _replace_member(self, member_id, project, token, access_token):
-        new_assignee_member = DBSession.query(Member) \
-            .filter(Member.id == member_id) \
-            .one()
-
-        current_assignee_member = project.member
-        project.member = new_assignee_member
-
-        room_members_modified = True
-
-        try:
-            # Add new assignee member to project chat room
-            ChatClient().add_member(
-                project.room_id,
-                new_assignee_member.reference_id,
-                token,
-                access_token
-            )
-        except RoomMemberAlreadyExist:
-            room_members_modified = False
-            pass
-
-        try:
-            # Remove current assignee member from project chat room
-            ChatClient().kick_member(
-                project.room_id,
-                current_assignee_member.reference_id,
-                token,
-                access_token
-            )
-        except RoomMemberNotFound:
-            room_members_modified = False
-            pass
-
-        return room_members_modified
-
     @authorize
     @json(form_whitelist=(
         ['title', 'description', 'status', 'releaseId', 'workflowId', 'groupId'],
@@ -128,9 +92,9 @@ class ProjectController(ModelRestController):
     @json(
         prevent_empty_form='708 No Parameter Exists In The Form',
         form_whitelist=(
-            ['groupId', 'memberId', 'title', 'description', 'status'],
+            ['groupId', 'title', 'description', 'status'],
             '707 Invalid field, only following fields are accepted: ' \
-            'groupId, memberId, title, description and status' \
+            'groupId, title, description and status'
         )
     )
     @update_project_validator
@@ -163,35 +127,7 @@ class ProjectController(ModelRestController):
                 f'"{form["title"]}" is already exists.'
             )
 
-        member = Member.current()
-        current_member = project.member
         project.update_from_request()
-
-        if 'memberId' in form and project.member.id != form['memberId']:
-            member = DBSession.query(Member) \
-                .filter(Member.id == form['memberId']) \
-                .one_or_none()
-            self._replace_member(
-                form['memberId'],
-                project,
-                token,
-                member.access_token
-            )
-
-        # The exception type is not specified because after consulting with
-        # Mr.Mardani, the result got: there must be no specification on
-        # exception type because nobody knows what exception may be raised
-        try:
-            DBSession.flush()
-        except:
-            self.replace_member(
-                current_member.id,
-                project,
-                token,
-                member.access_token
-            )
-            raise
-
         return project
 
     @authorize
