@@ -72,7 +72,6 @@ class TestProject(LocalApplicationTestCase):
                 title='My interesting project',
                 description='A updated project description',
                 status='active',
-                memberId=1,
             )
         ):
             assert status == 200
@@ -92,20 +91,6 @@ class TestProject(LocalApplicationTestCase):
                 url_parameters=dict(id=100)
             )
             assert status == 404
-
-            when(
-                'Member not found with string type',
-                form=given | dict(memberId='Alphabetical', title='New title')
-            )
-            assert status == 610
-            assert status.text.startswith('Member not found')
-
-            when(
-                'Member is not found',
-                form=Update(memberId=100)
-            )
-            assert status == 610
-            assert status.text.startswith('Member not found')
 
             when(
                 'Title is repetetive',
@@ -162,34 +147,6 @@ class TestProject(LocalApplicationTestCase):
                 url_parameters=dict(id=3)
             )
             assert status == '746 Hidden Project Is Not Editable'
-
-            with chat_server_status('404 Not Found'):
-                when(
-                    'Chat server is not found',
-                    form=given | dict(memberId=2)
-                )
-                assert status == '617 Chat Server Not Found'
-
-            with chat_server_status('503 Service Not Available'):
-                when(
-                    'Chat server is not available',
-                    form=given | dict(memberId=2)
-                )
-                assert status == '800 Chat Server Not Available'
-
-            with chat_server_status('500 Internal Service Error'):
-                when(
-                    'Chat server faces with internal error',
-                    form=given | dict(memberId=2)
-                )
-                assert status == '801 Chat Server Internal Error'
-
-            with room_mockup_server():
-                when(
-                    'Room member is already added to room',
-                    form=given | dict(memberId=2)
-                )
-                assert status == 200
 
             with self.given(
                 'Updating project with empty form',
