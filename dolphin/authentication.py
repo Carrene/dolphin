@@ -40,6 +40,11 @@ class Authenticator(StatefulAuthenticator):
 
         cas_member = CASClient().get_member(member.access_token)
 
+        self.update_member_if_needed()
+        return principal
+
+    def update_member_if_needed(self):
+
         # FIXME: If any item added to scopes, the additional scopes item must
         # be considered here
         if member.title != cas_member['title']:
@@ -49,5 +54,4 @@ class Authenticator(StatefulAuthenticator):
             member.avatar = cas_member['avatar']
 
         DBSession.commit()
-        return principal
 
