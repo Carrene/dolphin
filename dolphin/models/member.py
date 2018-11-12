@@ -54,7 +54,10 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     avatar = Field(
         Unicode(200),
         label='Avatar',
+<<<<<<< HEAD
         nullable=True,
+=======
+>>>>>>> Add avatar field to Member model
         unique=False,
         not_none=False,
         required=False,

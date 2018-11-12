@@ -63,7 +63,11 @@ class TokenController(RestController):
         elif member.avatar != cas_member['avatar']:
             member.avatar = cas_member['avatar']
 
+<<<<<<< HEAD
         DBSession.flush()
+=======
+        DBSession.commit()
+>>>>>>> Add avatar field to Member model
         principal = context.application.__authenticator__.login(member.email)
         context.response_headers.add_header(
             'X-New-JWT-Token',
