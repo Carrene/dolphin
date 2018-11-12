@@ -94,7 +94,7 @@ class ProjectController(ModelRestController):
         form_whitelist=(
             ['groupId', 'title', 'description', 'status'],
             '707 Invalid field, only following fields are accepted: ' \
-            'groupId, title, description and status' \
+            'groupId, title, description and status'
         )
     )
     @update_project_validator
