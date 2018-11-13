@@ -1,10 +1,10 @@
 from bddrest import status, when, response
 
-from dolphin.models import Project, Member, Workflow
+from dolphin.models import Container, Member, Workflow
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
-class TestProject(LocalApplicationTestCase):
+class TestContainer(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
@@ -20,32 +20,32 @@ class TestProject(LocalApplicationTestCase):
 
         workflow1 = Workflow(title='First Workflow')
 
-        project1 = Project(
+        container1 = Container(
             member=member1,
             workflow=workflow1,
-            title='My first project',
-            description='A decription for my project',
+            title='My first container',
+            description='A decription for my container',
             room_id=1001
         )
-        session.add(project1)
+        session.add(container1)
 
-        hidden_project = Project(
+        hidden_container = Container(
             member=member1,
             workflow=workflow1,
-            title='My hidden project',
-            description='A decription for my project',
+            title='My hidden container',
+            description='A decription for my container',
             removed_at='2020-2-20',
             room_id=1000
         )
-        session.add(hidden_project)
+        session.add(hidden_container)
         session.commit()
 
     def test_hide(self):
         self.login('member1@example.com')
 
         with oauth_mockup_server(), self.given(
-            'Hiding a project',
-            '/apiv1/projects/id:1',
+            'Hiding a container',
+            '/apiv1/containers/id:1',
             'HIDE'
         ):
             assert status == 200
@@ -58,12 +58,12 @@ class TestProject(LocalApplicationTestCase):
             assert status == 404
 
             when(
-                'Intended Project With String Type Not Found',
+                'Intended Container With String Type Not Found',
                 url_parameters=dict(id=100)
             )
             assert status == 404
 
-            when('Project not found', url_parameters=dict(id=100))
+            when('Container not found', url_parameters=dict(id=100))
             assert status == 404
 
             when(

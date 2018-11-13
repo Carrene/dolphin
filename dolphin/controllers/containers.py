@@ -7,12 +7,12 @@ from restfulpy.utils import to_camel_case
 from ..backends import ChatClient
 from ..exceptions import ChatRoomNotFound, RoomMemberAlreadyExist, \
     RoomMemberNotFound
-from ..models import Project, Member, Subscription
-from ..validators import project_validator, update_project_validator
+from ..models import Container, Member, Subscription
+from ..validators import container_validator, update_container_validator
 
 
-class ProjectController(ModelRestController):
-    __model__ = Project
+class ContainerController(ModelRestController):
+    __model__ = Container
 
     def _ensure_room(self, title, token, access_token):
         create_room_error = 1
@@ -38,8 +38,8 @@ class ProjectController(ModelRestController):
         '707 Invalid field, only following fields are accepted: ' \
         'title, description, status, releaseId, workflowId and groupId' \
     ))
-    @project_validator
-    @Project.expose
+    @container_validator
+    @Container.expose
     @commit
     def create(self):
         PENDING = -1
@@ -47,20 +47,20 @@ class ProjectController(ModelRestController):
         token = context.environ['HTTP_AUTHORIZATION']
         member = Member.current()
 
-        project = Project()
-        project.update_from_request()
-        project.member_id = member.id
-        DBSession.add(project)
-        project.room_id = PENDING
+        container = Container()
+        container.update_from_request()
+        container.member_id = member.id
+        DBSession.add(container)
+        container.room_id = PENDING
         DBSession.flush()
 
         room = self._ensure_room(form['title'], token, member.access_token)
 
         chat_client = ChatClient()
-        project.room_id = room['id']
+        container.room_id = room['id']
         try:
             chat_client.add_member(
-                project.room_id,
+                container.room_id,
                 member.reference_id,
                 token,
                 member.access_token
@@ -76,17 +76,17 @@ class ProjectController(ModelRestController):
         # Mr.Mardani, the result got: there must be no specification on
         # exception type because nobody knows what exception may be raised
         try:
-            project.room_id = room['id']
+            container.room_id = room['id']
             DBSession.flush()
         except:
             chat_client.delete_room(
-                project.room_id,
+                container.room_id,
                 token,
                 member.access_token
             )
             raise
 
-        return project
+        return container
 
     @authorize
     @json(
@@ -97,8 +97,8 @@ class ProjectController(ModelRestController):
             'groupId, title, description and status'
         )
     )
-    @update_project_validator
-    @Project.expose
+    @update_container_validator
+    @Container.expose
     @commit
     def update(self, id):
         form = context.form
@@ -109,30 +109,30 @@ class ProjectController(ModelRestController):
         except (ValueError, TypeError):
             raise HTTPNotFound()
 
-        project = DBSession.query(Project) \
-            .filter(Project.id == id) \
+        container = DBSession.query(Container) \
+            .filter(Container.id == id) \
             .one_or_none()
-        if not project:
+        if not container:
             raise HTTPNotFound()
 
-        if project.is_deleted:
-            raise HTTPStatus('746 Hidden Project Is Not Editable')
+        if container.is_deleted:
+            raise HTTPStatus('746 Hidden Container Is Not Editable')
 
-        if 'title' in form and DBSession.query(Project).filter(
-            Project.id != id,
-            Project.title == form['title']
+        if 'title' in form and DBSession.query(Container).filter(
+            Container.id != id,
+            Container.title == form['title']
         ).one_or_none():
             raise HTTPStatus(
-                f'600 Another project with title: ' \
+                f'600 Another container with title: ' \
                 f'"{form["title"]}" is already exists.'
             )
 
-        project.update_from_request()
-        return project
+        container.update_from_request()
+        return container
 
     @authorize
     @json(prevent_form='709 Form Not Allowed')
-    @Project.expose
+    @Container.expose
     @commit
     def hide(self, id):
         form = context.form
@@ -142,18 +142,18 @@ class ProjectController(ModelRestController):
         except ValueError:
             raise HTTPNotFound()
 
-        project = DBSession.query(Project) \
-            .filter(Project.id == id) \
+        container = DBSession.query(Container) \
+            .filter(Container.id == id) \
             .one_or_none()
-        if not project:
+        if not container:
             raise HTTPNotFound()
 
-        project.soft_delete()
-        return project
+        container.soft_delete()
+        return container
 
     @authorize
     @json(prevent_form='709 Form Not Allowed')
-    @Project.expose
+    @Container.expose
     @commit
     def show(self, id):
         form = context.form
@@ -163,26 +163,26 @@ class ProjectController(ModelRestController):
         except ValueError:
             raise HTTPNotFound()
 
-        project = DBSession.query(Project) \
-            .filter(Project.id == id) \
+        container = DBSession.query(Container) \
+            .filter(Container.id == id) \
             .one_or_none()
-        if not project:
+        if not container:
             raise HTTPNotFound()
 
-        project.soft_undelete()
-        return project
+        container.soft_undelete()
+        return container
 
     @authorize
     @json
-    @Project.expose
+    @Container.expose
     def list(self):
 
-        query = DBSession.query(Project)
+        query = DBSession.query(Container)
         return query
 
     @authorize
     @json(prevent_form='709 Form Not Allowed')
-    @Project.expose
+    @Container.expose
     @commit
     def subscribe(self, id):
         token = context.environ['HTTP_AUTHORIZATION']
@@ -193,10 +193,10 @@ class ProjectController(ModelRestController):
         except ValueError:
             raise HTTPNotFound()
 
-        project = DBSession.query(Project) \
-            .filter(Project.id == id) \
+        container = DBSession.query(Container) \
+            .filter(Container.id == id) \
             .one_or_none()
-        if not project:
+        if not container:
             raise HTTPNotFound()
 
         member = Member.current()
@@ -215,7 +215,7 @@ class ProjectController(ModelRestController):
         chat_client = ChatClient()
         try:
             chat_client.add_member(
-                project.room_id,
+                container.room_id,
                 identity.reference_id,
                 token,
                 member.access_token
@@ -231,18 +231,18 @@ class ProjectController(ModelRestController):
             DBSession.flush()
         except:
             chat_client.kick_member(
-                project.room_id,
+                container.room_id,
                 identity.reference_id,
                 token,
                 member.access_token
             )
             raise
 
-        return project
+        return container
 
     @authorize
     @json(prevent_form='709 Form Not Allowed')
-    @Project.expose
+    @Container.expose
     @commit
     def unsubscribe(self, id):
         token = context.environ['HTTP_AUTHORIZATION']
@@ -253,10 +253,10 @@ class ProjectController(ModelRestController):
         except ValueError:
             raise HTTPNotFound()
 
-        project = DBSession.query(Project) \
-            .filter(Project.id == id) \
+        container = DBSession.query(Container) \
+            .filter(Container.id == id) \
             .one_or_none()
-        if not project:
+        if not container:
             raise HTTPNotFound()
 
         member = Member.current()
@@ -272,7 +272,7 @@ class ProjectController(ModelRestController):
         chat_client = ChatClient()
         try:
             chat_client.kick_member(
-                project.room_id,
+                container.room_id,
                 identity.reference_id,
                 token,
                 member.access_token
@@ -288,18 +288,18 @@ class ProjectController(ModelRestController):
             DBSession.flush()
         except:
             chat_client.add_member(
-                project.room_id,
+                container.room_id,
                 identity.reference_id,
                 token,
                 access_token
             )
             raise
 
-        return project
+        return container
 
     @authorize
     @json(prevent_form='709 Form Not Allowed')
-    @Project.expose
+    @Container.expose
     def get(self, id):
 
         try:
@@ -307,9 +307,11 @@ class ProjectController(ModelRestController):
         except (ValueError, TypeError):
             raise HTTPNotFound()
 
-        project = DBSession.query(Project).filter(Project.id == id).one_or_none()
-        if not project:
+        container = DBSession.query(Container) \
+            .filter(Container.id == id) \
+            .one_or_none()
+        if not container:
             raise HTTPNotFound()
 
-        return project
+        return container
 

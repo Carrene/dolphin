@@ -1,6 +1,6 @@
 from .member import Member
 from .subscribable import Subscribable, Subscription
-from .project import Project, project_statuses
+from .container import Container, container_statuses
 from .release import Release, release_statuses
 from .issue import Issue, Tag, issue_kinds, issue_statuses
 from .phase import Phase

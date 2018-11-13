@@ -4,7 +4,7 @@ from dolphin.models import Member
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
-class TestProject(LocalApplicationTestCase):
+class TestContainer(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
@@ -24,7 +24,7 @@ class TestProject(LocalApplicationTestCase):
         self.login('member1@example.com')
 
         with oauth_mockup_server(), self.given(
-            'Getting a project',
+            'Getting a container',
             '/apiv1/members/id:1',
             'GET'
         ):
@@ -33,13 +33,13 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['title'] == 'member1'
 
             when(
-                'Intended project with string type not found',
+                'Intended container with string type not found',
                 url_parameters=dict(id='Alphabetical')
             )
             assert status == 404
 
             when(
-                'Intended project with string type not found',
+                'Intended container with string type not found',
                 url_parameters=dict(id=100)
             )
             assert status == 404
