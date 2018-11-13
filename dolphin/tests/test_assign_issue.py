@@ -1,6 +1,6 @@
 from bddrest import status, when, given, response
 
-from dolphin.models import Issue, Project, Member, Phase, Resource, Workflow
+from dolphin.models import Issue, Container, Member, Phase, Resource, Workflow
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -20,7 +20,7 @@ class TestIssue(LocalApplicationTestCase):
 
         workflow1 = Workflow(title='First Workflow')
 
-        project = Project(
+        container = Container(
             member=member,
             title='My first project',
             description='A decription for my project',
@@ -44,7 +44,7 @@ class TestIssue(LocalApplicationTestCase):
         session.add(resource)
 
         issue1 = Issue(
-            project=project,
+            container=container,
             title='First issue',
             description='This is description of first issue',
             due_date='2020-2-20',
@@ -54,7 +54,7 @@ class TestIssue(LocalApplicationTestCase):
         )
         session.add(issue1)
         session.commit()
-        cls.project = project
+        cls.container = container
 
     def test_assign(self):
         self.login('member1@example.com')

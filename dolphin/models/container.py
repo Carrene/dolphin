@@ -9,7 +9,7 @@ from .issue import Issue
 from .subscribable import Subscribable, Subscription
 
 
-project_statuses = [
+container_statuses = [
     'active',
     'on-hold',
     'queued',
@@ -17,10 +17,10 @@ project_statuses = [
 ]
 
 
-class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
-              SoftDeleteMixin, Subscribable):
+class Container(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
+                SoftDeleteMixin, Subscribable):
 
-    __tablename__ = 'project'
+    __tablename__ = 'container'
     __mapper_args__ = {'polymorphic_identity': __tablename__}
 
     _boarding = ['on-time', 'delayed', 'at-risk']
@@ -49,7 +49,7 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
     status = Field(
-        Enum(*project_statuses, name='project_status'),
+        Enum(*container_statuses, name='container_status'),
         python_type=str,
         label='Status',
         watermark='Choose a status',
@@ -63,13 +63,13 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     member = relationship(
         'Member',
         foreign_keys=[member_id],
-        back_populates='projects',
+        back_populates='containers',
         protected=True
     )
     release = relationship(
         'Release',
         foreign_keys=[release_id],
-        back_populates='projects',
+        back_populates='containers',
         protected=True
     )
     issues = relationship(
@@ -81,7 +81,7 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     due_date = column_property(
         select([func.max(Issue.due_date)]) \
-        .where(Issue.project_id == id) \
+        .where(Issue.container_id == id) \
         .correlate_except(Issue)
     )
 
@@ -134,9 +134,9 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         )
 
     def to_dict(self):
-        project_dict = super().to_dict()
-        project_dict['boarding'] = self.boardings
-        project_dict['dueDate'] = self.due_date.isoformat() if self.due_date else None
-        project_dict['isSubscribed'] = True if self.is_subscribed else False
-        return project_dict
+        container_dict = super().to_dict()
+        container_dict['boarding'] = self.boardings
+        container_dict['dueDate'] = self.due_date.isoformat() if self.due_date else None
+        container_dict['isSubscribed'] = True if self.is_subscribed else False
+        return container_dict
 

@@ -1,11 +1,11 @@
 from bddrest import status, response, when, Remove, given
 
-from dolphin.models import Project, Member, Workflow, Release
+from dolphin.models import Container, Member, Workflow, Release
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
 
-class TestProject(LocalApplicationTestCase):
+class TestContainer(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
@@ -25,14 +25,14 @@ class TestProject(LocalApplicationTestCase):
             cutoff='2030-2-20',
         )
 
-        project1 = Project(
+        container1 = Container(
             release=release1,
             member=member1,
             title='My first project',
             description='A decription for my project',
             room_id=1001
         )
-        session.add(project1)
+        session.add(container1)
         session.commit()
 
         cls.member = member1
@@ -41,8 +41,8 @@ class TestProject(LocalApplicationTestCase):
         self.login('member1@example.com')
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
-            'Createing a project',
-            '/apiv1/projects',
+            'Createing a container',
+            '/apiv1/containers',
             'CREATE',
             form=dict(
                 releaseId=1,
@@ -52,8 +52,8 @@ class TestProject(LocalApplicationTestCase):
             )
         ):
             assert status == 200
-            assert response.json['title'] == 'My awesome project'
-            assert response.json['description'] == 'A decription for my project'
+            assert response.json['title'] == 'My awesome container'
+            assert response.json['description'] == 'A decription for my container'
             assert response.json['status'] == 'active'
             assert response.json['boarding'] == None
             assert response.json['dueDate'] == None
@@ -66,10 +66,10 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Title is repetetive',
-                form=given | dict(title='My first project')
+                form=given | dict(title='My first container')
             )
             assert status == 600
-            assert status.text.startswith('Another project with title')
+            assert status.text.startswith('Another container with title')
 
             when(
                 'Release ID type is wrong',
@@ -150,7 +150,7 @@ class TestProject(LocalApplicationTestCase):
             with chat_server_status('604 Already Added To Target'):
                 when(
                     'Chat server faces with internal error',
-                    form=given | dict(title='Awesome project')
+                    form=given | dict(title='Awesome container')
                 )
                 assert status == 200
 
