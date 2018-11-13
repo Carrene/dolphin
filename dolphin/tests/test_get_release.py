@@ -4,7 +4,7 @@ from dolphin.models import Release, Member, Workflow
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
-class TestProject(LocalApplicationTestCase):
+class TestRelease(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
@@ -40,13 +40,13 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['title'] == 'My first release'
 
             when(
-                'Intended project with string type not found',
+                'Intended release with string type not found',
                 url_parameters=dict(id='Alphabetical')
             )
             assert status == 404
 
             when(
-                'Intended project with string type not found',
+                'Intended release with string type not found',
                 url_parameters=dict(id=100)
             )
             assert status == 404
