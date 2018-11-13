@@ -3,12 +3,12 @@ from bddrest.authoring import status, response
 from dolphin.tests.helpers import LocalApplicationTestCase
 
 
-class TestProject(LocalApplicationTestCase):
+class TestContainer(LocalApplicationTestCase):
 
     def test_metadata(self):
         with self.given(
             'Test metadata verb',
-            '/apiv1/projects',
+            '/apiv1/containers',
             'METADATA'
         ):
             fields = response.json['fields']

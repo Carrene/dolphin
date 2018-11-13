@@ -1,11 +1,11 @@
 from bddrest import status, when, given, response
 
-from dolphin.models import Project, Member, Release, Subscription, Workflow
+from dolphin.models import Container, Member, Release, Subscription, Workflow
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
 
-class TestProject(LocalApplicationTestCase):
+class TestContainer(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
@@ -22,34 +22,34 @@ class TestProject(LocalApplicationTestCase):
 
         workflow1 = Workflow(title='First Workflow')
 
-        project1 = Project(
+        container1 = Container(
             member=member,
             workflow=workflow1,
-            title='My first project',
-            description='A decription for my project',
+            title='My first container',
+            description='A decription for my container',
             room_id=1001
         )
-        session.add(project1)
+        session.add(container1)
         session.flush()
 
-        project2 = Project(
+        container2 = Container(
             member=member,
             workflow=workflow1,
-            title='My second project',
-            description='A decription for my project',
+            title='My second container',
+            description='A decription for my container',
             room_id=1002
         )
-        session.add(project2)
+        session.add(container2)
         session.flush()
 
         subscription1 = Subscription(
-            subscribable=project1.id,
+            subscribable=container1.id,
             member=member.id
         )
         session.add(subscription1)
 
         subscription2 = Subscription(
-            subscribable=project2.id,
+            subscribable=container2.id,
             member=member.id
         )
         session.add(subscription2)
@@ -59,8 +59,8 @@ class TestProject(LocalApplicationTestCase):
         self.login('member1@example.com')
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
-            'Unsubscribe an project',
-            '/apiv1/projects/id:1',
+            'Unsubscribe an container',
+            '/apiv1/containers/id:1',
             'UNSUBSCRIBE',
         ):
             assert status == 200
@@ -68,13 +68,13 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['isSubscribed'] == False
 
             when(
-                'Intended project with string type not found',
+                'Intended container with string type not found',
                 url_parameters=dict(id='Alphabetical'),
             )
             assert status == 404
 
             when(
-                'Intended project with integer type not found',
+                'Intended container with integer type not found',
                 url_parameters=dict(id=100),
             )
             assert status == 404
