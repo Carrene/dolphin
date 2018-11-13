@@ -42,7 +42,7 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         pattern=r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)',
         example='member@example.com'
     )
-    access_token = Field(Unicode(200), protected=True)
+    access_token = Field(Unicode(512), protected=True)
     phone = Field(
         BigInteger,
         label='Phone',
