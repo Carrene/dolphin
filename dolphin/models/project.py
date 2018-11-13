@@ -31,12 +31,21 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         ForeignKey('release.id'),
         python_type=int,
         nullable=True,
-        watermark='Choose a release',
-        label='Release',
+        watermark='Choose a launch',
+        label='Launch',
         not_none=False,
         required=False
     )
-    member_id = Field(Integer, ForeignKey('member.id'))
+    member_id = Field(
+        Integer,
+        ForeignKey('member.id'),
+        python_type=int,
+        watermark='Choose a member',
+        label='Member',
+        nullable=False,
+        not_none=False,
+        required=True
+    )
     group_id = Field(Integer, ForeignKey('group.id'), nullable=True)
     room_id = Field(Integer)
 
@@ -121,7 +130,7 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         yield MetadataField(
             'boarding',
             'boarding',
-            label='Boarding',
+            label='Pace',
             required=False,
             readonly=True
         )
