@@ -9,7 +9,7 @@ from restfulpy.orm.metadata import FieldInfo
 
 from dolphin import Dolphin
 from dolphin.authentication import Authenticator
-from dolphin.models import Member, Project, Release, Issue, Item
+from dolphin.models import Member, Container, Release, Issue, Item
 
 
 HERE = path.abspath(path.dirname(__file__))
@@ -24,19 +24,19 @@ member_id = FieldInfo(type_=int, not_none=True, required=True).to_json()
 workflow_id = FieldInfo(type_=int, not_none=True, required=True).to_json()
 resource_id = FieldInfo(type_=int, not_none=True, required=True).to_json()
 phase_id = FieldInfo(type_=int, not_none=True, required=True).to_json()
-project_id = FieldInfo(type_=int, not_none=True, required=True).to_json()
+container_id = FieldInfo(type_=int, not_none=True, required=True).to_json()
 
 release_fields = Release.json_metadata()['fields']
-project_fields = Project.json_metadata()['fields']
+container_fields = Container.json_metadata()['fields']
 issue_fields = Issue.json_metadata()['fields']
 
 issue_fields.update({
     'resourceId': resource_id,
     'phaseId': phase_id,
-    'projectId': project_id,
+    'containerId': container_id,
     'memberId': member_id
 })
-project_fields.update({'memberId': member_id, 'workflowId': workflow_id})
+container_fields.update({'memberId': member_id, 'workflowId': workflow_id})
 release_fields.update({'memberId': member_id})
 
 
@@ -46,7 +46,7 @@ class LocalApplicationTestCase(ApplicableTestCase):
     __api_documentation_directory__ = path.join(DATA_DIRECTORY, 'markdown')
     __metadata__ = {
         r'^/apiv1/releases.*': release_fields,
-        r'^/apiv1/projects.*': project_fields,
+        r'^/apiv1/containers.*': container_fields,
         r'^/apiv1/issues.*': issue_fields,
         r'^/apiv1/items.*': Item.json_metadata()['fields'],
         r'^/apiv1/members.*': Member.json_metadata()['fields'],

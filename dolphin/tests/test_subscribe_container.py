@@ -1,12 +1,12 @@
 from bddrest import status, response, Update, when, Remove, given
 
-from dolphin.models import Project, Member, Release, Workflow
+from dolphin.models import Container, Member, Release, Workflow
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status, \
     room_mockup_server
 
 
-class TestProject(LocalApplicationTestCase):
+class TestContainer(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
@@ -27,23 +27,23 @@ class TestProject(LocalApplicationTestCase):
             description='A decription for my project',
             room_id=1001
         )
-        session.add(project1)
+        session.add(container1)
 
-        project2 = Project(
+        container2 = Container(
             member=member1,
             title='My second project',
             description='A decription for my project',
             room_id=1002
         )
-        session.add(project2)
+        session.add(container2)
         session.commit()
 
     def test_subscribe(self):
         self.login('member1@example.com')
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
-            'Subscribe project',
-            '/apiv1/projects/id:1',
+            'Subscribe container',
+            '/apiv1/containers/id:1',
             'SUBSCRIBE',
         ):
             assert status == 200
@@ -51,19 +51,19 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['isSubscribed'] == True
 
             when(
-                'Intended project with string type not found',
+                'Intended container with string type not found',
                 url_parameters=dict(id='Alphabetical'),
             )
             assert status == 404
 
             when(
-                'Intended project with integer type not found',
+                'Intended container with integer type not found',
                 url_parameters=dict(id=100),
             )
             assert status == 404
 
             when(
-                'Project is already subscribed',
+                'Container is already subscribed',
                 url_parameters=dict(id=1),
             )
             assert status == '611 Already Subscribed'
