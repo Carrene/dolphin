@@ -6,7 +6,7 @@ from .issues import IssueController
 from .items import ItemController
 from .members import MemberController
 from .oauth2 import OAUTHController
-from .projects import ProjectController
+from .containers import ContainerController
 from .releases import ReleaseController
 from .tokens import TokenController
 
@@ -14,7 +14,7 @@ from .tokens import TokenController
 class Apiv1(Controller):
 
     releases = ReleaseController()
-    projects = ProjectController()
+    containers = ContainerController()
     members = MemberController()
     issues = IssueController()
     items = ItemController()
