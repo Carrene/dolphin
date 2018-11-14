@@ -9,7 +9,7 @@ from .issue import Issue
 from .subscribable import Subscribable, Subscription
 
 
-project_statuses = [
+container_statuses = [
     'active',
     'on-hold',
     'queued',
@@ -17,15 +17,14 @@ project_statuses = [
 ]
 
 
-class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
-              SoftDeleteMixin, Subscribable):
+class Container(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
+                SoftDeleteMixin, Subscribable):
 
-    __tablename__ = 'project'
+    __tablename__ = 'container'
     __mapper_args__ = {'polymorphic_identity': __tablename__}
 
     _boarding = ['on-time', 'delayed', 'at-risk']
 
-    workflow_id = Field(Integer, ForeignKey('workflow.id'), nullable=True)
     release_id = Field(
         Integer,
         ForeignKey('release.id'),
@@ -46,52 +45,43 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         not_none=False,
         required=True
     )
-    group_id = Field(Integer, ForeignKey('group.id'), nullable=True)
     room_id = Field(Integer)
 
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
     status = Field(
-        Enum(*project_statuses, name='project_status'),
+        Enum(*container_statuses, name='container_status'),
         python_type=str,
         label='Status',
         watermark='Choose a status',
         not_none=True,
         required=False,
-        default='queued'
+        default='queued',
+        example='Lorem Ipsum',
+        message='Lorem Ipsum'
     )
 
     member = relationship(
         'Member',
         foreign_keys=[member_id],
-        back_populates='projects',
+        back_populates='containers',
         protected=True
     )
     release = relationship(
         'Release',
         foreign_keys=[release_id],
-        back_populates='projects',
+        back_populates='containers',
         protected=True
     )
     issues = relationship(
         'Issue',
-        primaryjoin=id == Issue.project_id,
-        back_populates='project',
-        protected=True
-    )
-    group = relationship(
-        'Group',
-        back_populates='projects',
-        protected=True
-    )
-    workflow = relationship(
-        'Workflow',
-        back_populates='projects',
+        primaryjoin=id == Issue.container_id,
+        back_populates='container',
         protected=True
     )
 
     due_date = column_property(
         select([func.max(Issue.due_date)]) \
-        .where(Issue.project_id == id) \
+        .where(Issue.container_id == id) \
         .correlate_except(Issue)
     )
 
@@ -144,9 +134,9 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         )
 
     def to_dict(self):
-        project_dict = super().to_dict()
-        project_dict['boarding'] = self.boardings
-        project_dict['dueDate'] = self.due_date.isoformat() if self.due_date else None
-        project_dict['isSubscribed'] = True if self.is_subscribed else False
-        return project_dict
+        container_dict = super().to_dict()
+        container_dict['boarding'] = self.boardings
+        container_dict['dueDate'] = self.due_date.isoformat() if self.due_date else None
+        container_dict['isSubscribed'] = True if self.is_subscribed else False
+        return container_dict
 

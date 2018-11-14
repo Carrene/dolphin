@@ -29,7 +29,9 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         nullable=False,
         not_none=False,
         required=True,
-        python_type=str
+        python_type=str,
+        example='Lorem Ipsum',
+        message='Lorem Ipsum'
     )
     email = Field(
         Unicode(100),
@@ -40,7 +42,8 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         required=True,
         index=True,
         pattern=r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)',
-        example='member@example.com'
+        example='member@example.com',
+        message='Lorem Ipsum'
     )
     access_token = Field(Unicode(512), protected=True)
     phone = Field(
@@ -50,6 +53,8 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         nullable=True,
         required=False,
         unique=True,
+        example='Lorem Ipsum',
+        message='Lorem Ipsum'
     )
     avatar = Field(
         Unicode(200),
@@ -58,6 +63,8 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         unique=False,
         not_none=False,
         required=False,
+        example='Lorem Ipsum',
+        message='Lorem Ipsum'
     )
 
     subscribables = relationship(
@@ -66,7 +73,7 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         back_populates='members',
     )
 
-    projects = relationship('Project', back_populates='member', protected=True)
+    containers = relationship('Container', back_populates='member', protected=True)
 
     @property
     def roles(self):

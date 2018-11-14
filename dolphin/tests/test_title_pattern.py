@@ -2,9 +2,9 @@ from dolphin.validators import TITLE_PATTERN as pattern
 
 
 def test_date_pattern():
-    assert pattern.match('First Project')
-    assert pattern.match('First-Project')
-    assert pattern.match('First Sample-Project')
+    assert pattern.match('First Container')
+    assert pattern.match('First-Container')
+    assert pattern.match('First Sample-Container')
     assert pattern.match('Title with ?><!:; and ...')
     assert pattern.match('1')
 

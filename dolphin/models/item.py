@@ -26,7 +26,9 @@ class Item(TimestampMixin, DeclarativeBase):
         label='Status',
         watermark='Choose a status',
         nullable=True,
-        required=False
+        required=False,
+        example='Lorem Ipsum',
+        message='Lorem Ipsum'
     )
     end = Field(
         DateTime,
@@ -37,6 +39,7 @@ class Item(TimestampMixin, DeclarativeBase):
         watermark='Enter a end time',
         nullable=True,
         required=False,
+        message='Lorem Ipsum'
     )
 
     resource = relationship('Resource', back_populates='items', protected=True)
