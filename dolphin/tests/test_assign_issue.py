@@ -22,7 +22,6 @@ class TestIssue(LocalApplicationTestCase):
 
         container = Container(
             member=member,
-            workflow=workflow1,
             title='My first container',
             description='A decription for my container',
             room_id=1
@@ -64,7 +63,7 @@ class TestIssue(LocalApplicationTestCase):
             'Assign an issue to a resource',
             '/apiv1/issues/id:2',
             'ASSIGN',
-            form=dict(resourceId=2, phaseId=1)
+            form=dict(resourceId=1, phaseId=1)
         ):
             assert status == 200
             assert response.json['id'] == 2
@@ -124,7 +123,7 @@ class TestIssue(LocalApplicationTestCase):
             when(
                 'Issue is already assigned',
                 url_parameters=dict(id=2),
-                form=given | dict(resourceId=2)
+                form=given | dict(resourceId=1)
             )
             assert status == '602 Already Assigned'
 

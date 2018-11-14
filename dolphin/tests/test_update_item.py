@@ -36,7 +36,6 @@ class TestItem(LocalApplicationTestCase):
 
         container = Container(
             member=member,
-            workflow=workflow1,
             release=release,
             title='My first container',
             description='A decription for my container',

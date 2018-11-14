@@ -34,7 +34,7 @@ class ContainerController(ModelRestController):
 
     @authorize
     @json(form_whitelist=(
-        ['title', 'description', 'status', 'releaseId', 'workflowId', 'groupId'],
+        ['title', 'description', 'status', 'releaseId'],
         '707 Invalid field, only following fields are accepted: ' \
         'title, description, status, releaseId, workflowId and groupId' \
     ))
