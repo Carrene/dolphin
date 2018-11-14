@@ -25,6 +25,7 @@ class Container(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     _boarding = ['on-time', 'delayed', 'at-risk']
 
+    project_id = Field(Integer, ForeignKey('project.id'), nullable=True)
     release_id = Field(
         Integer,
         ForeignKey('release.id'),
@@ -76,6 +77,11 @@ class Container(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         'Issue',
         primaryjoin=id == Issue.container_id,
         back_populates='container',
+        protected=True
+    )
+    project = relationship(
+        'Project',
+        back_populates='containers',
         protected=True
     )
 

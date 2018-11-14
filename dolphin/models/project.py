@@ -1,4 +1,4 @@
-from restfulpy.orm import Field, DeclarativeBase
+from restfulpy.orm import Field, DeclarativeBase, relationship
 
 
 class Project(DeclarativeBase):
@@ -18,5 +18,11 @@ class Project(DeclarativeBase):
         not_none=False,
         required=True,
         python_type=str
+    )
+
+    containers = relationship(
+        'Project',
+        back_populates='container',
+        protected=True
     )
 
