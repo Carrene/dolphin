@@ -25,7 +25,6 @@ class Container(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     _boarding = ['on-time', 'delayed', 'at-risk']
 
-    workflow_id = Field(Integer, ForeignKey('workflow.id'), nullable=True)
     release_id = Field(
         Integer,
         ForeignKey('release.id'),
@@ -46,7 +45,6 @@ class Container(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         not_none=False,
         required=True
     )
-    group_id = Field(Integer, ForeignKey('group.id'), nullable=True)
     room_id = Field(Integer)
 
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
@@ -57,7 +55,9 @@ class Container(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         watermark='Choose a status',
         not_none=True,
         required=False,
-        default='queued'
+        default='queued',
+        example='Lorem Ipsum',
+        message='Lorem Ipsum'
     )
 
     member = relationship(

@@ -30,7 +30,9 @@ class Subscribable(TimestampMixin, DeclarativeBase):
         nullable=False,
         not_none=False,
         required=True,
-        python_type=str
+        python_type=str,
+        message='Lorem Ipsum',
+        example='Lorem Ipsum'
     )
     description = Field(
         String,
@@ -41,7 +43,9 @@ class Subscribable(TimestampMixin, DeclarativeBase):
         not_none=False,
         nullable=True,
         required=False,
-        python_type=str
+        python_type=str,
+        message='Lorem Ipsum',
+        example='Lorem Ipsum'
     )
 
     members = relationship(
