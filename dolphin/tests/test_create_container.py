@@ -72,19 +72,6 @@ class TestContainer(LocalApplicationTestCase):
             assert status.text.startswith('Another container with title')
 
             when(
-                'Workflow ID type is wrong',
-                form=given | dict(workflowId='Alphabetical', title='New title')
-            )
-            assert status == '743 Invalid Workflow Id Type'
-
-            when(
-                'Workflow not found with integer type',
-                form=given | dict(workflowId=100, title='New title')
-            )
-            assert status == 616
-            assert status.text.startswith('Workflow not found')
-
-            when(
                 'Release ID type is wrong',
                 form=given | dict(releaseId='Alphabetical', title='New title')
             )

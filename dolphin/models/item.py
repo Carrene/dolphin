@@ -39,7 +39,6 @@ class Item(TimestampMixin, DeclarativeBase):
         watermark='Enter a end time',
         nullable=True,
         required=False,
-        example='Lorem Ipsum',
         message='Lorem Ipsum'
     )
 

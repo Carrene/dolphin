@@ -32,7 +32,6 @@ class Subscribable(TimestampMixin, DeclarativeBase):
         required=True,
         python_type=str,
         message='Lorem Ipsum',
-        example='Lorem Ipsum'
     )
     description = Field(
         String,

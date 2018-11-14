@@ -44,7 +44,6 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
         nullable=False,
         not_none=True,
         required=True,
-        example='Lorem Ipsum',
         message='Lorem Ipsum'
     )
 
