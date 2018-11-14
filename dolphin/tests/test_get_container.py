@@ -18,11 +18,8 @@ class TestContainer(LocalApplicationTestCase):
             reference_id=2
         )
 
-        workflow1 = Workflow(title='First Workflow')
-
         container1 = Container(
             member=member1,
-            workflow=workflow1,
             title='My first container',
             description='A decription for my container',
             room_id=1001

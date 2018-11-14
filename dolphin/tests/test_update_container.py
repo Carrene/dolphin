@@ -30,11 +30,8 @@ class TestContainer(LocalApplicationTestCase):
         )
         session.add(member2)
 
-        workflow1 = Workflow(title='First Workflow')
-
         container1 = Container(
             member=member1,
-            workflow=workflow1,
             title='My first container',
             description='A decription for my container',
             room_id=1001
@@ -43,7 +40,6 @@ class TestContainer(LocalApplicationTestCase):
 
         container2 = Container(
             member=member1,
-            workflow=workflow1,
             title='My second container',
             description='A decription for my container',
             room_id=1002
@@ -52,7 +48,6 @@ class TestContainer(LocalApplicationTestCase):
 
         hidden_container = Container(
             member=member1,
-            workflow=workflow1,
             title='My hidden container',
             description='A decription for my container',
             removed_at='2020-2-20',

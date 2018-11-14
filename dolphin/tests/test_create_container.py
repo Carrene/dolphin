@@ -19,8 +19,6 @@ class TestContainer(LocalApplicationTestCase):
             reference_id=2
         )
 
-        workflow1 = Workflow(title='First Workflow')
-
         release1 = Release(
             title='My first release',
             description='A decription for my first release',
@@ -30,7 +28,6 @@ class TestContainer(LocalApplicationTestCase):
         container1 = Container(
             release=release1,
             member=member1,
-            workflow=workflow1,
             title='My first container',
             description='A decription for my container',
             room_id=1001
@@ -39,7 +36,6 @@ class TestContainer(LocalApplicationTestCase):
         session.commit()
 
         cls.member = member1
-        cls.workflow = workflow1
 
     def test_create(self):
         self.login('member1@example.com')
@@ -50,7 +46,6 @@ class TestContainer(LocalApplicationTestCase):
             'CREATE',
             form=dict(
                 releaseId=1,
-                workflowId=1,
                 title='My awesome container',
                 description='A decription for my container',
                 status='active'
@@ -75,19 +70,6 @@ class TestContainer(LocalApplicationTestCase):
             )
             assert status == 600
             assert status.text.startswith('Another container with title')
-
-            when(
-                'Workflow ID type is wrong',
-                form=given | dict(workflowId='Alphabetical', title='New title')
-            )
-            assert status == '743 Invalid Workflow Id Type'
-
-            when(
-                'Workflow not found with integer type',
-                form=given | dict(workflowId=100, title='New title')
-            )
-            assert status == 616
-            assert status.text.startswith('Workflow not found')
 
             when(
                 'Release ID type is wrong',

@@ -21,11 +21,8 @@ class TestIssue(LocalApplicationTestCase):
         session.add(member)
         session.flush()
 
-        workflow1 = Workflow(title='First Workflow')
-
         container = Container(
             member=member,
-            workflow=workflow1,
             title='My first container',
             description='A decription for my container',
             room_id=1
