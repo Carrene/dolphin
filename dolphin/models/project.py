@@ -5,6 +5,8 @@ class Project(DeclarativeBase):
 
     __tablename__ = 'project'
 
+    group_id = Field(Integer, ForeignKey('group.id'))
+
     id = Field(Integer, primary_key=True)
     title = Field(
         String,
@@ -23,6 +25,11 @@ class Project(DeclarativeBase):
     containers = relationship(
         'Project',
         back_populates='container',
+        protected=True
+    )
+    group = relationship(
+        'Group',
+        back_populates='projects',
         protected=True
     )
 

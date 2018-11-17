@@ -72,8 +72,16 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         secondary='subscription',
         back_populates='members',
     )
-
-    containers = relationship('Container', back_populates='member', protected=True)
+    containers = relationship(
+        'Container',
+        back_populates='member',
+        protected=True
+    )
+    groups = relationship(
+        'Group',
+        back_populates='members',
+        protected=True
+    )
 
     @property
     def roles(self):
