@@ -3,7 +3,6 @@ from sqlalchemy import Integer, ForeignKey, String
 
 
 class Project(DeclarativeBase):
-
     __tablename__ = 'project'
 
     group_id = Field(Integer, ForeignKey('group.id'))
