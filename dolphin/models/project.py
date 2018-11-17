@@ -18,7 +18,7 @@ class Project(DeclarativeBase):
         pattern=r'^[^\s].+[^\s]$',
         example='Sample Title',
         nullable=False,
-        not_none=False,
+        not_none=True,
         required=True,
         python_type=str
     )
