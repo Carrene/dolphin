@@ -23,6 +23,7 @@ class Group(DeclarativeBase):
     members = relationship(
         'Member',
         back_populates='groups',
+        secondary='group_member',
         protected=True
     )
 

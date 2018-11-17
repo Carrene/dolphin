@@ -80,6 +80,7 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     groups = relationship(
         'Group',
         back_populates='members',
+        secondary='group_member',
         protected=True
     )
 

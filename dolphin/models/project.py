@@ -1,4 +1,5 @@
 from restfulpy.orm import Field, DeclarativeBase, relationship
+from sqlalchemy import Integer, ForeignKey, String
 
 
 class Project(DeclarativeBase):
@@ -23,8 +24,8 @@ class Project(DeclarativeBase):
     )
 
     containers = relationship(
-        'Project',
-        back_populates='container',
+        'Container',
+        back_populates='project',
         protected=True
     )
     group = relationship(

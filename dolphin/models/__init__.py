@@ -8,5 +8,7 @@ from .resource import Resource
 from .guest import Guest
 from .team import Team
 from .item import Item, item_statuses
-from .group import Group
+from .group import Group, GroupMember
 from .workflow import Workflow
+from .project import Project
+
