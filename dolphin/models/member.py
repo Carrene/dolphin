@@ -85,7 +85,7 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         if session_id is None:
             session_id = str(uuid.uuid4())
 
-         return CASPrincipal(dict(
+        return CASPrincipal(dict(
             id=self.id,
             roles=self.roles,
             email=self.email,

@@ -18,7 +18,7 @@ project_statuses = [
 
 
 class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
-                SoftDeleteMixin, Subscribable):
+              SoftDeleteMixin, Subscribable):
 
     __tablename__ = 'project'
     __mapper_args__ = {'polymorphic_identity': __tablename__}
