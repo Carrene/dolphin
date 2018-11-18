@@ -5,7 +5,7 @@ from restfulpy.orm import Field, relationship, ModifiedMixin, FilteringMixin, \
 from sqlalchemy import Integer, Enum, DateTime, ForeignKey, select, func
 from sqlalchemy.orm import column_property
 
-from .container import Container
+from .project import Project
 from .subscribable import Subscribable
 
 
@@ -47,22 +47,22 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
         message='Lorem Ipsum'
     )
 
-    containers = relationship(
-        'Container',
-        primaryjoin=id == Container.release_id,
+    projects = relationship(
+        'Project',
+        primaryjoin=id == Project.release_id,
         back_populates='release',
         protected=True,
         lazy='selectin'
     )
 
     due_date = column_property(
-        select([func.max(Container.due_date)]).\
-            where(Container.release_id == id).\
-            correlate_except(Container)
+        select([func.max(Project.due_date)]).\
+            where(Project.release_id == id).\
+            correlate_except(Project)
     )
 
     def to_dict(self):
-        container_dict = super().to_dict()
-        container_dict['dueDate'] = self.due_date
-        return container_dict
+        project_dict = super().to_dict()
+        project_dict['dueDate'] = self.due_date
+        return project_dict
 

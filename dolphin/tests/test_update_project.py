@@ -1,12 +1,12 @@
 from bddrest import status, response, Update, when, given
 
-from dolphin.models import Container, Member, Workflow
+from dolphin.models import Project, Member, Workflow
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status, \
     room_mockup_server
 
 
-class TestContainer(LocalApplicationTestCase):
+class TestProject(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
@@ -30,69 +30,69 @@ class TestContainer(LocalApplicationTestCase):
         )
         session.add(member2)
 
-        container1 = Container(
+        project1 = Project(
             member=member1,
-            title='My first container',
-            description='A decription for my container',
+            title='My first project',
+            description='A decription for my project',
             room_id=1001
         )
-        session.add(container1)
+        session.add(project1)
 
-        container2 = Container(
+        project2 = Project(
             member=member1,
-            title='My second container',
-            description='A decription for my container',
+            title='My second project',
+            description='A decription for my project',
             room_id=1002
         )
-        session.add(container2)
+        session.add(project2)
 
-        hidden_container = Container(
+        hidden_project = Project(
             member=member1,
-            title='My hidden container',
-            description='A decription for my container',
+            title='My hidden project',
+            description='A decription for my project',
             removed_at='2020-2-20',
             room_id=1000
         )
-        session.add(hidden_container)
+        session.add(hidden_project)
         session.commit()
 
     def test_update(self):
         self.login('member1@example.com')
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
-            'Updating a container',
-            '/apiv1/containers/id:1',
+            'Updating a project',
+            '/apiv1/projects/id:1',
             'UPDATE',
             form=dict(
-                title='My interesting container',
-                description='A updated container description',
+                title='My interesting project',
+                description='A updated project description',
                 status='active',
             )
         ):
             assert status == 200
-            assert response.json['title'] == 'My interesting container'
-            assert response.json['description'] == 'A updated container ' \
+            assert response.json['title'] == 'My interesting project'
+            assert response.json['description'] == 'A updated project ' \
                 'description'
             assert response.json['status'] == 'active'
 
             when(
-                'Intended container with string type not found',
+                'Intended project with string type not found',
                 url_parameters=dict(id='Alphabetical')
             )
             assert status == 404
 
             when(
-                'Intended container with string type not found',
+                'Intended project with string type not found',
                 url_parameters=dict(id=100)
             )
             assert status == 404
 
             when(
                 'Title is repetetive',
-                form=Update(title='My second container')
+                form=Update(title='My second project')
             )
             assert status == 600
-            assert status.text.startswith('Another container with title')
+            assert status.text.startswith('Another project with title')
 
             when(
                 'Title format is wrong',
@@ -138,14 +138,14 @@ class TestContainer(LocalApplicationTestCase):
             assert status == 401
 
             when(
-                'Update a hidden container',
+                'Update a hidden project',
                 url_parameters=dict(id=3)
             )
-            assert status == '746 Hidden Container Is Not Editable'
+            assert status == '746 Hidden Project Is Not Editable'
 
             with self.given(
-                'Updating container with empty form',
-                '/apiv1/containers/id:2',
+                'Updating project with empty form',
+                '/apiv1/projects/id:2',
                 'UPDATE',
                 form=dict()
             ):

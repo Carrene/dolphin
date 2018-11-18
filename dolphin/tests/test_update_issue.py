@@ -1,6 +1,6 @@
 from bddrest import status, when, given, response
 
-from dolphin.models import Issue, Container, Member, Workflow
+from dolphin.models import Issue, Project, Member, Workflow
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -19,16 +19,16 @@ class TestIssue(LocalApplicationTestCase):
         )
         session.add(member)
 
-        container = Container(
+        project = Project(
             member=member,
-            title='My first container',
-            description='A decription for my container',
+            title='My first project',
+            description='A decription for my project',
             room_id=1
         )
-        session.add(container)
+        session.add(project)
 
         issue1 = Issue(
-            container=container,
+            project=project,
             title='First issue',
             description='This is description of first issue',
             due_date='2020-2-20',
@@ -39,7 +39,7 @@ class TestIssue(LocalApplicationTestCase):
         session.add(issue1)
 
         issue2 = Issue(
-            container=container,
+            project=project,
             title='Second issue',
             description='This is description of second issue',
             due_date='2020-2-20',
@@ -152,6 +152,6 @@ class TestIssue(LocalApplicationTestCase):
             when('Request is not authorized', authorization=None)
             assert status == 401
 
-            when('Updating container with empty form', form=dict())
+            when('Updating project with empty form', form=dict())
             assert status == '708 No Parameter Exists In The Form'
 

@@ -34,9 +34,9 @@ class IssueController(ModelRestController):
 
     @authorize
     @json(form_whitelist=(
-        ['title', 'description', 'kind', 'days', 'status', 'containerId', 'dueDate'],
+        ['title', 'description', 'kind', 'days', 'status', 'projectId', 'dueDate'],
         '707 Invalid field, only following fields are accepted: ' \
-        'title, description, kind, days, status, containerId and dueDate'
+        'title, description, kind, days, status, projectId and dueDate'
     ))
     @issue_validator
     @Issue.expose
@@ -111,9 +111,9 @@ class IssueController(ModelRestController):
         if not issue:
             raise HTTPNotFound()
 
-        container = issue.container
+        project = issue.project
         if 'title' in form:
-            for i in container.issues:
+            for i in project.issues:
                 if i.title == form['title'] and i.id != id:
                     raise HTTPStatus(
                     f'600 Another issue with title: ' \
