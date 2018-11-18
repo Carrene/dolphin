@@ -1,10 +1,10 @@
 from bddrest import status, response, when
 
-from dolphin.models import Container, Member, Workflow
+from dolphin.models import Project, Member, Workflow
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
-class TestContainer(LocalApplicationTestCase):
+class TestProject(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
@@ -24,29 +24,29 @@ class TestContainer(LocalApplicationTestCase):
             description='A decription for my project',
             room_id=1001
         )
-        session.add(container1)
+        session.add(project1)
         session.commit()
 
     def test_get(self):
         self.login('member1@example.com')
 
         with oauth_mockup_server(), self.given(
-            'Getting a container',
-            '/apiv1/containers/id:1',
+            'Getting a project',
+            '/apiv1/projects/id:1',
             'GET'
         ):
             assert status == 200
             assert response.json['id'] == 1
-            assert response.json['title'] == 'My first container'
+            assert response.json['title'] == 'My first project'
 
             when(
-                'Intended container with string type not found',
+                'Intended project with string type not found',
                 url_parameters=dict(id='Alphabetical')
             )
             assert status == 404
 
             when(
-                'Intended container with string type not found',
+                'Intended project with string type not found',
                 url_parameters=dict(id=100)
             )
             assert status == 404
