@@ -19,85 +19,85 @@ class TestContainer(LocalApplicationTestCase):
         )
         session.add(member1)
 
-        container1 = Container(
+        project1 = Container(
             member=member1,
-            title='My first container',
-            description='A decription for my container',
+            title='My first project',
+            description='A decription for my project',
             room_id=1001
         )
-        session.add(container1)
+        session.add(project1)
 
-        container2 = Container(
+        project2 = Container(
             member=member1,
-            title='My second container',
-            description='A decription for my container',
+            title='My second project',
+            description='A decription for my project',
             room_id=1002
         )
-        session.add(container2)
+        session.add(project2)
 
-        container3 = Container(
+        project3 = Container(
             member=member1,
-            title='My third container',
-            description='A decription for my container',
+            title='My third project',
+            description='A decription for my project',
             removed_at='2020-2-20',
             room_id=1000
         )
-        session.add(container3)
+        session.add(project3)
         session.commit()
 
     def test_list(self):
         self.login('member1@example.com')
 
         with oauth_mockup_server(), self.given(
-            'List containers',
-            '/apiv1/containers',
+            'List projects',
+            '/apiv1/projects',
             'LIST',
         ):
             assert status == 200
             assert len(response.json) == 3
 
             with self.given(
-                'Sort containers by phases title',
-                '/apiv1/containers',
+                'Sort projects by phases title',
+                '/apiv1/projects',
                 'LIST',
                 query=dict(sort='title')
             ):
                 assert status == 200
-                assert response.json[0]['title'] == 'My first container'
+                assert response.json[0]['title'] == 'My first project'
 
                 when(
                     'Reverse sorting titles by alphabet',
                     query=dict(sort='-title')
                 )
-                assert response.json[0]['title'] == 'My third container'
+                assert response.json[0]['title'] == 'My third project'
 
             with self.given(
-                'Filter containers',
-                '/apiv1/containers',
+                'Filter projects',
+                '/apiv1/projects',
                 'LIST',
-                query=dict(sort='id', title='My first container')
+                query=dict(sort='id', title='My first project')
             ):
-                assert response.json[0]['title'] == 'My first container'
+                assert response.json[0]['title'] == 'My first project'
 
                 when(
-                    'List containers except one of them',
-                    query=dict(sort='id', title='!My awesome container')
+                    'List projects except one of them',
+                    query=dict(sort='id', title='!My awesome project')
                 )
-                assert response.json[0]['title'] == 'My first container'
+                assert response.json[0]['title'] == 'My first project'
 
             with self.given(
                 'Container pagination',
-                '/apiv1/containers',
+                '/apiv1/projects',
                 'LIST',
                 query=dict(sort='id', take=1, skip=2)
             ):
-                assert response.json[0]['title'] == 'My third container'
+                assert response.json[0]['title'] == 'My third project'
 
                 when(
                     'Manipulate sorting and pagination',
                     query=dict(sort='-title', take=1, skip=2)
                 )
-                assert response.json[0]['title'] == 'My first container'
+                assert response.json[0]['title'] == 'My first project'
 
                 when('Request is not authorized', authorization=None)
                 assert status == 401

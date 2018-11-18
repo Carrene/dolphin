@@ -20,32 +20,32 @@ class TestContainer(LocalApplicationTestCase):
         )
         session.add(member)
 
-        container1 = Container(
+        project1 = Container(
             member=member,
-            title='My first container',
-            description='A decription for my container',
+            title='My first project',
+            description='A decription for my project',
             room_id=1001
         )
-        session.add(container1)
+        session.add(project1)
         session.flush()
 
-        container2 = Container(
+        project2 = Container(
             member=member,
-            title='My second container',
-            description='A decription for my container',
+            title='My second project',
+            description='A decription for my project',
             room_id=1002
         )
-        session.add(container2)
+        session.add(project2)
         session.flush()
 
         subscription1 = Subscription(
-            subscribable=container1.id,
+            subscribable=project1.id,
             member=member.id
         )
         session.add(subscription1)
 
         subscription2 = Subscription(
-            subscribable=container2.id,
+            subscribable=project2.id,
             member=member.id
         )
         session.add(subscription2)
@@ -55,8 +55,8 @@ class TestContainer(LocalApplicationTestCase):
         self.login('member1@example.com')
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
-            'Unsubscribe an container',
-            '/apiv1/containers/id:1',
+            'Unsubscribe an project',
+            '/apiv1/projects/id:1',
             'UNSUBSCRIBE',
         ):
             assert status == 200
@@ -64,13 +64,13 @@ class TestContainer(LocalApplicationTestCase):
             assert response.json['isSubscribed'] == False
 
             when(
-                'Intended container with string type not found',
+                'Intended project with string type not found',
                 url_parameters=dict(id='Alphabetical'),
             )
             assert status == 404
 
             when(
-                'Intended container with integer type not found',
+                'Intended project with integer type not found',
                 url_parameters=dict(id=100),
             )
             assert status == 404

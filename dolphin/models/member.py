@@ -73,7 +73,7 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         back_populates='members',
     )
 
-    containers = relationship('Container', back_populates='member', protected=True)
+    projects = relationship('Container', back_populates='member', protected=True)
 
     @property
     def roles(self):

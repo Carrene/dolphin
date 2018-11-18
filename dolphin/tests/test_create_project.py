@@ -25,14 +25,14 @@ class TestContainer(LocalApplicationTestCase):
             cutoff='2030-2-20',
         )
 
-        container1 = Container(
+        project1 = Container(
             release=release1,
             member=member1,
-            title='My first container',
-            description='A decription for my container',
+            title='My first project',
+            description='A decription for my project',
             room_id=1001
         )
-        session.add(container1)
+        session.add(project1)
         session.commit()
 
         cls.member = member1
@@ -41,19 +41,19 @@ class TestContainer(LocalApplicationTestCase):
         self.login('member1@example.com')
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
-            'Createing a container',
-            '/apiv1/containers',
+            'Createing a project',
+            '/apiv1/projects',
             'CREATE',
             form=dict(
                 releaseId=1,
-                title='My awesome container',
-                description='A decription for my container',
+                title='My awesome project',
+                description='A decription for my project',
                 status='active'
             )
         ):
             assert status == 200
-            assert response.json['title'] == 'My awesome container'
-            assert response.json['description'] == 'A decription for my container'
+            assert response.json['title'] == 'My awesome project'
+            assert response.json['description'] == 'A decription for my project'
             assert response.json['status'] == 'active'
             assert response.json['boarding'] == None
             assert response.json['dueDate'] == None
@@ -66,10 +66,10 @@ class TestContainer(LocalApplicationTestCase):
 
             when(
                 'Title is repetetive',
-                form=given | dict(title='My first container')
+                form=given | dict(title='My first project')
             )
             assert status == 600
-            assert status.text.startswith('Another container with title')
+            assert status.text.startswith('Another project with title')
 
             when(
                 'Release ID type is wrong',
@@ -150,7 +150,7 @@ class TestContainer(LocalApplicationTestCase):
             with chat_server_status('604 Already Added To Target'):
                 when(
                     'Chat server faces with internal error',
-                    form=given | dict(title='Awesome container')
+                    form=given | dict(title='Awesome project')
                 )
                 assert status == 200
 

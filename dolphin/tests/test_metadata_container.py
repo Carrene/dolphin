@@ -8,7 +8,7 @@ class TestContainer(LocalApplicationTestCase):
     def test_metadata(self):
         with self.given(
             'Test metadata verb',
-            '/apiv1/containers',
+            '/apiv1/projects',
             'METADATA'
         ):
             fields = response.json['fields']

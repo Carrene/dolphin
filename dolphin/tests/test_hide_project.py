@@ -17,42 +17,35 @@ class TestContainer(LocalApplicationTestCase):
             phone=123456789,
             reference_id=2
         )
-        session.add(member1)
 
-        container1 = Container(
+        project1 = Container(
             member=member1,
-            title='My first container',
-            description='A decription for my container',
+            title='My first project',
+            description='A decription for my project',
             room_id=1001
         )
-        session.add(container1)
+        session.add(project1)
 
-        hidden_container = Container(
+        hidden_project = Container(
             member=member1,
-            title='My hidden container',
-            description='A decription for my container',
+            title='My hidden project',
+            description='A decription for my project',
             removed_at='2020-2-20',
             room_id=1000
         )
-        session.add(hidden_container)
+        session.add(hidden_project)
         session.commit()
 
-    def test_show(self):
+    def test_hide(self):
         self.login('member1@example.com')
 
         with oauth_mockup_server(), self.given(
-            'Showing a unhidden container',
-            '/apiv1/containers/id:2',
-            'SHOW'
+            'Hiding a project',
+            '/apiv1/projects/id:1',
+            'HIDE'
         ):
             assert status == 200
-            assert response.json['removedAt'] == None
-
-            when(
-                'Container not found',
-                url_parameters=dict(id=100)
-            )
-            assert status == 404
+            assert response.json['removedAt'] != None
 
             when(
                 'Intended issue with string type not found',
@@ -61,7 +54,16 @@ class TestContainer(LocalApplicationTestCase):
             assert status == 404
 
             when(
-                'There is parameter is form',
+                'Intended Container With String Type Not Found',
+                url_parameters=dict(id=100)
+            )
+            assert status == 404
+
+            when('Container not found', url_parameters=dict(id=100))
+            assert status == 404
+
+            when(
+                'There is parameter in form',
                 form=dict(any_parameter='A parameter in the form')
             )
             assert status == '709 Form Not Allowed'

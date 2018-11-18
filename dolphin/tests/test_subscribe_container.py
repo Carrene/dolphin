@@ -21,29 +21,29 @@ class TestContainer(LocalApplicationTestCase):
         )
         session.add(member1)
 
-        container1 = Container(
+        project1 = Container(
             member=member1,
-            title='My first container',
-            description='A decription for my container',
+            title='My first project',
+            description='A decription for my project',
             room_id=1001
         )
-        session.add(container1)
+        session.add(project1)
 
-        container2 = Container(
+        project2 = Container(
             member=member1,
-            title='My second container',
-            description='A decription for my container',
+            title='My second project',
+            description='A decription for my project',
             room_id=1002
         )
-        session.add(container2)
+        session.add(project2)
         session.commit()
 
     def test_subscribe(self):
         self.login('member1@example.com')
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
-            'Subscribe container',
-            '/apiv1/containers/id:1',
+            'Subscribe project',
+            '/apiv1/projects/id:1',
             'SUBSCRIBE',
         ):
             assert status == 200
@@ -51,13 +51,13 @@ class TestContainer(LocalApplicationTestCase):
             assert response.json['isSubscribed'] == True
 
             when(
-                'Intended container with string type not found',
+                'Intended project with string type not found',
                 url_parameters=dict(id='Alphabetical'),
             )
             assert status == 404
 
             when(
-                'Intended container with integer type not found',
+                'Intended project with integer type not found',
                 url_parameters=dict(id=100),
             )
             assert status == 404

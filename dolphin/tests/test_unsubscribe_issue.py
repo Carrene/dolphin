@@ -21,16 +21,16 @@ class TestIssue(LocalApplicationTestCase):
         session.add(member)
         session.flush()
 
-        container = Container(
+        project = Container(
             member=member,
-            title='My first container',
-            description='A decription for my container',
+            title='My first project',
+            description='A decription for my project',
             room_id=1
         )
-        session.add(container)
+        session.add(project)
 
         issue1 = Issue(
-            container=container,
+            project=project,
             title='First issue',
             description='This is description of first issue',
             due_date='2020-2-20',
@@ -42,7 +42,7 @@ class TestIssue(LocalApplicationTestCase):
         session.flush()
 
         issue2 = Issue(
-            container=container,
+            project=project,
             title='Second issue',
             description='This is description of second issue',
             due_date='2020-2-20',

@@ -24,7 +24,7 @@ class TestContainer(LocalApplicationTestCase):
         self.login('member1@example.com')
 
         with oauth_mockup_server(), self.given(
-            'Getting a container',
+            'Getting a project',
             '/apiv1/members/id:1',
             'GET'
         ):
@@ -33,13 +33,13 @@ class TestContainer(LocalApplicationTestCase):
             assert response.json['title'] == 'member1'
 
             when(
-                'Intended container with string type not found',
+                'Intended project with string type not found',
                 url_parameters=dict(id='Alphabetical')
             )
             assert status == 404
 
             when(
-                'Intended container with string type not found',
+                'Intended project with string type not found',
                 url_parameters=dict(id=100)
             )
             assert status == 404

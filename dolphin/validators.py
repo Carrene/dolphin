@@ -15,7 +15,7 @@ DATETIME_PATTERN = re.compile(
 TITLE_PATTERN = re.compile(r'^(?!\s).*[^\s]$')
 
 
-def release_exists_validator(releaseId, container, field):
+def release_exists_validator(releaseId, project, field):
     form = context.form
     try:
         releaseId = int(releaseId)
@@ -32,7 +32,7 @@ def release_exists_validator(releaseId, container, field):
     return releaseId
 
 
-def release_status_value_validator(status, container, field):
+def release_status_value_validator(status, project, field):
     form = context.form
     if 'status' in form and form['status'] not in release_statuses:
         raise HTTPStatus(
@@ -42,7 +42,7 @@ def release_status_value_validator(status, container, field):
     return form['status']
 
 
-def release_not_exists_validator(title, container, field):
+def release_not_exists_validator(title, project, field):
 
     release = DBSession.query(Release).filter(Release.title == title) \
         .one_or_none()
@@ -53,45 +53,45 @@ def release_not_exists_validator(title, container, field):
     return title
 
 
-def container_not_exists_validator(title, container, field):
+def project_not_exists_validator(title, project, field):
 
-    container = DBSession.query(Container).filter(Container.title == title) \
+    project = DBSession.query(Container).filter(Container.title == title) \
         .one_or_none()
-    if container is not None:
+    if project is not None:
         raise HTTPStatus(
-            f'600 Another container with title: {title} is already exists.'
+            f'600 Another project with title: {title} is already exists.'
         )
     return title
 
 
-def container_exists_validator(containerId, container, field):
+def project_exists_validator(projectId, project, field):
 
-    container = DBSession.query(Container) \
-            .filter(Container.id == context.form['containerId']).one_or_none()
-    if not container:
+    project = DBSession.query(Container) \
+            .filter(Container.id == context.form['projectId']).one_or_none()
+    if not project:
         raise HTTPStatus(
-            f'601 Container not found with id: {context.form["containerId"]}'
+            f'601 Container not found with id: {context.form["projectId"]}'
         )
-    return containerId
+    return projectId
 
 
-def container_status_value_validator(status, container, field):
+def project_status_value_validator(status, project, field):
     form = context.form
-    if 'status' in form and form['status'] not in container_statuses:
+    if 'status' in form and form['status'] not in project_statuses:
         raise HTTPStatus(
             f'705 Invalid status value, only one of ' \
-            f'"{", ".join(container_statuses)}" will be accepted'
+            f'"{", ".join(project_statuses)}" will be accepted'
         )
     return form['status']
 
 
-def issue_not_exists_validator(title, container, field):
+def issue_not_exists_validator(title, project, field):
     form = context.form
-    container = DBSession.query(Container) \
-        .filter(Container.id == form['containerId']) \
+    project = DBSession.query(Container) \
+        .filter(Container.id == form['projectId']) \
         .one()
 
-    for issue in container.issues:
+    for issue in project.issues:
         if issue.title == title:
             raise HTTPStatus(
                 f'600 Another issue with title: "{title}" is already exists.'
@@ -100,7 +100,7 @@ def issue_not_exists_validator(title, container, field):
     return title
 
 
-def kind_value_validator(kind, container, field):
+def kind_value_validator(kind, project, field):
     form = context.form
     if 'kind' in form and form['kind'] not in issue_kinds:
         raise HTTPStatus(
@@ -110,7 +110,7 @@ def kind_value_validator(kind, container, field):
     return form['kind']
 
 
-def issue_status_value_validator(status, container, field):
+def issue_status_value_validator(status, project, field):
     form = context.form
     if 'status' in form and form['status'] not in issue_statuses:
         raise HTTPStatus(
@@ -120,7 +120,7 @@ def issue_status_value_validator(status, container, field):
     return form['status']
 
 
-def phase_exists_validator(phaseId, container, field):
+def phase_exists_validator(phaseId, project, field):
     form = context.form
 
     if 'phaseId' in form and not DBSession.query(Phase) \
@@ -131,7 +131,7 @@ def phase_exists_validator(phaseId, container, field):
     return phaseId
 
 
-def workflow_exists_validator(workflowId, container, field):
+def workflow_exists_validator(workflowId, project, field):
 
     try:
         workflowId = int(workflowId)
@@ -146,7 +146,7 @@ def workflow_exists_validator(workflowId, container, field):
     return workflowId
 
 
-def item_status_value_validator(status, container, field):
+def item_status_value_validator(status, project, field):
     form = context.form
     if 'status' in form and form['status'] not in item_statuses:
         raise HTTPStatus(
@@ -156,7 +156,7 @@ def item_status_value_validator(status, container, field):
     return form['status']
 
 
-def member_exists_validator(memberId, container, field):
+def member_exists_validator(memberId, project, field):
     form = context.form
     try:
         memberId = int(memberId)
@@ -175,7 +175,7 @@ def member_exists_validator(memberId, container, field):
     return memberId
 
 
-def resource_exists_validator(resourceId, container, field):
+def resource_exists_validator(resourceId, project, field):
     form = context.form
     resource = DBSession.query(Resource) \
         .filter(Resource.id == form['resourceId']) \
@@ -224,10 +224,10 @@ update_release_validator = validate(
 )
 
 
-container_validator = validate(
+project_validator = validate(
     title=dict(
         required='710 Title Not In Form',
-        callback=container_not_exists_validator,
+        callback=project_not_exists_validator,
         max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
         pattern=(TITLE_PATTERN, '747 Invalid Title Format'),
     ),
@@ -235,7 +235,7 @@ container_validator = validate(
         max_length=(512, '703 At Most 512 Characters Are Valid For Description')
     ),
     status=dict(
-        callback=container_status_value_validator
+        callback=project_status_value_validator
     ),
     workflowId=dict(
         callback=workflow_exists_validator
@@ -246,7 +246,7 @@ container_validator = validate(
 )
 
 
-update_container_validator = validate(
+update_project_validator = validate(
     title=dict(
         max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
         pattern=(TITLE_PATTERN, '747 Invalid Title Format'),
@@ -255,16 +255,16 @@ update_container_validator = validate(
         max_length=(512, '703 At Most 512 Characters Are Valid For Description')
     ),
     status=dict(
-        callback=container_status_value_validator
+        callback=project_status_value_validator
     ),
 )
 
 
 issue_validator = validate(
-    containerId=dict(
+    projectId=dict(
         required='713 Container Id Not In Form',
         type_=(int, '714 Invalid Container Id Type'),
-        callback=container_exists_validator
+        callback=project_exists_validator
     ),
     title=dict(
         required='710 Title Not In Form',
