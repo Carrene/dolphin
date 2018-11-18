@@ -64,7 +64,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     _boarding = ['on-time', 'delayed']
 
-    container_id = Field(Integer, ForeignKey('container.id'))
+    project_id = Field(Integer, ForeignKey('project.id'))
     room_id = Field(Integer)
 
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
@@ -118,9 +118,9 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         protected=True
     )
 
-    container = relationship(
-        'Container',
-        foreign_keys=[container_id],
+    project = relationship(
+        'Project',
+        foreign_keys=[project_id],
         back_populates='issues',
         protected=True
     )
