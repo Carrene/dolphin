@@ -1,10 +1,10 @@
 from bddrest import status, when, response
 
-from dolphin.models import Container, Member, Workflow
+from dolphin.models import Project, Member, Workflow
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
-class TestContainer(LocalApplicationTestCase):
+class TestProject(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
@@ -19,7 +19,7 @@ class TestContainer(LocalApplicationTestCase):
         )
         session.add(member1)
 
-        project1 = Container(
+        project1 = Project(
             member=member1,
             title='My first project',
             description='A decription for my project',
@@ -27,7 +27,7 @@ class TestContainer(LocalApplicationTestCase):
         )
         session.add(project1)
 
-        hidden_project = Container(
+        hidden_project = Project(
             member=member1,
             title='My hidden project',
             description='A decription for my project',
@@ -49,7 +49,7 @@ class TestContainer(LocalApplicationTestCase):
             assert response.json['removedAt'] == None
 
             when(
-                'Container not found',
+                'Project not found',
                 url_parameters=dict(id=100)
             )
             assert status == 404

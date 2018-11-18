@@ -1,12 +1,12 @@
 from bddrest import status, response, Update, when, Remove, given
 
-from dolphin.models import Container, Member, Release, Workflow
+from dolphin.models import Project, Member, Release, Workflow
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status, \
     room_mockup_server
 
 
-class TestContainer(LocalApplicationTestCase):
+class TestProject(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
@@ -21,7 +21,7 @@ class TestContainer(LocalApplicationTestCase):
         )
         session.add(member1)
 
-        project1 = Container(
+        project1 = Project(
             member=member1,
             title='My first project',
             description='A decription for my project',
@@ -29,7 +29,7 @@ class TestContainer(LocalApplicationTestCase):
         )
         session.add(project1)
 
-        project2 = Container(
+        project2 = Project(
             member=member1,
             title='My second project',
             description='A decription for my project',
@@ -63,7 +63,7 @@ class TestContainer(LocalApplicationTestCase):
             assert status == 404
 
             when(
-                'Container is already subscribed',
+                'Project is already subscribed',
                 url_parameters=dict(id=1),
             )
             assert status == '611 Already Subscribed'

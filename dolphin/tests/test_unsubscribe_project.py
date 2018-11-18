@@ -1,11 +1,11 @@
 from bddrest import status, when, given, response
 
-from dolphin.models import Container, Member, Release, Subscription, Workflow
+from dolphin.models import Project, Member, Release, Subscription, Workflow
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
 
-class TestContainer(LocalApplicationTestCase):
+class TestProject(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
@@ -20,7 +20,7 @@ class TestContainer(LocalApplicationTestCase):
         )
         session.add(member)
 
-        project1 = Container(
+        project1 = Project(
             member=member,
             title='My first project',
             description='A decription for my project',
@@ -29,7 +29,7 @@ class TestContainer(LocalApplicationTestCase):
         session.add(project1)
         session.flush()
 
-        project2 = Container(
+        project2 = Project(
             member=member,
             title='My second project',
             description='A decription for my project',

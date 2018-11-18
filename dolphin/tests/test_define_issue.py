@@ -1,6 +1,6 @@
 from bddrest import status, response, Update, when, given
 
-from dolphin.models import Issue, Container, Member, Workflow
+from dolphin.models import Issue, Project, Member, Workflow
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
@@ -19,7 +19,7 @@ class TestIssue(LocalApplicationTestCase):
             reference_id=1
         )
 
-        project = Container(
+        project = Project(
             member=member,
             title='My first project',
             description='A decription for my project',
@@ -66,23 +66,23 @@ class TestIssue(LocalApplicationTestCase):
             assert response.json['status'] == 'in-progress'
 
             when(
-                'Container id not in form',
+                'Project id not in form',
                 form=given - 'projectId' | dict(title='New title')
             )
-            assert status == '713 Container Id Not In Form'
+            assert status == '713 Project Id Not In Form'
 
             when(
-                'Container not found with string type',
+                'Project not found with string type',
                 form=given | dict(projectId='Alphabetical', title='New title')
             )
-            assert status == '714 Invalid Container Id Type'
+            assert status == '714 Invalid Project Id Type'
 
             when(
-                'Container not found with integer type',
+                'Project not found with integer type',
                 form=given | dict(projectId=100, title='New title')
             )
             assert status == 601
-            assert status.text.startswith('Container not found')
+            assert status.text.startswith('Project not found')
 
             when(
                 'Title is not in form',

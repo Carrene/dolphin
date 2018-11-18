@@ -1,11 +1,11 @@
 from bddrest import status, response, when, Remove, given
 
-from dolphin.models import Container, Member, Workflow, Release
+from dolphin.models import Project, Member, Workflow, Release
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
 
-class TestContainer(LocalApplicationTestCase):
+class TestProject(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
@@ -25,7 +25,7 @@ class TestContainer(LocalApplicationTestCase):
             cutoff='2030-2-20',
         )
 
-        project1 = Container(
+        project1 = Project(
             release=release1,
             member=member1,
             title='My first project',

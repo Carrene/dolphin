@@ -17,7 +17,7 @@ project_statuses = [
 ]
 
 
-class Container(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
+class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
                 SoftDeleteMixin, Subscribable):
 
     __tablename__ = 'project'

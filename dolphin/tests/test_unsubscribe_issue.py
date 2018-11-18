@@ -1,6 +1,6 @@
 from bddrest import status, when, given, response
 
-from dolphin.models import Issue, Container, Member, Subscription, Workflow
+from dolphin.models import Issue, Project, Member, Subscription, Workflow
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
@@ -21,7 +21,7 @@ class TestIssue(LocalApplicationTestCase):
         session.add(member)
         session.flush()
 
-        project = Container(
+        project = Project(
             member=member,
             title='My first project',
             description='A decription for my project',

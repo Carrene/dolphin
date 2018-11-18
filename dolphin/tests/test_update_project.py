@@ -1,12 +1,12 @@
 from bddrest import status, response, Update, when, given
 
-from dolphin.models import Container, Member, Workflow
+from dolphin.models import Project, Member, Workflow
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status, \
     room_mockup_server
 
 
-class TestContainer(LocalApplicationTestCase):
+class TestProject(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
@@ -30,7 +30,7 @@ class TestContainer(LocalApplicationTestCase):
         )
         session.add(member2)
 
-        project1 = Container(
+        project1 = Project(
             member=member1,
             title='My first project',
             description='A decription for my project',
@@ -38,7 +38,7 @@ class TestContainer(LocalApplicationTestCase):
         )
         session.add(project1)
 
-        project2 = Container(
+        project2 = Project(
             member=member1,
             title='My second project',
             description='A decription for my project',
@@ -46,7 +46,7 @@ class TestContainer(LocalApplicationTestCase):
         )
         session.add(project2)
 
-        hidden_project = Container(
+        hidden_project = Project(
             member=member1,
             title='My hidden project',
             description='A decription for my project',
@@ -141,7 +141,7 @@ class TestContainer(LocalApplicationTestCase):
                 'Update a hidden project',
                 url_parameters=dict(id=3)
             )
-            assert status == '746 Hidden Container Is Not Editable'
+            assert status == '746 Hidden Project Is Not Editable'
 
             with self.given(
                 'Updating project with empty form',

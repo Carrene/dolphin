@@ -119,7 +119,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     )
 
     project = relationship(
-        'Container',
+        'Project',
         foreign_keys=[project_id],
         back_populates='issues',
         protected=True

@@ -9,7 +9,7 @@ from restfulpy.orm.metadata import FieldInfo
 
 from dolphin import Dolphin
 from dolphin.authentication import Authenticator
-from dolphin.models import Member, Container, Release, Issue, Item
+from dolphin.models import Member, Project, Release, Issue, Item
 
 
 HERE = path.abspath(path.dirname(__file__))
@@ -27,7 +27,7 @@ phase_id = FieldInfo(type_=int, not_none=True, required=True).to_json()
 project_id = FieldInfo(type_=int, not_none=True, required=True).to_json()
 
 release_fields = Release.json_metadata()['fields']
-project_fields = Container.json_metadata()['fields']
+project_fields = Project.json_metadata()['fields']
 issue_fields = Issue.json_metadata()['fields']
 
 issue_fields.update({

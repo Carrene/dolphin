@@ -1,10 +1,10 @@
 from bddrest import status, response, when
 
-from dolphin.models import Container, Member, Workflow
+from dolphin.models import Project, Member, Workflow
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
-class TestContainer(LocalApplicationTestCase):
+class TestProject(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
@@ -19,7 +19,7 @@ class TestContainer(LocalApplicationTestCase):
         )
         session.add(member1)
 
-        project1 = Container(
+        project1 = Project(
             member=member1,
             title='My first project',
             description='A decription for my project',
@@ -27,7 +27,7 @@ class TestContainer(LocalApplicationTestCase):
         )
         session.add(project1)
 
-        project2 = Container(
+        project2 = Project(
             member=member1,
             title='My second project',
             description='A decription for my project',
@@ -35,7 +35,7 @@ class TestContainer(LocalApplicationTestCase):
         )
         session.add(project2)
 
-        project3 = Container(
+        project3 = Project(
             member=member1,
             title='My third project',
             description='A decription for my project',
@@ -86,7 +86,7 @@ class TestContainer(LocalApplicationTestCase):
                 assert response.json[0]['title'] == 'My first project'
 
             with self.given(
-                'Container pagination',
+                'Project pagination',
                 '/apiv1/projects',
                 'LIST',
                 query=dict(sort='id', take=1, skip=2)

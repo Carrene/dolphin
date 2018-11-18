@@ -55,7 +55,7 @@ def release_not_exists_validator(title, project, field):
 
 def project_not_exists_validator(title, project, field):
 
-    project = DBSession.query(Container).filter(Container.title == title) \
+    project = DBSession.query(Project).filter(Project.title == title) \
         .one_or_none()
     if project is not None:
         raise HTTPStatus(
@@ -66,11 +66,11 @@ def project_not_exists_validator(title, project, field):
 
 def project_exists_validator(projectId, project, field):
 
-    project = DBSession.query(Container) \
-            .filter(Container.id == context.form['projectId']).one_or_none()
+    project = DBSession.query(Project) \
+            .filter(Project.id == context.form['projectId']).one_or_none()
     if not project:
         raise HTTPStatus(
-            f'601 Container not found with id: {context.form["projectId"]}'
+            f'601 Project not found with id: {context.form["projectId"]}'
         )
     return projectId
 
@@ -87,8 +87,8 @@ def project_status_value_validator(status, project, field):
 
 def issue_not_exists_validator(title, project, field):
     form = context.form
-    project = DBSession.query(Container) \
-        .filter(Container.id == form['projectId']) \
+    project = DBSession.query(Project) \
+        .filter(Project.id == form['projectId']) \
         .one()
 
     for issue in project.issues:
@@ -262,8 +262,8 @@ update_project_validator = validate(
 
 issue_validator = validate(
     projectId=dict(
-        required='713 Container Id Not In Form',
-        type_=(int, '714 Invalid Container Id Type'),
+        required='713 Project Id Not In Form',
+        type_=(int, '714 Invalid Project Id Type'),
         callback=project_exists_validator
     ),
     title=dict(

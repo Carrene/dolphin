@@ -3,7 +3,7 @@ from bddrest.authoring import status, response
 from dolphin.tests.helpers import LocalApplicationTestCase
 
 
-class TestContainer(LocalApplicationTestCase):
+class TestProject(LocalApplicationTestCase):
 
     def test_metadata(self):
         with self.given(
