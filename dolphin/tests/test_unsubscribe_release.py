@@ -1,6 +1,6 @@
 from bddrest import status, when, given, response
 
-from dolphin.models import Release, Member, Container, Subscription, Workflow
+from dolphin.models import Release, Member, Project, Subscription, Workflow
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server
 
@@ -35,24 +35,24 @@ class TestRelease(LocalApplicationTestCase):
         )
         session.add(release2)
 
-        container1 = Container(
+        project1 = Project(
             member=member,
             release=release1,
-            title='My first container',
-            description='A decription for my container',
+            title='My first project',
+            description='A decription for my project',
             room_id=1000
         )
-        session.add(container1)
+        session.add(project1)
         session.flush()
 
-        container2 = Container(
+        project2 = Project(
             member=member,
             release=release2,
-            title='My first container',
-            description='A decription for my container',
+            title='My first project',
+            description='A decription for my project',
             room_id=1000
         )
-        session.add(container2)
+        session.add(project2)
 
         subscription1 = Subscription(
             subscribable=release1.id,
