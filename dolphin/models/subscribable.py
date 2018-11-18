@@ -12,9 +12,9 @@ class Subscription(DeclarativeBase):
 class Subscribable(TimestampMixin, DeclarativeBase):
     __tablename__ = 'subscribable'
 
-    type = Field(String(50))
+    type_ = Field(String(50))
     __mapper_args__ = {
-        'polymorphic_on': type,
+        'polymorphic_on': type_,
         'polymorphic_identity': __tablename__
     }
 
