@@ -1,3 +1,5 @@
+import uuid
+
 from cas import CASPrincipal
 from nanohttp import context
 from restfulpy.orm import DeclarativeBase, Field, relationship, DBSession, \
@@ -79,13 +81,17 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     def roles(self):
         return []
 
-    def create_jwt_principal(self):
-        return CASPrincipal(dict(
+    def create_jwt_principal(self, session_id=None):
+        if session_id is None:
+            session_id = str(uuid.uuid4())
+
+         return CASPrincipal(dict(
             id=self.id,
             roles=self.roles,
             email=self.email,
             name=self.title,
             referenceId=self.reference_id,
+            sessionId=session_id,
         ))
 
     def create_refresh_principal(self):
