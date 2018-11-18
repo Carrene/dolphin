@@ -1,6 +1,6 @@
 from bddrest import status, response, Update, when, given
 
-from dolphin.models import Issue, Container, Member, Workflow
+from dolphin.models import Issue, Project, Member, Workflow
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
@@ -19,15 +19,15 @@ class TestIssue(LocalApplicationTestCase):
             reference_id=1
         )
 
-        container = Container(
+        project = Project(
             member=member,
-            title='My first container',
-            description='A decription for my container',
+            title='My first project',
+            description='A decription for my project',
             room_id=1
         )
 
         issue1 = Issue(
-            container=container,
+            project=project,
             title='First issue',
             description='This is description of first issue',
             due_date='2020-2-20',
@@ -37,7 +37,7 @@ class TestIssue(LocalApplicationTestCase):
         )
         session.add(issue1)
         session.commit()
-        cls.container = container
+        cls.project = project
 
     def test_define(self):
         self.login('member1@example.com')
@@ -53,7 +53,7 @@ class TestIssue(LocalApplicationTestCase):
                 dueDate='2200-2-20',
                 kind='enhancement',
                 days=3,
-                containerId=self.container.id,
+                projectId=self.project.id,
             )
         ):
             assert status == 200
@@ -66,23 +66,23 @@ class TestIssue(LocalApplicationTestCase):
             assert response.json['status'] == 'in-progress'
 
             when(
-                'Container id not in form',
-                form=given - 'containerId' | dict(title='New title')
+                'Project id not in form',
+                form=given - 'projectId' | dict(title='New title')
             )
-            assert status == '713 Container Id Not In Form'
+            assert status == '713 Project Id Not In Form'
 
             when(
-                'Container not found with string type',
-                form=given | dict(containerId='Alphabetical', title='New title')
+                'Project not found with string type',
+                form=given | dict(projectId='Alphabetical', title='New title')
             )
-            assert status == '714 Invalid Container Id Type'
+            assert status == '714 Invalid Project Id Type'
 
             when(
-                'Container not found with integer type',
-                form=given | dict(containerId=100, title='New title')
+                'Project not found with integer type',
+                form=given | dict(projectId=100, title='New title')
             )
             assert status == 601
-            assert status.text.startswith('Container not found')
+            assert status.text.startswith('Project not found')
 
             when(
                 'Title is not in form',
@@ -204,7 +204,7 @@ class TestIssue(LocalApplicationTestCase):
             with chat_server_status('604 Already Added To Target'):
                 when(
                     'Chat server faces with internal error',
-                    form=given | dict(title='Awesome container')
+                    form=given | dict(title='Awesome project')
                 )
                 assert status == 200
 
