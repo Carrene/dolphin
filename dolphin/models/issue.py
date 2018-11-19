@@ -108,7 +108,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         watermark='Choose a status',
         not_none=True,
         required=False,
-        default='triage'
+        default='on-hold'
     )
 
     tags = relationship(
