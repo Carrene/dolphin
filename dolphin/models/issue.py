@@ -18,12 +18,12 @@ association_table = Table('issue_tag', DeclarativeBase.metadata,
 
 
 issue_statuses = [
-    'backlog',
-    'triage',
     'in-progress',
     'on-hold',
+    'to-do',
     'delayed',
     'done',
+    'complete',
 ]
 
 
