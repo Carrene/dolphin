@@ -22,5 +22,6 @@ pip3 install -U pip setuptools wheel
 pip3 install -r requirements-ci.txt
 pip3 install git+git://github.com/Carrene/nanohttp.git@master
 pip3 install git+git://github.com/Carrene/cas-common.git@master
+pip3 install git+git://github.com/Carrene/restfulpy.git@master
 pip3 install -e .
 
