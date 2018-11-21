@@ -22,6 +22,22 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     reference_id = Field(Integer, unique=True)
     id = Field(Integer, primary_key=True)
+    name = Field(
+        Unicode(20),
+        nullable=True,
+        not_none=False,
+        python_type=str,
+        min_length=3,
+        max_length=20,
+        required=False,
+        pattern=r'^[a-zA-Z]{1}[a-z-A-Z ,.\'-]{2,19}$',
+        pattern_description='Only alphabetical characters, ., \' and space are'
+            'valid',
+        example='John Doe',
+        label='Full Name',
+        watermark='John Doe',
+        message='Enter your full name',
+    )
     title = Field(
         String,
         max_length=50,
@@ -89,7 +105,9 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             id=self.id,
             roles=self.roles,
             email=self.email,
-            name=self.title,
+            name=self.name,
+            title=self.title,
+            avatar=self.avatar,
             referenceId=self.reference_id,
             sessionId=session_id,
         ))
