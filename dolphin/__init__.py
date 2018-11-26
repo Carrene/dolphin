@@ -18,6 +18,10 @@ class Dolphin(Application):
         test_url: postgresql://postgres:postgres@localhost/dolphin_test
         administrative_url: postgresql://postgres:postgres@localhost/postgres
 
+      migration:
+        directory: %(root_path)s/migration
+        ini: %(root_path)s/alembic.ini
+
       logging:
         loggers:
           backends:
