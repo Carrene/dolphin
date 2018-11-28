@@ -113,7 +113,8 @@ def oauth_mockup_server():
                     id=1,
                     title='member1',
                     email='member1@example.com',
-                    avatar='avatar1'
+                    avatar='avatar1',
+                    name='full name'
                 )
 
             raise HTTPForbidden()
