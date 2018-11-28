@@ -15,7 +15,7 @@ DATETIME_PATTERN = re.compile(
 TITLE_PATTERN = re.compile(r'^(?!\s).*[^\s]$')
 
 
-def release_exists_validator(releaseId, container, field):
+def release_exists_validator(releaseId, project, field):
     form = context.form
     try:
         releaseId = int(releaseId)
@@ -32,7 +32,7 @@ def release_exists_validator(releaseId, container, field):
     return releaseId
 
 
-def release_status_value_validator(status, container, field):
+def release_status_value_validator(status, project, field):
     form = context.form
     if 'status' in form and form['status'] not in release_statuses:
         raise HTTPStatus(
@@ -42,7 +42,7 @@ def release_status_value_validator(status, container, field):
     return form['status']
 
 
-def release_not_exists_validator(title, container, field):
+def release_not_exists_validator(title, project, field):
 
     release = DBSession.query(Release).filter(Release.title == title) \
         .one_or_none()
@@ -53,7 +53,7 @@ def release_not_exists_validator(title, container, field):
     return title
 
 
-def project_not_exists_validator(title, container, field):
+def project_not_exists_validator(title, project, field):
 
     project = DBSession.query(Project).filter(Project.title == title) \
         .one_or_none()
@@ -64,7 +64,7 @@ def project_not_exists_validator(title, container, field):
     return title
 
 
-def project_exists_validator(projectId, container, field):
+def project_exists_validator(projectId, project, field):
 
     project = DBSession.query(Project) \
             .filter(Project.id == context.form['projectId']).one_or_none()
@@ -75,7 +75,7 @@ def project_exists_validator(projectId, container, field):
     return projectId
 
 
-def project_status_value_validator(status, container, field):
+def project_status_value_validator(status, project, field):
     form = context.form
     if 'status' in form and form['status'] not in project_statuses:
         raise HTTPStatus(
@@ -85,7 +85,7 @@ def project_status_value_validator(status, container, field):
     return form['status']
 
 
-def issue_not_exists_validator(title, container, field):
+def issue_not_exists_validator(title, project, field):
     form = context.form
     project = DBSession.query(Project) \
         .filter(Project.id == form['projectId']) \
@@ -100,7 +100,7 @@ def issue_not_exists_validator(title, container, field):
     return title
 
 
-def kind_value_validator(kind, container, field):
+def kind_value_validator(kind, project, field):
     form = context.form
     if 'kind' in form and form['kind'] not in issue_kinds:
         raise HTTPStatus(
@@ -110,7 +110,7 @@ def kind_value_validator(kind, container, field):
     return form['kind']
 
 
-def issue_status_value_validator(status, container, field):
+def issue_status_value_validator(status, project, field):
     form = context.form
     if 'status' in form and form['status'] not in issue_statuses:
         raise HTTPStatus(
@@ -120,7 +120,7 @@ def issue_status_value_validator(status, container, field):
     return form['status']
 
 
-def phase_exists_validator(phaseId, container, field):
+def phase_exists_validator(phaseId, project, field):
     form = context.form
 
     if 'phaseId' in form and not DBSession.query(Phase) \
@@ -131,7 +131,7 @@ def phase_exists_validator(phaseId, container, field):
     return phaseId
 
 
-def workflow_exists_validator(workflowId, container, field):
+def workflow_exists_validator(workflowId, project, field):
 
     try:
         workflowId = int(workflowId)
@@ -146,7 +146,7 @@ def workflow_exists_validator(workflowId, container, field):
     return workflowId
 
 
-def item_status_value_validator(status, container, field):
+def item_status_value_validator(status, project, field):
     form = context.form
     if 'status' in form and form['status'] not in item_statuses:
         raise HTTPStatus(
@@ -156,7 +156,7 @@ def item_status_value_validator(status, container, field):
     return form['status']
 
 
-def member_exists_validator(memberId, container, field):
+def member_exists_validator(memberId, project, field):
     form = context.form
     try:
         memberId = int(memberId)
@@ -175,7 +175,7 @@ def member_exists_validator(memberId, container, field):
     return memberId
 
 
-def resource_exists_validator(resourceId, container, field):
+def resource_exists_validator(resourceId, project, field):
     form = context.form
     resource = DBSession.query(Resource) \
         .filter(Resource.id == form['resourceId']) \

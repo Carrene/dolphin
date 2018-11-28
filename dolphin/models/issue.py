@@ -71,9 +71,11 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     due_date = Field(
         DateTime,
         python_type=datetime,
-        label='Target',
-        pattern=r'^(\d{4})-(0[1-9]|1[012]|[1-9])-(0[1-9]|[12]\d{1}|3[01]|[1-9])$',
-        example='2018-02-02',
+        label='Target Date',
+        pattern=
+            r'^(\d{4})-(0[1-9]|1[012]|[1-9])-(0[1-9]|[12]\d{1}|3[01]|[1-9])' \
+            r'(T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z)?)?$',
+        example='2018-02-02T1:12:12.000Z',
         watermark='Enter a target',
         nullable=False,
         not_none=True,
@@ -82,7 +84,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     kind = Field(
         Enum(*issue_kinds, name='kind'),
         python_type=str,
-        label='Kind',
+        label='Type',
         watermark='Choose a kind',
         nullable=False,
         not_none=True,
@@ -153,7 +155,14 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         yield MetadataField(
             'boarding',
             'boarding',
-            label='Boarding',
+            label='Pace',
+            required=False,
+            readonly=True
+        )
+        yield MetadataField(
+            'isSubscribed',
+            'isSubscribed',
+            label='Subscribe',
             required=False,
             readonly=True
         )

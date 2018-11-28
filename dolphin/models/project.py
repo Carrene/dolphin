@@ -25,7 +25,6 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     _boarding = ['on-time', 'delayed', 'at-risk']
 
-    workflow_id = Field(Integer, ForeignKey('workflow.id'), nullable=True)
     release_id = Field(
         Integer,
         ForeignKey('release.id'),
@@ -46,7 +45,6 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         not_none=False,
         required=True
     )
-    group_id = Field(Integer, ForeignKey('group.id'), nullable=True)
     room_id = Field(Integer)
 
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
@@ -57,7 +55,9 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         watermark='Choose a status',
         not_none=True,
         required=False,
-        default='queued'
+        default='queued',
+        example='Lorem Ipsum',
+        message='Lorem Ipsum'
     )
 
     member = relationship(
@@ -76,16 +76,6 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         'Issue',
         primaryjoin=id == Issue.project_id,
         back_populates='project',
-        protected=True
-    )
-    group = relationship(
-        'Group',
-        back_populates='projects',
-        protected=True
-    )
-    workflow = relationship(
-        'Workflow',
-        back_populates='projects',
         protected=True
     )
 

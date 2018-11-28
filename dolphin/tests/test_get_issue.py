@@ -4,7 +4,7 @@ from dolphin.models import Issue, Member, Workflow, Project
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
-class TestProject(LocalApplicationTestCase):
+class TestIssue(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
@@ -19,11 +19,8 @@ class TestProject(LocalApplicationTestCase):
         )
         session.add(member)
 
-        workflow1 = Workflow(title='First Workflow')
-
         project = Project(
             member=member,
-            workflow=workflow1,
             title='My first project',
             description='A decription for my project',
             room_id=1

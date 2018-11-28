@@ -34,7 +34,7 @@ class ProjectController(ModelRestController):
 
     @authorize
     @json(form_whitelist=(
-        ['title', 'description', 'status', 'releaseId', 'workflowId', 'groupId'],
+        ['title', 'description', 'status', 'releaseId'],
         '707 Invalid field, only following fields are accepted: ' \
         'title, description, status, releaseId, workflowId and groupId' \
     ))
@@ -307,7 +307,9 @@ class ProjectController(ModelRestController):
         except (ValueError, TypeError):
             raise HTTPNotFound()
 
-        project = DBSession.query(Project).filter(Project.id == id).one_or_none()
+        project = DBSession.query(Project) \
+            .filter(Project.id == id) \
+            .one_or_none()
         if not project:
             raise HTTPNotFound()
 

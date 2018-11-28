@@ -1,3 +1,5 @@
+import uuid
+
 from cas import CASPrincipal
 from nanohttp import context
 from restfulpy.orm import DeclarativeBase, Field, relationship, DBSession, \
@@ -29,7 +31,9 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         nullable=False,
         not_none=False,
         required=True,
-        python_type=str
+        python_type=str,
+        example='Lorem Ipsum',
+        message='Lorem Ipsum'
     )
     email = Field(
         Unicode(100),
@@ -40,7 +44,8 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         required=True,
         index=True,
         pattern=r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)',
-        example='member@example.com'
+        example='member@example.com',
+        message='Lorem Ipsum'
     )
     access_token = Field(Unicode(512), protected=True)
     phone = Field(
@@ -50,6 +55,8 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         nullable=True,
         required=False,
         unique=True,
+        example='Lorem Ipsum',
+        message='Lorem Ipsum'
     )
     avatar = Field(
         Unicode(200),
@@ -58,6 +65,8 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         unique=False,
         not_none=False,
         required=False,
+        example='Lorem Ipsum',
+        message='Lorem Ipsum'
     )
 
     subscribables = relationship(
@@ -72,13 +81,17 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     def roles(self):
         return []
 
-    def create_jwt_principal(self):
+    def create_jwt_principal(self, session_id=None):
+        if session_id is None:
+            session_id = str(uuid.uuid4())
+
         return CASPrincipal(dict(
             id=self.id,
             roles=self.roles,
             email=self.email,
             name=self.title,
             referenceId=self.reference_id,
+            sessionId=session_id,
         ))
 
     def create_refresh_principal(self):

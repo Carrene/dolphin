@@ -8,9 +8,3 @@ class Group(DeclarativeBase):
     id = Field(Integer, primary_key=True)
     title = Field(String, max_length=50)
 
-    projects = relationship(
-        'Project',
-        back_populates='group',
-        protected=True
-    )
-

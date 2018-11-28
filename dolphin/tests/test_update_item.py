@@ -36,7 +36,6 @@ class TestItem(LocalApplicationTestCase):
 
         project = Project(
             member=member,
-            workflow=workflow1,
             release=release,
             title='My first project',
             description='A decription for my project',

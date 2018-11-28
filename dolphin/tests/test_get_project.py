@@ -18,11 +18,8 @@ class TestProject(LocalApplicationTestCase):
             reference_id=2
         )
 
-        workflow1 = Workflow(title='First Workflow')
-
         project1 = Project(
             member=member1,
-            workflow=workflow1,
             title='My first project',
             description='A decription for my project',
             room_id=1001

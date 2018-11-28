@@ -19,11 +19,8 @@ class TestProject(LocalApplicationTestCase):
         )
         session.add(member1)
 
-        workflow1 = Workflow(title='First Workflow')
-
         project1 = Project(
             member=member1,
-            workflow=workflow1,
             title='My first project',
             description='A decription for my project',
             room_id=1001
@@ -32,7 +29,6 @@ class TestProject(LocalApplicationTestCase):
 
         project2 = Project(
             member=member1,
-            workflow=workflow1,
             title='My second project',
             description='A decription for my project',
             room_id=1002
@@ -41,7 +37,6 @@ class TestProject(LocalApplicationTestCase):
 
         project3 = Project(
             member=member1,
-            workflow=workflow1,
             title='My third project',
             description='A decription for my project',
             removed_at='2020-2-20',
