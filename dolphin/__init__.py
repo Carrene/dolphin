@@ -7,7 +7,7 @@ from .controllers.root import Root
 from . import basedata
 
 
-__version__ = '0.11.4nightly'
+__version__ = '0.11.5nightly'
 
 
 class Dolphin(Application):
@@ -17,6 +17,10 @@ class Dolphin(Application):
         url: postgresql://postgres:postgres@localhost/dolphin_dev
         test_url: postgresql://postgres:postgres@localhost/dolphin_test
         administrative_url: postgresql://postgres:postgres@localhost/postgres
+
+      migration:
+        directory: %(root_path)s/migration
+        ini: %(root_path)s/alembic.ini
 
       logging:
         loggers:
