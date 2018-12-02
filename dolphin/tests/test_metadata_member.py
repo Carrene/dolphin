@@ -20,13 +20,13 @@ class TestMember(LocalApplicationTestCase):
             assert fields['title']['label'] is not None
             assert fields['title']['watermark'] is not None
             assert fields['title']['name'] is not None
-            assert fields['title']['not_none'] is not None
+            assert fields['title']['notNone'] is not None
             assert fields['title']['required'] is not None
 
             assert fields['email']['label'] is not None
             assert fields['email']['watermark'] is not None
             assert fields['email']['name'] is not None
-            assert fields['email']['not_none'] is not None
+            assert fields['email']['notNone'] is not None
             assert fields['email']['required'] is not None
             assert fields['email']['pattern'] is not None
             assert fields['email']['example'] is not None
