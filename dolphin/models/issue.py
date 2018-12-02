@@ -6,9 +6,8 @@ from restfulpy.orm import Field, DeclarativeBase, relationship, \
 from restfulpy.orm.metadata import MetadataField
 from sqlalchemy.orm import column_property
 from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
-    DateTime, String, Column, Table, func, case
+    DateTime, String, Column, Table, case
 from sqlalchemy.ext.hybrid import hybrid_property
-
 
 from .subscribable import Subscribable, Subscription
 
