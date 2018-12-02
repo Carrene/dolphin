@@ -6,7 +6,9 @@ from restfulpy.orm import Field, DeclarativeBase, relationship, \
 from restfulpy.orm.metadata import MetadataField
 from sqlalchemy.orm import column_property
 from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
-    DateTime, String, Column, Table
+    DateTime, String, Column, Table, func, case
+from sqlalchemy.ext.hybrid import hybrid_property
+
 
 from .subscribable import Subscribable, Subscription
 
@@ -48,6 +50,32 @@ issue_priorities = [
     'normal',
     'high',
 ]
+
+
+DELAYED = 'delayed'
+ONHOLD = 'on-hold'
+
+
+class Tag(DeclarativeBase):
+    __tablename__ = 'tag'
+
+    id = Field(Integer, primary_key=True)
+    title = Field(
+        String,
+        max_length=50,
+        min_length=1,
+        label='Title',
+        watermark='Enter the title',
+        nullable=False,
+        not_none=False,
+        required=True,
+        python_type=str
+    )
+    issues = relationship(
+        'Issue',
+        secondary=association_table,
+        back_populates='tags'
+    )
 
 
 class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
@@ -176,12 +204,20 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         .correlate_except(Subscription)
     )
 
-    @property
+    @hybrid_property
     def boardings(self):
         if self.due_date < datetime.now():
-            return self._boarding[1]
+            return DELAYED
 
-        return self._boarding[0]
+        return ONHOLD
+
+    @boardings.expression
+    def boardings(cls):
+        return case([
+            (cls.due_date < datetime.now(), DELAYED),
+            (cls.due_date > datetime.now(), ONHOLD)
+        ])
+
 
     @classmethod
     def iter_metadata_fields(cls):

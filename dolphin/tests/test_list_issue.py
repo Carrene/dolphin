@@ -42,7 +42,7 @@ class TestIssue(LocalApplicationTestCase):
             project=project,
             title='Second issue',
             description='This is description of second issue',
-            due_date='2020-2-20',
+            due_date='2016-2-20',
             kind='feature',
             days=2,
             room_id=3
@@ -99,6 +99,12 @@ class TestIssue(LocalApplicationTestCase):
                 query=dict(title='!Second issue')
             )
             assert len(response.json) == 2
+
+            when(
+                'Filter based on hybrid property',
+                query=dict(boardings='delayed')
+            )
+            assert len(response.json) == 1
 
         with oauth_mockup_server(), self.given(
              'Issues pagination',
