@@ -11,7 +11,7 @@ with open(join(dirname(__file__), 'dolphin', '__init__.py')) as v_file:
 
 
 dependencies = [
-    'restfulpy >= 2.3.1',
+    'restfulpy >= 2.6.2',
 #    'cas-common',
 
     # Deployment

@@ -22,7 +22,7 @@ class TestProject(LocalApplicationTestCase):
             assert fields['title']['pattern'] is not None
             assert fields['title']['example'] is not None
             assert fields['title']['name'] is not None
-            assert fields['title']['not_none'] is not None
+            assert fields['title']['notNone'] is not None
             assert fields['title']['required'] is not None
 
             assert fields['description']['maxLength'] is not None
@@ -30,13 +30,13 @@ class TestProject(LocalApplicationTestCase):
             assert fields['description']['label'] is not None
             assert fields['description']['watermark'] is not None
             assert fields['description']['name'] is not None
-            assert fields['description']['not_none'] is not None
+            assert fields['description']['notNone'] is not None
             assert fields['description']['required'] is not None
 
             assert fields['status']['label'] is not None
             assert fields['status']['watermark'] is not None
             assert fields['status']['name'] is not None
-            assert fields['status']['not_none'] is not None
+            assert fields['status']['notNone'] is not None
             assert fields['status']['required'] is not None
             assert fields['status']['default'] is not None
 
@@ -55,6 +55,6 @@ class TestProject(LocalApplicationTestCase):
             assert fields['releaseId']['type'] is not None
             assert fields['releaseId']['required'] is not None
             assert fields['releaseId']['watermark'] is not None
-            assert fields['releaseId']['not_none'] is not None
+            assert fields['releaseId']['notNone'] is not None
             assert fields['releaseId']['watermark'] is not None
 

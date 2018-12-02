@@ -22,7 +22,7 @@ class TestRelease(LocalApplicationTestCase):
             assert fields['title']['pattern'] is not None
             assert fields['title']['example'] is not None
             assert fields['title']['name'] is not None
-            assert fields['title']['not_none'] is not None
+            assert fields['title']['notNone'] is not None
             assert fields['title']['required'] is not None
 
             assert fields['description']['maxLength'] is not None
@@ -30,7 +30,7 @@ class TestRelease(LocalApplicationTestCase):
             assert fields['description']['label'] is not None
             assert fields['description']['watermark'] is not None
             assert fields['description']['name'] is not None
-            assert fields['description']['not_none'] is not None
+            assert fields['description']['notNone'] is not None
             assert fields['description']['required'] is not None
 
             assert fields['status']['label'] is not None
@@ -41,7 +41,7 @@ class TestRelease(LocalApplicationTestCase):
             assert fields['cutoff']['label'] is not None
             assert fields['cutoff']['watermark'] is not None
             assert fields['cutoff']['name'] is not None
-            assert fields['cutoff']['not_none'] is not None
+            assert fields['cutoff']['notNone'] is not None
             assert fields['cutoff']['required'] is not None
             assert fields['cutoff']['pattern'] is not None
             assert fields['cutoff']['example'] is not None
