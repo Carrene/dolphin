@@ -11,3 +11,4 @@ from .item import Item, item_statuses
 from .group import Group
 from .workflow import Workflow
 from .organization import OrganizationMember, Organization
+from .messaging import OrganizationInvitationEmail
