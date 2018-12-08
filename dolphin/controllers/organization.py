@@ -10,7 +10,7 @@ from ..models import Member, Organization, OrganizationMember, \
     OrganizationInvitationEmail
 from ..tokens import OrganizationInvitationToken
 from ..validators import organization_create_validator, \
-    organization_invite_validator
+    organization_invite_validator, organization_join_validator
 
 
 class OrganizationController(ModelRestController):
@@ -101,5 +101,37 @@ class OrganizationController(ModelRestController):
                 }
             )
         )
+        return organization
+
+    @authorize
+    @store_manager(DBSession)
+    @json(prevent_empty_form=True)
+    @organization_join_validator
+    @commit
+    def join(self):
+        token = OrganizationInvitationToken.load(context.form.get('token'))
+        organization = DBSession.query(Organization).get(token.organization_id)
+        if organization is None:
+            raise HTTPNotFound()
+
+        is_member_in_organization = DBSession.query(
+            exists() \
+            .where(
+                OrganizationMember.organization_id == token.organization_id
+            ) \
+            .where(
+                OrganizationMember.member_reference_id == \
+                    token.member_reference_id
+            )
+        ).scalar()
+        if is_member_in_organization:
+            raise HTTPAlreadyInThisOrganization()
+
+        organization_member = OrganizationMember(
+            member_reference_id=token.member_reference_id,
+            organization_id=organization.id,
+            role=token.role,
+        )
+        DBSession.add(organization_member)
         return organization
 

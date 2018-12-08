@@ -370,3 +370,10 @@ organization_invite_validator = validate(
     ),
 )
 
+
+organization_join_validator = validate(
+    token=dict(
+        required='757 Token Not In Form',
+    ),
+)
+
