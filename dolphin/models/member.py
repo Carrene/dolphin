@@ -53,7 +53,6 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     )
     email = Field(
         Unicode(100),
-        label='Email',
         unique=True,
         not_none=False,
         required=True,
