@@ -54,14 +54,17 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     email = Field(
         Unicode(100),
         label='Email',
-        watermark='Enter you email',
         unique=True,
         not_none=False,
         required=True,
         index=True,
+        python_type=str,
         pattern=r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)',
-        example='member@example.com',
-        message='Lorem Ipsum'
+        pattern_description='Invalid email format, example: user@example.com',
+        watermark='user@example.com',
+        example='user@example.com',
+        label='Email Address',
+        message='Enter your email address',
     )
     access_token = Field(Unicode(512), protected=True)
     phone = Field(
