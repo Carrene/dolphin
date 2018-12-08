@@ -95,6 +95,13 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     projects = relationship('Project', back_populates='member', protected=True)
 
+    organizations = relationship(
+        'Organization',
+        back_populates='members',
+        secondary='organization_member',
+        protected=True,
+    )
+
     @property
     def roles(self):
         return []
