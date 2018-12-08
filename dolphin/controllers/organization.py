@@ -1,16 +1,11 @@
-from nanohttp import context, json, HTTPNotFound, HTTPForbidden, settings
+from nanohttp import context, json
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import commit, DBSession
-from sqlalchemy import exists, and_
-from sqlalchemy_media import store_manager
 
 from ..exceptions import HTTPRepetitiveTitle
-from ..models import Member, Organization, OrganizationMember, OrganizationInvitationEmail
-from ..tokens import OrganizationInvitationToken
-from ..validators import token_validator, organization_create_validator, \
-    organization_title_validator, organization_domain_validator, \
-    organization_url_validator, email_validator, organization_role_validator
+from ..models import Member, Organization, OrganizationMember
+from ..validators import organization_create_validator
 
 
 class OrganizationController(ModelRestController):

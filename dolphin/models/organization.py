@@ -63,16 +63,17 @@ class Logo(Image):
 
 class Organization(OrderingMixin, FilteringMixin, PaginationMixin, \
                    ModifiedMixin, TimestampMixin, DeclarativeBase):
+
     __tablename__ = 'organization'
 
     id = Field(Integer, primary_key=True)
 
     title = Field(
-        Unicode(40),
+        Unicode(50),
         unique=True,
         index=True,
         min_length=1,
-        max_length=40,
+        max_length=50,
         pattern=r'^([0-9a-zA-Z]+-?[0-9a-zA-Z]*)*[\da-zA-Z]$',
         pattern_description='Lorem ipsum dolor sit amet',
         python_type=str,
@@ -165,16 +166,16 @@ class Organization(OrderingMixin, FilteringMixin, PaginationMixin, \
                 self._logo = Logo.create_from(value)
 
             except DimensionValidationError as e:
-                raise HTTPStatus(f'618 {e}')
+                raise HTTPStatus(f'625 {e}')
 
             except AspectRatioValidationError as e:
-                raise HTTPStatus(f'619 {e}')
+                raise HTTPStatus(f'622 {e}')
 
             except ContentTypeValidationError as e:
-                raise HTTPStatus(f'620 {e}')
+                raise HTTPStatus(f'623 {e}')
 
             except MaximumLengthIsReachedError as e:
-                raise HTTPStatus(f'621 {e}')
+                raise HTTPStatus(f'624 {e}')
 
         else:
             self._logo = None

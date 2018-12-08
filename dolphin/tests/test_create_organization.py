@@ -1,19 +1,20 @@
 from bddrest.authoring import when, status, response, given
 
 from dolphin.models import Member, Organization, OrganizationMember
-from dolphin.tests.helpers import LocalApplicationTestCase
+from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
-class TestApplication(LocalApplicationTestCase):
+class TestOrganization(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
         session = cls.create_session()
         member = Member(
-            email='already.added@example.com',
-            title='username',
-            password='123abcABC',
-            role='member'
+            title='First Member',
+            email='member1@example.com',
+            access_token='access token 1',
+            phone=123456789,
+            reference_id=2
         )
         session.add(member)
 
@@ -31,11 +32,11 @@ class TestApplication(LocalApplicationTestCase):
         session.add(organization_member)
         session.commit()
 
-    def test_create_organization(self):
+    def test_create(self):
         title = 'My-organization'
-        self.login(email='already.added@example.com', password='123abcABC')
+        self.login(email='member1@example.com')
 
-        with self.given(
+        with oauth_mockup_server(),  self.given(
             'The organization has successfully created',
             '/apiv1/organizations',
             'CREATE',
@@ -53,19 +54,19 @@ class TestApplication(LocalApplicationTestCase):
                 'The organization title is exist',
                 form=dict(title='organization-title')
             )
-            assert status == '622 Organization Title Is Already Taken'
+            assert status == '600 Repetitive Title'
 
             when('The title format is invalid', form=dict(title='my organ'))
-            assert status == 705
+            assert status == '747 Invalid Title Format'
 
             when(
                 'The length of title is too long',
-                form=dict(title=(40 + 1) * 'a')
+                form=dict(title=(50 + 1) * 'a')
             )
-            assert status == 720
+            assert status == '704 At Most 50 Characters Are Valid For Title'
 
             when('The title not in form', form=given - 'title' + dict(a='a'))
-            assert status == 718
+            assert status == '710 Title Not In Form'
 
             when('Trying to pass with empty form', form={})
             assert status == '400 Empty Form'

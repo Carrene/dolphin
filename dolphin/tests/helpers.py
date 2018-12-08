@@ -9,7 +9,7 @@ from restfulpy.orm.metadata import FieldInfo
 
 from dolphin import Dolphin
 from dolphin.authentication import Authenticator
-from dolphin.models import Member, Project, Release, Issue, Item
+from dolphin.models import Member, Project, Release, Issue, Item, Organization
 
 
 HERE = path.abspath(path.dirname(__file__))
@@ -25,6 +25,9 @@ workflow_id = FieldInfo(type_=int, not_none=True, required=True).to_json()
 resource_id = FieldInfo(type_=int, not_none=True, required=True).to_json()
 phase_id = FieldInfo(type_=int, not_none=True, required=True).to_json()
 project_id = FieldInfo(type_=int, not_none=True, required=True).to_json()
+email=FieldInfo(type_=str, required=True, not_none=True).to_json()
+title=FieldInfo(type_=str, required=True, not_none=True).to_json()
+role=FieldInfo(type_=str, required=True, not_none=True).to_json()
 
 release_fields = Release.json_metadata()['fields']
 project_fields = Project.json_metadata()['fields']
@@ -38,6 +41,12 @@ issue_fields.update({
 })
 project_fields.update({'memberId': member_id, 'workflowId': workflow_id})
 release_fields.update({'memberId': member_id})
+organization_fields = Organization.json_metadata()['fields']
+organization_fields.update(dict(
+    email=email,
+    role=role,
+    title=title,
+))
 
 
 class LocalApplicationTestCase(ApplicableTestCase):
@@ -50,6 +59,7 @@ class LocalApplicationTestCase(ApplicableTestCase):
         r'^/apiv1/issues.*': issue_fields,
         r'^/apiv1/items.*': Item.json_metadata()['fields'],
         r'^/apiv1/members.*': Member.json_metadata()['fields'],
+        r'^/apiv1/organizations.*': organization_fields,
     }
 
     def login(self, email):
