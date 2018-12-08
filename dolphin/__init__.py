@@ -43,6 +43,12 @@ class Dolphin(Application):
       chat:
         url: http://localhost:8081
 
+      organization_invitation:
+        secret: !!binary dKcWy4fQTpgjjAhS6SbapQUvtxPhiO23GguaV9U1y7k=
+        max_age: 2592000  # seconds
+        algorithm: HS256
+        callback_url: http://localhost:8082
+
    '''
 
     def __init__(self, application_name='dolphin', root=Root()):

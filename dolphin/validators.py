@@ -3,7 +3,8 @@ import re
 from nanohttp import validate, HTTPStatus, context
 from restfulpy.orm import DBSession
 
-from dolphin.models import *
+from .models import *
+from .models.organization import roles
 
 
 TITLE_PATTERN = re.compile(r'^(?!\s).*[^\s]$')
@@ -13,6 +14,9 @@ DATETIME_PATTERN = re.compile(
 )
 ORGANIZATION_TITLE_PATTERN = re.compile(
     r'^([0-9a-zA-Z]+-?[0-9a-zA-Z]*)*[\da-zA-Z]$'
+)
+USER_EMAIL_PATTERN = re.compile(
+    r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'
 )
 
 
@@ -188,6 +192,13 @@ def resource_exists_validator(resourceId, project, field):
     return resourceId
 
 
+def organization_value_of_role_validator(role, container, field):
+    if context.form.get('role') not in roles:
+        raise HTTPStatus('756 Invalid Role Value')
+
+    return role
+
+
 release_validator = validate(
     title=dict(
         required='710 Title Not In Form',
@@ -346,3 +357,16 @@ organization_create_validator = validate(
         pattern=(ORGANIZATION_TITLE_PATTERN, '747 Invalid Title Format'),
     ),
 )
+
+
+organization_invite_validator = validate(
+    email=dict(
+        required='753 Email Not In Form',
+        pattern=(USER_EMAIL_PATTERN, '754 Invalid Email Format')
+    ),
+    role=dict(
+        required='755 Role Not In Form',
+        callback=organization_value_of_role_validator,
+    ),
+)
+

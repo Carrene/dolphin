@@ -23,7 +23,11 @@ roles = [
 class OrganizationMember(DeclarativeBase):
     __tablename__ = 'organization_member'
 
-    member_id = Field(Integer, ForeignKey('member.id'), primary_key=True)
+    member_reference_id = Field(
+        Integer,
+        ForeignKey('member.reference_id'),
+        primary_key=True
+    )
     organization_id = Field(
         Integer,
         ForeignKey('organization.id'),
@@ -136,7 +140,7 @@ class Organization(OrderingMixin, FilteringMixin, PaginationMixin, \
     )
 
     members_count = column_property(
-        select([func.count(OrganizationMember.member_id)])
+        select([func.count(OrganizationMember.member_reference_id)])
         .select_from(OrganizationMember)
         .where(OrganizationMember.organization_id == id)
         .correlate_except(OrganizationMember)
@@ -146,7 +150,7 @@ class Organization(OrderingMixin, FilteringMixin, PaginationMixin, \
         select([OrganizationMember.role])
         .select_from(OrganizationMember)
         .where(and_(
-            OrganizationMember.member_id == bindparam(
+            OrganizationMember.member_reference_id == bindparam(
                 'member_id',
                 callable_=lambda: context.identity.reference_id,
             ),

@@ -1,11 +1,16 @@
-from nanohttp import context, json
+from nanohttp import context, json, HTTPForbidden, HTTPNotFound, settings
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import commit, DBSession
+from sqlalchemy import exists, and_
+from sqlalchemy_media import store_manager
 
-from ..exceptions import HTTPRepetitiveTitle
-from ..models import Member, Organization, OrganizationMember
-from ..validators import organization_create_validator
+from ..exceptions import HTTPRepetitiveTitle, HTTPAlreadyInThisOrganization
+from ..models import Member, Organization, OrganizationMember, \
+    OrganizationInvitationEmail
+from ..tokens import OrganizationInvitationToken
+from ..validators import organization_create_validator, \
+    organization_invite_validator
 
 
 class OrganizationController(ModelRestController):
@@ -32,9 +37,69 @@ class OrganizationController(ModelRestController):
 
         organization_member = OrganizationMember(
             organization_id=organization.id,
-            member_id=member.id,
+            member_reference_id=member.reference_id,
             role='owner',
         )
         DBSession.add(organization_member)
+        return organization
+
+    @authorize
+    @store_manager(DBSession)
+    @json(prevent_empty_form=True)
+    @organization_invite_validator
+    @Organization.expose
+    @commit
+    def invite(self, id):
+        try:
+            id = int(id)
+        except (ValueError, TypeError):
+            raise HTTPNotFound()
+
+        organization = DBSession.query(Organization).get(id)
+        if organization is None:
+            raise HTTPNotFound()
+
+        email = context.form.get('email')
+        member = DBSession.query(Member) \
+            .filter(Member.email == email) \
+            .one_or_none()
+        if member is None:
+            raise HTTPNotFound()
+
+        organization_member = DBSession.query(OrganizationMember) \
+            .filter(
+                OrganizationMember.organization_id == id,
+                OrganizationMember.member_reference_id == \
+                    context.identity.reference_id
+            ) \
+            .one_or_none()
+        if organization_member is None or organization_member.role != 'owner':
+            raise HTTPForbidden()
+
+        is_member_in_organization = DBSession.query(exists().where(and_(
+            OrganizationMember.organization_id == id,
+            OrganizationMember.member_reference_id == member.reference_id
+        ))).scalar()
+        if is_member_in_organization:
+            raise HTTPAlreadyInThisOrganization()
+
+        token = OrganizationInvitationToken(dict(
+            email=email,
+            organizationId=id,
+            memberReferenceId=member.reference_id,
+            ownerReferenceId=context.identity.reference_id,
+            role=context.form.get('role'),
+        ))
+        DBSession.add(
+            OrganizationInvitationEmail(
+                to=email,
+                subject='Invite to organization',
+                body={
+                    'token': token.dump(),
+                    'callback_url':
+                        settings.organization_invitation.callback_url
+                }
+            )
+        )
         return organization
 

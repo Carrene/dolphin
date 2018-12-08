@@ -48,3 +48,15 @@ class InvalidSecret(HTTPKnownStatus):
 class HTTPRepetitiveTitle(HTTPKnownStatus):
     status = '600 Repetitive Title'
 
+
+class HTTPTokenExpired(HTTPKnownStatus):
+    status = '627 Token Expired'
+
+
+class HTTPMalformedToken(HTTPKnownStatus):
+    status = '626 Malformed Token'
+
+
+class HTTPAlreadyInThisOrganization(HTTPKnownStatus):
+    status = '628 Already In This Organization'
+
