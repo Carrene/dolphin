@@ -3,7 +3,7 @@ import re
 from nanohttp import validate, HTTPStatus, context
 from restfulpy.orm import DBSession
 
-from dolphin.models import *
+from ..models import *
 from .models.organization import roles
 
 
