@@ -44,3 +44,6 @@ class InvalidApplicationID(HTTPKnownStatus):
 class InvalidSecret(HTTPKnownStatus):
     status = '621 Invalid Secret'
 
+class HTTPRepetitiveTitle(HTTPKnownStatus):
+    status = '600 Repetitive Title'
+
