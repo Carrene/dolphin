@@ -126,7 +126,7 @@ class Organization(OrderingMixin, FilteringMixin, PaginationMixin, \
         nullable=True,
         not_none=False,
         required=False,
-        label='Icon',
+        label='Logo',
         protected=False,
         json='logo',
     )
@@ -146,18 +146,18 @@ class Organization(OrderingMixin, FilteringMixin, PaginationMixin, \
         .correlate_except(OrganizationMember)
     )
 
-    role = column_property(
-        select([OrganizationMember.role])
-        .select_from(OrganizationMember)
-        .where(and_(
-            OrganizationMember.member_reference_id == bindparam(
-                'member_id',
-                callable_=lambda: context.identity.reference_id,
-            ),
-            OrganizationMember.organization_id == id
-        ))
-        .correlate_except(OrganizationMember)
-    )
+#    role = column_property(
+#        select([OrganizationMember.role])
+#        .select_from(OrganizationMember)
+#        .where(and_(
+#            OrganizationMember.member_reference_id == bindparam(
+#                'member_reference_id',
+#                callable_=lambda: context.identity.reference_id,
+#            ),
+#            OrganizationMember.organization_id == id
+#        ))
+#        .correlate_except(OrganizationMember)
+#    )
 
     @property
     def logo(self):

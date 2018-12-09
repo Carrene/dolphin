@@ -135,3 +135,23 @@ class OrganizationController(ModelRestController):
         DBSession.add(organization_member)
         return organization
 
+    @store_manager(DBSession)
+    @json
+    @Organization.expose
+    @commit
+    def list(self):
+        if 'email' in context.form.keys():
+            return DBSession.query(Organization) \
+                .join(
+                    OrganizationMember,
+                    OrganizationMember.organization_id == Organization.id
+                ) \
+                .join(
+                    Member,
+                    Member.reference_id == OrganizationMember.member_reference_id
+                ) \
+                .filter(Member.email == context.form.get('email'))
+
+        else:
+            return DBSession.query(Organization)
+
