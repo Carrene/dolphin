@@ -13,6 +13,8 @@ from sqlalchemy_media.exceptions import DimensionValidationError, \
     AspectRatioValidationError, MaximumLengthIsReachedError, \
     ContentTypeValidationError
 
+from .member import Member
+
 
 roles = [
     'owner',
@@ -126,7 +128,7 @@ class Organization(OrderingMixin, FilteringMixin, PaginationMixin, \
         nullable=True,
         not_none=False,
         required=False,
-        label='Icon',
+        label='Logo',
         protected=False,
         json='logo',
     )
@@ -148,11 +150,15 @@ class Organization(OrderingMixin, FilteringMixin, PaginationMixin, \
 
     role = column_property(
         select([OrganizationMember.role])
-        .select_from(OrganizationMember)
+        .select_from(OrganizationMember.__table__.join(
+            Member,
+            Member.reference_id == OrganizationMember.member_reference_id
+        ))
         .where(and_(
-            OrganizationMember.member_reference_id == bindparam(
-                'member_id',
-                callable_=lambda: context.identity.reference_id,
+            Member.email == bindparam(
+                'member_email',
+                callable_=lambda: context.identity.email \
+                    if context.identity else None,
             ),
             OrganizationMember.organization_id == id
         ))
