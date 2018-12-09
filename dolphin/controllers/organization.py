@@ -148,7 +148,8 @@ class OrganizationController(ModelRestController):
                 ) \
                 .join(
                     Member,
-                    Member.reference_id == OrganizationMember.member_reference_id
+                    Member.reference_id \
+                        == OrganizationMember.member_reference_id
                 ) \
                 .filter(Member.email == context.form.get('email'))
 

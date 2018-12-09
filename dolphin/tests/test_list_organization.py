@@ -1,7 +1,7 @@
 from bddrest.authoring import when, status, response
 
 from dolphin.models import Member, Organization, OrganizationMember
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestOrganization(LocalApplicationTestCase):
@@ -63,8 +63,7 @@ class TestOrganization(LocalApplicationTestCase):
         session.commit()
 
     def test_list(self):
-
-        with oauth_mockup_server(), self.given(
+        with self.given(
             'List of organization',
             '/apiv1/organizations',
             'LIST',
