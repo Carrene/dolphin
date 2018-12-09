@@ -16,6 +16,9 @@ from ..validators import organization_create_validator, \
 class OrganizationController(ModelRestController):
     __model__ = Organization
 
+    def __init__(self, member=None):
+        self.member = member
+
     @authorize
     @json(prevent_empty_form=True)
     @organization_create_validator
@@ -140,6 +143,15 @@ class OrganizationController(ModelRestController):
     @Organization.expose
     @commit
     def list(self):
+
+        if self.member is not None:
+            return DBSession.query(Organization).join(
+                OrganizationMember,
+                OrganizationMember.organization_id == Organization.id
+            ).filter(
+                OrganizationMember.member_reference_id == self.member.reference_id
+            )
+
         if 'email' in context.form.keys():
             return DBSession.query(Organization) \
                 .join(

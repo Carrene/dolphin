@@ -1,13 +1,38 @@
-from nanohttp import json, HTTPNotFound
+from nanohttp import json, HTTPNotFound, context, HTTPUnauthorized
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession
 
 from ..models import Member
+from .organization import OrganizationController
 
 
 class MemberController(ModelRestController):
     __model__ = Member
+
+    def __call__(self, *remaining_paths):
+
+        if len(remaining_paths) > 1 and remaining_paths[1] == 'organizations':
+            if not context.identity:
+                raise HTTPUnauthorized()
+
+            try:
+                id = int(remaining_paths[0])
+
+            except (ValueError, TypeError):
+                raise HTTPNotFound()
+
+            member = DBSession.query(Member) \
+                .filter(Member.id == id) \
+                .one_or_none()
+
+            if member is None \
+                    or member.reference_id != context.identity.reference_id:
+                raise HTTPNotFound()
+
+            return OrganizationController(member=member)(*remaining_paths[2:])
+
+        return super().__call__(*remaining_paths)
 
     @authorize
     @json
