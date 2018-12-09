@@ -13,11 +13,42 @@ from ..validators import organization_create_validator, \
     organization_invite_validator, organization_join_validator
 
 
+OrganizationMemberView = AbstractOrganizationMemberView.create_mapped_class()
+
+
 class OrganizationController(ModelRestController):
     __model__ = Organization
 
     def __init__(self, member=None):
         self.member = member
+
+    def __call__(self, *remaining_paths):
+        if len(remaining_paths) > 1 \
+                and remaining_paths[1] == 'organizationmembers':
+
+            if not context.identity:
+                raise HTTPUnauthorized()
+
+            try:
+                id = int(remaining_paths[0])
+
+            except (ValueError, TypeError):
+                raise HTTPNotFound()
+
+            organization = DBSession.query(Organization) \
+               .filter(Organization.id == id) \
+               .join(
+                   OrganizationMember,
+                   OrganizationMember.member_id == context.identity.reference_id
+               ) \
+               .one_or_none()
+            if organization is None:
+                raise HTTPNotFound()
+
+            return OrganizationMemberController(organization=organization) \
+                (*remaining_paths[2:])
+
+        return super().__call__(*remaining_paths)
 
     @authorize
     @json(prevent_empty_form=True)
@@ -191,4 +222,22 @@ class OrganizationController(ModelRestController):
             raise HTTPNotFound()
 
         return organization
+
+
+class OrganizationMemberController(ModelRestController):
+    __model__ = OrganizationMemberView
+
+    def __init__(self, organization=None):
+        self.organization = organization
+
+    @authorize
+    @store_manager(DBSession)
+    @json(prevent_form=True)
+    @OrganizationMemberView.expose
+    @commit
+    def list(self):
+        query = DBSession.query(OrganizationMemberView).filter(
+            OrganizationMemberView.organization_id == self.organization.id
+        )
+        return query
 
