@@ -80,6 +80,5 @@ class TestMember(LocalApplicationTestCase):
             )
             assert response.json[0]['title'] == 'member1'
 
-            when('Request is not authorized', authorization=None)
-            assert status == 401
+
 
