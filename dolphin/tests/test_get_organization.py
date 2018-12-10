@@ -61,6 +61,9 @@ class TestOrganization(LocalApplicationTestCase):
             when('Type of id is invalid', url_parameters=dict(id='not-integer'))
             assert status == 404
 
+            when('The request with form parameter', form=dict(param='param'))
+            assert status == '709 Form Not Allowed'
+
             when('Trying with an unauthorized member', authorization=None)
             assert status == 401
 
