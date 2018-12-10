@@ -1,4 +1,5 @@
-from nanohttp import context, json, HTTPForbidden, HTTPNotFound, settings
+from nanohttp import context, json, HTTPForbidden, HTTPNotFound, settings, \
+    HTTPUnauthorized
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import commit, DBSession
@@ -7,7 +8,7 @@ from sqlalchemy_media import store_manager
 
 from ..exceptions import HTTPRepetitiveTitle, HTTPAlreadyInThisOrganization
 from ..models import Member, Organization, OrganizationMember, \
-    OrganizationInvitationEmail
+    OrganizationInvitationEmail, AbstractOrganizationMemberView
 from ..tokens import OrganizationInvitationToken
 from ..validators import organization_create_validator, \
     organization_invite_validator, organization_join_validator
@@ -39,7 +40,8 @@ class OrganizationController(ModelRestController):
                .filter(Organization.id == id) \
                .join(
                    OrganizationMember,
-                   OrganizationMember.member_id == context.identity.reference_id
+                   OrganizationMember.member_reference_id \
+                       == context.identity.reference_id
                ) \
                .one_or_none()
             if organization is None:

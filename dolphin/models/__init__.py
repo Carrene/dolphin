@@ -12,3 +12,5 @@ from .group import Group
 from .workflow import Workflow
 from .organization import OrganizationMember, Organization
 from .messaging import OrganizationInvitationEmail
+from .organization_member import AbstractOrganizationMemberView
+

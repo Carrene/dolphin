@@ -1,50 +1,57 @@
 from bddrest.authoring import when, status, response
- from panda.models import Member, Organization, OrganizationMember
-from panda.tests.helpers import LocalApplicationTestCase
+
+from dolphin.models import Member, Organization, OrganizationMember
+from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
- class TestOrganizationMembers(LocalApplicationTestCase):
+class TestOrganizationMembers(LocalApplicationTestCase):
 
-     @classmethod
+    @classmethod
     def mockup(cls):
         session = cls.create_session()
-        owner1 = Member(
+        cls.owner = Member(
+            title='Owner',
             email='owner1@example.com',
-            title='owner1',
-            password='123456',
-            role='member'
+            access_token='access token 1',
+            phone=222222222,
+            reference_id=2
         )
-        session.add(owner1)
-         member1 = Member(
+        session.add(cls.owner)
+
+        cls.member= Member(
+            title='Member',
             email='member1@example.com',
-            title='member1',
-            password='123456',
-            role='member'
+            access_token='access token 2',
+            phone=333333333,
+            reference_id=3
         )
-        session.add(member1)
-         cls.organization1 = Organization(
+        session.add(cls.member)
+
+        cls.organization1 = Organization(
             title='organization-title-1',
         )
         session.add(cls.organization1)
         session.flush()
-         organization_member1 = OrganizationMember(
-            member_id=owner1.id,
+
+        organization_member1 = OrganizationMember(
+            member_reference_id=cls.owner.reference_id,
             organization_id=cls.organization1.id,
             role='owner',
         )
         session.add(organization_member1)
-         organization_member2 = OrganizationMember(
-            member_id=member1.id,
+
+        organization_member2 = OrganizationMember(
+            member_reference_id=cls.member.reference_id,
             organization_id=cls.organization1.id,
             role='member',
         )
         session.add(organization_member2)
         session.commit()
 
-     def test_list(self):
-        self.login(email='owner1@example.com', password='123456')
+    def test_list(self):
+        self.login(email=self.owner.email)
 
-         with self.given(
+        with oauth_mockup_server(), self.given(
             f'List of organization',
             f'/apiv1/organizations/id: {self.organization1.id}/'
                 'organizationmembers',
@@ -56,7 +63,7 @@ from panda.tests.helpers import LocalApplicationTestCase
             when('Trying to pass with wrong id', url_parameters=dict(id=0))
             assert status == 404
 
-            when('Type of id is invalid', url_parameters=dict(id='id'))
+            when('Type of id is invalid', url_parameters=dict(id='not-integer'))
             assert status == 404
 
             when('The request with form parameter', form=dict(param='param'))

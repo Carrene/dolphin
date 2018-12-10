@@ -9,7 +9,7 @@ from .oauth2 import OAUTHController
 from .projects import ProjectController
 from .releases import ReleaseController
 from .tokens import TokenController
-from .organization import OrganizationController, OrganizationMemberControllers
+from .organization import OrganizationController, OrganizationMemberController
 
 
 class Apiv1(Controller):
@@ -22,7 +22,7 @@ class Apiv1(Controller):
     tokens = TokenController()
     oauth2 = OAUTHController()
     organizations = OrganizationController()
-    organizationmembers = OrganizationMemberControllers()
+    organizationmembers = OrganizationMemberController()
 
     @json
     def version(self):
