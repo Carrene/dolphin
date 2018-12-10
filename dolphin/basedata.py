@@ -1,6 +1,9 @@
+from nanohttp import context
+from nanohttp.contexts import Context
 from restfulpy.orm import DBSession
+from sqlalchemy_media import StoreManager
 
-from .models import Release
+from .models import Release, Member, Organization, OrganizationMember
 
 
 def indented(n): # pragma: no cover
@@ -15,6 +18,17 @@ def indented(n): # pragma: no cover
 
 @indented(2)
 def print_subscribables(s): # pragma: no cover
+    yield f'title: {s.title}'
+
+
+@indented(2)
+def print_member(s): # pragma: no cover
+    yield f'title: {s.title}'
+    yield f'email: {s.email}'
+
+
+@indented(2)
+def print_organization(s): # pragma: no cover
     yield f'title: {s.title}'
 
 
@@ -54,12 +68,45 @@ def insert(): # pragma: no cover
         cutoff='2034-2-20',
     )
     DBSession.add(release5)
-    DBSession.commit()
 
-    print('Following releases have been added:')
-    print_subscribables(release1)
-    print_subscribables(release2)
-    print_subscribables(release3)
-    print_subscribables(release4)
-    print_subscribables(release5)
+    with Context(dict()), StoreManager(DBSession):
+        god = Member(
+            title='GOD',
+            email='god@example.com',
+            access_token='access token 1',
+            reference_id=1
+        )
+        DBSession.add(god)
+
+        class Identity:
+            email = god.email
+
+        context.identity = Identity
+
+        organization = Organization(
+            title='carrene',
+        )
+        DBSession.add(organization)
+        DBSession.flush()
+
+        organization_member = OrganizationMember(
+            organization_id=organization.id,
+            member_reference_id=god.reference_id,
+            role='owner',
+        )
+        DBSession.add(organization_member)
+        DBSession.commit()
+
+        print('Following releases have been added:')
+        print_subscribables(release1)
+        print_subscribables(release2)
+        print_subscribables(release3)
+        print_subscribables(release4)
+        print_subscribables(release5)
+
+        print('Following user has been added:')
+        print_member(god)
+
+        print('Following organization has been added:')
+        print_organization(organization)
 
