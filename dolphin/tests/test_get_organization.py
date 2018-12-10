@@ -38,7 +38,6 @@ class TestOrganization(LocalApplicationTestCase):
             member_reference_id=cls.owner.reference_id,
             role='owner',
         )
-
         session.add(cls.organization_member)
         session.commit()
 
@@ -72,3 +71,4 @@ class TestOrganization(LocalApplicationTestCase):
                 authorization=self._authentication_token
             )
             assert status == 404
+
