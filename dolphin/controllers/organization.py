@@ -183,7 +183,7 @@ class OrganizationController(ModelRestController):
            .join(
                OrganizationMember,
                OrganizationMember.member_reference_id \
-                == context.identity.reference_id
+                   == context.identity.reference_id
            ) \
            .one_or_none()
 
