@@ -66,8 +66,8 @@ class TokenController(RestController):
         if member.name != cas_member['name']:
             member.name = cas_member['name']
 
-        if member.access_token != cas_member['access_tokne']:
-            member.access_token = cas_member['access_token']
+        if member.access_token != 'access_tokne':
+            member.access_token = access_token
 
         DBSession.flush()
         principal = context.application.__authenticator__.login(member.email)
