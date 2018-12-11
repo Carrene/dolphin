@@ -14,13 +14,13 @@ class SendEmailLauncher(Launcher):  # pragma: no cover
             '-e',
             '--email',
             required=True,
-            help='Email to be invite'
+            help='Invitation email'
         )
         parser.add_argument(
             '-o',
             '--organization',
             required=True,
-            help='Organization is invited'
+            help='Organization id'
         )
         parser.add_argument(
             '-m',
