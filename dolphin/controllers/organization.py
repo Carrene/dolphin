@@ -133,7 +133,9 @@ class OrganizationController(ModelRestController):
                 body={
                     'token': token.dump(),
                     'callback_url':
-                        settings.organization_invitation.callback_url
+                        settings.organization_invitation.callback_url,
+                    'state': id,
+                    'email': email,
                 }
             )
         )
