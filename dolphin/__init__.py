@@ -2,9 +2,10 @@ from os.path import dirname, join
 
 from restfulpy import Application
 
-from .authentication import Authenticator
-from .controllers.root import Root
 from . import basedata
+from .authentication import Authenticator
+from .cli.email import EmailLauncher
+from .controllers.root import Root
 
 
 __version__ = '0.12.0'
@@ -49,6 +50,10 @@ class Dolphin(Application):
         algorithm: HS256
         callback_url: http://localhost:8082
 
+      messaging:
+        default_messenger: restfulpy.messaging.ConsoleMessenger
+        template_dirs:
+          - %(root_path)s/dolphin/email_templates
    '''
 
     def __init__(self, application_name='dolphin', root=Root()):
@@ -61,6 +66,9 @@ class Dolphin(Application):
 
     def insert_basedata(self, *args):
         basedata.insert()
+
+    def register_cli_launchers(self, subparsers):
+        EmailLauncher.register(subparsers)
 
 
 dolphin = Dolphin()

@@ -1,5 +1,5 @@
 <%
-    url = '%s?t_=%s' % (callback_url, token)
+    url = '%s?t_=%s&state=%s&email=%s' % (callback_url, token, state, email)
 %>
 
 <html>
