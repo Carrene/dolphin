@@ -57,14 +57,17 @@ class TokenController(RestController):
             )
             DBSession.add(member)
 
-        elif member.title != cas_member['title']:
+        if member.title != cas_member['title']:
             member.title = cas_member['title']
 
-        elif member.avatar != cas_member['avatar']:
+        if member.avatar != cas_member['avatar']:
             member.avatar = cas_member['avatar']
 
-        elif member.name != cas_member['name']:
+        if member.name != cas_member['name']:
             member.name = cas_member['name']
+
+        if member.access_token != cas_member['access_tokne']:
+            member.access_token = cas_member['access_token']
 
         DBSession.flush()
         principal = context.application.__authenticator__.login(member.email)
