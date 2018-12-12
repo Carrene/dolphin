@@ -23,16 +23,10 @@ class SendEmailLauncher(Launcher):  # pragma: no cover
             help='Organization id'
         )
         parser.add_argument(
-            '-m',
-            '--member',
+            '-i',
+            '--inviter',
             required=True,
-            help='Member id'
-        )
-        parser.add_argument(
-            '-w',
-            '--owner',
-            required=True,
-            help='Owner id'
+            help='By member'
         )
         parser.add_argument(
             '-r',
@@ -47,8 +41,7 @@ class SendEmailLauncher(Launcher):  # pragma: no cover
         token = OrganizationInvitationToken(dict(
             email=self.args.email,
             organizationId=self.args.organization,
-            memberReferenceId=self.args.member,
-            ownerReferenceId=self.args.owner,
+            byMemberReferenceId=self.args.inviter,
             role=self.args.role,
         ))
         email = OrganizationInvitationEmail(
