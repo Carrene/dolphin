@@ -82,6 +82,11 @@ class Invitation(OrderingMixin, FilteringMixin, PaginationMixin, \
         else:
             return 'accepted'
 
+<<<<<<< HEAD
+=======
+        return 'ali'
+
+>>>>>>> Implementing the create method for the invitation controller, closes #264
     @status.expression
     def status(cls):
         return case([
