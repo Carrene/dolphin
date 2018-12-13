@@ -82,8 +82,6 @@ class Invitation(OrderingMixin, FilteringMixin, PaginationMixin, \
         else:
             return 'accepted'
 
-        return 'ali'
-
     @status.expression
     def status(cls):
         return case([
