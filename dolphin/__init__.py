@@ -45,8 +45,8 @@ class Dolphin(Application):
         url: http://localhost:8081
 
       organization_invitation:
-        secret: !!binary dKcWy4fQTpgjjAhS6SbapQUvtxPhiO23GguaV9U1y7k=
-        max_age: 2592000  # seconds
+        secret: !!binary xxSN/uarj5SpcEphAHhmsab8Ql2Og/2IcieNfQ3PysI=
+        max_age: 86400  # seconds
         algorithm: HS256
         callback_url: http://localhost:8082
 
