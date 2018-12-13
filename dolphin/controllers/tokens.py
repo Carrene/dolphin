@@ -2,12 +2,44 @@ from nanohttp import RestController, json, context, HTTPBadRequest, validate, \
     settings
 from restfulpy.authorization import authorize
 from restfulpy.orm import DBSession, commit
+from sqlalchemy import exists, and_
 
 from ..backends import CASClient
-from ..models import Member
+from ..models import Member, Invitation, OrganizationMember
+from ..validators import token_obtain_validator
 
 
 class TokenController(RestController):
+
+    def _ensure_organization(self, member):
+        organization_id = context.form.get('organizationId')
+
+        is_member_in_organization = DBSession.query(exists().where(and_(
+            OrganizationMember.organization_id == organization_id,
+            OrganizationMember.member_reference_id == member.reference_id
+        ))).scalar()
+
+        if is_member_in_organization:
+            return organization_id
+
+        invitation = DBSession.query(Invitation) \
+            .filter(
+                Invitation.email == member.email,
+                Invitation.organization_id == organization_id
+            ) \
+            .one_or_none()
+
+        if invitation is None:
+            raise HTTPBadRequest()
+
+        organization_member = OrganizationMember(
+            organization_id=invitation.organization_id,
+            member_reference_id=member.reference_id,
+            role=invitation.role,
+        )
+        DBSession.add(organization_member)
+        return organization_id
+
 
     @validate(
         email=dict(
@@ -36,6 +68,7 @@ class TokenController(RestController):
         )
 
     @json
+    @token_obtain_validator
     @commit
     def obtain(self):
         cas_client = CASClient()
@@ -71,10 +104,8 @@ class TokenController(RestController):
 
         DBSession.flush()
         principal = context.application.__authenticator__.login(member.email)
-        context.response_headers.add_header(
-            'X-New-JWT-Token',
-            principal.dump().decode('utf-8')
-        )
 
+        organization_id = self._ensure_organization(member)
+        principal.payload['organizationId'] = organization_id
         return dict(token=principal.dump().decode('utf-8'))
 
