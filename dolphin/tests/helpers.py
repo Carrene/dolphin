@@ -112,11 +112,23 @@ def oauth_mockup_server():
             if _oauth_server_status != 'idle':
                 raise HTTPStatus(_oauth_server_status)
 
+            if code.startswith('authorization code 2'):
+                return dict(accessToken='access token 2', memberId=2)
+
             return dict(accessToken='access token', memberId=1)
 
         @json
         def get(self):
             access_token = context.environ['HTTP_AUTHORIZATION']
+
+            if 'access token 2' in access_token:
+                return dict(
+                    id=2,
+                    title='member2',
+                    email='member2@example.com',
+                    avatar='avatar2',
+                    name='full name'
+                )
 
             if 'access token' in access_token:
                 return dict(

@@ -377,3 +377,14 @@ organization_join_validator = validate(
     ),
 )
 
+
+token_obtain_validator = validate(
+    organizationId=dict(
+        required='761 Organization Id Not In Form',
+        type_=(int, '763 Invalid Organization Id Type')
+    ),
+    authorizationCode=dict(
+        required='762 Authorization Code Not In Form'
+    )
+)
+
