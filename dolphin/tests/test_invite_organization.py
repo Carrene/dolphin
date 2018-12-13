@@ -76,6 +76,7 @@ class TestOrganization(LocalApplicationTestCase):
         ):
             assert status == 200
             assert response.json['email'] == self.member3.email
+            assert response.json['id'] is not None
 
             task = OrganizationInvitationEmail.pop()
             task.do_(None)

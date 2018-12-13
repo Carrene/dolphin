@@ -22,8 +22,8 @@ class InvitationController(ModelRestController):
 
     @authorize
     @store_manager(DBSession)
-    @json(prevent_empty_form=True)
     @organization_invite_validator
+    @json(prevent_empty_form=True)
     @Organization.expose
     @commit
     def create(self):
@@ -65,6 +65,7 @@ class InvitationController(ModelRestController):
                 expired_date=datetime.now() + timedelta(days=1),
                 accepted=False
             )
+            DBSession.add(invitation)
 
         token = OrganizationInvitationToken(dict(
             email=email,
