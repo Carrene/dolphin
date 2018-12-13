@@ -11,7 +11,8 @@ from ..models import Member, Organization, OrganizationMember, \
     OrganizationInvitationEmail, AbstractOrganizationMemberView
 from ..tokens import OrganizationInvitationToken
 from ..validators import organization_create_validator, \
-    organization_invite_validator, organization_join_validator
+    organization_invite_validator
+from .invitation import InvitationController
 
 
 OrganizationMemberView = AbstractOrganizationMemberView.create_mapped_class()
@@ -24,8 +25,7 @@ class OrganizationController(ModelRestController):
         self.member = member
 
     def __call__(self, *remaining_paths):
-        if len(remaining_paths) > 1 \
-                and remaining_paths[1] == 'organizationmembers':
+        if len(remaining_paths) > 1:
 
             if not context.identity:
                 raise HTTPUnauthorized()
@@ -47,8 +47,12 @@ class OrganizationController(ModelRestController):
             if organization is None:
                 raise HTTPNotFound()
 
-            return OrganizationMemberController(organization=organization) \
-                (*remaining_paths[2:])
+            if remaining_paths[1] == 'organizationmembers':
+                return OrganizationMemberController(organization=organization) \
+                    (*remaining_paths[2:])
+            elif remaining_paths[1] == 'invitations':
+                return InvitationController(organization=organization) \
+                    (*remaining_paths[2:])
 
         return super().__call__(*remaining_paths)
 
@@ -139,38 +143,6 @@ class OrganizationController(ModelRestController):
                 }
             )
         )
-        return organization
-
-    @authorize
-    @store_manager(DBSession)
-    @json(prevent_empty_form=True)
-    @organization_join_validator
-    @commit
-    def join(self):
-        token = OrganizationInvitationToken.load(context.form.get('token'))
-        organization = DBSession.query(Organization).get(token.organization_id)
-        if organization is None:
-            raise HTTPNotFound()
-
-        is_member_in_organization = DBSession.query(
-            exists() \
-            .where(
-                OrganizationMember.organization_id == token.organization_id
-            ) \
-            .where(
-                OrganizationMember.member_reference_id == \
-                    token.member_reference_id
-            )
-        ).scalar()
-        if is_member_in_organization:
-            raise HTTPAlreadyInThisOrganization()
-
-        organization_member = OrganizationMember(
-            member_reference_id=token.member_reference_id,
-            organization_id=organization.id,
-            role=token.role,
-        )
-        DBSession.add(organization_member)
         return organization
 
     @store_manager(DBSession)

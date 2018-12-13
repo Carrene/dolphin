@@ -70,12 +70,13 @@ class TestOrganization(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             f'Inviting to the organization has successfully created',
-            f'/apiv1/organizations/id: {self.organization.id}',
-            f'INVITE',
+            f'/apiv1/organizations/id: {self.organization.id} /invitations',
+            f'CREATE',
             form=dict(email=self.member3.email, role='member')
         ):
             assert status == 200
-            assert response.json['title'] == self.organization.title
+            assert response.json['email'] == self.member3.email
+            assert response.json['id'] is not None
 
             task = OrganizationInvitationEmail.pop()
             task.do_(None)
@@ -85,8 +86,7 @@ class TestOrganization(LocalApplicationTestCase):
             )
             assert token.role == 'member'
             assert token.email == self.member3.email
-            assert token.owner_reference_id == self.member1.reference_id
-            assert token.member_reference_id == self.member3.reference_id
+            assert token.by_member_reference_id == self.member1.reference_id
             assert token.organization_id == self.organization.id
 
             when(
@@ -105,7 +105,7 @@ class TestOrganization(LocalApplicationTestCase):
                 'Trying to pass with not exist user',
                 form=Update(email='not_exist_user@example.com')
             )
-            assert status == 404
+            assert status == 200
 
             when(
                 'The email format is invalid',

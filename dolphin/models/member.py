@@ -102,6 +102,12 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         protected=True,
     )
 
+    invitations = relationship(
+        'Invitation',
+        back_populates='by_member',
+        protected=True
+    )
+
     @property
     def roles(self):
         return []
