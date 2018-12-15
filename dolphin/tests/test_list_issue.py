@@ -102,7 +102,7 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Filter based on a hybrid property',
-                query=dict(boardings='delayed')
+                query=dict(boarding='delayed')
             )
             assert len(response.json) == 1
 

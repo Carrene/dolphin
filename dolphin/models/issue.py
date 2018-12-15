@@ -204,14 +204,14 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     )
 
     @hybrid_property
-    def boardings(self):
+    def boarding(self):
         if self.due_date < datetime.now():
             return DELAYED
 
         return ONHOLD
 
-    @boardings.expression
-    def boardings(cls):
+    @boarding.expression
+    def boarding(cls):
         return case([
             (cls.due_date < datetime.now(), DELAYED),
             (cls.due_date > datetime.now(), ONHOLD)
@@ -238,7 +238,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     def to_dict(self):
         issue_dict = super().to_dict()
-        issue_dict['boarding'] = self.boardings
+        issue_dict['boarding'] = self.boarding
         issue_dict['isSubscribed'] = True if self.is_subscribed else False
         return issue_dict
 
