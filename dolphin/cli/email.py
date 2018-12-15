@@ -48,11 +48,13 @@ class SendEmailLauncher(Launcher):  # pragma: no cover
             to=self.args.email,
             subject='Invite to organization',
             body={
-                'token': token.dump(),
+                'token': token.dump().decode('utf-8'),
                 'callback_url':
                     settings.organization_invitation.callback_url,
                 'state': self.args.organization,
                 'email': self.args.email,
+                'application_id': 1,
+                'scopes': 'title,email,name,phone,avatar',
             }
         )
         email.to = self.args.email

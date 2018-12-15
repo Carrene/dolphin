@@ -368,6 +368,12 @@ organization_invite_validator = validate(
         required='755 Role Not In Form',
         callback=organization_value_of_role_validator,
     ),
+    scopes=dict(
+        required='765 Scopes Not In Form'
+    ),
+    applicationId=dict(
+        required='764 Application Id Not In form'
+    ),
 )
 
 

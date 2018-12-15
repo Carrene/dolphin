@@ -72,8 +72,14 @@ class TestOrganization(LocalApplicationTestCase):
             f'Inviting to the organization has successfully created',
             f'/apiv1/organizations/id: {self.organization.id} /invitations',
             f'CREATE',
-            form=dict(email=self.member3.email, role='member')
+            form=dict(
+                email=self.member3.email,
+                role='member',
+                scopes='title,email',
+                applicationId=1,
+            )
         ):
+
             assert status == 200
             assert response.json['email'] == self.member3.email
             assert response.json['id'] is not None
@@ -130,6 +136,18 @@ class TestOrganization(LocalApplicationTestCase):
                 form=Remove('role')
             )
             assert status == '755 Role Not In Form'
+
+            when(
+                'Trying to pass without scopes parameter in form',
+                form=Remove('scopes')
+            )
+            assert status == '765 Scopes Not In Form'
+
+            when(
+                'Trying to pass without application id parameter in form',
+                form=Remove('applicationId')
+            )
+            assert status == '764 Application Id Not In form'
 
             when(
                 'The user already in this organization',

@@ -29,6 +29,8 @@ class InvitationController(ModelRestController):
     def create(self):
         email = context.form.get('email')
         role = context.form.get('role')
+        application_id = context.form.get('applicationId')
+        scopes = context.form.get('scopes')
         by_member = Member.current()
 
         organization_member = DBSession.query(OrganizationMember) \
@@ -83,6 +85,8 @@ class InvitationController(ModelRestController):
                         settings.organization_invitation.callback_url,
                     'state': self.organization.id,
                     'email': email,
+                    'application_id': application_id,
+                    'scopes': scopes,
                 }
             )
         )
