@@ -94,7 +94,7 @@ class TestToken(LocalApplicationTestCase):
                     'Trying to pass with damage authorization code',
                     form=Update(authorizationCode='token is damage')
                 )
-                assert status == 403
+                assert status == 401
 
                 with oauth_server_status('404 Not Found'):
                     when('Chat server is not found')
