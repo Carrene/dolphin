@@ -71,14 +71,9 @@ class CASClient:
             f'GET {url} - ' \
             f'target-application={self._server_name}'
         )
-        if response.status_code == 401:
-            raise HTTPUnauthorized()
-
-        if response.status_code == 404:
-            raise HTTPNotFound()
 
         if response.status_code != 200:
-            raise HTTPForbidden()
+            raise HTTPUnauthorized()
 
         return json.loads(response.text)
 
