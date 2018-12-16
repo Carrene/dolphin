@@ -31,6 +31,7 @@ class InvitationController(ModelRestController):
         role = context.form.get('role')
         application_id = context.form.get('applicationId')
         scopes = context.form.get('scopes')
+        rediredt_uri = context.form.get('redirectUri')
         by_member = Member.current()
 
         organization_member = DBSession.query(OrganizationMember) \
@@ -87,6 +88,7 @@ class InvitationController(ModelRestController):
                     'email': email,
                     'application_id': application_id,
                     'scopes': scopes,
+                    'rediredt_uri': rediredt_uri,
                 }
             )
         )

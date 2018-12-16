@@ -77,6 +77,7 @@ class TestOrganization(LocalApplicationTestCase):
                 role='member',
                 scopes='title,email',
                 applicationId=1,
+                redirectUri='www.example.com',
             )
         ):
 
@@ -148,6 +149,12 @@ class TestOrganization(LocalApplicationTestCase):
                 form=Remove('applicationId')
             )
             assert status == '764 Application Id Not In form'
+
+            when(
+                'Trying to pass without redirect uri parameter in form',
+                form=Remove('redirectUri')
+            )
+            assert status == '766 Redirect Uri Not In form'
 
             when(
                 'The user already in this organization',
