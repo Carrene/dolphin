@@ -374,6 +374,9 @@ organization_invite_validator = validate(
     applicationId=dict(
         required='764 Application Id Not In form'
     ),
+    redirectUri=dict(
+        required='766 Redirect Uri Not In form'
+    ),
 )
 
 
@@ -391,6 +394,6 @@ token_obtain_validator = validate(
     ),
     authorizationCode=dict(
         required='762 Authorization Code Not In Form'
-    )
+    ),
 )
 

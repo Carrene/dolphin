@@ -34,6 +34,12 @@ class SendEmailLauncher(Launcher):  # pragma: no cover
             required=True,
             help='role'
         )
+        parser.add_argument(
+            '-u',
+            '--redirect_uri',
+            required=True,
+            help='Redirect uri'
+        )
 
         return parser
 
@@ -55,6 +61,7 @@ class SendEmailLauncher(Launcher):  # pragma: no cover
                 'email': self.args.email,
                 'application_id': 1,
                 'scopes': 'title,email,name,phone,avatar',
+                'redirect_uri': self.args.redirect_uri,
             }
         )
         email.to = self.args.email
