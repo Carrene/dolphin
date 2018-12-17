@@ -9,7 +9,8 @@ from restfulpy.orm.metadata import FieldInfo
 
 from dolphin import Dolphin
 from dolphin.authentication import Authenticator
-from dolphin.models import Member, Project, Release, Issue, Item, Organization
+from dolphin.models import Member, Project, Release, Issue, Item, \
+    Organization, Invitation
 
 
 HERE = path.abspath(path.dirname(__file__))
@@ -32,6 +33,7 @@ role=FieldInfo(type_=str, required=True, not_none=True).to_json()
 release_fields = Release.json_metadata()['fields']
 project_fields = Project.json_metadata()['fields']
 issue_fields = Issue.json_metadata()['fields']
+invivation_fields = Invitation.json_metadata()['fields']
 
 issue_fields.update({
     'resourceId': resource_id,
@@ -60,6 +62,7 @@ class LocalApplicationTestCase(ApplicableTestCase):
         r'^/apiv1/items.*': Item.json_metadata()['fields'],
         r'^/apiv1/members.*': Member.json_metadata()['fields'],
         r'^/apiv1/organizations.*': organization_fields,
+        r'^/apiv1/invitations.*': invivation_fields,
     }
 
     def login(self, email):

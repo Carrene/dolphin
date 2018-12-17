@@ -34,14 +34,14 @@ class TestOrganizationMembers(LocalApplicationTestCase):
         session.flush()
 
         organization_member1 = OrganizationMember(
-            member_reference_id=cls.owner.reference_id,
+            member_id=cls.owner.id,
             organization_id=cls.organization1.id,
             role='owner',
         )
         session.add(organization_member1)
 
         organization_member2 = OrganizationMember(
-            member_reference_id=cls.member.reference_id,
+            member_id=cls.member.id,
             organization_id=cls.organization1.id,
             role='member',
         )

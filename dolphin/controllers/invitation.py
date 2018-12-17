@@ -31,13 +31,13 @@ class InvitationController(ModelRestController):
         role = context.form.get('role')
         application_id = context.form.get('applicationId')
         scopes = context.form.get('scopes')
-        rediredt_uri = context.form.get('redirectUri')
+        redirect_uri = context.form.get('redirectUri')
         by_member = Member.current()
 
         organization_member = DBSession.query(OrganizationMember) \
             .filter(and_(
                 OrganizationMember.organization_id == self.organization.id,
-                OrganizationMember.member_reference_id == by_member.reference_id
+                OrganizationMember.member_id == by_member.id
             )) \
             .one_or_none()
         if organization_member is None or organization_member.role != 'owner':
@@ -50,8 +50,7 @@ class InvitationController(ModelRestController):
         if invited_member is not None:
             is_member_in_organization = DBSession.query(exists().where(and_(
                 OrganizationMember.organization_id == self.organization.id,
-                OrganizationMember.member_reference_id \
-                    == invited_member.reference_id
+                OrganizationMember.member_id == invited_member.id
             ))).scalar()
             if is_member_in_organization:
                 raise HTTPAlreadyInThisOrganization()
@@ -88,7 +87,7 @@ class InvitationController(ModelRestController):
                     'email': email,
                     'application_id': application_id,
                     'scopes': scopes,
-                    'rediredt_uri': rediredt_uri,
+                    'redirect_uri': redirect_uri,
                 }
             )
         )

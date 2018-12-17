@@ -39,7 +39,7 @@ class TestToken(LocalApplicationTestCase):
 
         cls.organization_member = OrganizationMember(
             organization_id=cls.organization.id,
-            member_reference_id=cls.owner.reference_id,
+            member_id=cls.owner.id,
             role='owner',
         )
         session.add(cls.organization_member)
