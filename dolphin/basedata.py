@@ -91,7 +91,7 @@ def insert(): # pragma: no cover
 
         organization_member = OrganizationMember(
             organization_id=organization.id,
-            member_reference_id=god.reference_id,
+            member_id=god.id,
             role='owner',
         )
         DBSession.add(organization_member)
