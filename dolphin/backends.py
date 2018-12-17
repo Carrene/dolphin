@@ -138,6 +138,7 @@ class ChatClient:
         except requests.RequestException as e: # pragma: no cover
             logger.exception(e)
             raise ChatInternallError()
+
         else:
             room = json.loads(response.text)
             return room
@@ -196,6 +197,7 @@ class ChatClient:
         except requests.RequestException as e: # pragma: no cover
             logger.exception(e)
             raise ChatInternallError()
+
         else:
             room = json.loads(response.text)
             return room
@@ -244,7 +246,44 @@ class ChatClient:
         except requests.RequestException as e: # pragma: no cover
             logger.exception(e)
             raise ChatInternallError()
+
         else:
             room = json.loads(response.text)
             return room
+
+    def ensure_member(self, token, x_access_token):
+        url = f'{settings.chat.url}/apiv1/members'
+        try:
+            response = requests.request(
+                'ENSURE',
+                url,
+                headers={
+                    'authorization': token,
+                    'X-Oauth2-Access-Token': x_access_token
+                }
+            )
+            logger.debug(
+                f'ENSURE {url} - ' \
+                f'response-HTTP-code={response.status_code} - ' \
+                f'target-application={self._server_name}'
+            )
+            if response.status_code == 404:
+                raise ChatServerNotFound()
+
+            # 502: Bad Gateway
+            # 503: Service Unavailbale
+            if response.status_code in (502, 503):
+                raise ChatServerNotAvailable()
+
+            if response.status_code != 200:
+                logger.exception(response.content.decode())
+                raise ChatInternallError()
+
+        except requests.RequestException as e: # pragma: no cover
+           logger.exception(e)
+           raise ChatInternallError()
+
+        else:
+            member = json.loads(response.text)
+            return member
 

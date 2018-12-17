@@ -3,7 +3,7 @@ from nanohttp import RestController, json, context, HTTPBadRequest, validate, \
 from restfulpy.authorization import authorize
 from restfulpy.orm import DBSession, commit
 
-from ..backends import CASClient
+from ..backends import CASClient, ChatClient
 from ..models import Member
 
 
@@ -76,5 +76,7 @@ class TokenController(RestController):
             principal.dump().decode('utf-8')
         )
 
-        return dict(token=principal.dump().decode('utf-8'))
+        token = principal.dump().decode('utf-8')
+        ensured_member = ChatClient().ensure_member(token, member.access_token)
+        return dict(token=token)
 

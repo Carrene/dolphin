@@ -1,13 +1,13 @@
 from bddrest.authoring import status, when, Remove, Update
 
 from dolphin.tests.helpers import LocalApplicationTestCase, \
-    oauth_mockup_server, oauth_server_status
-
+    oauth_mockup_server, oauth_server_status, chat_mockup_server, \
+    chat_server_status
 
 class TestToken(LocalApplicationTestCase):
 
     def test_get_access_token(self):
-        with oauth_mockup_server(), self.given(
+        with oauth_mockup_server(), chat_mockup_server(), self.given(
                 'Try to get an access token from CAS',
                 '/apiv1/oauth2/tokens',
                 'OBTAIN',
@@ -52,4 +52,8 @@ class TestToken(LocalApplicationTestCase):
                 with oauth_server_status('610 Malformed Access Token'):
                     when('Access token is manipulated')
                     assert status == 401
+
+                with chat_server_status('404 Not Found'):
+                    when('Server is not found')
+                    assert status == 617
 

@@ -138,7 +138,8 @@ def chat_mockup_server():
         def __init__(self):
             super().__init__([
                 ('/apiv1/rooms', self.create),
-                ('/apiv1/targets', self.list_)
+                ('/apiv1/targets', self.list_),
+                ('/apiv1/members', self.ensure),
             ])
 
         @json(verbs=['create', 'delete', 'add', 'kick', 'list'])
@@ -170,6 +171,13 @@ def chat_mockup_server():
                 raise HTTPStatus(_chat_server_status)
 
             return dict(id=1, title='First chat room')
+
+        @json
+        def ensure(self):
+            if _chat_server_status != 'idle':
+                raise HTTPStatus(_chat_server_status)
+
+            return dict(id=1, title='member1', email='member@example.com')
 
     app = MockupApplication('chat-server', Root())
     with mockup_http_server(app) as (server, url):
