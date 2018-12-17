@@ -19,6 +19,13 @@ depends_on = None
 
 def upgrade():
     op.create_table(
+        'organization',
+        sa.Column('title', sa.Unicode(50), index=True),
+        sa.Column('url', sa.Unicode(50), nullable=True),
+        sa.Column('domain', sa.Unicode(50), nullable=True),
+        sa.Column('_logo', Logo.as_mutable(sa.JSON), nullable=True)
+    )
+    op.create_table(
         'organization_member',
         sa.Column(
             'member_id',
