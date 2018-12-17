@@ -51,14 +51,14 @@ class TestOrganization(LocalApplicationTestCase):
 
         organization_member1 = OrganizationMember(
             organization_id=cls.organization.id,
-            member_reference_id=cls.member1.reference_id,
+            member_id=cls.member1.id,
             role='owner'
         )
         session.add(organization_member1)
 
         organization_member2 = OrganizationMember(
             organization_id=cls.organization.id,
-            member_reference_id=cls.member2.reference_id,
+            member_id=cls.member2.id,
             role='member'
         )
         session.add(organization_member2)

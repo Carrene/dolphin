@@ -26,7 +26,7 @@ class TestOrganization(LocalApplicationTestCase):
 
         organization_member = OrganizationMember(
             organization_id=organization.id,
-            member_reference_id=member.reference_id,
+            member_id=member.id,
             role='owner',
         )
         session.add(organization_member)

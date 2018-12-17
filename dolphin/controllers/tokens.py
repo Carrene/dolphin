@@ -16,7 +16,7 @@ class TokenController(RestController):
 
         is_member_in_organization = DBSession.query(exists().where(and_(
             OrganizationMember.organization_id == organization_id,
-            OrganizationMember.member_reference_id == member.reference_id
+            OrganizationMember.member_id == member.id
         ))).scalar()
 
         if is_member_in_organization:
@@ -34,7 +34,7 @@ class TokenController(RestController):
 
         organization_member = OrganizationMember(
             organization_id=invitation.organization_id,
-            member_reference_id=member.reference_id,
+            member_id=member.id,
             role=invitation.role,
         )
         DBSession.add(organization_member)

@@ -36,12 +36,12 @@ class OrganizationController(ModelRestController):
             except (ValueError, TypeError):
                 raise HTTPNotFound()
 
+            member = Member.current()
             organization = DBSession.query(Organization) \
                .filter(Organization.id == id) \
                .join(
                    OrganizationMember,
-                   OrganizationMember.member_reference_id \
-                       == context.identity.reference_id
+                   OrganizationMember.member_id == member.id
                ) \
                .one_or_none()
             if organization is None:
@@ -77,73 +77,73 @@ class OrganizationController(ModelRestController):
 
         organization_member = OrganizationMember(
             organization_id=organization.id,
-            member_reference_id=member.reference_id,
+            member_id=member.id,
             role='owner',
         )
         DBSession.add(organization_member)
         return organization
 
-    @authorize
-    @store_manager(DBSession)
-    @json(prevent_empty_form=True)
-    @organization_invite_validator
-    @Organization.expose
-    @commit
-    def invite(self, id):
-        try:
-            id = int(id)
-        except (ValueError, TypeError):
-            raise HTTPNotFound()
-
-        organization = DBSession.query(Organization).get(id)
-        if organization is None:
-            raise HTTPNotFound()
-
-        email = context.form.get('email')
-        member = DBSession.query(Member) \
-            .filter(Member.email == email) \
-            .one_or_none()
-        if member is None:
-            raise HTTPNotFound()
-
-        organization_member = DBSession.query(OrganizationMember) \
-            .filter(
-                OrganizationMember.organization_id == id,
-                OrganizationMember.member_reference_id == \
-                    context.identity.reference_id
-            ) \
-            .one_or_none()
-        if organization_member is None or organization_member.role != 'owner':
-            raise HTTPForbidden()
-
-        is_member_in_organization = DBSession.query(exists().where(and_(
-            OrganizationMember.organization_id == id,
-            OrganizationMember.member_reference_id == member.reference_id
-        ))).scalar()
-        if is_member_in_organization:
-            raise HTTPAlreadyInThisOrganization()
-
-        token = OrganizationInvitationToken(dict(
-            email=email,
-            organizationId=id,
-            memberReferenceId=member.reference_id,
-            ownerReferenceId=context.identity.reference_id,
-            role=context.form.get('role'),
-        ))
-        DBSession.add(
-            OrganizationInvitationEmail(
-                to=email,
-                subject='Invite to organization',
-                body={
-                    'token': token.dump(),
-                    'callback_url':
-                        settings.organization_invitation.callback_url,
-                    'state': id,
-                    'email': email,
-                }
-            )
-        )
-        return organization
+#    @authorize
+#    @store_manager(DBSession)
+#    @json(prevent_empty_form=True)
+#    @organization_invite_validator
+#    @Organization.expose
+#    @commit
+#    def invite(self, id):
+#        try:
+#            id = int(id)
+#        except (ValueError, TypeError):
+#            raise HTTPNotFound()
+#
+#        organization = DBSession.query(Organization).get(id)
+#        if organization is None:
+#            raise HTTPNotFound()
+#
+#        email = context.form.get('email')
+#        member = DBSession.query(Member) \
+#            .filter(Member.email == email) \
+#            .one_or_none()
+#        if member is None:
+#            raise HTTPNotFound()
+#
+#        organization_member = DBSession.query(OrganizationMember) \
+#            .filter(
+#                OrganizationMember.organization_id == id,
+#                OrganizationMember.member_id == \
+#                    context.identity.reference_id
+#            ) \
+#            .one_or_none()
+#        if organization_member is None or organization_member.role != 'owner':
+#            raise HTTPForbidden()
+#
+#        is_member_in_organization = DBSession.query(exists().where(and_(
+#            OrganizationMember.organization_id == id,
+#            OrganizationMember.member_id == member.id
+#        ))).scalar()
+#        if is_member_in_organization:
+#            raise HTTPAlreadyInThisOrganization()
+#
+#        token = OrganizationInvitationToken(dict(
+#            email=email,
+#            organizationId=id,
+#            memberReferenceId=member.reference_id,
+#            ownerReferenceId=context.identity.reference_id,
+#            role=context.form.get('role'),
+#        ))
+#        DBSession.add(
+#            OrganizationInvitationEmail(
+#                to=email,
+#                subject='Invite to organization',
+#                body={
+#                    'token': token.dump(),
+#                    'callback_url':
+#                        settings.organization_invitation.callback_url,
+#                    'state': id,
+#                    'email': email,
+#                }
+#            )
+#        )
+#        return organization
 
     @store_manager(DBSession)
     @json
@@ -155,9 +155,7 @@ class OrganizationController(ModelRestController):
             return DBSession.query(Organization).join(
                 OrganizationMember,
                 OrganizationMember.organization_id == Organization.id
-            ).filter(
-                OrganizationMember.member_reference_id == self.member.reference_id
-            )
+            ).filter(OrganizationMember.member_id == self.member.id)
 
         if 'email' in context.form.keys():
             return DBSession.query(Organization) \
@@ -167,8 +165,7 @@ class OrganizationController(ModelRestController):
                 ) \
                 .join(
                     Member,
-                    Member.reference_id \
-                        == OrganizationMember.member_reference_id
+                    Member.id == OrganizationMember.member_id
                 ) \
                 .filter(Member.email == context.form.get('email'))
 
@@ -185,12 +182,12 @@ class OrganizationController(ModelRestController):
         except (ValueError, TypeError):
             raise HTTPNotFound()
 
+        member = Member.current()
         organization = DBSession.query(Organization) \
            .filter(Organization.id == id) \
            .join(
                OrganizationMember,
-               OrganizationMember.member_reference_id \
-                   == context.identity.reference_id
+               OrganizationMember.member_id == member.id
            ) \
            .one_or_none()
 

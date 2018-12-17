@@ -29,7 +29,7 @@ class AbstractOrganizationMemberView(PaginationMixin, OrderingMixin,
             OrganizationMember.organization_id,
         ]).select_from(Member.__table__.join(
             OrganizationMember,
-            OrganizationMember.member_reference_id == Member.reference_id
+            OrganizationMember.member_id == Member.id
         )).cte()
 
         class OrganizationMemberView(cls):
