@@ -4,7 +4,7 @@ from restfulpy.authorization import authorize
 from restfulpy.orm import DBSession, commit
 from sqlalchemy import exists, and_
 
-from ..backends import CASClient
+from ..backends import CASClient, ChatClient
 from ..models import Member, Invitation, OrganizationMember
 from ..validators import token_obtain_validator
 
@@ -82,6 +82,7 @@ class TokenController(RestController):
             .one_or_none()
 
         if member is None:
+
             member = Member(
                 reference_id=cas_member['id'],
                 email=cas_member['email'],
@@ -107,5 +108,8 @@ class TokenController(RestController):
 
         organization_id = self._ensure_organization(member)
         principal.payload['organizationId'] = organization_id
-        return dict(token=principal.dump().decode('utf-8'))
+        token = principal.dump().decode('utf-8')
+
+        ensured_member = ChatClient().ensure_member(token, member.access_token)
+        return dict(token=token)
 
