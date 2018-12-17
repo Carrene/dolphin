@@ -161,7 +161,7 @@ def chat_mockup_server():
             super().__init__([
                 ('/apiv1/rooms', self.create),
                 ('/apiv1/targets', self.list_),
-                ('/apiv1/members', self.ensure)
+                ('/apiv1/members', self.ensure),
             ])
 
         @json(verbs=['create', 'delete', 'add', 'kick', 'list'])

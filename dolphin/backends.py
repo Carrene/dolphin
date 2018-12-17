@@ -138,6 +138,7 @@ class ChatClient:
         except requests.RequestException as e: # pragma: no cover
             logger.exception(e)
             raise ChatInternallError()
+
         else:
             room = json.loads(response.text)
             return room
@@ -196,6 +197,7 @@ class ChatClient:
         except requests.RequestException as e: # pragma: no cover
             logger.exception(e)
             raise ChatInternallError()
+
         else:
             room = json.loads(response.text)
             return room
@@ -244,6 +246,7 @@ class ChatClient:
         except requests.RequestException as e: # pragma: no cover
             logger.exception(e)
             raise ChatInternallError()
+
         else:
             room = json.loads(response.text)
             return room
@@ -279,7 +282,6 @@ class ChatClient:
         except requests.RequestException as e: # pragma: no cover
             logger.exception(e)
             raise ChatInternallError()
+
         else:
-            member = json.loads(response.text)
-            return member
 
