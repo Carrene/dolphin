@@ -100,7 +100,7 @@ class TokenController(RestController):
         if member.name != cas_member['name']:
             member.name = cas_member['name']
 
-        if member.access_token != 'access_tokne':
+        if member.access_token != access_token:
             member.access_token = access_token
 
         DBSession.flush()
