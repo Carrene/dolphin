@@ -107,6 +107,7 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         back_populates='by_member',
         protected=True
     )
+    attachments = relationship('Attachment', lazy='selectin')
 
     @property
     def roles(self):
