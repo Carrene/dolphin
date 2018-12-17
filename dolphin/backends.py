@@ -284,4 +284,6 @@ class ChatClient:
             raise ChatInternallError()
 
         else:
+            member = json.loads(response.text)
+            return member
 
