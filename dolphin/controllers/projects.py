@@ -4,6 +4,7 @@ from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 from restfulpy.utils import to_camel_case
 
+from .files import FileController
 from ..backends import ChatClient
 from ..exceptions import ChatRoomNotFound, RoomMemberAlreadyExist, \
     RoomMemberNotFound
@@ -13,6 +14,22 @@ from ..validators import project_validator, update_project_validator
 
 class ProjectController(ModelRestController):
     __model__ = Project
+
+    def __call__(self, *remaining_paths):
+        if len(remaining_paths) > 1 and remaining_paths[1] == 'files':
+            project = self._get_project(remaining_paths[0])
+            return FileController(project)(*remaining_paths[2:])
+
+        return super().__call__(*remaining_paths)
+
+    def _get_project(self, id):
+        project = DBSession.query(Project).filter(Project.id == id) \
+            .one_or_none()
+
+        if project is None:
+            raise HTTPNotFound()
+
+        return project
 
     def _ensure_room(self, title, token, access_token):
         create_room_error = 1

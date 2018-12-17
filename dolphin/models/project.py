@@ -7,6 +7,7 @@ from sqlalchemy.orm import column_property
 
 from .issue import Issue
 from .subscribable import Subscribable, Subscription
+from .attachment import Attachment
 
 
 project_statuses = [
@@ -82,6 +83,7 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         back_populates='project',
         protected=True
     )
+    attachments = relationship('Attachment', lazy='selectin')
 
     due_date = column_property(
         select([func.max(Issue.due_date)]) \

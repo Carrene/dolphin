@@ -1,4 +1,6 @@
-from nanohttp import Controller, json
+from os.path import abspath, dirname, join
+
+from nanohttp import Controller, json, Static
 from restfulpy.controllers import RootController
 
 import dolphin
@@ -15,6 +17,11 @@ from .tag import TagController
 from .workflows import WorkflowController
 from .phases import PhaseController
 from .draft_issue import DraftIssueController
+from .files import FileController
+
+
+here = abspath(dirname(__file__))
+attachment_storage = abspath(join(here, '../..', 'data/assets'))
 
 
 class Apiv1(Controller):
@@ -41,4 +48,5 @@ class Apiv1(Controller):
 
 class Root(RootController):
     apiv1 = Apiv1()
+    assets = Static(attachment_storage)
 
