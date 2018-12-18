@@ -51,7 +51,7 @@ class TestIssue(LocalApplicationTestCase):
                 status='in-progress',
                 description='A description for defined issue',
                 dueDate='2200-2-20',
-                kind='enhancement',
+                kind='feature',
                 days=3,
                 projectId=self.project.id,
             )
@@ -61,7 +61,7 @@ class TestIssue(LocalApplicationTestCase):
             assert response.json['description'] == 'A description for '\
                 'defined issue'
             assert response.json['dueDate'] == '2200-02-20T00:00:00'
-            assert response.json['kind'] == 'enhancement'
+            assert response.json['kind'] == 'feature'
             assert response.json['days'] == 3
             assert response.json['status'] == 'in-progress'
 
