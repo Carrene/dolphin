@@ -3,7 +3,8 @@ from nanohttp.contexts import Context
 from restfulpy.orm import DBSession
 from sqlalchemy_media import StoreManager
 
-from .models import Release, Member, Organization, OrganizationMember
+from .models import Release, Member, Organization, OrganizationMember,\
+    Workflow, Phase
 
 
 def indented(n): # pragma: no cover
@@ -68,6 +69,14 @@ def insert(): # pragma: no cover
         cutoff='2034-2-20',
     )
     DBSession.add(release5)
+
+    triage = Phase(title='triage', order=0)
+    backlog = Phase(title='backlog', order=-1)
+    workflow = Workflow(
+        title='default',
+        phases=[triage, backlog]
+    )
+    DBSession.add(workflow)
 
     with Context(dict()), StoreManager(DBSession):
         god = Member(
