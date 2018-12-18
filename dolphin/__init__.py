@@ -1,4 +1,4 @@
-from os.path import dirname, join
+from os.path import dirname, join, abspath
 import functools
 
 from nanohttp import settings
@@ -56,7 +56,7 @@ class Dolphin(Application):
       messaging:
         default_messenger: restfulpy.messaging.ConsoleMessenger
         template_dirs:
-          - %(root_path)s/dolphin/email_templates
+          - %(root_path)s/email_templates
 
       storage:
         local_directory: %(root_path)s/data/assets
