@@ -1,5 +1,6 @@
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession
+from restfulpy.authorization import authorize
 from nanohttp import json
 
 from ..models import Phase
@@ -12,6 +13,7 @@ class PhaseController(ModelRestController):
     def __init__(self, workflow):
         self.workflow = workflow
 
+    @authorize
     @json
     @Phase.expose
     def list(self):
