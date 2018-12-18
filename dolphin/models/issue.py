@@ -35,7 +35,6 @@ issue_kinds = [
 
 DELAYED = 'delayed'
 ONTIME = 'on-time'
-ATRISK = 'at-risk'
 
 
 class Tag(DeclarativeBase):
@@ -147,10 +146,6 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     @hybrid_property
     def boarding(self):
-        release = self.project.release
-        if self.due_date > release.cutoff:
-            return ATRISK
-
         if self.due_date < datetime.now():
             return DELAYED
 
@@ -160,7 +155,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     def boarding(cls):
         return case([
             (cls.due_date < datetime.now(), DELAYED),
-            (cls.due_date > datetime.now(), ONHOLD)
+            (cls.due_date > datetime.now(), ONTIME)
         ])
 
 
