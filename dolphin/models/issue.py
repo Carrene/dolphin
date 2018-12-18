@@ -22,7 +22,6 @@ issue_statuses = [
     'in-progress',
     'on-hold',
     'to-do',
-    'delayed',
     'done',
     'complete',
 ]
@@ -30,13 +29,13 @@ issue_statuses = [
 
 issue_kinds = [
     'feature',
-    'enhancement',
     'bug',
 ]
 
 
 DELAYED = 'delayed'
-ONHOLD = 'on-hold'
+ONTIME = 'on-time'
+ATRISK = 'at-risk'
 
 
 class Tag(DeclarativeBase):
@@ -148,10 +147,14 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     @hybrid_property
     def boarding(self):
+        release = self.project.release
+        if self.due_date > release.cutoff:
+            return ATRISK
+
         if self.due_date < datetime.now():
             return DELAYED
 
-        return ONHOLD
+        return ONTIME
 
     @boarding.expression
     def boarding(cls):
