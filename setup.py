@@ -26,6 +26,7 @@ setup(
     version=package_version,
     packages=find_packages(),
     install_requires=dependencies,
+    include_package_data=True,
     entry_points={
         'console_scripts': [
             'dolphin = dolphin:dolphin.cli_main'

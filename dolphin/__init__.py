@@ -60,7 +60,7 @@ class Dolphin(Application):
         super().__init__(
             application_name,
             root=root,
-            root_path=join(dirname(__file__), '..'),
+            root_path=dirname(__file__),
             version=__version__
         )
 
