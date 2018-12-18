@@ -1,4 +1,6 @@
-from nanohttp import Controller, json
+from os.path import abspath, dirname, join
+
+from nanohttp import Controller, json, Static
 from restfulpy.controllers import RootController
 
 import dolphin
@@ -11,6 +13,11 @@ from .releases import ReleaseController
 from .tokens import TokenController
 from .organization import OrganizationController, OrganizationMemberController
 from .invitation import InvitationController
+from .files import FileController
+
+
+here = abspath(dirname(__file__))
+attachment_storage = abspath(join(here, '../..', 'data/assets'))
 
 
 class Apiv1(Controller):
@@ -33,4 +40,5 @@ class Apiv1(Controller):
 
 class Root(RootController):
     apiv1 = Apiv1()
+    assets = Static(attachment_storage)
 

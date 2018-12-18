@@ -1,8 +1,11 @@
 from os.path import dirname, join
+import functools
 
+from nanohttp import settings
 from restfulpy import Application
+from sqlalchemy_media import StoreManager, FileSystemStore
 
-from . import basedata
+from . import basedata, mockup
 from .authentication import Authenticator
 from .cli.email import EmailLauncher
 from .controllers.root import Root
@@ -54,6 +57,10 @@ class Dolphin(Application):
         default_messenger: restfulpy.messaging.ConsoleMessenger
         template_dirs:
           - %(root_path)s/dolphin/email_templates
+
+      storage:
+        local_directory: %(root_path)s/data/assets
+        base_url: http://localhost:8080/assets
    '''
 
     def __init__(self, application_name='dolphin', root=Root()):
@@ -67,8 +74,18 @@ class Dolphin(Application):
     def insert_basedata(self, *args):
         basedata.insert()
 
-    def register_cli_launchers(self, subparsers):
-        EmailLauncher.register(subparsers)
+    @classmethod
+    def initialize_orm(cls, engine=None):
+        StoreManager.register(
+            'fs',
+            functools.partial(
+                FileSystemStore,
+                settings.storage.local_directory,
+                base_url=settings.storage.base_url,
+            ),
+            default=True
+        )
+        super().initialize_orm(cls, engine)
 
 
 dolphin = Dolphin()
