@@ -10,10 +10,9 @@ class WorkflowController(ModelRestController):
     __model__ = Workflow
 
     def __call__(self, *remaining_paths):
-        from pudb import set_trace; set_trace()
         if len(remaining_paths) > 1 and remaining_paths[1] == 'phases':
             workflow = self._get_workflow(remaining_paths[0])
-            return PhaseController(workflow)(remaining_paths[1])
+            return PhaseController(workflow)(*remaining_paths[2:])
 
 
     def _get_workflow(self, id):
