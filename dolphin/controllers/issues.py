@@ -3,6 +3,7 @@ from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 
+from .phases import PhaseController
 from ..backends import ChatClient
 from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound, \
     ChatRoomNotFound
@@ -13,6 +14,23 @@ from ..validators import issue_validator, update_issue_validator, \
 
 class IssueController(ModelRestController):
     __model__ = Issue
+
+    def __call__(self, *remaining_paths):
+        if len(remaining_paths) > 1 and remaining_paths[1] == 'phases':
+            issue = self._get_issue(remaining_paths[0])
+            return PhaseController(issue=issue)(*remaining_paths[2:])
+
+        return super().__call__(*remaining_paths)
+
+    def _get_issue(self, id):
+        issue = DBSession.query(Issue) \
+            .filter(Issue.id == id) \
+            .one_or_none()
+
+        if issue is None:
+            raise HTTPNotFound()
+
+        return issue
 
     def _ensure_room(self, title, token, access_token):
         create_room_error = 1

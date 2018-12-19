@@ -125,12 +125,13 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         back_populates='issues',
         protected=True
     )
-
-    items = relationship(
-        'Item',
-        back_populates='issue',
-        protected=True
-    )
+#    phases = relationship(
+#        'Phase',
+#        secondary='item',
+#        backpopulates='issues',
+#        lazy='selectin',
+#        protected=True,
+#    )
 
     is_subscribed = column_property(
         select([func.count(Subscription.member)]) \
