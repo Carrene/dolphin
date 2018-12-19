@@ -14,6 +14,7 @@ class WorkflowController(ModelRestController):
             workflow = self._get_workflow(remaining_paths[0])
             return PhaseController(workflow)(*remaining_paths[2:])
 
+        return super().__call__(*remaining_paths)
 
     def _get_workflow(self, id):
         workflow = DBSession.query(Workflow) \
@@ -23,4 +24,3 @@ class WorkflowController(ModelRestController):
             raise HTTPNotFound()
 
         return workflow
-

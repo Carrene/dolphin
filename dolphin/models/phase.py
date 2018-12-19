@@ -17,5 +17,11 @@ class Phase(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
         back_populates='phases',
         protected=True
     )
-    items = relationship('Item', back_populates='phase', protected=True)
+
+    issues = relationship(
+        'Issue',
+        secondary='item',
+        lazy='selectin',
+        protected=False
+    )
 
