@@ -1,4 +1,4 @@
-from bddrest.authoring import status, response
+from bddrest.authoring import status, response, when
 
 from dolphin.models import Phase, Workflow, Member
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
@@ -17,12 +17,12 @@ class TestListPhase(LocalApplicationTestCase):
             reference_id=2
         )
         cls.session.add(member)
-        triage = Phase(title='triage', order=0)
-        design = Phase(title='design', order=2)
+        cls.triage = Phase(title='triage', order=0)
+        backlog = Phase(title='backlog', order=-1)
         implement = Phase(title='implement', order=3)
         default_workflow = Workflow(
             title='default',
-            phases=[triage,design]
+            phases=[cls.triage, backlog]
         )
         cls.session.add(default_workflow)
         cls.session.commit()
@@ -37,4 +37,35 @@ class TestListPhase(LocalApplicationTestCase):
         ):
             assert status == 200
             assert len(response.json) == 2
+
+            when(
+                'Try to send a form in the request',
+                form=dict(parameter='form parameter')
+            )
+            assert status == '709 Form Not Allowed'
+
+            when('Try to sort the response', query=dict(sort='id'))
+            assert len(response.json) == 2
+            assert response.json[0]['id'] == 1
+
+            when('Sorting the response descending', query=dict(sort='-id'))
+            assert response.json[0]['id'] == 2
+
+            when('Testing pagination', query=dict(take=1, skip=1))
+            assert len(response.json) == 1
+            assert response.json[0]['order'] == -1
+
+            when(
+                'Sorting befor pagination',
+                query=dict(sort='-id', take=1, skip=1)
+            )
+            assert len(response.json) == 1
+            assert response.json[0]['order'] == 0
+
+            when('Filtering the response', query=dict(id=self.triage.id))
+            assert len(response.json) == 1
+            assert response.json[0]['title'] == 'triage'
+
+            when('Try to pass an Unauthorized request', authorization=None)
+            assert status == 401
 
