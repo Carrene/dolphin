@@ -14,9 +14,10 @@ class PhaseController(ModelRestController):
         self.workflow = workflow
 
     @authorize
-    @json
+    @json(prevent_form='709 Form Not Allowed')
     @Phase.expose
     def list(self):
         query = DBSession.query(Phase) \
             .filter(Phase.workflow_id == self.workflow.id)
         return query
+
