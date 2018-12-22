@@ -19,7 +19,7 @@ sudo apt-get install libass-dev libpq-dev postgresql \
 ### Setup Python environment
 
 ```bash
-sudo apt-get install python3.6-pip python3-dev
+sudo apt-get install python3-pip python3-dev
 sudo pip3 install virtualenvwrapper
 echo "export VIRTUALENVWRAPPER_PYTHON=`which python3.6`" >> ~/.bashrc
 echo "alias v.activate=\"source $(which virtualenvwrapper.sh)\"" >> ~/.bashrc
