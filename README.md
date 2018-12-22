@@ -64,7 +64,7 @@ So, your changes will affect instantly on the installed version
 
 ```bash
 cd /path/to/workspace
-git clone git@git.carrene.com:web/dolphin.git
+git clone git@github.com:Carrene/dolphin.git
 cd dolphin
 pip install -e .
 ```
