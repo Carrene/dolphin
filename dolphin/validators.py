@@ -69,7 +69,7 @@ def project_not_exists_validator(title, project, field):
     return title
 
 
-def project_exists_validator(projectId, project, field):
+def project_accessible_validator(projectId, project, field):
 
     project = DBSession.query(Project) \
             .filter(Project.id == context.form['projectId']).one_or_none()
@@ -77,6 +77,10 @@ def project_exists_validator(projectId, project, field):
         raise HTTPStatus(
             f'601 Project not found with id: {context.form["projectId"]}'
         )
+
+    if project.is_deleted:
+        raise HTTPStatus('746 Hidden Project Is Not Editable')
+
     return projectId
 
 
@@ -276,7 +280,7 @@ issue_validator = validate(
     projectId=dict(
         required='713 Project Id Not In Form',
         type_=(int, '714 Invalid Project Id Type'),
-        callback=project_exists_validator
+        callback=project_accessible_validator,
     ),
     title=dict(
         required='710 Title Not In Form',
@@ -394,6 +398,15 @@ token_obtain_validator = validate(
     ),
     authorizationCode=dict(
         required='762 Authorization Code Not In Form'
+    ),
+)
+
+
+issue_move_validator = validate(
+    projectId=dict(
+        required='713 Project Id Not In Form',
+        type_=(int, '714 Invalid Project Id Type'),
+        callback=project_accessible_validator,
     ),
 )
 

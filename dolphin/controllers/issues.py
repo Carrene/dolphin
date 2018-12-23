@@ -8,7 +8,7 @@ from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound, \
     ChatRoomNotFound
 from ..models import Issue, Subscription, Resource, Phase, Item, Member
 from ..validators import issue_validator, update_issue_validator, \
-    assign_issue_validator
+    assign_issue_validator, issue_move_validator
 
 
 class IssueController(ModelRestController):
@@ -299,5 +299,23 @@ class IssueController(ModelRestController):
         if not issue:
             raise HTTPNotFound()
 
+        return issue
+
+    @authorize
+    @json(prevent_empty_form='708 No Parameter Exists In The Form')
+    @issue_move_validator
+    @commit
+    def move(self, id):
+        try:
+            id = int(id)
+
+        except (ValueError, TypeError):
+            raise HTTPNotFound()
+
+        issue = DBSession.query(Issue).get(id)
+        if not issue:
+            raise HTTPNotFound()
+
+        issue.project_id = context.form.get('projectId')
         return issue
 
