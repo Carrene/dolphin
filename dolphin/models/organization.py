@@ -147,6 +147,12 @@ class Organization(OrderingMixin, FilteringMixin, PaginationMixin, \
         protected=True
     )
 
+    tags = relationship(
+        'Tag',
+        back_populates='organization',
+        protected=True
+    )
+
     members_count = column_property(
         select([func.count(OrganizationMember.member_id)])
         .select_from(OrganizationMember)
