@@ -105,6 +105,8 @@ class IssueController(ModelRestController):
             )
             raise
 
+        if 'phaseId' in form and
+
         return issue
 
     @authorize
@@ -291,9 +293,9 @@ class IssueController(ModelRestController):
             .one_or_none()
 
         if DBSession.query(Item).filter(
-            Item.phase == phase,
-            Item.resource == resource,
-            Item.issue == issue
+            Item.phase_id == phase.id,
+            Item.member_id == resource.id,
+            Item.issue_id == issue.id
         ).one_or_none():
             raise HTTPStatus('602 Already Assigned')
 

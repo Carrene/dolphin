@@ -34,15 +34,6 @@ class TestIssue(LocalApplicationTestCase):
         )
         session.add(phase)
 
-        resource = Resource(
-            title='First Resource',
-            email='resource1@example.com',
-            access_token='access token 2',
-            phone=987654321,
-            reference_id=2
-        )
-        session.add(resource)
-
         issue1 = Issue(
             project=project,
             title='First issue',
@@ -63,7 +54,7 @@ class TestIssue(LocalApplicationTestCase):
             'Assign an issue to a resource',
             '/apiv1/issues/id:2',
             'ASSIGN',
-            form=dict(resourceId=1, phaseId=1)
+            form=dict(memberId=1, phaseId=1)
         ):
             assert status == 200
             assert response.json['id'] == 2
