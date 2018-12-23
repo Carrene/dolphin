@@ -48,8 +48,10 @@ class Tag(DeclarativeBase, OrderingMixin, FilteringMixin, PaginationMixin):
         min_length=1,
         label='Title',
         watermark='Enter the title',
+        example='lorem ipsum',
+        message='lorem ipsum',
         nullable=False,
-        not_none=False,
+        not_none=True,
         required=True,
         python_type=str
     )
