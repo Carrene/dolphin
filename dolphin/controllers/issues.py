@@ -312,7 +312,7 @@ class IssueController(ModelRestController):
         except (ValueError, TypeError):
             raise HTTPNotFound()
 
-        issue = DBSession.query(Issue).filter(Issue.id == id).one_or_none()
+        issue = DBSession.query(Issue).get(id)
         if not issue:
             raise HTTPNotFound()
 
