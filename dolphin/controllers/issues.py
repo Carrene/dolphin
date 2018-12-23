@@ -317,6 +317,5 @@ class IssueController(ModelRestController):
             raise HTTPNotFound()
 
         issue.project_id = context.form.get('projectId')
-        DBSession.add(issue)
         return issue
 
