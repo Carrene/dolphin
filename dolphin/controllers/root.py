@@ -11,6 +11,7 @@ from .releases import ReleaseController
 from .tokens import TokenController
 from .organization import OrganizationController, OrganizationMemberController
 from .invitation import InvitationController
+from .tag import TagController
 
 
 class Apiv1(Controller):
@@ -25,6 +26,7 @@ class Apiv1(Controller):
     organizations = OrganizationController()
     organizationmembers = OrganizationMemberController()
     invitations = InvitationController()
+    tags = TagController()
 
     @json
     def version(self):

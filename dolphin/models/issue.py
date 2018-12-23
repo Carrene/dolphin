@@ -34,25 +34,38 @@ issue_kinds = [
 ]
 
 
-class Tag(DeclarativeBase):
+class Tag(DeclarativeBase, OrderingMixin, FilteringMixin, PaginationMixin):
+
     __tablename__ = 'tag'
 
     id = Field(Integer, primary_key=True)
+
+    organization_id = Field(Integer, ForeignKey('organization.id'))
+
     title = Field(
         String,
         max_length=50,
         min_length=1,
         label='Title',
         watermark='Enter the title',
+        example='lorem ipsum',
+        message='lorem ipsum',
         nullable=False,
-        not_none=False,
+        not_none=True,
         required=True,
         python_type=str
     )
+
     issues = relationship(
         'Issue',
         secondary=association_table,
         back_populates='tags'
+    )
+
+    organization = relationship(
+        'Organization',
+        back_populates='tags',
+        protected=True
     )
 
 
