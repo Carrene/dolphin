@@ -14,7 +14,6 @@ class TeamResource(DeclarativeBase):
 class Resource(Member):
     __mapper_args__ = {'polymorphic_identity': 'resource'}
 
-    items = relationship('Item', back_populates='resource', protected=True)
     teams = relationship(
         'Team',
         secondary='resourceteam',
