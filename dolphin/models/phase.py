@@ -1,8 +1,9 @@
-from restfulpy.orm import DeclarativeBase, Field, relationship
+from restfulpy.orm import DeclarativeBase, Field, relationship, \
+    FilteringMixin, OrderingMixin, PaginationMixin
 from sqlalchemy import Integer, String, ForeignKey
 
 
-class Phase(DeclarativeBase):
+class Phase(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
     __tablename__ = 'phase'
 
     workflow_id = Field(Integer, ForeignKey('workflow.id'))
@@ -16,5 +17,16 @@ class Phase(DeclarativeBase):
         back_populates='phases',
         protected=True
     )
-    items = relationship('Item', back_populates='phase', protected=True)
+    issues = relationship(
+        'Issue',
+        secondary='item',
+        lazy='selectin',
+        protected=True
+    )
+    members = relationship(
+        'Member',
+        secondary='item',
+        lazy='selectin',
+        protected=True
+    )
 

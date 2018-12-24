@@ -153,18 +153,25 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         back_populates='issues',
         protected=True
     )
-
     project = relationship(
         'Project',
         foreign_keys=[project_id],
         back_populates='issues',
         protected=True
     )
-
-    items = relationship(
-        'Item',
-        back_populates='issue',
-        protected=True
+    phases = relationship(
+        'Phase',
+        secondary='item',
+        back_populates='issues',
+        lazy='selectin',
+        protected=True,
+    )
+    members = relationship(
+        'Member',
+        secondary='item',
+        back_populates='issues',
+        lazy='selectin',
+        protected=True,
     )
 
     is_subscribed = column_property(

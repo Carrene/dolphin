@@ -12,6 +12,7 @@ from .tokens import TokenController
 from .organization import OrganizationController, OrganizationMemberController
 from .invitation import InvitationController
 from .tag import TagController
+from .workflows import WorkflowController
 
 
 class Apiv1(Controller):
@@ -27,6 +28,7 @@ class Apiv1(Controller):
     organizationmembers = OrganizationMemberController()
     invitations = InvitationController()
     tags = TagController()
+    workflows = WorkflowController()
 
     @json
     def version(self):

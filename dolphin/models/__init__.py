@@ -7,7 +7,7 @@ from .phase import Phase
 from .resource import Resource
 from .guest import Guest
 from .team import Team
-from .item import Item, item_statuses
+from .item import Item
 from .group import Group
 from .workflow import Workflow
 from .organization import OrganizationMember, Organization
