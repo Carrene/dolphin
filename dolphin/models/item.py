@@ -10,7 +10,5 @@ class Item(TimestampMixin, DeclarativeBase):
 
     phase_id = Field(Integer, ForeignKey('phase.id'), primary_key=True)
     issue_id = Field(Integer, ForeignKey('issue.id'), primary_key=True)
-    member_id = Field(Integer, ForeignKey('member.id'), nullable=True)
-
-    id = Field(Integer, primary_key=True)
+    member_id = Field(Integer, ForeignKey('member.id'), primary_key=True)
 

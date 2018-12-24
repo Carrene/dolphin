@@ -52,15 +52,18 @@ class IssueController(ModelRestController):
 
     @authorize
     @json(form_whitelist=(
-        ['title', 'description', 'kind', 'days', 'status', 'projectId', 'dueDate'],
+        ['title', 'description', 'kind', 'days', 'status', 'projectId',
+         'dueDate', 'phaseId', 'memberId'],
         '707 Invalid field, only following fields are accepted: ' \
-        'title, description, kind, days, status, projectId and dueDate'
+        'title, description, kind, days, status, projectId, dueDate, ' \
+        'phaseId and memberId'
     ))
     @issue_validator
     @Issue.expose
     @commit
     def define(self):
         PENDING = -1
+        UNKNOWN_ASSIGNEE = -1
         form = context.form
         token = context.environ['HTTP_AUTHORIZATION']
 
@@ -103,7 +106,26 @@ class IssueController(ModelRestController):
             )
             raise
 
-        if 'phaseId' in form and
+        if 'phaseId' in form:
+            item = Item(
+                phase_id=form['phaseId'],
+                issue_id=issue.id,
+                member_id=UNKNOWN_ASSIGNEE,
+            )
+        else:
+            default_phase = DBSession.query(Phase) \
+                .filter(Phase.title == 'backlog') \
+                .one()
+            item = Item(
+                phase_id=default_phase.id,
+                issue_id=issue.id,
+                member_id=UNKNOWN_ASSIGNEE,
+            )
+
+        if 'memberId' in form:
+            item.member_id=form['memberId']
+        else:
+            item.member_id=context.identity.id
 
         return issue
 
@@ -281,8 +303,8 @@ class IssueController(ModelRestController):
         if not issue:
             raise HTTPNotFound()
 
-        resource = DBSession.query(Resource) \
-            .filter(Resource.id == form['resourceId']) \
+        member = DBSession.query(Member) \
+            .filter(Member.id == form['memberId']) \
             .one_or_none()
 
         phase = DBSession.query(Phase) \
@@ -291,15 +313,15 @@ class IssueController(ModelRestController):
 
         if DBSession.query(Item).filter(
             Item.phase_id == phase.id,
-            Item.member_id == resource.id,
+            Item.member_id == member.id,
             Item.issue_id == issue.id
         ).one_or_none():
             raise HTTPStatus('602 Already Assigned')
 
         item = Item(
-            phase=phase,
-            resource=resource,
-            issue=issue
+            phase_id=phase.id,
+            member_id=member.id,
+            issue_id=issue.id
         )
 
         DBSession.add(item)

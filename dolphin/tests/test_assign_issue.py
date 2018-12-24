@@ -18,7 +18,21 @@ class TestIssue(LocalApplicationTestCase):
             reference_id=1
         )
 
-        workflow1 = Workflow(title='First Workflow')
+        workflow1 = Workflow(title='default')
+
+        phase1 = Phase(
+            title='backlog',
+            order=-1,
+            workflow=workflow1
+        )
+        session.add(phase1)
+
+        phase2 = Phase(
+            title='triage',
+            order=0,
+            workflow=workflow1
+        )
+        session.add(phase2)
 
         project = Project(
             member=member,
@@ -26,13 +40,6 @@ class TestIssue(LocalApplicationTestCase):
             description='A decription for my project',
             room_id=1
         )
-
-        phase = Phase(
-            title='development',
-            order=2,
-            workflow=workflow1
-        )
-        session.add(phase)
 
         issue1 = Issue(
             project=project,
@@ -74,23 +81,23 @@ class TestIssue(LocalApplicationTestCase):
             assert status == 404
 
             when(
-                'Resource not found',
-                form=given | dict(resourceId=100)
+                'Member not found',
+                form=given | dict(memberId=100)
             )
-            assert status == 609
-            assert status.text.startswith('Resource not found')
+            assert status == 610
+            assert status.text.startswith('Member not found')
 
             when(
-                'Resource id is not in form',
-                form=given - 'resourceId'
+                'Member id is not in form',
+                form=given - 'memberId'
             )
-            assert status == '715 Resource Id Not In Form'
+            assert status == '735 Member Id Not In Form'
 
             when(
-                'Resource id type is not valid',
-                form=given | dict(resourceId='Alphabetical')
+                'Member id type is not valid',
+                form=given | dict(memberId='Alphabetical')
             )
-            assert status == '716 Invalid Resource Id Type'
+            assert status == '736 Invalid Member Id Type'
 
             when(
                 'Phase not found',
