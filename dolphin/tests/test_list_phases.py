@@ -8,11 +8,7 @@ class TestListPhase(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
-<<<<<<< HEAD
-        cls.session = cls.create_session()
-=======
         session = cls.create_session()
->>>>>>> enhancement/metadata
         member = Member(
             title='First Member',
             email='member1@example.com',
@@ -20,11 +16,7 @@ class TestListPhase(LocalApplicationTestCase):
             phone=123456789,
             reference_id=2
         )
-<<<<<<< HEAD
-        cls.session.add(member)
-=======
         session.add(member)
->>>>>>> enhancement/metadata
         cls.triage = Phase(title='triage', order=0)
         backlog = Phase(title='backlog', order=-1)
         implement = Phase(title='implement', order=3)
@@ -32,13 +24,8 @@ class TestListPhase(LocalApplicationTestCase):
             title='default',
             phases=[cls.triage, backlog]
         )
-<<<<<<< HEAD
-        cls.session.add(default_workflow)
-        cls.session.commit()
-=======
         session.add(default_workflow)
         session.commit()
->>>>>>> enhancement/metadata
 
     def test_list_phases(self):
         self.login('member1@example.com')

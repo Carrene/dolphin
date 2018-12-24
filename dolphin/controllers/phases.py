@@ -34,10 +34,5 @@ class PhaseController(ModelRestController):
 
         phase.issues.append(self.issue)
         DBSession.add(phase)
-<<<<<<< HEAD
-
-        return phase
-=======
         return phase
 
->>>>>>> enhancement/metadata

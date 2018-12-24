@@ -430,7 +430,6 @@ token_obtain_validator = validate(
 )
 
 
-<<<<<<< HEAD
 attachment_validator = validate(
     title=dict(
         max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
@@ -439,13 +438,14 @@ attachment_validator = validate(
     attachment=dict(
         required='758 File Not In Form'
     )
-=======
+)
+
+
 issue_move_validator = validate(
     projectId=dict(
         required='713 Project Id Not In Form',
         type_=(int, '714 Invalid Project Id Type'),
         callback=project_accessible_validator,
     ),
->>>>>>> feature/phase
 )
 
