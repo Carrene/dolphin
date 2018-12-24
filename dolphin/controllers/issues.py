@@ -9,7 +9,7 @@ from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound, \
     ChatRoomNotFound
 from ..models import Issue, Subscription, Resource, Phase, Item, Member
 from ..validators import issue_validator, update_issue_validator, \
-    assign_issue_validator
+    assign_issue_validator, issue_move_validator
 
 
 class IssueController(ModelRestController):
@@ -53,10 +53,10 @@ class IssueController(ModelRestController):
     @authorize
     @json(form_whitelist=(
         ['title', 'description', 'kind', 'days', 'status', 'projectId',
-         'dueDate', 'phaseId', 'memberId'],
+         'dueDate', 'phaseId', 'memberId', 'priority'],
         '707 Invalid field, only following fields are accepted: ' \
         'title, description, kind, days, status, projectId, dueDate, ' \
-        'phaseId and memberId'
+        'phaseId, memberId and priority'
     ))
     @issue_validator
     @Issue.expose
@@ -133,9 +133,9 @@ class IssueController(ModelRestController):
     @json(
         prevent_empty_form='708 No Parameter Exists In The Form',
         form_whitelist=(
-            ['title', 'days', 'dueDate', 'kind', 'description', 'status'],
+            ['title', 'days', 'dueDate', 'kind', 'description', 'status', 'priority'],
             '707 Invalid field, only following fields are accepted: ' \
-            'title, days, dueDate, kind, description, status' \
+            'title, days, dueDate, kind, description, status, priority' \
         )
     )
     @update_issue_validator
@@ -146,10 +146,11 @@ class IssueController(ModelRestController):
 
         try:
             id = int(id)
+
         except (TypeError, ValueError):
             raise HTTPNotFound()
 
-        issue = DBSession.query(Issue).filter(Issue.id == id).one_or_none()
+        issue = DBSession.query(Issue).get(id)
         if not issue:
             raise HTTPNotFound()
 
@@ -341,5 +342,23 @@ class IssueController(ModelRestController):
         if not issue:
             raise HTTPNotFound()
 
+        return issue
+
+    @authorize
+    @json(prevent_empty_form='708 No Parameter Exists In The Form')
+    @issue_move_validator
+    @commit
+    def move(self, id):
+        try:
+            id = int(id)
+
+        except (ValueError, TypeError):
+            raise HTTPNotFound()
+
+        issue = DBSession.query(Issue).get(id)
+        if not issue:
+            raise HTTPNotFound()
+
+        issue.project_id = context.form.get('projectId')
         return issue
 

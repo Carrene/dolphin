@@ -1,4 +1,4 @@
-from bddrest import status, response, Update, when, given
+from bddrest import status, response, Update, when, given, Remove
 
 from dolphin.models import Issue, Project, Member, Workflow, Phase
 from dolphin.tests.helpers import LocalApplicationTestCase, \
@@ -70,6 +70,7 @@ class TestIssue(LocalApplicationTestCase):
                 kind='feature',
                 days=3,
                 projectId=self.project.id,
+                priority='high',
             )
         ):
             assert status == 200
@@ -80,6 +81,42 @@ class TestIssue(LocalApplicationTestCase):
             assert response.json['kind'] == 'feature'
             assert response.json['days'] == 3
             assert response.json['status'] == 'in-progress'
+            assert response.json['priority'] == 'high'
+
+            when('Priority value not in form', form=Remove('priority'))
+            assert status == '768 Priority Not In Form'
+
+            when('Invalid the priority value', form=Update(priority='lorem'))
+            assert status == 767
+            assert status.text.startswith('Invalid priority, only one of')
+
+            when(
+                'Phase id is in form but not found(alphabetical)',
+                form=given | dict(title='New title', phaseId='Alphabetical')
+            )
+            assert status == 613
+            assert status.text.startswith('Phase not found with id')
+
+            when(
+                'Phase id is in form but not found(numeric)',
+                form=given | dict(title='New title', phaseId=100)
+            )
+            assert status == 613
+            assert status.text.startswith('Phase not found with id')
+
+            when(
+                'Member id is in form but not found(alphabetical)',
+                form=given | dict(title='New title', memberId='Alphabetical')
+            )
+            assert status == 610
+            assert status.text.startswith('Member not found with id')
+
+            when(
+                'Member id is in form but not found(numeric)',
+                form=given | dict(title='New title', memberId=100)
+            )
+            assert status == 610
+            assert status.text.startswith('Member not found with id')
 
             when(
                 'Phase id is in form but not found(alphabetical)',

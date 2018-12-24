@@ -1,4 +1,4 @@
-from bddrest import status, when, given, response
+from bddrest import status, when, given, response, Update
 
 from dolphin.models import Issue, Project, Member, Workflow
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
@@ -63,10 +63,12 @@ class TestIssue(LocalApplicationTestCase):
                 dueDate='2200-12-12',
                 kind='feature',
                 days=4,
+                priority='high',
             )
         ):
             assert status == 200
             assert response.json['id'] == 2
+            assert response.json['priority'] == 'high'
 
             when(
                 'Intended issue with string type not found',
@@ -140,6 +142,14 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert status == 705
             assert status.text.startswith('Invalid status')
+
+            when(
+                'Invalid priority value is in form',
+                form=Update(priority='no_priority')
+            )
+            assert status == 767
+            assert status.text.startswith('Invalid priority')
+
 
             when(
                 'Invalid parameter is in the form',

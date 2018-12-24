@@ -69,7 +69,7 @@ def project_not_exists_validator(title, project, field):
     return title
 
 
-def project_exists_validator(projectId, project, field):
+def project_accessible_validator(projectId, project, field):
 
     project = DBSession.query(Project) \
             .filter(Project.id == context.form['projectId']).one_or_none()
@@ -77,6 +77,10 @@ def project_exists_validator(projectId, project, field):
         raise HTTPStatus(
             f'601 Project not found with id: {context.form["projectId"]}'
         )
+
+    if project.is_deleted:
+        raise HTTPStatus('746 Hidden Project Is Not Editable')
+
     return projectId
 
 
@@ -123,6 +127,16 @@ def issue_status_value_validator(status, project, field):
             f'"{", ".join(issue_statuses)}" will be accepted'
         )
     return form['status']
+
+
+def issue_priority_value_validator(priority, project, field):
+    form = context.form
+    if 'priority' in form and form['priority'] not in issue_priorities:
+        raise HTTPStatus(
+            f'767 Invalid priority, only one of ' \
+            f'"{", ".join(issue_priorities)}" will be accepted'
+        )
+    return form['priority']
 
 
 def phase_exists_validator(phaseId, project, field):
@@ -278,10 +292,14 @@ update_project_validator = validate(
 
 
 issue_validator = validate(
+    priority=dict(
+        required='768 Priority Not In Form',
+        callback=issue_priority_value_validator
+    ),
     projectId=dict(
         required='713 Project Id Not In Form',
         type_=(int, '714 Invalid Project Id Type'),
-        callback=project_exists_validator
+        callback=project_accessible_validator,
     ),
     title=dict(
         required='710 Title Not In Form',
@@ -335,6 +353,9 @@ update_issue_validator = validate(
     ),
     days=dict(
         type_=(int, '721 Invalid Days Type'),
+    ),
+    priority=dict(
+        callback=issue_priority_value_validator,
     ),
 )
 
@@ -409,6 +430,7 @@ token_obtain_validator = validate(
 )
 
 
+<<<<<<< HEAD
 attachment_validator = validate(
     title=dict(
         max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
@@ -417,5 +439,13 @@ attachment_validator = validate(
     attachment=dict(
         required='758 File Not In Form'
     )
+=======
+issue_move_validator = validate(
+    projectId=dict(
+        required='713 Project Id Not In Form',
+        type_=(int, '714 Invalid Project Id Type'),
+        callback=project_accessible_validator,
+    ),
+>>>>>>> feature/phase
 )
 

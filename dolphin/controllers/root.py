@@ -13,6 +13,7 @@ from .releases import ReleaseController
 from .tokens import TokenController
 from .organization import OrganizationController, OrganizationMemberController
 from .invitation import InvitationController
+from .tag import TagController
 from .files import FileController
 from .workflows import WorkflowController
 
@@ -33,6 +34,7 @@ class Apiv1(Controller):
     organizations = OrganizationController()
     organizationmembers = OrganizationMemberController()
     invitations = InvitationController()
+    tags = TagController()
     workflows = WorkflowController()
 
     @json
