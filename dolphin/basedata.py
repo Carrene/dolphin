@@ -23,14 +23,24 @@ def print_subscribables(s): # pragma: no cover
 
 
 @indented(2)
-def print_member(s): # pragma: no cover
-    yield f'title: {s.title}'
-    yield f'email: {s.email}'
+def print_member(m): # pragma: no cover
+    yield f'title: {m.title}'
+    yield f'email: {m.email}'
 
 
 @indented(2)
 def print_organization(s): # pragma: no cover
     yield f'title: {s.title}'
+
+
+@indented(2)
+def print_workflow(w): # pragma: no cover
+    yield f'title: {w.title}'
+
+
+@indented(2)
+def print_phase(p): # pragma: no cover
+    yield f'title: {p.title}'
 
 
 def insert(): # pragma: no cover
@@ -70,13 +80,22 @@ def insert(): # pragma: no cover
     )
     DBSession.add(release5)
 
-    triage = Phase(title='triage', order=0)
-    backlog = Phase(title='backlog', order=-1)
-    workflow = Workflow(
-        title='default',
-        phases=[triage, backlog]
+    default_workflow = Workflow(title='default')
+
+    phase1 = Phase(
+        title='backlog',
+        order=-1,
+        workflow=default_workflow
     )
-    DBSession.add(workflow)
+    DBSession.add(phase1)
+
+    phase2 = Phase(
+        title='triage',
+        order=0,
+        workflow=default_workflow
+    )
+    DBSession.add(phase2)
+    DBSession.commit()
 
     with Context(dict()), StoreManager(DBSession):
         god = Member(
@@ -118,4 +137,11 @@ def insert(): # pragma: no cover
 
         print('Following organization has been added:')
         print_organization(organization)
+
+        print('Following workflow have been added:')
+        print_workflow(default_workflow)
+
+        print('Following phases have been added:')
+        print_phase(phase1)
+        print_phase(phase2)
 
