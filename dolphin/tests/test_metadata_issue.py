@@ -64,3 +64,12 @@ class TestIssue(LocalApplicationTestCase):
             assert fields['boarding']['required'] is not None
             assert fields['boarding']['readonly'] is not None
 
+            assert fields['priority']['label'] is not None
+            assert fields['priority']['watermark'] is not None
+            assert fields['priority']['name'] is not None
+            assert fields['priority']['notNone'] is not None
+            assert fields['priority']['required'] is not None
+            assert fields['priority']['default'] is not None
+
+
+

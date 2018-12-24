@@ -129,6 +129,16 @@ def issue_status_value_validator(status, project, field):
     return form['status']
 
 
+def issue_priority_value_validator(priority, project, field):
+    form = context.form
+    if 'priority' in form and form['priority'] not in issue_priorities:
+        raise HTTPStatus(
+            f'767 Invalid priority, only one of ' \
+            f'"{", ".join(issue_priorities)}" will be accepted'
+        )
+    return form['priority']
+
+
 def phase_exists_validator(phaseId, project, field):
     form = context.form
 
@@ -277,6 +287,10 @@ update_project_validator = validate(
 
 
 issue_validator = validate(
+    priority=dict(
+        required='768 Priority Not In Form',
+        callback=issue_priority_value_validator
+    ),
     projectId=dict(
         required='713 Project Id Not In Form',
         type_=(int, '714 Invalid Project Id Type'),
@@ -328,6 +342,9 @@ update_issue_validator = validate(
     ),
     days=dict(
         type_=(int, '721 Invalid Days Type'),
+    ),
+    priority=dict(
+        callback=issue_priority_value_validator,
     ),
 )
 
