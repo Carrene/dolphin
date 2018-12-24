@@ -1,4 +1,4 @@
-from nanohttp import json, context, HTTPNotFound
+from nanohttp import json, context, HTTPNotFound, HTTPForbidden
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
@@ -49,6 +49,9 @@ class TagController(ModelRestController):
                 issue_id=self.issue.id,
             )
             DBSession.add(issue_tag)
+
+        else:
+            raise HTTPForbidden()
 
         return tag
 

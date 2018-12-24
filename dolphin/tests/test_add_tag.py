@@ -73,7 +73,7 @@ class TestTag(LocalApplicationTestCase):
             assert status == 200
             assert response.json['id'] == self.tag.id
 
-            when('Trying to pass with form parameres', form=dict(a='a'))
+            when('Trying to pass with form parameters', form=dict(a='a'))
             assert status == '709 Form Not Allowed'
 
             when(
@@ -114,7 +114,7 @@ class TestTag(LocalApplicationTestCase):
             assert status == 200
             assert response.json['id'] == self.tag.id
 
-            when('Trying to pass with form parameres', form=dict(a='a'))
+            when('Trying to pass with form parameters', form=dict(a='a'))
             assert status == '709 Form Not Allowed'
 
             when(
