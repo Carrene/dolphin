@@ -1,5 +1,6 @@
 from nanohttp import json, context, HTTPNotFound
 from restfulpy.controllers import ModelRestController
+from restfulpy.authorization import authorize
 from restfulpy.orm import DBSession
 
 from ..models import Workflow
@@ -24,3 +25,11 @@ class WorkflowController(ModelRestController):
             raise HTTPNotFound()
 
         return workflow
+
+    @authorize
+    @json(prevent_form='709 Form Not Allowed')
+    @Workflow.expose
+    def list(self):
+        query = DBSession.query(Workflow)
+        return query
+

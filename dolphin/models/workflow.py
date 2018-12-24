@@ -1,12 +1,30 @@
-from restfulpy.orm import DeclarativeBase, Field, relationship
+from restfulpy.orm import Field, relationship, SoftDeleteMixin, \
+    ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
+    DeclarativeBase
 from sqlalchemy import Integer, String
 
 
-class Workflow(DeclarativeBase):
+class Workflow(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
+               SoftDeleteMixin,DeclarativeBase):
+
     __tablename__ = 'workflow'
 
     id = Field(Integer, primary_key=True)
-    title = Field(String, max_length=50)
+    title = Field(
+        String,
+        max_length=50,
+        min_length=1,
+        label='Name',
+        watermark='Enter the name',
+        pattern=r'^[^\s].+[^\s]$',
+        pattern_description='Spaces at the first and end of title is not valid',
+        example='Sample Title',
+        nullable=False,
+        not_none=False,
+        required=True,
+        python_type=str,
+        message='Lorem Ipsum',
+    )
 
     phases = relationship(
         'Phase',
