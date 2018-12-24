@@ -31,6 +31,7 @@ class Apiv1(Controller):
     invitations = InvitationController()
     tags = TagController()
     workflows = WorkflowController()
+    phases = PhaseController()
     draftissues = DraftIssueController()
 
     @json
