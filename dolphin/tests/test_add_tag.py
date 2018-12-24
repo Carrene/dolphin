@@ -2,7 +2,11 @@ from bddrest import status, response, when, Update
 
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
 from dolphin.models import Member, Tag, DraftIssue, Issue, Organization, \
+<<<<<<< HEAD
     OrganizationMember, Project, DraftIssueTag, IssueTag
+=======
+    OrganizationMember, Project
+>>>>>>> Implementing the add method for the tag controller, closes #313
 
 
 class TestTag(LocalApplicationTestCase):
@@ -32,6 +36,7 @@ class TestTag(LocalApplicationTestCase):
         )
         session.add(organization_member)
 
+<<<<<<< HEAD
         cls.tag1 = Tag(
             title='tag 1',
             organization_id=organization.id,
@@ -43,6 +48,13 @@ class TestTag(LocalApplicationTestCase):
             organization_id=organization.id,
         )
         session.add(cls.tag2)
+=======
+        cls.tag = Tag(
+            title='tag 1',
+            organization_id=organization.id,
+        )
+        session.add(cls.tag)
+>>>>>>> Implementing the add method for the tag controller, closes #313
 
         cls.draft_issue = DraftIssue()
         session.add(cls.draft_issue)
@@ -65,6 +77,7 @@ class TestTag(LocalApplicationTestCase):
             room_id=2
         )
         session.add(cls.issue)
+<<<<<<< HEAD
 
         session.flush()
         draft_issue_tag = DraftIssueTag(
@@ -78,6 +91,8 @@ class TestTag(LocalApplicationTestCase):
             tag_id=cls.tag2.id,
         )
         session.add(issue_tag)
+=======
+>>>>>>> Implementing the add method for the tag controller, closes #313
         session.commit()
 
     def test_add_tag_to_draft_issue(self):
@@ -86,6 +101,7 @@ class TestTag(LocalApplicationTestCase):
         with oauth_mockup_server(), self.given(
             f'Adding a tag to the draft issue',
             f'/apiv1/draftissues/draft_issue_id: {self.draft_issue.id}'
+<<<<<<< HEAD
                 f'/tags/id: {self.tag1.id}',
             f'ADD',
         ):
@@ -99,6 +115,15 @@ class TestTag(LocalApplicationTestCase):
             assert status == '634 Already Tag Added'
 
             when('Trying to pass with form parameters', form=dict(a='a'))
+=======
+                f'/tags/id: {self.tag.id}',
+            f'ADD',
+        ):
+            assert status == 200
+            assert response.json['id'] == self.tag.id
+
+            when('Trying to pass with form parameres', form=dict(a='a'))
+>>>>>>> Implementing the add method for the tag controller, closes #313
             assert status == '709 Form Not Allowed'
 
             when(
@@ -125,12 +150,15 @@ class TestTag(LocalApplicationTestCase):
             )
             assert status == 404
 
+<<<<<<< HEAD
             when(
                 'Trying to pass without draft issue',
                 url=f'/apiv1/tags/{self.tag1.id}'
             )
             assert status == 403
 
+=======
+>>>>>>> Implementing the add method for the tag controller, closes #313
             when('Request is not authorized', authorization=None)
             assert status == 401
 
@@ -139,6 +167,7 @@ class TestTag(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             f'Adding a tag to the draft issue',
+<<<<<<< HEAD
             f'/apiv1/issues/issue_id: {self.issue.id}/tags/id: {self.tag1.id}',
             f'ADD',
         ):
@@ -152,6 +181,15 @@ class TestTag(LocalApplicationTestCase):
             assert status == '634 Already Tag Added'
 
             when('Trying to pass with form parameters', form=dict(a='a'))
+=======
+            f'/apiv1/issues/issue_id: {self.issue.id}/tags/id: {self.tag.id}',
+            f'ADD',
+        ):
+            assert status == 200
+            assert response.json['id'] == self.tag.id
+
+            when('Trying to pass with form parameres', form=dict(a='a'))
+>>>>>>> Implementing the add method for the tag controller, closes #313
             assert status == '709 Form Not Allowed'
 
             when(
@@ -178,12 +216,15 @@ class TestTag(LocalApplicationTestCase):
             )
             assert status == 404
 
+<<<<<<< HEAD
             when(
                 'Trying to pass without issue',
                 url=f'/apiv1/tags/{self.tag1.id}'
             )
             assert status == 403
 
+=======
+>>>>>>> Implementing the add method for the tag controller, closes #313
             when('Request is not authorized', authorization=None)
             assert status == 401
 
