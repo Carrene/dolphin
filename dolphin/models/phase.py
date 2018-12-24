@@ -9,8 +9,34 @@ class Phase(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
     workflow_id = Field(Integer, ForeignKey('workflow.id'))
 
     id = Field(Integer, primary_key=True)
-    title = Field(String, max_length=50)
-    order = Field(Integer, unique=True)
+    title = Field(
+        String,
+        max_length=50,
+        min_length=1,
+        label='Name',
+        watermark='Enter the name',
+        pattern=r'^[^\s].+[^\s]$',
+        pattern_description='Spaces at the first and end of title is not valid',
+        example='Sample Title',
+        nullable=False,
+        not_none=True,
+        required=True,
+        python_type=str,
+        message='Lorem Ipsum',
+    )
+    order = Field(
+        Integer,
+        unique=True,
+        minimum=-1,
+        label='order',
+        watermark='Enter the order',
+        example=1,
+        nullable=False,
+        not_none=True,
+        required=True,
+        python_type=str,
+        message='Lorem Ipsum',
+    )
 
     workflow = relationship(
         'Workflow',
