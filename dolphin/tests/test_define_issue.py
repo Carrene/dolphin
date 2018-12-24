@@ -1,4 +1,4 @@
-from bddrest import status, response, Update, when, given
+from bddrest import status, response, Update, when, given, Remove
 
 from dolphin.models import Issue, Project, Member, Workflow
 from dolphin.tests.helpers import LocalApplicationTestCase, \
@@ -54,6 +54,7 @@ class TestIssue(LocalApplicationTestCase):
                 kind='enhancement',
                 days=3,
                 projectId=self.project.id,
+                priority='high',
             )
         ):
             assert status == 200
@@ -64,6 +65,14 @@ class TestIssue(LocalApplicationTestCase):
             assert response.json['kind'] == 'enhancement'
             assert response.json['days'] == 3
             assert response.json['status'] == 'in-progress'
+            assert response.json['priority'] == 'high'
+
+            when('Priority value not in form', form=Remove('priority'))
+            assert status == '768 Priority Not In Form'
+
+            when('Invalid the priority value', form=Update(priority='lorem'))
+            assert status == 767
+            assert status.text.startswith('Invalid priority, only one of')
 
             when(
                 'Project id not in form',

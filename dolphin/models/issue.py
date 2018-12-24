@@ -34,6 +34,13 @@ issue_kinds = [
 ]
 
 
+issue_priorities = [
+    'low',
+    'normal',
+    'high',
+]
+
+
 class Tag(DeclarativeBase, OrderingMixin, FilteringMixin, PaginationMixin):
 
     __tablename__ = 'tag'
@@ -122,7 +129,22 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         watermark='Choose a status',
         not_none=True,
         required=False,
-        default='on-hold'
+        default='on-hold',
+        message='lorem ipsum',
+        example='lorem ipsum',
+    )
+
+    priority = Field(
+        Enum(*issue_priorities, name='priority'),
+        python_type=str,
+        label='Priority',
+        nullable=False,
+        not_none=True,
+        required=True,
+        default='low',
+        watermark='lorem ipsum',
+        message='lorem ipsum',
+        example='lorem ipsum',
     )
 
     tags = relationship(
