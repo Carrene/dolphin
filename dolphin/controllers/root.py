@@ -13,6 +13,7 @@ from .organization import OrganizationController, OrganizationMemberController
 from .invitation import InvitationController
 from .tag import TagController
 from .workflows import WorkflowController
+from .phases import PhaseController
 
 
 class Apiv1(Controller):
@@ -29,6 +30,7 @@ class Apiv1(Controller):
     invitations = InvitationController()
     tags = TagController()
     workflows = WorkflowController()
+    phases = PhaseController()
 
     @json
     def version(self):
