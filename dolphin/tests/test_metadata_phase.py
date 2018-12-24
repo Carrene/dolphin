@@ -11,9 +11,8 @@ class TestPhase(LocalApplicationTestCase):
             '/apiv1/phases',
             'METADATA'
         ):
-            fields = response.json['fields']
-
             assert status == 200
+            fields = response.json['fields']
 
             assert fields['title']['maxLength'] is not None
             assert fields['title']['minLength'] is not None
