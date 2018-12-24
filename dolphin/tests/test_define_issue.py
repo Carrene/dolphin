@@ -119,34 +119,6 @@ class TestIssue(LocalApplicationTestCase):
             assert status.text.startswith('Member not found with id')
 
             when(
-                'Phase id is in form but not found(alphabetical)',
-                form=given | dict(title='New title', phaseId='Alphabetical')
-            )
-            assert status == 613
-            assert status.text.startswith('Phase not found with id')
-
-            when(
-                'Phase id is in form but not found(numeric)',
-                form=given | dict(title='New title', phaseId=100)
-            )
-            assert status == 613
-            assert status.text.startswith('Phase not found with id')
-
-            when(
-                'Member id is in form but not found(alphabetical)',
-                form=given | dict(title='New title', memberId='Alphabetical')
-            )
-            assert status == 610
-            assert status.text.startswith('Member not found with id')
-
-            when(
-                'Member id is in form but not found(numeric)',
-                form=given | dict(title='New title', memberId=100)
-            )
-            assert status == 610
-            assert status.text.startswith('Member not found with id')
-
-            when(
                 'Project id not in form',
                 form=given - 'projectId' | dict(title='New title')
             )

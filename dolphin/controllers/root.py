@@ -16,6 +16,7 @@ from .invitation import InvitationController
 from .tag import TagController
 from .files import FileController
 from .workflows import WorkflowController
+from .phases import PhaseController
 
 
 here = abspath(dirname(__file__))
@@ -36,6 +37,7 @@ class Apiv1(Controller):
     invitations = InvitationController()
     tags = TagController()
     workflows = WorkflowController()
+    phases = PhaseController()
 
     @json
     def version(self):
