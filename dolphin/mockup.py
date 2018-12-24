@@ -1,7 +1,4 @@
-
 from restfulpy.orm import DBSession
-from nanohttp.contexts import Context
-from nanohttp import context
 
 from .models import Member, Project
 
@@ -23,3 +20,4 @@ def insert(): # pragma: no cover
     )
     DBSession.add(project1)
     DBSession.commit()
+
