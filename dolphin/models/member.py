@@ -95,13 +95,24 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     projects = relationship('Project', back_populates='member', protected=True)
 
+    phases = relationship(
+        'Phase',
+        back_populates='members',
+        secondary='item',
+        protected=True
+    )
+    issues = relationship(
+        'Issue',
+        back_populates='members',
+        secondary='item',
+        protected=True
+    )
     organizations = relationship(
         'Organization',
         back_populates='members',
         secondary='organization_member',
         protected=True,
     )
-
     invitations = relationship(
         'Invitation',
         back_populates='by_member',

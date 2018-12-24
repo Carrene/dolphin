@@ -4,8 +4,8 @@ from os import path
 from nanohttp import RegexRouteController, json, settings, context, HTTPStatus
 from restfulpy.application import Application
 from restfulpy.mockup import mockup_http_server
-from restfulpy.testing import ApplicableTestCase
 from restfulpy.orm.metadata import FieldInfo
+from restfulpy.testing import ApplicableTestCase
 
 from dolphin import Dolphin
 from dolphin.authentication import Authenticator
@@ -23,7 +23,6 @@ _oauth_server_status = 'idle'
 
 member_id = FieldInfo(type_=int, not_none=True, required=True).to_json()
 workflow_id = FieldInfo(type_=int, not_none=True, required=True).to_json()
-resource_id = FieldInfo(type_=int, not_none=True, required=True).to_json()
 phase_id = FieldInfo(type_=int, not_none=True, required=True).to_json()
 project_id = FieldInfo(type_=int, not_none=True, required=True).to_json()
 email=FieldInfo(type_=str, required=True, not_none=True).to_json()
@@ -36,7 +35,6 @@ issue_fields = Issue.json_metadata()['fields']
 invivation_fields = Invitation.json_metadata()['fields']
 
 issue_fields.update({
-    'resourceId': resource_id,
     'phaseId': phase_id,
     'projectId': project_id,
     'memberId': member_id

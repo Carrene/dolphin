@@ -14,6 +14,7 @@ from .tokens import TokenController
 from .organization import OrganizationController, OrganizationMemberController
 from .invitation import InvitationController
 from .files import FileController
+from .workflows import WorkflowController
 
 
 here = abspath(dirname(__file__))
@@ -32,6 +33,7 @@ class Apiv1(Controller):
     organizations = OrganizationController()
     organizationmembers = OrganizationMemberController()
     invitations = InvitationController()
+    workflows = WorkflowController()
 
     @json
     def version(self):

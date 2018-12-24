@@ -128,6 +128,11 @@ def issue_status_value_validator(status, project, field):
 def phase_exists_validator(phaseId, project, field):
     form = context.form
 
+    try:
+        phaseId = int(phaseId)
+    except (TypeError, ValueError):
+        raise HTTPStatus(f'613 Phase not found with id: {form["phaseId"]}')
+
     if 'phaseId' in form and not DBSession.query(Phase) \
             .filter(Phase.id == form['phaseId']) \
             .one_or_none():
@@ -302,6 +307,12 @@ issue_validator = validate(
         type_=(int, '721 Invalid Days Type'),
         required='720 Days Not In Form'
     ),
+    phaseId=dict(
+        callback=phase_exists_validator
+    ),
+    memberId=dict(
+        callback=member_exists_validator
+    )
 )
 
 
@@ -337,10 +348,10 @@ update_item_validator = validate(
 
 
 assign_issue_validator = validate(
-    resourceId=dict(
-        required='715 Resource Id Not In Form',
-        type_=(int, '716 Invalid Resource Id Type'),
-        callback=resource_exists_validator
+    memberId=dict(
+        required='735 Member Id Not In Form',
+        type_=(int, '736 Invalid Member Id Type'),
+        callback=member_exists_validator
     ),
     phaseId=dict(
         required='737 Phase Id Not In Form',
