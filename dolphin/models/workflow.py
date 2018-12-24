@@ -5,7 +5,7 @@ from sqlalchemy import Integer, String
 
 
 class Workflow(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
-               SoftDeleteMixin,DeclarativeBase):
+               SoftDeleteMixin, DeclarativeBase):
 
     __tablename__ = 'workflow'
 
@@ -20,7 +20,7 @@ class Workflow(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         pattern_description='Spaces at the first and end of title is not valid',
         example='Sample Title',
         nullable=False,
-        not_none=False,
+        not_none=True,
         required=True,
         python_type=str,
         message='Lorem Ipsum',

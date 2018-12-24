@@ -34,5 +34,5 @@ class PhaseController(ModelRestController):
 
         phase.issues.append(self.issue)
         DBSession.add(phase)
-
         return phase
+
