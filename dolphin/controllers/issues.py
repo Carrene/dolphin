@@ -1,31 +1,45 @@
-from nanohttp import HTTPStatus, json, context, HTTPNotFound
+from nanohttp import HTTPStatus, json, context, HTTPNotFound, HTTPUnauthorized
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 
-from .phases import PhaseController
 from ..backends import ChatClient
 from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound, \
     ChatRoomNotFound
-from ..models import Issue, Subscription, Resource, Phase, Item, Member
+from ..models import Issue, Subscription, Phase, Item, Member
 from ..validators import issue_validator, update_issue_validator, \
     assign_issue_validator, issue_move_validator
+from .phases import PhaseController
+from .tag import TagController
 
 
 class IssueController(ModelRestController):
     __model__ = Issue
 
     def __call__(self, *remaining_paths):
-        if len(remaining_paths) > 1 and remaining_paths[1] == 'phases':
+        if len(remaining_paths) > 1:
+
+            if not context.identity:
+                raise HTTPUnauthorized()
+
             issue = self._get_issue(remaining_paths[0])
-            return PhaseController(issue=issue)(*remaining_paths[2:])
+
+            if remaining_paths[1] == 'phases':
+                return PhaseController(issue=issue)(*remaining_paths[2:])
+
+            elif remaining_paths[1] == 'tags':
+                return TagController(issue=issue)(*remaining_paths[2:])
 
         return super().__call__(*remaining_paths)
 
     def _get_issue(self, id):
-        issue = DBSession.query(Issue) \
-            .filter(Issue.id == id) \
-            .one_or_none()
+        try:
+            id = int(id)
+
+        except (ValueError, TypeError):
+            raise HTTPNotFound()
+
+        issue = DBSession.query(Issue).filter(Issue.id == id).one_or_none()
 
         if issue is None:
             raise HTTPNotFound()

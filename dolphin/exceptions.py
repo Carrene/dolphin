@@ -60,3 +60,7 @@ class HTTPMalformedToken(HTTPKnownStatus):
 class HTTPAlreadyInThisOrganization(HTTPKnownStatus):
     status = '628 Already In This Organization'
 
+
+class HTTPDraftIssueNotFound(HTTPKnownStatus):
+    status = '633 Issue Draft Not Found'
+
