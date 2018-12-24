@@ -69,6 +69,12 @@ class Tag(DeclarativeBase, OrderingMixin, FilteringMixin, PaginationMixin):
         back_populates='tags'
     )
 
+    draft_issues = relationship(
+        'DraftIssue',
+        secondary='draft_issue_tag',
+        back_populates='tags'
+    )
+
     organization = relationship(
         'Organization',
         back_populates='tags',
@@ -171,6 +177,12 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         secondary='item',
         back_populates='issues',
         lazy='selectin',
+        protected=True,
+    )
+
+    draft_issues = relationship(
+        'DraftIssue',
+        back_populates='issue',
         protected=True,
     )
 
