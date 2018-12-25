@@ -47,7 +47,18 @@ class Tag(DeclarativeBase, OrderingMixin, FilteringMixin, PaginationMixin):
 
     id = Field(Integer, primary_key=True)
 
-    organization_id = Field(Integer, ForeignKey('organization.id'))
+    organization_id = Field(
+        Integer,
+        ForeignKey('organization.id'),
+        python_type=int,
+        nullable=True,
+        watermark='Choose a organization',
+        label='Organization',
+        not_none=False,
+        required=False,
+        example='Lorem Ipsum',
+        message='Lorem Ipsum'
+    )
 
     title = Field(
         String,
@@ -90,7 +101,18 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     _boarding = ['on-time', 'delayed']
 
-    project_id = Field(Integer, ForeignKey('project.id'))
+    project_id = Field(
+        Integer,
+        ForeignKey('project.id'),
+        python_type=int,
+        nullable=True,
+        watermark='Choose a project',
+        label='Project',
+        not_none=False,
+        required=False,
+        example='Lorem Ipsum',
+        message='Lorem Ipsum'
+    )
     room_id = Field(Integer)
 
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
