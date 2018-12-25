@@ -20,6 +20,10 @@ class TestRelease(LocalApplicationTestCase):
         )
         session.add(member)
 
+        workflow = Workflow(title='default')
+        session.add(workflow)
+        session.flush()
+
         release1 = Release(
             title='My first release',
             description='A decription for my first release',
@@ -35,6 +39,7 @@ class TestRelease(LocalApplicationTestCase):
         session.add(release2)
 
         project1 = Project(
+            workflow_id=workflow.id,
             member=member,
             release=release1,
             title='My first project',
@@ -44,6 +49,7 @@ class TestRelease(LocalApplicationTestCase):
         session.add(project1)
 
         project2 = Project(
+            workflow_id=workflow.id,
             member=member,
             release=release2,
             title='My first project',

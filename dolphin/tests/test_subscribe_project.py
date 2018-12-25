@@ -21,7 +21,12 @@ class TestProject(LocalApplicationTestCase):
         )
         session.add(member1)
 
+        workflow = Workflow(title='default')
+        session.add(workflow)
+        session.flush()
+
         project1 = Project(
+            workflow_id=workflow.id,
             member=member1,
             title='My first project',
             description='A decription for my project',
@@ -30,6 +35,7 @@ class TestProject(LocalApplicationTestCase):
         session.add(project1)
 
         project2 = Project(
+            workflow_id=workflow.id,
             member=member1,
             title='My second project',
             description='A decription for my project',

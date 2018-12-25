@@ -17,9 +17,11 @@ class TestListPhase(LocalApplicationTestCase):
             reference_id=2
         )
         session.add(member)
+
         cls.triage = Phase(title='triage', order=0)
         backlog = Phase(title='backlog', order=-1)
         implement = Phase(title='implement', order=3)
+
         default_workflow = Workflow(
             title='default',
             phases=[cls.triage, backlog]

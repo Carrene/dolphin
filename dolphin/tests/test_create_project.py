@@ -25,7 +25,12 @@ class TestProject(LocalApplicationTestCase):
             cutoff='2030-2-20',
         )
 
+        cls.workflow = Workflow(title='default')
+        session.add(cls.workflow)
+        session.flush()
+
         project1 = Project(
+            workflow_id=cls.workflow.id,
             release=release1,
             member=member1,
             title='My first project',
@@ -45,6 +50,7 @@ class TestProject(LocalApplicationTestCase):
             '/apiv1/projects',
             'CREATE',
             form=dict(
+                workflowId=self.workflow.id,
                 releaseId=1,
                 title='My awesome project',
                 description='A decription for my project',
@@ -57,6 +63,20 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['status'] == 'active'
             assert response.json['boarding'] == None
             assert response.json['dueDate'] == None
+
+            when(
+                'Workflow id is in form but not found(alphabetical)',
+                form=given | dict(title='New title', workflowId='Alphabetical')
+            )
+            assert status == 743
+            assert status.text.startswith('Invalid Workflow Id Type')
+
+            when(
+                'Workflow id is in form but not found(numeric)',
+                form=given | dict(title='New title', workflowId=100)
+            )
+            assert status == 616
+            assert status.text.startswith('Workflow not found with id')
 
             when(
                 'Title format is wrong',

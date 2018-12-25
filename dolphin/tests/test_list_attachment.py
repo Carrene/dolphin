@@ -37,7 +37,13 @@ class TestProject(LocalApplicationTestCase):
                     attachment4
                 ]
             )
+
+            workflow = Workflow(title='default')
+            session.add(workflow)
+            session.flush()
+
             cls.project1 = Project(
+                workflow_id=workflow.id,
                 member=member1,
                 title='My first project',
                 description='A decription for my project',
@@ -45,6 +51,7 @@ class TestProject(LocalApplicationTestCase):
                 attachments=[attachment1, attachment2, attachment3]
             )
             cls.project2 = Project(
+                workflow_id=workflow.id,
                 member=member1,
                 title='My second project',
                 description='A decription for my project',

@@ -32,7 +32,12 @@ class TestProject(LocalApplicationTestCase):
                 attachments=[cls.attachment]
             )
 
+            workflow = Workflow(title='default')
+            cls.session.add(workflow)
+            cls.session.flush()
+
             cls.project1 = Project(
+                workflow_id=workflow.id,
                 member=member1,
                 title='My first project',
                 description='A decription for my project',
