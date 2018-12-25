@@ -58,7 +58,18 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     _boarding = ['on-time', 'delayed']
 
-    project_id = Field(Integer, ForeignKey('project.id'))
+    project_id = Field(
+        Integer,
+        ForeignKey('project.id'),
+        python_type=int,
+        nullable=True,
+        watermark='Choose a project',
+        label='Project',
+        not_none=False,
+        required=False,
+        example='Lorem Ipsum',
+        message='Lorem Ipsum'
+    )
     room_id = Field(Integer)
 
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)

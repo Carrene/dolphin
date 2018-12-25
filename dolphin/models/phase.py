@@ -6,7 +6,18 @@ from sqlalchemy import Integer, String, ForeignKey
 class Phase(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
     __tablename__ = 'phase'
 
-    workflow_id = Field(Integer, ForeignKey('workflow.id'))
+    workflow_id = Field(
+        Integer,
+        ForeignKey('workflow.id'),
+        python_type=int,
+        nullable=False,
+        watermark='Choose a workflow',
+        label='Workflow',
+        not_none=True,
+        required=False,
+        example='Lorem Ipsum',
+        message='Lorem Ipsum'
+    )
 
     id = Field(Integer, primary_key=True)
     title = Field(
