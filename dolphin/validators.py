@@ -291,7 +291,7 @@ update_project_validator = validate(
 )
 
 
-issue_validator = validate(
+draft_issue_finalize_validator = validate(
     priority=dict(
         required='768 Priority Not In Form',
         callback=issue_priority_value_validator
