@@ -12,10 +12,19 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from .subscribable import Subscribable, Subscription
 
 
-association_table = Table('issue_tag', DeclarativeBase.metadata,
-    Column('issue_id', Integer, ForeignKey('issue.id')),
-    Column('tag_id', Integer, ForeignKey('tag.id'))
-)
+class IssueTag(DeclarativeBase):
+    __tablename__ = 'issue_tag'
+
+    tag_id = Field(
+        Integer,
+        ForeignKey('tag.id'),
+        primary_key=True
+    )
+    issue_id = Field(
+        Integer,
+        ForeignKey('issue.id'),
+        primary_key=True
+    )
 
 
 issue_statuses = [
@@ -42,58 +51,6 @@ issue_priorities = [
     'normal',
     'high',
 ]
-
-
-class Tag(DeclarativeBase, OrderingMixin, FilteringMixin, PaginationMixin):
-
-    __tablename__ = 'tag'
-
-    id = Field(Integer, primary_key=True)
-
-    organization_id = Field(
-        Integer,
-        ForeignKey('organization.id'),
-        python_type=int,
-        nullable=True,
-        watermark='Choose a organization',
-        label='Organization',
-        not_none=False,
-        required=False,
-        example='Lorem Ipsum',
-        message='Lorem Ipsum'
-    )
-
-    title = Field(
-        String,
-        max_length=50,
-        min_length=1,
-        label='Title',
-        watermark='Enter the title',
-        example='lorem ipsum',
-        message='lorem ipsum',
-        nullable=False,
-        not_none=True,
-        required=True,
-        python_type=str
-    )
-
-    issues = relationship(
-        'Issue',
-        secondary=association_table,
-        back_populates='tags'
-    )
-
-    draft_issues = relationship(
-        'DraftIssue',
-        secondary='draft_issue_tag',
-        back_populates='tags'
-    )
-
-    organization = relationship(
-        'Organization',
-        back_populates='tags',
-        protected=True
-    )
 
 
 class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
@@ -180,7 +137,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     tags = relationship(
         'Tag',
-        secondary=association_table,
+        secondary='issue_tag',
         back_populates='issues',
         protected=True
     )

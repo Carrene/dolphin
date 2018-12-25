@@ -60,3 +60,10 @@ class HTTPMalformedToken(HTTPKnownStatus):
 class HTTPAlreadyInThisOrganization(HTTPKnownStatus):
     status = '628 Already In This Organization'
 
+
+class HTTPAlreadyTagAdded(HTTPKnownStatus):
+    status = '634 Already Tag Added'
+
+class HTTPAlreadyTagRemoved(HTTPKnownStatus):
+    status = '635 Already Tag Removed'
+
