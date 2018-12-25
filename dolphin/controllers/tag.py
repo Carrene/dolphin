@@ -4,7 +4,7 @@ from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 from sqlalchemy import and_, exists
 
-from ..exceptions import HTTPAlreadyTagAdded
+from ..exceptions import HTTPAlreadyTagAdded, HTTPAlreadyTagRemoved
 from ..models import Tag, DraftIssueTag, IssueTag
 
 
@@ -65,6 +65,52 @@ class TagController(ModelRestController):
                 issue_id=self.issue.id,
             )
             DBSession.add(issue_tag)
+
+        else:
+            raise HTTPForbidden()
+
+        return tag
+
+    @authorize
+    @json(prevent_form='709 Form Not Allowed')
+    @Tag.expose
+    @commit
+    def remove(self, id):
+        try:
+            id = int(id)
+
+        except (ValueError, TypeError):
+            raise HTTPNotFound()
+
+        tag = DBSession.query(Tag).get(id)
+        if tag is None:
+            raise HTTPNotFound()
+
+        if self.draft_issue is not None:
+            draft_issue_tag = DBSession.query(DraftIssueTag) \
+                .filter(
+                    DraftIssueTag.draft_issue_id == self.draft_issue.id,
+                    DraftIssueTag.tag_id == tag.id
+                ) \
+                .one_or_none()
+            if draft_issue_tag is None:
+                raise HTTPAlreadyTagRemoved()
+
+            else:
+                DBSession.delete(draft_issue_tag)
+
+        elif self.issue is not None:
+            issue_tag = DBSession.query(IssueTag) \
+                .filter(
+                    IssueTag.issue_id == self.issue.id,
+                    IssueTag.tag_id == tag.id
+                ) \
+                .one_or_none()
+            if issue_tag is None:
+                raise HTTPAlreadyTagRemoved()
+
+            else:
+                DBSession.delete(issue_tag)
 
         else:
             raise HTTPForbidden()
