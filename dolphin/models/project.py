@@ -34,7 +34,9 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         watermark='Choose a launch',
         label='Launch',
         not_none=False,
-        required=False
+        required=False,
+        example='Lorem Ipsum',
+        message='Lorem Ipsum'
     )
     member_id = Field(
         Integer,
@@ -44,7 +46,9 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         label='Member',
         nullable=False,
         not_none=False,
-        required=True
+        required=True,
+        example='Lorem Ipsum',
+        message='Lorem Ipsum'
     )
     room_id = Field(Integer)
 

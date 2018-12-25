@@ -17,6 +17,7 @@ from .tag import TagController
 from .files import FileController
 from .workflows import WorkflowController
 from .phases import PhaseController
+from .draft_issue import DraftIssueController
 
 
 here = abspath(dirname(__file__))
@@ -38,6 +39,7 @@ class Apiv1(Controller):
     tags = TagController()
     workflows = WorkflowController()
     phases = PhaseController()
+    draftissues = DraftIssueController()
 
     @json
     def version(self):

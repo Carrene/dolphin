@@ -50,7 +50,18 @@ class Tag(DeclarativeBase, OrderingMixin, FilteringMixin, PaginationMixin):
 
     id = Field(Integer, primary_key=True)
 
-    organization_id = Field(Integer, ForeignKey('organization.id'))
+    organization_id = Field(
+        Integer,
+        ForeignKey('organization.id'),
+        python_type=int,
+        nullable=True,
+        watermark='Choose a organization',
+        label='Organization',
+        not_none=False,
+        required=False,
+        example='Lorem Ipsum',
+        message='Lorem Ipsum'
+    )
 
     title = Field(
         String,
@@ -72,6 +83,12 @@ class Tag(DeclarativeBase, OrderingMixin, FilteringMixin, PaginationMixin):
         back_populates='tags'
     )
 
+    draft_issues = relationship(
+        'DraftIssue',
+        secondary='draft_issue_tag',
+        back_populates='tags'
+    )
+
     organization = relationship(
         'Organization',
         back_populates='tags',
@@ -85,7 +102,20 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     __tablename__ = 'issue'
     __mapper_args__ = {'polymorphic_identity': __tablename__}
 
-    project_id = Field(Integer, ForeignKey('project.id'))
+    _boarding = ['on-time', 'delayed']
+
+    project_id = Field(
+        Integer,
+        ForeignKey('project.id'),
+        python_type=int,
+        nullable=True,
+        watermark='Choose a project',
+        label='Project',
+        not_none=False,
+        required=False,
+        example='Lorem Ipsum',
+        message='Lorem Ipsum'
+    )
     room_id = Field(Integer)
 
     id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
@@ -172,6 +202,12 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         secondary='item',
         back_populates='issues',
         lazy='selectin',
+        protected=True,
+    )
+
+    draft_issues = relationship(
+        'DraftIssue',
+        back_populates='issue',
         protected=True,
     )
 

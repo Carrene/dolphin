@@ -15,4 +15,5 @@ from .messaging import OrganizationInvitationEmail
 from .organization_member import AbstractOrganizationMemberView
 from .invitation import Invitation
 from .attachment import Attachment
+from .draft_issue import DraftIssue
 
