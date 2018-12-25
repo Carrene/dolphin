@@ -2,8 +2,10 @@ from nanohttp import json, context, HTTPNotFound, HTTPForbidden
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
+from sqlalchemy import and_, exists
 
 from ..models import Tag, DraftIssueTag, IssueTag
+from ..exceptions import HTTPAlreadyTagAdded
 
 
 class TagController(ModelRestController):
@@ -37,6 +39,13 @@ class TagController(ModelRestController):
             raise HTTPNotFound()
 
         if self.draft_issue is not None:
+            is_exist_tag = DBSession.query(exists().where(and_(
+                DraftIssueTag.draft_issue_id == self.draft_issue.id,
+                DraftIssueTag.tag_id == tag.id
+            ))).scalar()
+            if is_exist_tag:
+                raise HTTPAlreadyTagAdded()
+
             draft_issue_tag = DraftIssueTag(
                 tag_id=tag.id,
                 draft_issue_id=self.draft_issue.id,
@@ -44,6 +53,13 @@ class TagController(ModelRestController):
             DBSession.add(draft_issue_tag)
 
         elif self.issue is not None:
+            is_exist_tag = DBSession.query(exists().where(and_(
+                IssueTag.issue_id == self.issue.id,
+                IssueTag.tag_id == tag.id
+            ))).scalar()
+            if is_exist_tag:
+                raise HTTPAlreadyTagAdded()
+
             issue_tag = IssueTag(
                 tag_id=tag.id,
                 issue_id=self.issue.id,

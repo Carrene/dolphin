@@ -2,7 +2,7 @@ from bddrest import status, response, when, Update
 
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
 from dolphin.models import Member, Tag, DraftIssue, Issue, Organization, \
-    OrganizationMember, Project
+    OrganizationMember, Project, DraftIssueTag, IssueTag
 
 
 class TestTag(LocalApplicationTestCase):
@@ -32,11 +32,17 @@ class TestTag(LocalApplicationTestCase):
         )
         session.add(organization_member)
 
-        cls.tag = Tag(
+        cls.tag1 = Tag(
             title='tag 1',
             organization_id=organization.id,
         )
-        session.add(cls.tag)
+        session.add(cls.tag1)
+
+        cls.tag2 = Tag(
+            title='tag 2',
+            organization_id=organization.id,
+        )
+        session.add(cls.tag2)
 
         cls.draft_issue = DraftIssue()
         session.add(cls.draft_issue)
@@ -59,6 +65,19 @@ class TestTag(LocalApplicationTestCase):
             room_id=2
         )
         session.add(cls.issue)
+
+        session.flush()
+        draft_issue_tag = DraftIssueTag(
+            draft_issue_id=cls.draft_issue.id,
+            tag_id=cls.tag2.id
+        )
+        session.add(draft_issue_tag)
+
+        issue_tag = IssueTag(
+            issue_id=cls.issue.id,
+            tag_id=cls.tag2.id,
+        )
+        session.add(issue_tag)
         session.commit()
 
     def test_add_tag_to_draft_issue(self):
@@ -67,11 +86,17 @@ class TestTag(LocalApplicationTestCase):
         with oauth_mockup_server(), self.given(
             f'Adding a tag to the draft issue',
             f'/apiv1/draftissues/draft_issue_id: {self.draft_issue.id}'
-                f'/tags/id: {self.tag.id}',
+                f'/tags/id: {self.tag1.id}',
             f'ADD',
         ):
             assert status == 200
-            assert response.json['id'] == self.tag.id
+            assert response.json['id'] == self.tag1.id
+
+            when(
+                'Already tag is added',
+                url_parameters=Update(id=self.tag2.id)
+            )
+            assert status == '634 Already Tag Added'
 
             when('Trying to pass with form parameters', form=dict(a='a'))
             assert status == '709 Form Not Allowed'
@@ -100,6 +125,12 @@ class TestTag(LocalApplicationTestCase):
             )
             assert status == 404
 
+            when(
+                'Trying to pass without draft issue',
+                url=f'/apiv1/tags/{self.tag1.id}'
+            )
+            assert status == 403
+
             when('Request is not authorized', authorization=None)
             assert status == 401
 
@@ -108,11 +139,17 @@ class TestTag(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             f'Adding a tag to the draft issue',
-            f'/apiv1/issues/issue_id: {self.issue.id}/tags/id: {self.tag.id}',
+            f'/apiv1/issues/issue_id: {self.issue.id}/tags/id: {self.tag1.id}',
             f'ADD',
         ):
             assert status == 200
-            assert response.json['id'] == self.tag.id
+            assert response.json['id'] == self.tag1.id
+
+            when(
+                'Already tag is added',
+                url_parameters=Update(id=self.tag2.id)
+            )
+            assert status == '634 Already Tag Added'
 
             when('Trying to pass with form parameters', form=dict(a='a'))
             assert status == '709 Form Not Allowed'
@@ -140,6 +177,12 @@ class TestTag(LocalApplicationTestCase):
                 url_parameters=Update(issue_id='not-integer')
             )
             assert status == 404
+
+            when(
+                'Trying to pass without issue',
+                url=f'/apiv1/tags/{self.tag1.id}'
+            )
+            assert status == 403
 
             when('Request is not authorized', authorization=None)
             assert status == 401
