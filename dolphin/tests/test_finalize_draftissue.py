@@ -1,6 +1,7 @@
 from bddrest import status, response, Update, when, given, Remove
 
-from dolphin.models import Issue, Project, Member, Workflow, Phase
+from dolphin.models import Issue, Project, Member, Workflow, Phase, Tag, \
+    DraftIssue, Organization, OrganizationMember
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
@@ -11,7 +12,7 @@ class TestIssue(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        member = Member(
+        cls.member = Member(
             title='First Member',
             email='member1@example.com',
             access_token='access token 1',
@@ -35,15 +36,15 @@ class TestIssue(LocalApplicationTestCase):
         )
         session.add(phase2)
 
-        project = Project(
-            member=member,
+        cls.project = Project(
+            member=cls.member,
             title='My first project',
             description='A decription for my project',
             room_id=1
         )
 
         issue1 = Issue(
-            project=project,
+            project=cls.project,
             title='First issue',
             description='This is description of first issue',
             due_date='2020-2-20',
@@ -52,16 +53,44 @@ class TestIssue(LocalApplicationTestCase):
             room_id=2
         )
         session.add(issue1)
-        session.commit()
-        cls.project = project
 
-    def test_define(self):
-        self.login('member1@example.com')
+        cls.draft_issue = DraftIssue()
+        session.add(cls.draft_issue)
+
+        organization = Organization(
+            title='organization-title',
+        )
+        session.add(organization)
+        session.flush()
+
+        organization_member = OrganizationMember(
+            organization_id=organization.id,
+            member_id=cls.member.id,
+            role='owner',
+        )
+        session.add(organization_member)
+
+        cls.tag1 = Tag(
+            title='tag 1',
+            organization_id=organization.id,
+        )
+        session.add(cls.tag1)
+
+        cls.tag2 = Tag(
+            title='tag 2',
+            organization_id=organization.id,
+        )
+        session.add(cls.tag2)
+        cls.draft_issue.tags = [cls.tag1, cls.tag2]
+        session.commit()
+
+    def test_finalize(self):
+        self.login(self.member.email)
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
-            'Define an issue',
-            '/apiv1/issues',
-            'DEFINE',
+            f'Define an issue',
+            f'/apiv1/draftissues/id: {self.draft_issue.id}',
+            f'FINALIZE',
             form=dict(
                 title='Defined issue',
                 status='in-progress',
@@ -74,14 +103,8 @@ class TestIssue(LocalApplicationTestCase):
             )
         ):
             assert status == 200
-            assert response.json['title'] == 'Defined issue'
-            assert response.json['description'] == 'A description for '\
-                'defined issue'
-            assert response.json['dueDate'] == '2200-02-20T00:00:00'
-            assert response.json['kind'] == 'enhancement'
-            assert response.json['days'] == 3
-            assert response.json['status'] == 'in-progress'
-            assert response.json['priority'] == 'high'
+            assert response.json['id'] == self.draft_issue.id
+            assert response.json['issueId'] is not None
 
             when('Priority value not in form', form=Remove('priority'))
             assert status == '768 Priority Not In Form'
@@ -99,7 +122,7 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Phase id is in form but not found(numeric)',
-                form=given | dict(title='New title', phaseId=100)
+                form=given | dict(title='New title', phaseId=0)
             )
             assert status == 613
             assert status.text.startswith('Phase not found with id')
@@ -113,7 +136,7 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Member id is in form but not found(numeric)',
-                form=given | dict(title='New title', memberId=100)
+                form=given | dict(title='New title', memberId=0)
             )
             assert status == 610
             assert status.text.startswith('Member not found with id')
@@ -132,7 +155,7 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Project not found with integer type',
-                form=given | dict(projectId=100, title='New title')
+                form=given | dict(projectId=0, title='New title')
             )
             assert status == 601
             assert status.text.startswith('Project not found')
