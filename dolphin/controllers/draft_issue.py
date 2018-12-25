@@ -31,7 +31,6 @@ class DraftIssueController(ModelRestController):
                 create_room_error = None
 
             except ChatRoomNotFound:
-                # FIXME: Cover here
                 create_room_error = 1
 
         return room
