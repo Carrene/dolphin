@@ -4,13 +4,7 @@ from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 from sqlalchemy import and_, exists
 
-from ..models import Tag, DraftIssueTag, IssueTag
 from ..exceptions import HTTPAlreadyTagAdded
-from nanohttp import json, context, HTTPNotFound
-from restfulpy.authorization import authorize
-from restfulpy.controllers import ModelRestController
-from restfulpy.orm import DBSession, commit
-
 from ..models import Tag, DraftIssueTag, IssueTag
 
 
