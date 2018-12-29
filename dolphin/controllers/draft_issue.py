@@ -6,12 +6,11 @@ from restfulpy.orm import commit, DBSession
 from ..backends import ChatClient
 from ..exceptions import RoomMemberAlreadyExist, ChatRoomNotFound
 from ..models import Issue, Phase, Item, Member, DraftIssue, DraftIssueTag, Tag
-from .tag import TagController
 from ..validators import draft_issue_finalize_validator
+from .tag import TagController
 
 
 PENDING = -1
-UNKNOWN_ASSIGNEE = -1
 
 
 class DraftIssueController(ModelRestController):

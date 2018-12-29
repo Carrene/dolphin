@@ -1,14 +1,7 @@
-from datetime import datetime
+from restfulpy.orm import Field, DeclarativeBase, relationship, ModifiedMixin
+from sqlalchemy import Integer, ForeignKey
 
-from nanohttp import context
-from restfulpy.orm import Field, DeclarativeBase, relationship, \
-    ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin
-from restfulpy.orm.metadata import MetadataField
-from sqlalchemy.orm import column_property
-from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
-    DateTime, String, Column, Table
-
-from .subscribable import Subscribable, Subscription
+from .issue import Issue
 
 
 class DraftIssueTag(DeclarativeBase):
@@ -26,13 +19,19 @@ class DraftIssueTag(DeclarativeBase):
     )
 
 
-class DraftIssue(DeclarativeBase):
+class DraftIssue(ModifiedMixin, DeclarativeBase):
 
     __tablename__ = 'draft_issue'
 
     id = Field(Integer, primary_key=True)
 
-    issue_id = Field(Integer, ForeignKey('issue.id'), nullable=True)
+    issue_id = Field(
+        Integer,
+        ForeignKey('issue.id'),
+        nullable=True,
+        required=False,
+        not_none=False
+    )
 
     tags = relationship(
         'Tag',
@@ -46,4 +45,15 @@ class DraftIssue(DeclarativeBase):
         back_populates='draft_issues',
         protected=True
     )
+
+    def to_dict(self):
+        result = {}
+        result['id'] = self.id
+        result['issueId'] = self.issue_id
+        return result
+
+    @classmethod
+    def iter_metadata_fields(cls):
+        yield from super().iter_metadata_fields()
+        yield from Issue.iter_metadata_fields()
 
