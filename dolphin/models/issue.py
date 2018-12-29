@@ -55,28 +55,6 @@ DELAYED = 'delayed'
 ONHOLD = 'on-hold'
 
 
-class Tag(DeclarativeBase):
-    __tablename__ = 'tag'
-
-    id = Field(Integer, primary_key=True)
-    title = Field(
-        String,
-        max_length=50,
-        min_length=1,
-        label='Title',
-        watermark='Enter the title',
-        nullable=False,
-        not_none=False,
-        required=True,
-        python_type=str
-    )
-    issues = relationship(
-        'Issue',
-        secondary=association_table,
-        back_populates='tags'
-    )
-
-
 class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             Subscribable):
 
