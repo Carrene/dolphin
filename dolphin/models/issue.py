@@ -6,7 +6,8 @@ from restfulpy.orm import Field, DeclarativeBase, relationship, \
 from restfulpy.orm.metadata import MetadataField
 from sqlalchemy.orm import column_property
 from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
-    DateTime, String, Column, Table
+    DateTime, String, Column, Table, case
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from .subscribable import Subscribable, Subscription
 
@@ -48,6 +49,10 @@ issue_priorities = [
     'normal',
     'high',
 ]
+
+
+DELAYED = 'delayed'
+ONHOLD = 'on-hold'
 
 
 class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
@@ -176,12 +181,20 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         .correlate_except(Subscription)
     )
 
-    @property
-    def boardings(self):
+    @hybrid_property
+    def boarding(self):
         if self.due_date < datetime.now():
-            return self._boarding[1]
+            return DELAYED
 
-        return self._boarding[0]
+        return ONHOLD
+
+    @boarding.expression
+    def boarding(cls):
+        return case([
+            (cls.due_date < datetime.now(), DELAYED),
+            (cls.due_date > datetime.now(), ONHOLD)
+        ])
+
 
     @classmethod
     def iter_metadata_fields(cls):
@@ -203,7 +216,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     def to_dict(self):
         issue_dict = super().to_dict()
-        issue_dict['boarding'] = self.boardings
+        issue_dict['boarding'] = self.boarding
         issue_dict['isSubscribed'] = True if self.is_subscribed else False
         return issue_dict
 

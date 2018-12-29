@@ -110,7 +110,7 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             if release is not None and issue.due_date > release.cutoff:
                 return self._boarding[2]
 
-            if issue.boardings == 'delayed':
+            if issue.boarding == 'delayed':
                 return self._boarding[1]
 
             if self.status != 'active':
