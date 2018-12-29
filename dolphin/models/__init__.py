@@ -17,4 +17,5 @@ from .organization_member import AbstractOrganizationMemberView
 from .invitation import Invitation
 from .draft_issue import DraftIssue, DraftIssueTag
 from .tag import Tag
+from .attachment import Attachment
 

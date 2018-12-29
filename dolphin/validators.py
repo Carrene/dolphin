@@ -438,3 +438,14 @@ issue_move_validator = validate(
     ),
 )
 
+
+attachment_validator = validate(
+    title=dict(
+        max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
+        pattern=(TITLE_PATTERN, '747 Invalid Title Format'),
+    ),
+    attachment=dict(
+        required='758 File Not In Form'
+    )
+)
+
