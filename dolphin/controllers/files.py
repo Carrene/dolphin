@@ -1,11 +1,10 @@
-
-from sqlalchemy_media import store_manager
 from nanohttp import json, HTTPNotFound, context, HTTPStatus
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
+from sqlalchemy_media import store_manager
 
-from ..models import Attachment, Project, Member
+from ..models import Attachment, Member
 from ..validators import attachment_validator
 
 

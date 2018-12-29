@@ -1,11 +1,9 @@
+from os.path import join, dirname, abspath
 
-import io
-from os.path import join, dirname, abspath, exists
-
-from bddrest import status, response, when, Update, Remove
+from bddrest import status, response, when
 from sqlalchemy_media import StoreManager
 
-from dolphin.models import Project, Member, Workflow, Attachment
+from dolphin.models import Project, Member, Attachment
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 

@@ -1,12 +1,9 @@
-
 import io
-from os.path import join, dirname, abspath, exists
-import shutil
-import functools
+from os.path import join, dirname, abspath
 
 from bddrest import status, response, when, Update, Remove
 
-from dolphin.models import Project, Member, Workflow
+from dolphin.models import Project, Member
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
