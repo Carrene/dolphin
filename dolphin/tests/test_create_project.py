@@ -64,6 +64,20 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['dueDate'] == None
 
             when(
+                'Workflow id is in form but not found(alphabetical)',
+                form=given | dict(title='New title', workflowId='Alphabetical')
+            )
+            assert status == 743
+            assert status.text.startswith('Invalid Workflow Id Type')
+
+            when(
+                'Workflow id is in form but not found(numeric)',
+                form=given | dict(title='New title', workflowId=100)
+            )
+            assert status == 616
+            assert status.text.startswith('Workflow not found with id')
+
+            when(
                 'Title format is wrong',
                 form=given | dict(title=' Invalid Format ')
             )

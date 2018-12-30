@@ -214,6 +214,17 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             required=False,
             readonly=True
         )
+        yield MetadataField(
+            'phaseId',
+            'phaseId',
+            label='Phase',
+            required=False,
+            readonly=True,
+            watermark='Choose a phase',
+            not_none=True,
+            example='Lorem Ipsum',
+            message='Lorem Ipsum'
+        )
 
     def to_dict(self):
         issue_dict = super().to_dict()

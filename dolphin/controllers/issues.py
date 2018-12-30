@@ -172,8 +172,11 @@ class IssueController(ModelRestController):
         if not issue:
             raise HTTPNotFound()
 
-        project = issue.project
         if 'title' in form:
+            project = issue.project
+            if 'projectId' in form and form['projectId'] != issue.project.id:
+                project = DBSession.query(Project).get(form['projectId'])
+
             for i in project.issues:
                 if i.title == form['title'] and i.id != id:
                     raise HTTPStatus(
