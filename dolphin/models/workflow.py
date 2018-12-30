@@ -32,3 +32,9 @@ class Workflow(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         protected=True
     )
 
+    projects = relationship(
+        'Project',
+        back_populates='workflow',
+        protected=True
+    )
+

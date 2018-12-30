@@ -18,23 +18,26 @@ class TestIssue(LocalApplicationTestCase):
             reference_id=1
         )
 
-        workflow1 = Workflow(title='default')
+        workflow = Workflow(title='default')
+        session.add(workflow)
+        session.flush()
 
         phase1 = Phase(
             title='backlog',
             order=-1,
-            workflow=workflow1
+            workflow=workflow
         )
         session.add(phase1)
 
         phase2 = Phase(
             title='triage',
             order=0,
-            workflow=workflow1
+            workflow=workflow
         )
         session.add(phase2)
 
         project = Project(
+            workflow_id=workflow.id,
             member=member,
             title='My first project',
             description='A decription for my project',

@@ -19,7 +19,11 @@ class TestIssue(LocalApplicationTestCase):
         )
         session.add(member)
 
+        workflow = Workflow(title='default')
+        session.add(workflow)
+
         project = Project(
+            workflow=workflow,
             member=member,
             title='My first project',
             description='A decription for my project',

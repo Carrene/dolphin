@@ -25,7 +25,12 @@ class TestProject(LocalApplicationTestCase):
             cutoff='2030-2-20',
         )
 
+        cls.workflow = Workflow(title='default')
+        session.add(cls.workflow)
+        session.flush()
+
         project1 = Project(
+            workflow_id=cls.workflow.id,
             release=release1,
             member=member1,
             title='My first project',
@@ -45,6 +50,7 @@ class TestProject(LocalApplicationTestCase):
             '/apiv1/projects',
             'CREATE',
             form=dict(
+                workflowId=self.workflow.id,
                 releaseId=1,
                 title='My awesome project',
                 description='A decription for my project',

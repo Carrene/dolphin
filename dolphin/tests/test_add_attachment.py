@@ -3,7 +3,7 @@ from os.path import join, dirname, abspath
 
 from bddrest import status, response, when, Update, Remove
 
-from dolphin.models import Project, Member
+from dolphin.models import Project, Member, Workflow
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -26,7 +26,12 @@ class TestProject(LocalApplicationTestCase):
             reference_id=2
         )
 
+        workflow = Workflow(title='default')
+        session.add(workflow)
+        session.flush()
+
         project1 = Project(
+            workflow_id=workflow.id,
             member=member1,
             title='My first project',
             description='A decription for my project',

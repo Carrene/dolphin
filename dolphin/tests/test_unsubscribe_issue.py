@@ -19,9 +19,12 @@ class TestIssue(LocalApplicationTestCase):
             reference_id=1
         )
         session.add(member)
-        session.flush()
+
+        workflow = Workflow(title='default')
+        session.add(workflow)
 
         project = Project(
+            workflow=workflow,
             member=member,
             title='My first project',
             description='A decription for my project',

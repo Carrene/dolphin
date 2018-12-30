@@ -51,7 +51,7 @@ class ProjectController(ModelRestController):
 
     @authorize
     @json(form_whitelist=(
-        ['title', 'description', 'status', 'releaseId'],
+        ['title', 'description', 'status', 'releaseId', 'workflowId'],
         '707 Invalid field, only following fields are accepted: ' \
         'title, description, status, releaseId, workflowId and groupId' \
     ))
@@ -66,6 +66,15 @@ class ProjectController(ModelRestController):
 
         project = Project()
         project.update_from_request()
+
+        if 'workflowId' in form:
+            project.workflow_id = form['workflowId']
+        else:
+            default_workflow = DBSession.query(Workflow) \
+                .filter(Workflow.title == 'default') \
+                .one()
+            project.workflow_id = default_workflow.id
+
         project.member_id = member.id
         DBSession.add(project)
         project.room_id = PENDING
