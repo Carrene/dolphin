@@ -97,7 +97,7 @@ class TestIssue(LocalApplicationTestCase):
                 status='in-progress',
                 description='A description for defined issue',
                 dueDate='2200-2-20',
-                kind='enhancement',
+                kind='feature',
                 days=3,
                 projectId=self.project.id,
                 priority='high',

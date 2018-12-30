@@ -22,6 +22,10 @@ class TestIssue(LocalApplicationTestCase):
 
         workflow = Workflow(title='default')
 
+        workflow = Workflow(title='default')
+        session.add(workflow)
+        session.flush()
+
         project = Project(
             workflow=workflow,
             member=member,
