@@ -21,17 +21,26 @@ class TestIssue(LocalApplicationTestCase):
 
         workflow = Workflow(title='default')
 
-        project = Project(
+        project1 = Project(
             workflow=workflow,
             member=member,
             title='My first project',
             description='A decription for my project',
             room_id=1
         )
-        session.add(project)
+        session.add(project1)
+
+        project2 = Project(
+            workflow=workflow,
+            member=member,
+            title='My first project',
+            description='A decription for my project',
+            room_id=1
+        )
+        session.add(project2)
 
         issue1 = Issue(
-            project=project,
+            project=project1,
             title='First issue',
             description='This is description of first issue',
             due_date='2020-2-20',
@@ -42,7 +51,7 @@ class TestIssue(LocalApplicationTestCase):
         session.add(issue1)
 
         issue2 = Issue(
-            project=project,
+            project=project1,
             title='Second issue',
             description='This is description of second issue',
             due_date='2020-2-20',
@@ -58,7 +67,7 @@ class TestIssue(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             'Update a issue',
-            '/apiv1/issues/id:2',
+            '/apiv1/issues/id:3',
             'UPDATE',
             form=dict(
                 title='New issue',
@@ -70,7 +79,7 @@ class TestIssue(LocalApplicationTestCase):
             )
         ):
             assert status == 200
-            assert response.json['id'] == 2
+            assert response.json['id'] == 3
             assert response.json['priority'] == 'high'
 
             when(
