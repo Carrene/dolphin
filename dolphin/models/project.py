@@ -128,7 +128,7 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             return None
 
         for issue in self.issues:
-            if release is not None and issue.due_date > release.cutoff:
+            if issue.boarding == 'at-risk':
                 return self._boarding[2]
 
             if issue.boarding == 'delayed':
