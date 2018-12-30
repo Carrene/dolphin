@@ -6,7 +6,7 @@ from restfulpy.orm import DBSession, commit
 from ..backends import ChatClient
 from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound, \
     ChatRoomNotFound
-from ..models import Issue, Subscription, Phase, Item, Member
+from ..models import Issue, Subscription, Phase, Item, Member, Project
 from ..validators import issue_validator, update_issue_validator, \
     assign_issue_validator, issue_move_validator
 from .phases import PhaseController
@@ -151,7 +151,8 @@ class IssueController(ModelRestController):
     @json(
         prevent_empty_form='708 No Parameter Exists In The Form',
         form_whitelist=(
-            ['title', 'days', 'dueDate', 'kind', 'description', 'status', 'priority'],
+            ['title', 'days', 'dueDate', 'kind', 'description', 'status',
+             'priority', 'projectId'],
             '707 Invalid field, only following fields are accepted: ' \
             'title, days, dueDate, kind, description, status, priority' \
         )
@@ -174,15 +175,16 @@ class IssueController(ModelRestController):
 
         if 'title' in form:
             project = issue.project
+
             if 'projectId' in form and form['projectId'] != issue.project.id:
                 project = DBSession.query(Project).get(form['projectId'])
 
             for i in project.issues:
                 if i.title == form['title'] and i.id != id:
                     raise HTTPStatus(
-                    f'600 Another issue with title: ' \
-                    f'"{form["title"]}" is already exists.'
-                )
+                        f'600 Another issue with title: ' \
+                        f'"{form["title"]}" is already exists.'
+                    )
 
         issue.update_from_request()
         return issue

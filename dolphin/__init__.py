@@ -5,13 +5,13 @@ from nanohttp import settings
 from restfulpy import Application
 from sqlalchemy_media import StoreManager, FileSystemStore
 
-from . import basedata
+from . import basedata, mockup
 from .authentication import Authenticator
 from .cli.email import EmailLauncher
 from .controllers.root import Root
 
 
-__version__ = '0.12.6nightly'
+__version__ = '0.13.2nightly'
 
 
 class Dolphin(Application):

@@ -33,7 +33,7 @@ class TestIssue(LocalApplicationTestCase):
         project2 = Project(
             workflow=workflow,
             member=member,
-            title='My first project',
+            title='My second project',
             description='A decription for my project',
             room_id=1
         )
@@ -59,7 +59,16 @@ class TestIssue(LocalApplicationTestCase):
             days=2,
             room_id=3
         )
-        session.add(issue2)
+        issue3 = Issue(
+            project=project2,
+            title='Third issue',
+            description='This is description of second issue',
+            due_date='2020-2-20',
+            kind='feature',
+            days=2,
+            room_id=3
+        )
+        session.add(issue3)
         session.commit()
 
     def test_update(self):
@@ -76,6 +85,7 @@ class TestIssue(LocalApplicationTestCase):
                 kind='feature',
                 days=4,
                 priority='high',
+                projectId=2
             )
         ):
             assert status == 200
@@ -98,13 +108,13 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Title is the same of it already is',
-                form=given | dict(title='New issue')
+                form=given | dict(title='Another issue')
             )
             assert status == 200
 
             when(
                 'Title is repetitive',
-                form=given | dict(title='Second issue')
+                form=given | dict(title='Third issue')
             )
             assert status == 600
             assert status.text.startswith('Another issue with title')

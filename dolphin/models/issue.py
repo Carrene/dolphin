@@ -31,7 +31,6 @@ issue_statuses = [
     'in-progress',
     'on-hold',
     'to-do',
-    'delayed',
     'done',
     'complete',
 ]
@@ -39,7 +38,6 @@ issue_statuses = [
 
 issue_kinds = [
     'feature',
-    'enhancement',
     'bug',
 ]
 
