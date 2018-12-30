@@ -3,7 +3,7 @@ from os.path import join, dirname, abspath
 from bddrest import status, response, when
 from sqlalchemy_media import StoreManager
 
-from dolphin.models import Project, Member, Attachment
+from dolphin.models import Project, Member, Attachment, Workflow
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -35,7 +35,13 @@ class TestProject(LocalApplicationTestCase):
                     attachment4
                 ]
             )
+
+            workflow = Workflow(title='default')
+            session.add(workflow)
+            session.flush()
+
             cls.project1 = Project(
+                workflow_id=workflow.id,
                 member=member1,
                 title='My first project',
                 description='A decription for my project',
@@ -43,6 +49,7 @@ class TestProject(LocalApplicationTestCase):
                 attachments=[attachment1, attachment2, attachment3]
             )
             cls.project2 = Project(
+                workflow_id=workflow.id,
                 member=member1,
                 title='My second project',
                 description='A decription for my project',

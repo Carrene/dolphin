@@ -26,6 +26,19 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     _boarding = ['on-time', 'delayed', 'at-risk']
 
+    workflow_id = Field(
+        Integer,
+        ForeignKey('workflow.id'),
+        python_type=int,
+        nullable=False,
+        watermark='Choose a workflow',
+        label='Workflow',
+        not_none=True,
+        required=False,
+        example='Lorem Ipsum',
+        message='Lorem Ipsum'
+    )
+
     release_id = Field(
         Integer,
         ForeignKey('release.id'),
@@ -63,6 +76,12 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         default='queued',
         example='Lorem Ipsum',
         message='Lorem Ipsum'
+    )
+
+    workflow = relationship(
+        'Workflow',
+        back_populates='projects',
+        protected=True
     )
 
     member = relationship(
