@@ -37,11 +37,9 @@ class TestProject(LocalApplicationTestCase):
             )
 
             workflow = Workflow(title='default')
-            session.add(workflow)
-            session.flush()
 
             cls.project1 = Project(
-                workflow_id=workflow.id,
+                workflow=workflow,
                 member=member1,
                 title='My first project',
                 description='A decription for my project',
@@ -49,7 +47,7 @@ class TestProject(LocalApplicationTestCase):
                 attachments=[attachment1, attachment2, attachment3]
             )
             cls.project2 = Project(
-                workflow_id=workflow.id,
+                workflow=workflow,
                 member=member1,
                 title='My second project',
                 description='A decription for my project',
@@ -73,13 +71,13 @@ class TestProject(LocalApplicationTestCase):
 
             when('Try to sort the response', query=dict(sort='id'))
             assert len(response.json) == 2
-            assert response.json[0]['id'] == 2
+            assert response.json[0]['id'] == 1
 
             when(
                 'Try to sort the response in descending order',
                 query=dict(sort='-id')
             )
-            assert response.json[0]['id'] == 3
+            assert response.json[0]['id'] == 2
 
             when(
                 'Try to filter the response using title',

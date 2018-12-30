@@ -21,7 +21,6 @@ class TestProject(LocalApplicationTestCase):
         session.add(member)
 
         workflow = Workflow(title='default')
-        session.add(workflow)
 
         project1 = Project(
             workflow=workflow,

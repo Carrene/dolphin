@@ -52,7 +52,7 @@ issue_priorities = [
 
 
 DELAYED = 'delayed'
-ONHOLD = 'on-hold'
+ONTIME = 'on-time'
 
 
 class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
@@ -186,13 +186,13 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         if self.due_date < datetime.now():
             return DELAYED
 
-        return ONHOLD
+        return ONTIME
 
     @boarding.expression
     def boarding(cls):
         return case([
             (cls.due_date < datetime.now(), DELAYED),
-            (cls.due_date > datetime.now(), ONHOLD)
+            (cls.due_date > datetime.now(), ONTIME)
         ])
 
 

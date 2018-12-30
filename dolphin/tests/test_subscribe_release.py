@@ -21,7 +21,6 @@ class TestRelease(LocalApplicationTestCase):
         session.add(member)
 
         workflow = Workflow(title='default')
-        session.add(workflow)
 
         release1 = Release(
             title='My first release',

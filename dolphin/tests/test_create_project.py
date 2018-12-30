@@ -27,10 +27,9 @@ class TestProject(LocalApplicationTestCase):
 
         cls.workflow = Workflow(title='default')
         session.add(cls.workflow)
-        session.flush()
 
         project1 = Project(
-            workflow_id=cls.workflow.id,
+            workflow=cls.workflow,
             release=release1,
             member=member1,
             title='My first project',
