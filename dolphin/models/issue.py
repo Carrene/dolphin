@@ -10,6 +10,7 @@ from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from .subscribable import Subscribable, Subscription
+from .item import Item
 
 
 class IssueTag(DeclarativeBase):
@@ -153,7 +154,8 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         secondary='item',
         back_populates='issues',
         lazy='selectin',
-        protected=True,
+        protected=False,
+        order_by=Item.created_at,
     )
     members = relationship(
         'Member',

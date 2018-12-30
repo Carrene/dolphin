@@ -142,9 +142,11 @@ class IssueController(ModelRestController):
 
         if 'memberId' in form:
             item.member_id=form['memberId']
+
         else:
             item.member_id=context.identity.id
 
+        DBSession.add(item)
         return issue
 
     @authorize
