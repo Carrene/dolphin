@@ -123,7 +123,18 @@ def insert(): # pragma: no cover
             role='owner',
         )
         DBSession.add(organization_member)
+
+        organization.tags.append(Tag(
+            title='Code Review'
+        ))
+        organization.tags.append(Tag(
+            title='Database'
+        ))
+        organization.tags.append(Tag(
+            title='Documentation'
+        ))
         DBSession.commit()
+
 
         print('Following releases have been added:')
         print_subscribables(release1)
@@ -144,4 +155,3 @@ def insert(): # pragma: no cover
         print('Following phases have been added:')
         print_phase(phase1)
         print_phase(phase2)
-
