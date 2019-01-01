@@ -33,7 +33,7 @@ def upgrade():
     sa.ForeignKeyConstraint(['tag_id'], ['tag.id'], ),
     sa.PrimaryKeyConstraint('tag_id', 'draft_issue_id')
     )
-    op.add_column('issue', sa.Column('priority', sa.Enum('low', 'normal', 'high', name='priority'), nullable=False))
+    op.add_column('issue', sa.Column('priority', sa.Enum('low', 'normal', 'high', name='priority'), nullable=True))
     op.alter_column('issue', 'project_id',
                existing_type=sa.INTEGER(),
                nullable=True)
