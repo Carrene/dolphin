@@ -20,3 +20,4 @@ class ResourceController(ModelRestController):
             .join(Item, Item.member_id == Member.id) \
             .filter(Item.phase_id == self.phase.id)
         return resources
+
