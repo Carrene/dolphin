@@ -1,6 +1,6 @@
 from nanohttp import json, context, HTTPNotFound, HTTPUnauthorized
 from restfulpy.authorization import authorize
-from restfulpy.controllers import ModelRestController
+from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import commit, DBSession
 
 from ..backends import ChatClient
@@ -13,7 +13,7 @@ from .tag import TagController
 PENDING = -1
 
 
-class DraftIssueController(ModelRestController):
+class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
     __model__ = DraftIssue
 
     def _ensure_room(self, title, token, access_token):

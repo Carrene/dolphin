@@ -1,6 +1,6 @@
 from nanohttp import json, context, HTTPNotFound, HTTPForbidden
 from restfulpy.authorization import authorize
-from restfulpy.controllers import ModelRestController
+from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import DBSession, commit
 from sqlalchemy import and_, exists
 
@@ -8,7 +8,7 @@ from ..exceptions import HTTPAlreadyTagAdded, HTTPAlreadyTagRemoved
 from ..models import Tag, DraftIssueTag, IssueTag
 
 
-class TagController(ModelRestController):
+class TagController(ModelRestController, JsonPatchControllerMixin):
     __model__ = Tag
 
     def __init__(self, draft_issue=None, issue=None):
@@ -24,7 +24,8 @@ class TagController(ModelRestController):
         )
 
     @authorize
-    @json(prevent_form='709 Form Not Allowed')
+    ## FIXME: Add prevent form in the new verion of nanohhtp
+    @json
     @Tag.expose
     @commit
     def add(self, id):
@@ -72,7 +73,8 @@ class TagController(ModelRestController):
         return tag
 
     @authorize
-    @json(prevent_form='709 Form Not Allowed')
+    ## FIXME: Add prevent form in the new verion of nanohhtp
+    @json
     @Tag.expose
     @commit
     def remove(self, id):

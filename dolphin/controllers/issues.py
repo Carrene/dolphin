@@ -1,6 +1,6 @@
 from nanohttp import HTTPStatus, json, context, HTTPNotFound, HTTPUnauthorized
 from restfulpy.authorization import authorize
-from restfulpy.controllers import ModelRestController
+from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import DBSession, commit
 
 from ..backends import ChatClient
@@ -17,7 +17,7 @@ PENDING = -1
 UNKNOWN_ASSIGNEE = -1
 
 
-class IssueController(ModelRestController):
+class IssueController(ModelRestController, JsonPatchControllerMixin):
     __model__ = Issue
 
     def __call__(self, *remaining_paths):
