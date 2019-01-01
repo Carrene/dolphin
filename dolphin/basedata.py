@@ -85,21 +85,42 @@ def insert(): # pragma: no cover
     )
     DBSession.add(release5)
 
-    default_workflow = Workflow(title='default')
+    default_workflow = Workflow(title='Default')
 
     phase1 = Phase(
-        title='backlog',
+        title='Backlog',
         order=-1,
         workflow=default_workflow
     )
     DBSession.add(phase1)
 
     phase2 = Phase(
-        title='triage',
+        title='Triage',
         order=0,
         workflow=default_workflow
     )
     DBSession.add(phase2)
+
+    phase3 = Phase(
+        title='Design',
+        order=1,
+        workflow=default_workflow
+    )
+    DBSession.add(phase3)
+
+    phase4 = Phase(
+        title='Development',
+        order=2,
+        workflow=default_workflow
+    )
+    DBSession.add(phase4)
+
+    phase5 = Phase(
+        title='Test',
+        order=3,
+        workflow=default_workflow
+    )
+    DBSession.add(phase5)
     DBSession.commit()
 
     with Context(dict()), StoreManager(DBSession):
@@ -164,6 +185,9 @@ def insert(): # pragma: no cover
         print('Following phases have been added:')
         print_phase(phase1)
         print_phase(phase2)
+        print_phase(phase3)
+        print_phase(phase4)
+        print_phase(phase5)
 
         print('Following tags have been added:')
         print_tag(code_review_tag)
