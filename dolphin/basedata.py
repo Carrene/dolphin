@@ -129,20 +129,20 @@ def insert(): # pragma: no cover
         )
         DBSession.add(organization_member)
 
-        tag1 = Tag(
+        code_review_tag = Tag(
             title='Code Review'
         )
-        organization.tags.append(tag1)
+        organization.tags.append(code_review_tag)
 
-        tag2 = Tag(
+        database_tag = Tag(
             title='Database'
         )
-        organization.tags.append(tag1)
+        organization.tags.append(database_tag)
 
-        tag3 = Tag(
+        documentation_tag = Tag(
             title='Documentation'
         )
-        organization.tags.append(tag1)
+        organization.tags.append(documentation_tag)
         DBSession.commit()
 
         print('Following releases have been added:')
@@ -166,7 +166,7 @@ def insert(): # pragma: no cover
         print_phase(phase2)
 
         print('Following tags have been added:')
-        print_tag(tag1)
-        print_tag(tag2)
-        print_tag(tag3)
+        print_tag(code_review_tag)
+        print_tag(database_tag)
+        print_tag(documentation_tag)
 
