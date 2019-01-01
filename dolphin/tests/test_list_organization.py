@@ -129,11 +129,9 @@ class TestOrganization(LocalApplicationTestCase):
             assert response.json[1]['id'] == 1
 
             when('Trying pagination response', query=dict(take=1))
-            assert response.json[0]['id'] == 1
             assert len(response.json) == 1
 
             when('Trying pagination with skip', query=dict(take=1, skip=1))
-            assert response.json[0]['id'] == 2
             assert len(response.json) == 1
 
             when('Trying filtering response', query=dict(id=1))

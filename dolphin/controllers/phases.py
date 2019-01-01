@@ -1,17 +1,42 @@
+from nanohttp import json, HTTPNotFound, HTTPUnauthorized, context
+from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
-from restfulpy.authorization import authorize
-from nanohttp import json, HTTPNotFound
 
-from ..models import Phase, Workflow, Item
+from ..models import Phase
+from .resource import ResourceController
 
 
 class PhaseController(ModelRestController):
     __model__ = Phase
 
+    def __call__(self, *remaining_paths):
+        if len(remaining_paths) > 1:
+            if not context.identity:
+                raise HTTPUnauthorized()
+
+            phase = self._get_phase(remaining_paths[0])
+            if remaining_paths[1] == 'resources':
+                return ResourceController(phase=phase)(*remaining_paths[2:])
+
+        return super().__call__(*remaining_paths)
+
     def __init__(self, workflow=None, issue=None):
         self.workflow = workflow
         self.issue = issue
+
+    def _get_phase(self, id):
+        try:
+            id = int(id)
+
+        except (ValueError, TypeError):
+            raise HTTPNotFound()
+
+        phase = DBSession.query(Phase).get(id)
+        if phase is None:
+            raise HTTPNotFound()
+
+        return phase
 
     @authorize
     @json(prevent_form='709 Form Not Allowed')
