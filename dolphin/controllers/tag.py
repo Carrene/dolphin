@@ -24,8 +24,7 @@ class TagController(ModelRestController, JsonPatchControllerMixin):
         )
 
     @authorize
-    ## FIXME: Add prevent form in the new verion of nanohhtp
-    @json
+    @json ## FIXME: Add prevent form in the new verion of nanohhtp
     @Tag.expose
     @commit
     def add(self, id):
@@ -73,8 +72,7 @@ class TagController(ModelRestController, JsonPatchControllerMixin):
         return tag
 
     @authorize
-    ## FIXME: Add prevent form in the new verion of nanohhtp
-    @json
+    @json ## FIXME: Add prevent form in the new verion of nanohhtp
     @Tag.expose
     @commit
     def remove(self, id):
