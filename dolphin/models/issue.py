@@ -69,7 +69,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         nullable=True,
         watermark='Choose a project',
         label='Project',
-        not_none=False,
+        not_none=True,
         required=False,
         example='Lorem Ipsum',
         message='Lorem Ipsum'
@@ -141,7 +141,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         'Tag',
         secondary='issue_tag',
         back_populates='issues',
-        protected=True
+        protected=False,
     )
     project = relationship(
         'Project',
@@ -225,6 +225,18 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             example='Lorem Ipsum',
             message='Lorem Ipsum'
         )
+        yield MetadataField(
+            'tags',
+            'tags',
+            label='Tags',
+            required=False,
+            readonly=True,
+            not_none=False,
+            watermark='Lorem Ipsum',
+            example='Lorem Ipsum',
+            message='Lorem Ipsum'
+        )
+
 
     def to_dict(self):
         issue_dict = super().to_dict()

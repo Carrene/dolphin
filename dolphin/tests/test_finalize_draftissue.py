@@ -106,6 +106,7 @@ class TestIssue(LocalApplicationTestCase):
             assert status == 200
             assert response.json['id'] == self.draft_issue.id
             assert response.json['issueId'] is not None
+            assert response.json['tags'] is not None
 
             when('Priority value not in form', form=Remove('priority'))
             assert status == '768 Priority Not In Form'
