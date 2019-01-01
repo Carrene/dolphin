@@ -11,7 +11,7 @@ from .cli.email import EmailLauncher
 from .controllers.root import Root
 
 
-__version__ = '0.13.2nightly'
+__version__ = '0.14.2nightly'
 
 
 class Dolphin(Application):
