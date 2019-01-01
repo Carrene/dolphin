@@ -4,7 +4,7 @@ from restfulpy.orm import DBSession
 from sqlalchemy_media import StoreManager
 
 from .models import Release, Member, Organization, OrganizationMember,\
-    Workflow, Phase
+    Workflow, Phase, Tag
 
 
 def indented(n): # pragma: no cover
@@ -41,6 +41,11 @@ def print_workflow(w): # pragma: no cover
 @indented(2)
 def print_phase(p): # pragma: no cover
     yield f'title: {p.title}'
+
+
+@indented(2)
+def print_tag(t): # pragma: no cover
+    yield f'title: {t.title}'
 
 
 def insert(): # pragma: no cover
@@ -123,6 +128,21 @@ def insert(): # pragma: no cover
             role='owner',
         )
         DBSession.add(organization_member)
+
+        code_review_tag = Tag(
+            title='Code Review'
+        )
+        organization.tags.append(code_review_tag)
+
+        database_tag = Tag(
+            title='Database'
+        )
+        organization.tags.append(database_tag)
+
+        documentation_tag = Tag(
+            title='Documentation'
+        )
+        organization.tags.append(documentation_tag)
         DBSession.commit()
 
         print('Following releases have been added:')
@@ -144,4 +164,9 @@ def insert(): # pragma: no cover
         print('Following phases have been added:')
         print_phase(phase1)
         print_phase(phase2)
+
+        print('Following tags have been added:')
+        print_tag(code_review_tag)
+        print_tag(database_tag)
+        print_tag(documentation_tag)
 
