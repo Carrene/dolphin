@@ -152,7 +152,7 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
 
         else:
             default_phase = DBSession.query(Phase) \
-                .filter(Phase.title == 'backlog') \
+                .filter(Phase.title == 'Backlog') \
                 .one()
             item = Item(
                 phase_id=default_phase.id,
