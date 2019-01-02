@@ -23,14 +23,14 @@ class TestIssue(LocalApplicationTestCase):
         session.add(workflow)
 
         phase1 = Phase(
-            title='backlog',
+            title='Backlog',
             order=-1,
             workflow=workflow
         )
         session.add(phase1)
 
         phase2 = Phase(
-            title='triage',
+            title='Triage',
             order=0,
             workflow=workflow
         )
