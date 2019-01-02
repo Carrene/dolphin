@@ -86,20 +86,20 @@ class TestIssue(LocalApplicationTestCase):
                 'Member not found',
                 form=given | dict(memberId=100)
             )
-            assert status == 610
-            assert status.text.startswith('Member not found')
+            assert status == 609
+            assert status.text.startswith('Resource not found')
 
             when(
                 'Member id is not in form',
                 form=given - 'memberId'
             )
-            assert status == '735 Member Id Not In Form'
+            assert status == '715 Resource Id Not In Form'
 
             when(
                 'Member id type is not valid',
                 form=given | dict(memberId='Alphabetical')
             )
-            assert status == '736 Invalid Member Id Type'
+            assert status == '716 Invalid Resource Id Type'
 
             when(
                 'Phase not found',

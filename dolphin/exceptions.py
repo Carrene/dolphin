@@ -64,6 +64,14 @@ class HTTPAlreadyInThisOrganization(HTTPKnownStatus):
 class HTTPAlreadyTagAdded(HTTPKnownStatus):
     status = '634 Already Tag Added'
 
+
 class HTTPAlreadyTagRemoved(HTTPKnownStatus):
     status = '635 Already Tag Removed'
+
+
+class HTTPResourceNotFound(HTTPKnownStatus):
+
+    def __init__(self, resource_id):
+        self.status = f'609 Resource not found with id: {resource_id}'
+
 
