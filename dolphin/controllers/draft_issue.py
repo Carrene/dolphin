@@ -88,6 +88,7 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
             raise HTTPNotFound()
 
         tags = DBSession.query(Tag) \
+            .join(DraftIssueTag, DraftIssueTag.tag_id == Tag.id) \
             .filter(DraftIssueTag.draft_issue_id == id) \
             .all()
 
