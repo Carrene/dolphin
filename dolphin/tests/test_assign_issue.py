@@ -93,13 +93,13 @@ class TestIssue(LocalApplicationTestCase):
                 'Member id is not in form',
                 form=given - 'memberId'
             )
-            assert status == '735 Member Id Not In Form'
+            assert status == '715 Member Id Not In Form'
 
             when(
                 'Member id type is not valid',
                 form=given | dict(memberId='Alphabetical')
             )
-            assert status == '736 Invalid Member Id Type'
+            assert status == '716 Invalid Member Id Type'
 
             when(
                 'Phase not found',

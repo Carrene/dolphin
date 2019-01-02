@@ -42,10 +42,10 @@ class Dolphin(Application):
       oauth:
         secret: A1dFVpz4w/qyym+HeXKWYmm6Ocj4X5ZNv1JQ7kgHBEk=\n
         application_id: 1
-        url: http://localhost:8080
+        url: http://localhost:8083
 
       chat:
-        url: http://localhost:8081
+        url: http://localhost:8084
 
       organization_invitation:
         secret: !!binary xxSN/uarj5SpcEphAHhmsab8Ql2Og/2IcieNfQ3PysI=

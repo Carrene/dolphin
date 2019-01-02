@@ -413,8 +413,9 @@ update_item_validator = validate(
 
 assign_issue_validator = validate(
     memberId=dict(
-        required='735 Member Id Not In Form',
-        type_=(int, '736 Invalid Member Id Type'),
+        not_none='716 Invalid Member Id Type',
+        required='715 Member Id Not In Form',
+        type_=(int, '716 Invalid Member Id Type'),
         callback=member_exists_validator
     ),
     phaseId=dict(
