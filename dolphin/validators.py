@@ -5,6 +5,7 @@ from restfulpy.orm import DBSession
 
 from .models import *
 from .models.organization import roles
+from .exceptions import HTTPResourceNotFound
 
 
 TITLE_PATTERN = re.compile(r'^(?!\s).*[^\s]$')
@@ -184,17 +185,14 @@ def member_exists_validator(memberId, project, field):
     form = context.form
     try:
         memberId = int(memberId)
+
     except (TypeError, ValueError):
-        raise HTTPStatus(
-            f'609 Resource not found with id: {context.form["memberId"]}'
-        )
+        raise HTTPResourceNotFound(resource_id=context.form['memberId'])
 
     if 'memberId' in form and not DBSession.query(Member) \
             .filter(Member.id == memberId) \
             .one_or_none():
-        raise HTTPStatus(
-            f'609 Resource not found with id: {context.form["memberId"]}'
-        )
+        raise HTTPResourceNotFound(resource_id=context.form['memberId'])
 
     return memberId
 
