@@ -82,6 +82,13 @@ class TestIssue(LocalApplicationTestCase):
             organization_id=organization.id,
         )
         session.add(cls.tag2)
+
+        cls.tag3 = Tag(
+            title='tag 3',
+            organization_id=organization.id,
+        )
+        session.add(cls.tag3)
+
         cls.draft_issue.tags = [cls.tag1, cls.tag2]
         session.commit()
 
@@ -106,7 +113,7 @@ class TestIssue(LocalApplicationTestCase):
             assert status == 200
             assert response.json['id'] == self.draft_issue.id
             assert response.json['issueId'] is not None
-            assert response.json['tags'] is not None
+            assert len(response.json['tags']) == 2
 
             when('Priority value not in form', form=Remove('priority'))
             assert status == '768 Priority Not In Form'
