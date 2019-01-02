@@ -91,6 +91,7 @@ class TestIssue(LocalApplicationTestCase):
             assert status == 200
             assert response.json['id'] == 3
             assert response.json['priority'] == 'high'
+            assert response.json['tags'] is not None
 
             when(
                 'Intended issue with string type not found',

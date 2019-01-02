@@ -11,9 +11,9 @@ class TestIssue(LocalApplicationTestCase):
             '/apiv1/issues',
             'METADATA'
         ):
-            fields = response.json['fields']
-
             assert status == 200
+
+            fields = response.json['fields']
 
             assert fields['title']['maxLength'] is not None
             assert fields['title']['minLength'] is not None

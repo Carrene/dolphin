@@ -37,7 +37,7 @@ class DraftIssue(ModifiedMixin, DeclarativeBase):
         'Tag',
         secondary='draft_issue_tag',
         back_populates='draft_issues',
-        protected=True
+        protected=False,
     )
 
     issue = relationship(
@@ -47,8 +47,7 @@ class DraftIssue(ModifiedMixin, DeclarativeBase):
     )
 
     def to_dict(self):
-        result = {}
-        result['id'] = self.id
+        result = super().to_dict()
         result['issueId'] = self.issue_id
         return result
 
