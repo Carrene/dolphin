@@ -110,15 +110,15 @@ class TestIssue(LocalApplicationTestCase):
                 'Member id is in form but not found(alphabetical)',
                 form=given | dict(title='New title', memberId='Alphabetical')
             )
-            assert status == 610
-            assert status.text.startswith('Member not found with id')
+            assert status == 609
+            assert status.text.startswith('Resource not found with id')
 
             when(
                 'Member id is in form but not found(numeric)',
                 form=given | dict(title='New title', memberId=100)
             )
-            assert status == 610
-            assert status.text.startswith('Member not found with id')
+            assert status == 609
+            assert status.text.startswith('Resource not found with id')
 
             when(
                 'Project id not in form',

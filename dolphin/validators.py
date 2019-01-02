@@ -186,14 +186,14 @@ def member_exists_validator(memberId, project, field):
         memberId = int(memberId)
     except (TypeError, ValueError):
         raise HTTPStatus(
-            f'610 Member not found with id: {context.form["memberId"]}'
+            f'609 Resource not found with id: {context.form["memberId"]}'
         )
 
     if 'memberId' in form and not DBSession.query(Member) \
             .filter(Member.id == memberId) \
             .one_or_none():
         raise HTTPStatus(
-            f'610 Member not found with id: {context.form["memberId"]}'
+            f'609 Resource not found with id: {context.form["memberId"]}'
         )
 
     return memberId
@@ -413,9 +413,9 @@ update_item_validator = validate(
 
 assign_issue_validator = validate(
     memberId=dict(
-        not_none='716 Invalid Member Id Type',
-        required='715 Member Id Not In Form',
-        type_=(int, '716 Invalid Member Id Type'),
+        not_none='769 Resource Id Is None',
+        required='715 Resource Id Not In Form',
+        type_=(int, '716 Invalid Resource Id Type'),
         callback=member_exists_validator
     ),
     phaseId=dict(
