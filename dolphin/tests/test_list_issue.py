@@ -63,17 +63,17 @@ class TestIssue(LocalApplicationTestCase):
         )
         session.add(issue3)
 
-        phase = Phase(
+        cls.phase = Phase(
             workflow=workflow,
             title='phase 1',
             order=1,
         )
-        session.add(phase)
+        session.add(cls.phase)
         session.flush()
 
         item = Item(
             member_id=member.id,
-            phase_id=phase.id,
+            phase_id=cls.phase.id,
             issue_id=issue1.id,
         )
         session.add(item)
@@ -123,10 +123,7 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert response.json[0]['title'] == 'First issue'
 
-            when(
-                'Filter by nested object',
-                query=dict(phaseId='1'),
-            )
+            when('Filter by phase id', query=dict(phaseId=self.phase.id))
             assert len(response.json) == 1
 
             when('Request is not authorized', authorization=None)
