@@ -195,9 +195,12 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     @json
     @Issue.expose
     def list(self):
+        if 'phaseId' in context.query:
+            return DBSession.query(Issue) \
+                .join(Item, Item.issue_id == Issue.id) \
+                .filter(Item.phase_id == context.query['phaseId'])
 
-        query = DBSession.query(Issue)
-        return query
+        return DBSession.query(Issue)
 
     @authorize
     @json(prevent_form='709 Form Not Allowed')

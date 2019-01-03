@@ -1,6 +1,6 @@
 from bddrest import status, response, when
 
-from dolphin.models import Issue, Project, Member, Workflow
+from dolphin.models import Issue, Project, Member, Workflow, Item, Phase
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -62,6 +62,21 @@ class TestIssue(LocalApplicationTestCase):
             room_id=4
         )
         session.add(issue3)
+
+        cls.phase = Phase(
+            workflow=workflow,
+            title='phase 1',
+            order=1,
+        )
+        session.add(cls.phase)
+        session.flush()
+
+        item = Item(
+            member_id=member.id,
+            phase_id=cls.phase.id,
+            issue_id=issue1.id,
+        )
+        session.add(item)
         session.commit()
 
     def test_list(self):
@@ -75,12 +90,7 @@ class TestIssue(LocalApplicationTestCase):
             assert status == 200
             assert len(response.json) == 3
 
-        with oauth_mockup_server(), self.given(
-            'Sort issues by title',
-            '/apiv1/issues',
-            'LIST',
-            query=dict(sort='title')
-        ):
+            when('Sort issues by title', query=dict(sort='title'))
             assert response.json[0]['title'] == 'First issue'
 
             when(
@@ -89,12 +99,7 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert response.json[0]['title'] == 'Third issue'
 
-        with oauth_mockup_server(), self.given(
-            'Filter issues',
-            '/apiv1/issues',
-            'LIST',
-            query=dict(title='First issue')
-        ):
+            when('Filter issues', query=dict(title='First issue'))
             assert response.json[0]['title'] == 'First issue'
 
             when(
@@ -109,12 +114,7 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert len(response.json) == 1
 
-        with oauth_mockup_server(), self.given(
-             'Issues pagination',
-             '/apiv1/issues',
-             'LIST',
-             query=dict(take=1, skip=2)
-         ):
+            when('Issues pagination', query=dict(take=1, skip=2))
             assert response.json[0]['title'] == 'Third issue'
 
             when(
@@ -122,6 +122,9 @@ class TestIssue(LocalApplicationTestCase):
                 query=dict(sort='-title', take=1, skip=2)
             )
             assert response.json[0]['title'] == 'First issue'
+
+            when('Filter by phase id', query=dict(phaseId=self.phase.id))
+            assert len(response.json) == 1
 
             when('Request is not authorized', authorization=None)
             assert status == 401
