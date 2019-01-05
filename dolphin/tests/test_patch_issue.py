@@ -1,9 +1,8 @@
-from bddrest import status, response, Update, when, given, Remove
+from bddrest import status, response, when
 
 from dolphin.models import Issue, Project, Member, Workflow, Phase, Tag, \
     Organization
-from dolphin.tests.helpers import LocalApplicationTestCase, \
-    oauth_mockup_server, chat_mockup_server, chat_server_status
+from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server, chat_mockup_server
 
 
 class TestIssue(LocalApplicationTestCase):
@@ -42,6 +41,7 @@ class TestIssue(LocalApplicationTestCase):
 
         tag1 = Tag(title='tag1', organization=organization)
         tag2 = Tag(title='tag2', organization=organization)
+        session.add(tag2)
 
         project = Project(
             workflow=workflow,
@@ -102,7 +102,13 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'One of requests response faces non 200 OK',
-                json=[dict(op='ADD', path='2/tags/100', value={})]
+                json=[
+                    dict(
+                        op='ADD',
+                        path='2/tags/100',
+                        value={}
+                    )
+                ]
             )
             assert status == 404
 
