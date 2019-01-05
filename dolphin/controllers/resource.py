@@ -7,7 +7,7 @@ from ..models import Item, Member
 
 
 class ResourceController(ModelRestController):
-    __table__ = Member
+    __model__ = Member
 
     def __init__(self, phase=None):
         self.phase = phase

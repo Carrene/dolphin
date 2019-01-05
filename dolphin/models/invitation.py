@@ -14,8 +14,8 @@ roles = [
 ]
 
 
-class Invitation(OrderingMixin, FilteringMixin, PaginationMixin, \
-                   ModifiedMixin, TimestampMixin, DeclarativeBase):
+class Invitation(OrderingMixin, FilteringMixin, PaginationMixin,
+                 ModifiedMixin, TimestampMixin, DeclarativeBase):
 
     __tablename__ = 'invitation'
 
