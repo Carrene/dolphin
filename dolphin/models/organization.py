@@ -67,7 +67,7 @@ class Logo(Image):
     __prefix__ = 'logo'
 
 
-class Organization(OrderingMixin, FilteringMixin, PaginationMixin, \
+class Organization(OrderingMixin, FilteringMixin, PaginationMixin,
                    ModifiedMixin, TimestampMixin, DeclarativeBase):
 
     __tablename__ = 'organization'
