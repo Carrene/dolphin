@@ -11,7 +11,7 @@ from ..validators import attachment_validator
 class FileController(ModelRestController):
     __model__ = Attachment
 
-    def __init__(self, project):
+    def __init__(self, project=None):
         self.project = project
 
     @authorize

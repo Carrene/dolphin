@@ -42,6 +42,7 @@ class Apiv1(Controller):
     phases = PhaseController()
     draftissues = DraftIssueController()
     resources = ResourceController()
+    files = FileController()
 
     @json
     def version(self):
