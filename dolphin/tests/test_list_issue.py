@@ -63,20 +63,34 @@ class TestIssue(LocalApplicationTestCase):
         )
         session.add(issue3)
 
-        cls.phase = Phase(
+        cls.phase1 = Phase(
             workflow=workflow,
             title='phase 1',
             order=1,
         )
-        session.add(cls.phase)
+        session.add(cls.phase1)
+
+        cls.phase2 = Phase(
+            workflow=workflow,
+            title='phase 2',
+            order=2,
+        )
+        session.add(cls.phase1)
         session.flush()
 
-        item = Item(
+        item1 = Item(
             member_id=member.id,
-            phase_id=cls.phase.id,
+            phase_id=cls.phase1.id,
             issue_id=issue1.id,
         )
-        session.add(item)
+        session.add(item1)
+
+        item2 = Item(
+            member_id=member.id,
+            phase_id=cls.phase2.id,
+            issue_id=issue2.id,
+        )
+        session.add(item2)
         session.commit()
 
     def test_list(self):
@@ -123,8 +137,14 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert response.json[0]['title'] == 'First issue'
 
-            when('Filter by phase id', query=dict(phaseId=self.phase.id))
+            when('Filter by phase id', query=dict(phaseId=self.phase1.id))
             assert len(response.json) == 1
+
+            when(
+                'Filter by phase id with IN function',
+                query=dict(phaseId=f'IN({self.phase1.id}, {self.phase2.id})')
+            )
+            assert len(response.json) == 2
 
             when('Request is not authorized', authorization=None)
             assert status == 401

@@ -244,3 +244,15 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         issue_dict['isSubscribed'] = True if self.is_subscribed else False
         return issue_dict
 
+    @classmethod
+    def filter_by_request(cls, query):
+        query = super().filter_by_request(query)
+
+        if 'phaseId' in context.query:
+            value = context.query['phaseId']
+            query = query.join(Item)
+            query = cls._filter_by_column_value(query, Item.phase_id, value)
+
+        return query
+
+
