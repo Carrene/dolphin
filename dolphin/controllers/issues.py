@@ -78,6 +78,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     ))
     @issue_validator
     @Issue.expose
+
     @commit
     def define(self):
         PENDING = -1
@@ -195,11 +196,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     @json
     @Issue.expose
     def list(self):
-        if 'phaseId' in context.query:
-            return DBSession.query(Issue) \
-                .join(Item, Item.issue_id == Issue.id) \
-                .filter(Item.phase_id == context.query['phaseId'])
-
         return DBSession.query(Issue)
 
     @authorize
