@@ -86,11 +86,11 @@ class TestIssue(LocalApplicationTestCase):
                     op='UPDATE',
                     path='2',
                     value={
-                        "title":"sample title",
-                        "priority":"low",
-                        "kind":"bug",
-                        "dueDate":"2019-01-24T00:00:00",
-                        "status":"on-hold"
+                        "title": "sample title",
+                        "priority": "low",
+                        "kind": "bug",
+                        "dueDate": "2019-01-24T00:00:00",
+                        "status": "on-hold"
                     }
                 )
             ]
