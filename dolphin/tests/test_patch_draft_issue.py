@@ -1,7 +1,7 @@
 from bddrest import status, response, when
 
 from dolphin.models import Issue, Project, Member, Workflow, Phase, Tag, \
-    Organization
+    Organization, DraftIssue
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server
 
@@ -62,10 +62,12 @@ class TestIssue(LocalApplicationTestCase):
             tags=[tag1]
         )
         session.add(issue1)
+
+        cls.tag = tag1
+        cls.project = project
+        cls.draft_issue = DraftIssue()
+        session.add(cls.draft_issue)
         session.commit()
-        cls.issue= issue1
-        cls.tag1 = tag1
-        cls.tag2 = tag2
 
     def test_patch(self):
         self.login('member1@example.com')
@@ -73,43 +75,40 @@ class TestIssue(LocalApplicationTestCase):
         with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Testing the patch method on issue',
             verb='PATCH',
-            url='/apiv1/issues',
+            url='/apiv1/draftissues',
             json=[
-                dict(
-                    op='ADD',
-                    path=f'{self.issue.id}/tags/{self.tag2.id}',
-                    value={}
-                ),
-                dict(
-                    op='REMOVE',
-                    path=f'{self.issue.id}/tags/{self.tag1.id}',
-                    value={}
-                ),
-                dict(
-                    op='UPDATE',
-                    path=f'{self.issue.id}',
-                    value={
-                        "title": "sample title",
-                        "priority": "low",
-                        "kind": "bug",
-                        "dueDate": "2019-01-24T00:00:00",
-                        "status": "on-hold"
-                    }
-                )
+              dict(
+                path=f'{self.draft_issue.id}/tags/{self.tag.id}',
+                op='add',
+                value={}
+              ),
+              dict(
+                path='1',
+                op='finalize',
+                value={
+                    'title': 'Defined issue',
+                    'status': 'in-progress',
+                    'description': 'A description for defined issue',
+                    'dueDate': '2200-2-20',
+                    'kind': 'feature',
+                    'days': 3,
+                    'projectId': self.project.id,
+                    'priority': 'high',
+                }
+              )
             ]
         ):
             assert status == 200
-            assert len(response.json) == 3
+            assert len(response.json) == 2
             assert response.json[0]['id'] is not None
             assert response.json[1]['id'] is not None
-            assert response.json[2]['id'] is not None
 
             when(
                 'One of requests response faces non 200 OK',
                 json=[
                     dict(
                         op='ADD',
-                        path='2/tags/100',
+                        path=f'{self.draft_issue.id}/tags/100',
                         value={}
                     )
                 ]
