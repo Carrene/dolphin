@@ -18,6 +18,7 @@ from .workflows import WorkflowController
 from .phases import PhaseController
 from .draft_issue import DraftIssueController
 from .files import FileController
+from .resource import ResourceController
 
 
 here = abspath(dirname(__file__))
@@ -40,6 +41,7 @@ class Apiv1(Controller):
     workflows = WorkflowController()
     phases = PhaseController()
     draftissues = DraftIssueController()
+    resources = ResourceController()
 
     @json
     def version(self):
