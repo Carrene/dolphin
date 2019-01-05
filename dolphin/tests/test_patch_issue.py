@@ -63,6 +63,9 @@ class TestIssue(LocalApplicationTestCase):
         )
         session.add(issue1)
         session.commit()
+        cls.issue= issue1
+        cls.tag1 = tag1
+        cls.tag2 = tag2
 
     def test_patch(self):
         self.login('member1@example.com')
@@ -74,17 +77,17 @@ class TestIssue(LocalApplicationTestCase):
             json=[
                 dict(
                     op='ADD',
-                    path='2/tags/2',
+                    path=f'{self.issue.id}/tags/{self.tag2.id}',
                     value={}
                 ),
                 dict(
                     op='REMOVE',
-                    path='2/tags/1',
+                    path=f'{self.issue.id}/tags/{self.tag1.id}',
                     value={}
                 ),
                 dict(
                     op='UPDATE',
-                    path='2',
+                    path=f'{self.issue.id}',
                     value={
                         "title": "sample title",
                         "priority": "low",

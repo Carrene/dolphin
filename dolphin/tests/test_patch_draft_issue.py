@@ -77,15 +77,15 @@ class TestIssue(LocalApplicationTestCase):
             verb='PATCH',
             url='/apiv1/draftissues',
             json=[
-              {
-                'path': f'1/tags/{self.tag.id}',
-                'op':'add',
-                'value':{}
-              },
-              {
-                'path': '1',
-                'op':'finalize',
-                'value': {
+              dict(
+                path=f'{self.draft_issue.id}/tags/{self.tag.id}',
+                op='add',
+                value={}
+              ),
+              dict(
+                path='1',
+                op='finalize',
+                value={
                     'title': 'Defined issue',
                     'status': 'in-progress',
                     'description': 'A description for defined issue',
@@ -95,7 +95,7 @@ class TestIssue(LocalApplicationTestCase):
                     'projectId': self.project.id,
                     'priority': 'high',
                 }
-              }
+              )
             ]
         ):
             assert status == 200
@@ -108,7 +108,7 @@ class TestIssue(LocalApplicationTestCase):
                 json=[
                     dict(
                         op='ADD',
-                        path='2/tags/100',
+                        path=f'{self.draft_issue.id}/tags/100',
                         value={}
                     )
                 ]
