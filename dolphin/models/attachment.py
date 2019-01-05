@@ -33,17 +33,51 @@ class Attachment(SoftDeleteMixin, FilteringMixin, OrderingMixin,
                  PaginationMixin, TimestampMixin, DeclarativeBase):
     __tablename__ = 'attachment'
 
-    id = Field(Integer, primary_key=True)
-    title = Field(String(100), nullable=True)
-    caption = Field(String(500), nullable=True)
+    project_id = Field(
+        Integer,
+        ForeignKey('project.id'),
+        python_type=int,
+        watermark='Choose a project',
+        label='Project',
+        not_none=True,
+        required=False,
+        example='Lorem Ipsum',
+        message='Lorem Ipsum'
+    )
 
+    id = Field(Integer, primary_key=True)
+    title = Field(
+        String(100),
+        python_type=str,
+        max_length=100,
+        min_length=1,
+        label='Title',
+        watermark='Enter the title',
+        example='Sample Title',
+        nullable=True,
+        not_none=False,
+        required=True,
+        message='Lorem Ipsum',
+    )
+    caption = Field(
+        String(500),
+        min_length=1,
+        max_length=500,
+        label='Caption',
+        watermark='Enter the caption',
+        not_none=False,
+        nullable=True,
+        required=False,
+        python_type=str,
+        message='Lorem Ipsum',
+        example='Lorem Ipsum'
+    )
     _file = Field(
         FileAttachment.as_mutable(JSON),
         nullable=True,
         protected=False,
         json='file'
     )
-    project_id = Field(Integer, ForeignKey('project.id'))
 
     @property
     def is_mine(self):
