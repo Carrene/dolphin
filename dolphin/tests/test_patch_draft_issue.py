@@ -63,6 +63,7 @@ class TestIssue(LocalApplicationTestCase):
         )
         session.add(issue1)
 
+        cls.tag = tag1
         cls.project = project
         cls.draft_issue = DraftIssue()
         session.add(cls.draft_issue)
@@ -77,7 +78,7 @@ class TestIssue(LocalApplicationTestCase):
             url='/apiv1/draftissues',
             json=[
               {
-                'path': '1/tags/2',
+                'path': f'1/tags/{self.tag.id}',
                 'op':'add',
                 'value':{}
               },
