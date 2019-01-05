@@ -15,7 +15,7 @@ from ..validators import organization_invite_validator
 
 
 class InvitationController(ModelRestController):
-    __model__ = Organization
+    __model__ = Invitation
 
     def __init__(self, organization=None):
         self.organization = organization

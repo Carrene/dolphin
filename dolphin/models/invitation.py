@@ -21,15 +21,37 @@ class Invitation(OrderingMixin, FilteringMixin, PaginationMixin,
 
     id = Field(Integer, primary_key=True)
 
-    organization_id = Field(Integer, ForeignKey('organization.id'))
-    by_member_id = Field(Integer, ForeignKey('member.id'))
+    organization_id = Field(
+        Integer,
+        ForeignKey('organization.id'),
+        python_type=int,
+        watermark='Choose a organization',
+        label='Organization',
+        not_none=True,
+        required=False,
+        example='Lorem Ipsum',
+        message='Lorem Ipsum'
+    )
+    by_member_id = Field(
+        Integer,
+        ForeignKey('member.id'),
+        python_type=int,
+        watermark='Choose a member',
+        label='Member',
+        not_none=True,
+        required=False,
+        example='Lorem Ipsum',
+        message='Lorem Ipsum'
+    )
     role = Field(
         Enum(*roles, name='roles'),
         python_type=str,
         label='role',
-        watermark='Choose a roles',
+        watermark='Choose a role',
         not_none=True,
         required=True,
+        example='Lorem Ipsum',
+        message='Lorem Ipsum'
     )
     accepted = Field(Boolean, default=False)
     expired_date = Field(
