@@ -16,7 +16,7 @@ class TestIssue(LocalApplicationTestCase):
             title='First Organization'
         )
 
-        member = Member(
+        cls.member = Member(
             title='First Member',
             email='member1@example.com',
             access_token='access token 1',
@@ -40,37 +40,37 @@ class TestIssue(LocalApplicationTestCase):
         )
         session.add(phase2)
 
-        tag1 = Tag(title='tag1', organization=organization)
-        tag2 = Tag(title='tag2', organization=organization)
-        session.add(tag2)
+        cls.tag1 = Tag(title='tag1', organization=organization)
+        session.add(cls.tag1)
 
-        project = Project(
+        cls.tag2 = Tag(title='tag2', organization=organization)
+        session.add(cls.tag2)
+
+        cls.project = Project(
             workflow=workflow,
-            member=member,
+            member=cls.member,
             title='My first project',
             description='A decription for my project',
             room_id=1
         )
         issue1 = Issue(
-            project=project,
+            project=cls.project,
             title='First issue',
             description='This is description of first issue',
             due_date='2020-2-20',
             kind='feature',
             days=1,
             room_id=2,
-            tags=[tag1]
+            tags=[cls.tag1]
         )
         session.add(issue1)
 
-        cls.tag = tag1
-        cls.project = project
         cls.draft_issue = DraftIssue()
         session.add(cls.draft_issue)
         session.commit()
 
     def test_patch(self):
-        self.login('member1@example.com')
+        self.login(self.member.email)
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Testing the patch method on issue',
@@ -78,12 +78,12 @@ class TestIssue(LocalApplicationTestCase):
             url='/apiv1/draftissues',
             json=[
               dict(
-                path=f'{self.draft_issue.id}/tags/{self.tag.id}',
+                path=f'{self.draft_issue.id}/tags/{self.tag1.id}',
                 op='add',
                 value={}
               ),
               dict(
-                path='1',
+                path=f'{self.draft_issue.id}',
                 op='finalize',
                 value={
                     'title': 'Defined issue',
@@ -108,7 +108,7 @@ class TestIssue(LocalApplicationTestCase):
                 json=[
                     dict(
                         op='ADD',
-                        path=f'{self.draft_issue.id}/tags/100',
+                        path=f'{self.draft_issue.id}/tags/0',
                         value={}
                     )
                 ]
