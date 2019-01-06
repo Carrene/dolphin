@@ -88,7 +88,7 @@ class TestTag(LocalApplicationTestCase):
         self.login(self.member1.email)
 
         with oauth_mockup_server(), self.given(
-            f'Adding a tag to the draft issue',
+            f'Removing a tag to the draft issue',
             f'/apiv1/draftissues/draft_issue_id: {self.draft_issue.id}'
                 f'/tags/id: {self.tag1.id}',
             f'REMOVE',
