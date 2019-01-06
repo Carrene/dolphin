@@ -59,7 +59,7 @@ class Dolphin(Application):
           - %(root_path)s/email_templates
 
       storage:
-        local_directory: %(root_path)s/data/assets
+        local_directory: %(root_path)s/../data/assets
         base_url: http://localhost:8080/assets
    '''
 
