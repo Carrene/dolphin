@@ -16,7 +16,7 @@ class TestIssue(LocalApplicationTestCase):
             title='First Organization'
         )
 
-        member = Member(
+        cls.member = Member(
             title='First Member',
             email='member1@example.com',
             access_token='access token 1',
@@ -40,18 +40,20 @@ class TestIssue(LocalApplicationTestCase):
         )
         session.add(phase2)
 
-        tag1 = Tag(title='tag1', organization=organization)
-        tag2 = Tag(title='tag2', organization=organization)
-        session.add(tag2)
+        cls.tag1 = Tag(title='tag1', organization=organization)
+        session.add(cls.tag1)
+
+        cls.tag2 = Tag(title='tag2', organization=organization)
+        session.add(cls.tag2)
 
         project = Project(
             workflow=workflow,
-            member=member,
+            member=cls.member,
             title='My first project',
             description='A decription for my project',
             room_id=1
         )
-        issue1 = Issue(
+        cls.issue = Issue(
             project=project,
             title='First issue',
             description='This is description of first issue',
@@ -59,16 +61,13 @@ class TestIssue(LocalApplicationTestCase):
             kind='feature',
             days=1,
             room_id=2,
-            tags=[tag1]
+            tags=[cls.tag1]
         )
-        session.add(issue1)
+        session.add(cls.issue)
         session.commit()
-        cls.issue= issue1
-        cls.tag1 = tag1
-        cls.tag2 = tag2
 
     def test_patch(self):
-        self.login('member1@example.com')
+        self.login(self.member.email)
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Testing the patch method on issue',
@@ -109,7 +108,7 @@ class TestIssue(LocalApplicationTestCase):
                 json=[
                     dict(
                         op='ADD',
-                        path='2/tags/100',
+                        path=f'{self.issue.id}/tags/0',
                         value={}
                     )
                 ]
