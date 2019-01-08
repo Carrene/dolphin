@@ -67,3 +67,9 @@ class Phase(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
         protected=True
     )
 
+    resources = relationship(
+        'Resource',
+        back_populates='phase',
+        protected=True
+    )
+

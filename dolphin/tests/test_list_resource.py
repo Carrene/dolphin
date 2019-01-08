@@ -1,6 +1,6 @@
 from bddrest import when, response, status
 
-from ..models import Item, Member, Issue, Workflow, Project, Phase
+from ..models import Workflow, Phase, Resource
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -10,24 +10,6 @@ class TestResource(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        cls.member1 = Member(
-            title='First Member',
-            email='member1@example.com',
-            access_token='access token 1',
-            phone=222222222,
-            reference_id=2
-        )
-        session.add(cls.member1)
-
-        member2 = Member(
-            title='Second Member',
-            email='member2@example.com',
-            access_token='access token 2',
-            phone=333333333,
-            reference_id=3
-        )
-        session.add(member2)
-
         workflow = Workflow(title='default')
 
         cls.phase1 = Phase(
@@ -35,45 +17,30 @@ class TestResource(LocalApplicationTestCase):
             order=-1,
             workflow=workflow
         )
-        session.add(cls.phase1)
 
-        project = Project(
-            workflow=workflow,
-            member=cls.member1,
-            title='My first project',
-            description='A decription for my project',
-            room_id=1
+        cls.resource1 = Resource(
+            title='First Resource',
+            email='resource1@example.com',
+            access_token='access token 1',
+            phone=222222222,
+            reference_id=2,
+            phase=cls.phase1,
         )
+        session.add(cls.resource1)
 
-        issue1 = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            due_date='2020-2-20',
-            kind='feature',
-            days=1,
-            room_id=2
+        resource2 = Resource(
+            title='Second Resource',
+            email='resource2@example.com',
+            access_token='access token 2',
+            phone=333333333,
+            reference_id=3,
+            phase=cls.phase1,
         )
-        session.add(issue1)
-        session.flush()
-
-        item1=Item(
-            issue_id=issue1.id,
-            phase_id=cls.phase1.id,
-            member_id=cls.member1.id,
-        )
-        session.add(item1)
-
-        item2=Item(
-            issue_id=issue1.id,
-            phase_id=cls.phase1.id,
-            member_id=member2.id,
-        )
-        session.add(item2)
+        session.add(resource2)
         session.commit()
 
     def test_list(self):
-        self.login(self.member1.email)
+        self.login(self.resource1.email)
 
         with oauth_mockup_server(), self.given(
            f'Getting list of resources',

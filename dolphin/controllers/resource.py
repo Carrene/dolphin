@@ -3,21 +3,19 @@ from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession
 
-from ..models import Item, Member
+from ..models import Resource
 
 
 class ResourceController(ModelRestController):
-    __model__ = Member
+    __model__ = Resource
 
     def __init__(self, phase=None):
         self.phase = phase
 
     @authorize
     @json(prevent_form='709 Form Not Allowed')
-    @Member.expose
+    @Resource.expose
     def list(self):
-        resources = DBSession.query(Member) \
-            .join(Item, Item.member_id == Member.id) \
-            .filter(Item.phase_id == self.phase.id)
-        return resources
+        return DBSession.query(Resource) \
+            .filter(Resource.phase_id == self.phase.id)
 
