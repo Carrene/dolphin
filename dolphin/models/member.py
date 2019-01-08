@@ -6,7 +6,7 @@ from restfulpy.orm import DeclarativeBase, Field, relationship, DBSession, \
     SoftDeleteMixin, ModifiedMixin, FilteringMixin, PaginationMixin, \
     OrderingMixin
 from restfulpy.principal import JwtRefreshToken
-from sqlalchemy import Integer, String, Unicode, BigInteger
+from sqlalchemy import Integer, String, Unicode, BigInteger, ForeignKey
 
 
 class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
