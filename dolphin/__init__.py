@@ -5,7 +5,7 @@ from nanohttp import settings
 from restfulpy import Application
 from sqlalchemy_media import StoreManager, FileSystemStore
 
-from . import basedata
+from . import basedata, mockup
 from .authentication import Authenticator
 from .cli.email import EmailLauncher
 from .controllers.root import Root
@@ -73,6 +73,9 @@ class Dolphin(Application):
 
     def insert_basedata(self, *args):
         basedata.insert()
+
+    def insert_mockup(self, *args):
+        mockup.insert()
 
     @classmethod
     def initialize_orm(cls, engine=None):
