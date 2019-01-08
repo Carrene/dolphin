@@ -125,6 +125,7 @@ def insert(): # pragma: no cover
 
     with Context(dict()), StoreManager(DBSession):
         god = Member(
+            id=1,
             title='GOD',
             email='god@example.com',
             access_token='access token 1',
