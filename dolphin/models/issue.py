@@ -76,7 +76,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     )
     room_id = Field(Integer)
 
-    id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
+    id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True, label='ID')
     due_date = Field(
         DateTime,
         python_type=datetime,
