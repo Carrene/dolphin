@@ -35,8 +35,7 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         label='Workflow',
         not_none=True,
         required=False,
-        example='Lorem Ipsum',
-        message='Lorem Ipsum'
+        example='Lorem Ipsum'
     )
 
     release_id = Field(
@@ -48,8 +47,7 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         label='Launch',
         not_none=False,
         required=False,
-        example='Lorem Ipsum',
-        message='Lorem Ipsum'
+        example='Lorem Ipsum'
     )
     member_id = Field(
         Integer,
@@ -60,7 +58,6 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         nullable=False,
         not_none=False,
         required=True,
-        example='Lorem Ipsum',
         message='Lorem Ipsum'
     )
     room_id = Field(Integer)
@@ -74,8 +71,7 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         not_none=True,
         required=False,
         default='queued',
-        example='Lorem Ipsum',
-        message='Lorem Ipsum'
+        example='Lorem Ipsum'
     )
 
     workflow = relationship(

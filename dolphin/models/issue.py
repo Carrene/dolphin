@@ -71,8 +71,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         label='Project',
         not_none=True,
         required=False,
-        example='Lorem Ipsum',
-        message='Lorem Ipsum'
+        example='Lorem Ipsum'
     )
     room_id = Field(Integer)
 
@@ -80,7 +79,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     due_date = Field(
         DateTime,
         python_type=datetime,
-        label='Target Date',
+        label='Target',
         pattern=
             r'^(\d{4})-(0[1-9]|1[012]|[1-9])-(0[1-9]|[12]\d{1}|3[01]|[1-9])'
             r'(T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z)?)?$',
@@ -120,7 +119,6 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         not_none=True,
         required=False,
         default='on-hold',
-        message='lorem ipsum',
         example='lorem ipsum',
     )
 
@@ -133,7 +131,6 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         required=True,
         default='low',
         watermark='lorem ipsum',
-        message='lorem ipsum',
         example='lorem ipsum',
     )
 
