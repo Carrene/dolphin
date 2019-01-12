@@ -219,8 +219,7 @@ class Organization(OrderingMixin, FilteringMixin, PaginationMixin,
             protected=False,
             type_=int,
             watermark='lorem ipsum',
-            example='10',
-            message='lorem ipsum',
+            example='10'
         )
 
         yield MetadataField(
@@ -232,7 +231,6 @@ class Organization(OrderingMixin, FilteringMixin, PaginationMixin,
             protected=False,
             type_=str,
             watermark='lorem ipsum',
-            example='owner',
-            message='lorem ipsum',
+            example='owner'
         )
 

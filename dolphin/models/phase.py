@@ -15,8 +15,7 @@ class Phase(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
         label='Workflow',
         not_none=True,
         required=False,
-        example='Lorem Ipsum',
-        message='Lorem Ipsum'
+        example='Lorem Ipsum'
     )
 
     id = Field(Integer, primary_key=True)
@@ -32,8 +31,7 @@ class Phase(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
         nullable=False,
         not_none=True,
         required=True,
-        python_type=str,
-        message='Lorem Ipsum',
+        python_type=str
     )
     order = Field(
         Integer,
@@ -45,8 +43,7 @@ class Phase(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
         nullable=False,
         not_none=True,
         required=True,
-        python_type=str,
-        message='Lorem Ipsum',
+        python_type=str
     )
 
     workflow = relationship(

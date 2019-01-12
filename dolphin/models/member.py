@@ -49,7 +49,6 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         required=True,
         python_type=str,
         example='Lorem Ipsum',
-        message='Lorem Ipsum'
     )
     email = Field(
         Unicode(100),
@@ -73,8 +72,7 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         nullable=True,
         required=False,
         unique=True,
-        example='Lorem Ipsum',
-        message='Lorem Ipsum'
+        example='Lorem Ipsum'
     )
     avatar = Field(
         Unicode(200),
@@ -83,8 +81,7 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         unique=False,
         not_none=False,
         required=False,
-        example='Lorem Ipsum',
-        message='Lorem Ipsum'
+        example='Lorem Ipsum'
     )
 
     subscribables = relationship(

@@ -22,8 +22,7 @@ class Workflow(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         nullable=False,
         not_none=True,
         required=True,
-        python_type=str,
-        message='Lorem Ipsum',
+        python_type=str
     )
 
     phases = relationship(

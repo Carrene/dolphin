@@ -41,8 +41,7 @@ class Attachment(SoftDeleteMixin, FilteringMixin, OrderingMixin,
         label='Project',
         not_none=True,
         required=False,
-        example='Lorem Ipsum',
-        message='Lorem Ipsum'
+        example='Lorem Ipsum'
     )
 
     id = Field(Integer, primary_key=True)
@@ -56,8 +55,7 @@ class Attachment(SoftDeleteMixin, FilteringMixin, OrderingMixin,
         example='Sample Title',
         nullable=True,
         not_none=False,
-        required=True,
-        message='Lorem Ipsum',
+        required=True
     )
     caption = Field(
         String(500),
@@ -69,7 +67,6 @@ class Attachment(SoftDeleteMixin, FilteringMixin, OrderingMixin,
         nullable=True,
         required=False,
         python_type=str,
-        message='Lorem Ipsum',
         example='Lorem Ipsum'
     )
     _file = Field(

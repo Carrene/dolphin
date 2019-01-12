@@ -29,8 +29,7 @@ class Invitation(OrderingMixin, FilteringMixin, PaginationMixin,
         label='Organization',
         not_none=True,
         required=False,
-        example='Lorem Ipsum',
-        message='Lorem Ipsum'
+        example='Lorem Ipsum'
     )
     by_member_id = Field(
         Integer,
@@ -40,8 +39,7 @@ class Invitation(OrderingMixin, FilteringMixin, PaginationMixin,
         label='Member',
         not_none=True,
         required=False,
-        example='Lorem Ipsum',
-        message='Lorem Ipsum'
+        example='Lorem Ipsum'
     )
     role = Field(
         Enum(*roles, name='roles'),
@@ -50,8 +48,7 @@ class Invitation(OrderingMixin, FilteringMixin, PaginationMixin,
         watermark='Choose a role',
         not_none=True,
         required=True,
-        example='Lorem Ipsum',
-        message='Lorem Ipsum'
+        example='Lorem Ipsum'
     )
     accepted = Field(Boolean, default=False)
     expired_date = Field(
@@ -64,7 +61,6 @@ class Invitation(OrderingMixin, FilteringMixin, PaginationMixin,
         pattern_description='ISO format and format like "yyyy-mm-dd" is valid',
         example='2018-02-02T1:12:12.000Z',
         watermark='lorem ipsum',
-        message='lorem ipsum',
         nullable=False,
         not_none=True,
         required=True,
@@ -80,8 +76,7 @@ class Invitation(OrderingMixin, FilteringMixin, PaginationMixin,
         pattern_description='Invalid email format, example: user@example.com',
         watermark='lorem ipsum',
         example='lorem ipsum',
-        label='Invited Email',
-        message='lorem ipsum',
+        label='Invited Email'
     )
 
     by_member = relationship(

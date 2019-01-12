@@ -57,8 +57,7 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         label='Member',
         nullable=False,
         not_none=False,
-        required=True,
-        message='Lorem Ipsum'
+        required=True
     )
     room_id = Field(Integer)
 

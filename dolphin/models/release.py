@@ -31,8 +31,7 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
         watermark='Choose a status',
         nullable=True,
         required=False,
-        example='Lorem Ipsum',
-        message='Lorem Ipsum'
+        example='Lorem Ipsum'
     )
     cutoff = Field(
         DateTime,
@@ -46,8 +45,7 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
         watermark='Enter a cutoff date',
         nullable=False,
         not_none=True,
-        required=True,
-        message='Lorem Ipsum'
+        required=True
     )
 
     projects = relationship(

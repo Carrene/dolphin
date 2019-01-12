@@ -219,8 +219,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             readonly=True,
             watermark='Choose a phase',
             not_none=True,
-            example='Lorem Ipsum',
-            message='Lorem Ipsum'
+            example='Lorem Ipsum'
         )
         yield MetadataField(
             'tags',
@@ -230,8 +229,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             readonly=True,
             not_none=False,
             watermark='Lorem Ipsum',
-            example='Lorem Ipsum',
-            message='Lorem Ipsum'
+            example='Lorem Ipsum'
         )
 
 
