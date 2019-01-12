@@ -4,7 +4,7 @@ from restfulpy.orm import DBSession
 from sqlalchemy_media import StoreManager
 
 from .models import Release, Member, Organization, OrganizationMember,\
-    Workflow, Phase, Tag
+    Workflow, Phase, Tag, Group
 
 
 def indented(n): # pragma: no cover
@@ -48,6 +48,11 @@ def print_tag(t): # pragma: no cover
     yield f'title: {t.title}'
 
 
+@indented(2)
+def print_group(g): # pragma: no cover
+    yield f'title: {g.title}, public: {g.public}'
+
+
 def insert(): # pragma: no cover
 
     release1 = Release(
@@ -86,6 +91,9 @@ def insert(): # pragma: no cover
     DBSession.add(release5)
 
     default_workflow = Workflow(title='Default')
+
+    public_group = Group(title='Public', public=True)
+    DBSession.add(public_group)
 
     phase1 = Phase(
         title='Backlog',
@@ -194,4 +202,7 @@ def insert(): # pragma: no cover
         print_tag(code_review_tag)
         print_tag(database_tag)
         print_tag(documentation_tag)
+
+        print('Following group has been added:')
+        print_group(public_group)
 

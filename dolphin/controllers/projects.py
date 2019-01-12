@@ -8,7 +8,7 @@ from .files import FileController
 from ..backends import ChatClient
 from ..exceptions import ChatRoomNotFound, RoomMemberAlreadyExist, \
     RoomMemberNotFound
-from ..models import Project, Member, Subscription, Workflow
+from ..models import Project, Member, Subscription, Workflow, Group
 from ..validators import project_validator, update_project_validator
 
 
@@ -66,6 +66,14 @@ class ProjectController(ModelRestController):
 
         project = Project()
         project.update_from_request()
+
+        if 'groupId' in form:
+            project.group_id = form['groupId']
+        else:
+            default_group = DBSession.query(Group)\
+                .filter(Group.public == True)\
+                .one()
+            project.group = default_group
 
         if 'workflowId' in form:
             project.workflow_id = form['workflowId']

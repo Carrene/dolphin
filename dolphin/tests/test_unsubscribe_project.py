@@ -1,6 +1,6 @@
 from bddrest import status, when, given, response
 
-from dolphin.models import Project, Member, Release, Subscription, Workflow
+from dolphin.models import Project, Member, Group, Subscription, Workflow
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
@@ -21,9 +21,11 @@ class TestProject(LocalApplicationTestCase):
         session.add(member)
 
         workflow = Workflow(title='default')
+        group = Group(title='default')
 
         project1 = Project(
             workflow=workflow,
+            group=group,
             member=member,
             title='My first project',
             description='A decription for my project',
@@ -34,6 +36,7 @@ class TestProject(LocalApplicationTestCase):
 
         project2 = Project(
             workflow=workflow,
+            group=group,
             member=member,
             title='My second project',
             description='A decription for my project',
