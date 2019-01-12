@@ -50,7 +50,7 @@ def print_tag(t): # pragma: no cover
 
 @indented(2)
 def print_group(g): # pragma: no cover
-    yield f'title: {g.title}, public: {g.public}'
+    yield f'title: {g.title}, public: {g.is_public}'
 
 
 def insert(): # pragma: no cover
@@ -92,7 +92,7 @@ def insert(): # pragma: no cover
 
     default_workflow = Workflow(title='Default')
 
-    public_group = Group(title='Public', public=True)
+    public_group = Group(title='Public', is_public=True)
     DBSession.add(public_group)
 
     phase1 = Phase(
