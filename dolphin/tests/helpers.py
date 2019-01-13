@@ -32,7 +32,7 @@ role=FieldInfo(type_=str, required=True, not_none=True).to_json()
 release_fields = Release.json_metadata()['fields']
 project_fields = Project.json_metadata()['fields']
 issue_fields = Issue.json_metadata()['fields']
-invivation_fields = Invitation.json_metadata()['fields']
+invitation_fields = Invitation.json_metadata()['fields']
 
 issue_fields.update({
     'phaseId': phase_id,
@@ -60,7 +60,7 @@ class LocalApplicationTestCase(ApplicableTestCase):
         r'^/apiv1/items.*': Item.json_metadata()['fields'],
         r'^/apiv1/members.*': Member.json_metadata()['fields'],
         r'^/apiv1/organizations.*': organization_fields,
-        r'^/apiv1/invitations.*': invivation_fields,
+        r'^/apiv1/invitations.*': invitation_fields,
     }
 
     def login(self, email):
