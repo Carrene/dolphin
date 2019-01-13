@@ -12,7 +12,8 @@ class Group(DeclarativeBase):
         max_length=50,
         label='Title',
         not_none=False,
-        required=True
+        required=True,
+        unique=True,
     )
     public = Field(
         BOOLEAN,
