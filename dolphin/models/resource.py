@@ -14,9 +14,7 @@ class TeamResource(DeclarativeBase):
 class Resource(Member):
     __mapper_args__ = {'polymorphic_identity': 'resource'}
 
-    phase_id = Field(Integer, ForeignKey('phase.id'), nullable=True)
-
-    phase = relationship(
+    phases = relationship(
         'Phase',
         secondary='skill',
         lazy='selectin',

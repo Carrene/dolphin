@@ -3,7 +3,7 @@ from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession
 
-from ..models import Resource
+from ..models import Resource, Skill
 
 
 class ResourceController(ModelRestController):
@@ -17,5 +17,6 @@ class ResourceController(ModelRestController):
     @Resource.expose
     def list(self):
         return DBSession.query(Resource) \
-            .filter(Resource.phase_id == self.phase.id)
+            .join(Skill, Resource.id == Skill.resource_id) \
+            .filter(Skill.phase_id == self.phase.id)
 
