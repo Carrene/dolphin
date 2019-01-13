@@ -7,8 +7,21 @@ class Group(DeclarativeBase):
 
     id = Field(Integer, primary_key=True)
 
-    title = Field(String, max_length=50)
-    public = Field(BOOLEAN, unique=True, nullable=True)
+    title = Field(
+        String,
+        max_length=50,
+        label='Title',
+        not_none=False,
+        required=True
+    )
+    public = Field(
+        BOOLEAN,
+        unique=True,
+        nullable=True,
+        required=False,
+        not_none=False,
+        label='Public'
+    )
 
     projects = relationship('Project', back_populates='group', protected=True)
 

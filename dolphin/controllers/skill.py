@@ -1,6 +1,6 @@
 from restfulpy.controllers import ModelRestController
 
-from ..models.skill import Skill
+from ..models import Skill
 
 
 class SkillController(ModelRestController):
