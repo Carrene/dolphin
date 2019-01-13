@@ -130,7 +130,7 @@ def insert(): # pragma: no cover
         DBSession.commit()
 
         print('Following releases have been added:')
-        print(release1, )
+        print(release1)
         print(release2)
         print(release3)
         print(release4)
