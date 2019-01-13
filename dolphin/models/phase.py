@@ -70,3 +70,5 @@ class Phase(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
         protected=True
     )
 
+    def __repr__(self):
+        return f'\tTitle: {self.title}\n'

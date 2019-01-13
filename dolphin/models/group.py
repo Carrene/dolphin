@@ -12,3 +12,5 @@ class Group(DeclarativeBase):
 
     projects = relationship('Project', back_populates='group', protected=True)
 
+    def __repr__(self):
+        return f'\tTitle: {self.title}, Public: {self.public}'
