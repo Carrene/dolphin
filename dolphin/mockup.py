@@ -6,22 +6,6 @@ from sqlalchemy_media import StoreManager
 from .models import Resource, Phase, Member
 
 
-def indented(n): # pragma: no cover
-    def decorator(f):
-        def wrapper(*a, **kw):
-            for i in f(*a, **kw):
-                print(f'{n*" "}{i}')
-            print()
-        return wrapper
-    return decorator
-
-
-@indented(2)
-def print_resource(m): # pragma: no cover
-    yield f'title: {m.title}'
-    yield f'email: {m.email}'
-
-
 def insert(): # pragma: no cover
     # These mockup datas are shared between panda and dolphin.
     # The GOD id is 1.
@@ -43,7 +27,7 @@ def insert(): # pragma: no cover
             email='user1@example.com',
             reference_id=2,
             access_token='access token 2',
-            phase=phase,
+            phases=[phase],
         )
         DBSession.add(resource1)
 
@@ -53,7 +37,7 @@ def insert(): # pragma: no cover
             email='user2@example.com',
             reference_id=3,
             access_token='access token 3',
-            phase=phase,
+            phases=[phase],
         )
         DBSession.add(resource2)
 
@@ -63,13 +47,13 @@ def insert(): # pragma: no cover
             email='user3@example.com',
             reference_id=4,
             access_token='access token 4',
-            phase=phase,
+            phases=[phase],
         )
         DBSession.add(resource3)
         DBSession.commit()
 
         print('Following resource has been added:')
-        print_resource(resource1)
-        print_resource(resource2)
-        print_resource(resource3)
+        print(resource1)
+        print(resource2)
+        print(resource3)
 
