@@ -32,7 +32,6 @@ class TestFile(LocalApplicationTestCase):
             assert fields['caption']['name'] is not None
             assert fields['caption']['notNone'] is not None
             assert fields['caption']['required'] is not None
-            assert fields['caption']['message'] is not None
 
             assert fields['projectId']['label'] is not None
             assert fields['projectId']['watermark'] is not None
@@ -40,5 +39,4 @@ class TestFile(LocalApplicationTestCase):
             assert fields['projectId']['name'] is not None
             assert fields['projectId']['notNone'] is not None
             assert fields['projectId']['required'] is not None
-            assert fields['projectId']['message'] is not None
 

@@ -77,5 +77,4 @@ class TestIssue(LocalApplicationTestCase):
             assert fields['phaseId']['watermark'] is not None
             assert fields['phaseId']['notNone'] is not None
             assert fields['phaseId']['example'] is not None
-            assert fields['phaseId']['message'] is not None
 
