@@ -71,7 +71,7 @@ class ProjectController(ModelRestController):
             project.group_id = form['groupId']
         else:
             default_group = DBSession.query(Group)\
-                .filter(Group.is_public == True)\
+                .filter(Group.public == True)\
                 .one()
             project.group = default_group
 

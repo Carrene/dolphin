@@ -26,7 +26,7 @@ class TestProject(LocalApplicationTestCase):
         )
 
         cls.workflow = Workflow(title='default')
-        cls.group = Group(title='Public', is_public=True)
+        cls.group = Group(title='Public', public=True)
 
         project1 = Project(
             workflow=cls.workflow,
