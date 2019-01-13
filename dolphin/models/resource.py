@@ -18,8 +18,10 @@ class Resource(Member):
 
     phase = relationship(
         'Phase',
+        secondary='skill',
+        lazy='selectin',
         back_populates='resources',
-        protected=True
+        protected=True,
     )
 
     teams = relationship(

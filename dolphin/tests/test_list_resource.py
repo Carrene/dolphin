@@ -10,21 +10,12 @@ class TestResource(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        workflow = Workflow(title='default')
-
-        cls.phase1 = Phase(
-            title='backlog',
-            order=-1,
-            workflow=workflow
-        )
-
         cls.resource1 = Resource(
             title='First Resource',
             email='resource1@example.com',
             access_token='access token 1',
             phone=222222222,
             reference_id=2,
-            phase=cls.phase1,
         )
         session.add(cls.resource1)
 
@@ -34,7 +25,6 @@ class TestResource(LocalApplicationTestCase):
             access_token='access token 2',
             phone=333333333,
             reference_id=3,
-            phase=cls.phase1,
         )
         session.add(resource2)
         session.commit()

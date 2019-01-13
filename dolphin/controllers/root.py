@@ -19,6 +19,7 @@ from .phases import PhaseController
 from .draft_issue import DraftIssueController
 from .files import FileController
 from .resource import ResourceController
+from .skill import SkillController
 
 
 here = abspath(dirname(__file__))
@@ -43,6 +44,7 @@ class Apiv1(Controller):
     draftissues = DraftIssueController()
     resources = ResourceController()
     files = FileController()
+    skills = SkillController()
 
     @json
     def version(self):
