@@ -18,7 +18,6 @@ class Tag(DeclarativeBase, OrderingMixin, FilteringMixin, PaginationMixin):
         label='Title',
         watermark='Enter the title',
         example='lorem ipsum',
-        message='lorem ipsum',
         nullable=False,
         not_none=True,
         required=True,
