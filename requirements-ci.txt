@@ -1,4 +1,5 @@
 coverage
 coveralls
 pytest-cov
+git+https://github.com/Carrene/wsgi-auditor.git
 -r requirements-private.txt
