@@ -15,7 +15,6 @@ class GroupController(ModelRestController):
     def list(self):
         return DBSession.query(Group)
 
-
     @authorize
     @json(prevent_form='709 Form Not Allowed')
     @Group.expose
@@ -27,3 +26,4 @@ class GroupController(ModelRestController):
             raise HTTPNotFound()
 
         return group
+
