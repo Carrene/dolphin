@@ -24,7 +24,7 @@ class TestResource(LocalApplicationTestCase):
             access_token='access token 1',
             phone=222222222,
             reference_id=2,
-            phase=cls.phase1,
+            phases=[cls.phase1],
         )
         session.add(cls.resource1)
 
@@ -34,7 +34,7 @@ class TestResource(LocalApplicationTestCase):
             access_token='access token 2',
             phone=333333333,
             reference_id=3,
-            phase=cls.phase1,
+            phases=[cls.phase1],
         )
         session.add(resource2)
         session.commit()

@@ -2,9 +2,13 @@ from restfulpy.orm import DeclarativeBase, Field, relationship, \
     FilteringMixin, OrderingMixin, PaginationMixin
 from sqlalchemy import Integer, String, ForeignKey
 
+from .skill import Skill
+
 
 class Phase(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
     __tablename__ = 'phase'
+
+    id = Field(Integer, primary_key=True)
 
     workflow_id = Field(
         Integer,
@@ -18,7 +22,6 @@ class Phase(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
         example='Lorem Ipsum'
     )
 
-    id = Field(Integer, primary_key=True)
     title = Field(
         String,
         max_length=50,
@@ -66,7 +69,11 @@ class Phase(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
 
     resources = relationship(
         'Resource',
-        back_populates='phase',
-        protected=True
+        secondary='skill',
+        lazy='selectin',
+        back_populates='phases',
+        protected=True,
     )
 
+    def __repr__(self):
+        return f'\tTitle: {self.title}\n'

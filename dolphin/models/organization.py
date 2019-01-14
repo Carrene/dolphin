@@ -207,6 +207,9 @@ class Organization(OrderingMixin, FilteringMixin, PaginationMixin,
         organization['logo'] = self.logo
         return organization
 
+    def __repr__(self):
+        return f'\tTitle: {self.title}\n'
+
     @classmethod
     def iter_metadata_fields(cls):
         yield from super().iter_metadata_fields()
