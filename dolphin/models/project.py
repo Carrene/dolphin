@@ -68,8 +68,8 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         watermark='Choose a group',
         label='Group',
         nullable=False,
-        not_none=False,
-        required=True,
+        not_none=True,
+        required=False,
         message='Lorem Ipsum'
     )
 
