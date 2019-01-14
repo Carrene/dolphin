@@ -4,48 +4,7 @@ from restfulpy.orm import DBSession
 from sqlalchemy_media import StoreManager
 
 from .models import Release, Member, Organization, OrganizationMember,\
-    Workflow, Phase, Tag
-
-
-def indented(n): # pragma: no cover
-    def decorator(f):
-        def wrapper(*a, **kw):
-            for i in f(*a, **kw):
-                print(f'{n*" "}{i}')
-            print()
-        return wrapper
-    return decorator
-
-
-@indented(2)
-def print_subscribables(s): # pragma: no cover
-    yield f'title: {s.title}'
-
-
-@indented(2)
-def print_member(m): # pragma: no cover
-    yield f'title: {m.title}'
-    yield f'email: {m.email}'
-
-
-@indented(2)
-def print_organization(s): # pragma: no cover
-    yield f'title: {s.title}'
-
-
-@indented(2)
-def print_workflow(w): # pragma: no cover
-    yield f'title: {w.title}'
-
-
-@indented(2)
-def print_phase(p): # pragma: no cover
-    yield f'title: {p.title}'
-
-
-@indented(2)
-def print_tag(t): # pragma: no cover
-    yield f'title: {t.title}'
+    Workflow, Phase, Tag, Group
 
 
 def insert(): # pragma: no cover
@@ -86,6 +45,9 @@ def insert(): # pragma: no cover
     DBSession.add(release5)
 
     default_workflow = Workflow(title='Default')
+
+    public_group = Group(title='Public', public=True)
+    DBSession.add(public_group)
 
     phase1 = Phase(
         title='Backlog',
@@ -168,30 +130,33 @@ def insert(): # pragma: no cover
         DBSession.commit()
 
         print('Following releases have been added:')
-        print_subscribables(release1)
-        print_subscribables(release2)
-        print_subscribables(release3)
-        print_subscribables(release4)
-        print_subscribables(release5)
+        print(release1)
+        print(release2)
+        print(release3)
+        print(release4)
+        print(release5)
 
         print('Following user has been added:')
-        print_member(god)
+        print(god)
 
         print('Following organization has been added:')
-        print_organization(organization)
+        print(organization)
 
         print('Following workflow have been added:')
-        print_workflow(default_workflow)
+        print(default_workflow)
 
         print('Following phases have been added:')
-        print_phase(phase1)
-        print_phase(phase2)
-        print_phase(phase3)
-        print_phase(phase4)
-        print_phase(phase5)
+        print(phase1)
+        print(phase2)
+        print(phase3)
+        print(phase4)
+        print(phase5)
 
         print('Following tags have been added:')
-        print_tag(code_review_tag)
-        print_tag(database_tag)
-        print_tag(documentation_tag)
+        print(code_review_tag)
+        print(database_tag)
+        print(documentation_tag)
+
+        print('Following group has been added:')
+        print(public_group)
 

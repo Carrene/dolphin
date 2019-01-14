@@ -67,3 +67,5 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
         project_dict['dueDate'] = self.due_date
         return project_dict
 
+    def __repr__(self):
+        return f'\tTitle: {self.title}\n'

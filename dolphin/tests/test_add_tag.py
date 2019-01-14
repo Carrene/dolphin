@@ -2,7 +2,7 @@ from bddrest import status, response, when, Update
 
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
 from dolphin.models import Member, Tag, DraftIssue, Issue, Organization, \
-    OrganizationMember, Project, DraftIssueTag, IssueTag, Workflow
+    OrganizationMember, Project, DraftIssueTag, IssueTag, Workflow, Group
 
 
 class TestTag(LocalApplicationTestCase):
@@ -51,8 +51,11 @@ class TestTag(LocalApplicationTestCase):
         cls.draft_issue = DraftIssue()
         session.add(cls.draft_issue)
 
+        group = Group(title='default')
+
         project = Project(
             workflow_id=workflow.id,
+            group=group,
             member=cls.member1,
             title='My first project',
             description='A decription for my project',

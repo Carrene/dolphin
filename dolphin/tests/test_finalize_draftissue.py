@@ -1,7 +1,7 @@
 from bddrest import status, response, Update, when, given, Remove
 
 from dolphin.models import Issue, Project, Member, Workflow, Phase, Tag, \
-    DraftIssue, Organization, OrganizationMember
+    DraftIssue, Organization, OrganizationMember, Group
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
@@ -36,8 +36,11 @@ class TestIssue(LocalApplicationTestCase):
         )
         session.add(phase2)
 
+        group = Group(title='default')
+
         cls.project = Project(
             workflow=workflow1,
+            group=group,
             member=cls.member,
             title='My first project',
             description='A decription for my project',

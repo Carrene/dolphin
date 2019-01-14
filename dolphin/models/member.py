@@ -147,3 +147,5 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             .filter(cls.reference_id == context.identity.reference_id) \
             .one()
 
+    def __repr__(self):
+        return f'\tTitle: {self.title}, Email: {self.email}\n'

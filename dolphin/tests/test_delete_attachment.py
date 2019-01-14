@@ -3,7 +3,7 @@ from os.path import join, dirname, abspath
 from bddrest import status, response, when, Update
 from sqlalchemy_media import StoreManager
 
-from dolphin.models import Project, Member, Attachment, Workflow
+from dolphin.models import Project, Member, Attachment, Workflow, Group
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -29,9 +29,11 @@ class TestProject(LocalApplicationTestCase):
             )
 
             workflow = Workflow(title='default')
+            group = Group(title='default')
 
             cls.project1 = Project(
                 workflow=workflow,
+                group=group,
                 member=member1,
                 title='My first project',
                 description='A decription for my project',
