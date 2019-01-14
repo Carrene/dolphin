@@ -1,6 +1,4 @@
-from auditing.middleware import MiddleWareFactory
-from auditing.context import Context
-from nanohttp import context
+from auditing import MiddleWareFactory
 
 from dolphin import dolphin as app
 
