@@ -15,9 +15,11 @@ class AuditLogMixin:
                 to_camel_case(attribute) in self.json_metadata()['fields'] and \
                 value != getattr(self, attribute):
 
-                    print(f'Setting Attribute: {attribute} with value: '
-                          f'{value}, Old: {getattr(self, attribute)} related '
-                          f'to {type(self).__name__} with id: {self.id}')
+                    print(
+                        f'Setting Attribute: {attribute} with value: {value}, '
+                        f'Old: {getattr(self, attribute)} related to '
+                        f'{type(self).__name__} with id: {self.id}'
+                    )
 
         super().__setattr__(attribute, value)
 
