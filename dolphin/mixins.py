@@ -30,5 +30,11 @@ class AuditLogMixin:
 
 @event.listens_for(AuditLogMixin, 'after_insert', propagate=True)
 def after_insert(mapper, connection, target):
-    AuditLogContext.append_instantiation(user='me', obj=target)
+    try:
+        email = context.identity.email
+
+    except:
+        email = 'anonymous'
+
+    AuditLogContext.append_instantiation(user=email, obj=target)
 
