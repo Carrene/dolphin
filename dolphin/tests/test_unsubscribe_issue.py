@@ -1,4 +1,5 @@
 from bddrest import status, when, given, response
+from auditing.context import Context as AuditLogContext
 
 from dolphin.models import Issue, Project, Member, Subscription, Workflow, \
     Group
@@ -10,66 +11,67 @@ class TestIssue(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
-        session = cls.create_session()
+        with AuditLogContext({}):
+            session = cls.create_session()
 
-        member = Member(
-            title='First Member',
-            email='member1@example.com',
-            access_token='access token 1',
-            phone=123456789,
-            reference_id=1
-        )
-        session.add(member)
+            member = Member(
+                title='First Member',
+                email='member1@example.com',
+                access_token='access token 1',
+                phone=123456789,
+                reference_id=1
+            )
+            session.add(member)
 
-        workflow = Workflow(title='default')
-        group = Group(title='default')
+            workflow = Workflow(title='default')
+            group = Group(title='default')
 
-        project = Project(
-            workflow=workflow,
-            group=group,
-            member=member,
-            title='My first project',
-            description='A decription for my project',
-            room_id=1
-        )
-        session.add(project)
+            project = Project(
+                workflow=workflow,
+                group=group,
+                member=member,
+                title='My first project',
+                description='A decription for my project',
+                room_id=1
+            )
+            session.add(project)
 
-        issue1 = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            due_date='2020-2-20',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(issue1)
-        session.flush()
+            issue1 = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                due_date='2020-2-20',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(issue1)
+            session.flush()
 
-        issue2 = Issue(
-            project=project,
-            title='Second issue',
-            description='This is description of second issue',
-            due_date='2020-2-20',
-            kind='feature',
-            days=2,
-            room_id=3
-        )
-        session.add(issue2)
-        session.flush()
+            issue2 = Issue(
+                project=project,
+                title='Second issue',
+                description='This is description of second issue',
+                due_date='2020-2-20',
+                kind='feature',
+                days=2,
+                room_id=3
+            )
+            session.add(issue2)
+            session.flush()
 
-        subscription1 = Subscription(
-            subscribable=issue1.id,
-            member=member.id
-        )
-        session.add(subscription1)
+            subscription1 = Subscription(
+                subscribable=issue1.id,
+                member=member.id
+            )
+            session.add(subscription1)
 
-        subscription2 = Subscription(
-            subscribable=issue2.id,
-            member=member.id
-        )
-        session.add(subscription2)
-        session.commit()
+            subscription2 = Subscription(
+                subscribable=issue2.id,
+                member=member.id
+            )
+            session.add(subscription2)
+            session.commit()
 
     def test_unsubscribe(self):
         self.login('member1@example.com')

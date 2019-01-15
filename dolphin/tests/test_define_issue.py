@@ -1,4 +1,5 @@
 from bddrest import status, response, Update, when, given, Remove
+from auditing.context import Context as AuditLogContext
 
 from dolphin.models import Issue, Project, Member, Workflow, Phase, Group
 from dolphin.tests.helpers import LocalApplicationTestCase, \
@@ -9,56 +10,57 @@ class TestIssue(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
-        session = cls.create_session()
+        with AuditLogContext({}):
+            session = cls.create_session()
 
-        member = Member(
-            title='First Member',
-            email='member1@example.com',
-            access_token='access token 1',
-            phone=123456789,
-            reference_id=1
-        )
+            member = Member(
+                title='First Member',
+                email='member1@example.com',
+                access_token='access token 1',
+                phone=123456789,
+                reference_id=1
+            )
 
-        workflow = Workflow(title='default')
-        session.add(workflow)
+            workflow = Workflow(title='default')
+            session.add(workflow)
 
-        phase1 = Phase(
-            title='Backlog',
-            order=-1,
-            workflow=workflow
-        )
-        session.add(phase1)
+            phase1 = Phase(
+                title='Backlog',
+                order=-1,
+                workflow=workflow
+            )
+            session.add(phase1)
 
-        phase2 = Phase(
-            title='Triage',
-            order=0,
-            workflow=workflow
-        )
-        session.add(phase2)
+            phase2 = Phase(
+                title='Triage',
+                order=0,
+                workflow=workflow
+            )
+            session.add(phase2)
 
-        group = Group(title='default')
+            group = Group(title='default')
 
-        project = Project(
-            workflow=workflow,
-            group=group,
-            member=member,
-            title='My first project',
-            description='A decription for my project',
-            room_id=1
-        )
+            project = Project(
+                workflow=workflow,
+                group=group,
+                member=member,
+                title='My first project',
+                description='A decription for my project',
+                room_id=1
+            )
 
-        issue1 = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            due_date='2020-2-20',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(issue1)
-        session.commit()
-        cls.project = project
+            issue1 = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                due_date='2020-2-20',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(issue1)
+            session.commit()
+            cls.project = project
 
     def test_define(self):
         self.login('member1@example.com')

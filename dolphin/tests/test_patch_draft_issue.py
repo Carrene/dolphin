@@ -1,3 +1,4 @@
+from auditing.context import Context as AuditLogContext
 from bddrest import status, response, when
 
 from dolphin.models import Issue, Project, Member, Workflow, Phase, Tag, \
@@ -10,66 +11,67 @@ class TestIssue(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
-        session = cls.create_session()
+        with AuditLogContext({}):
+            session = cls.create_session()
 
-        organization = Organization(
-            title='First Organization'
-        )
+            organization = Organization(
+                title='First Organization'
+            )
 
-        cls.member = Member(
-            title='First Member',
-            email='member1@example.com',
-            access_token='access token 1',
-            phone=123456789,
-            reference_id=1,
-        )
+            cls.member = Member(
+                title='First Member',
+                email='member1@example.com',
+                access_token='access token 1',
+                phone=123456789,
+                reference_id=1,
+            )
 
-        workflow = Workflow(title='default')
-        group = Group(title='default')
+            workflow = Workflow(title='default')
+            group = Group(title='default')
 
-        phase1 = Phase(
-            title='Backlog',
-            order=-1,
-            workflow=workflow
-        )
-        session.add(phase1)
+            phase1 = Phase(
+                title='Backlog',
+                order=-1,
+                workflow=workflow
+            )
+            session.add(phase1)
 
-        phase2 = Phase(
-            title='Triage',
-            order=0,
-            workflow=workflow
-        )
-        session.add(phase2)
+            phase2 = Phase(
+                title='Triage',
+                order=0,
+                workflow=workflow
+            )
+            session.add(phase2)
 
-        cls.tag1 = Tag(title='tag1', organization=organization)
-        session.add(cls.tag1)
+            cls.tag1 = Tag(title='tag1', organization=organization)
+            session.add(cls.tag1)
 
-        cls.tag2 = Tag(title='tag2', organization=organization)
-        session.add(cls.tag2)
+            cls.tag2 = Tag(title='tag2', organization=organization)
+            session.add(cls.tag2)
 
-        cls.project = Project(
-            workflow=workflow,
-            group=group,
-            member=cls.member,
-            title='My first project',
-            description='A decription for my project',
-            room_id=1
-        )
-        issue1 = Issue(
-            project=cls.project,
-            title='First issue',
-            description='This is description of first issue',
-            due_date='2020-2-20',
-            kind='feature',
-            days=1,
-            room_id=2,
-            tags=[cls.tag1]
-        )
-        session.add(issue1)
+            cls.project = Project(
+                workflow=workflow,
+                group=group,
+                member=cls.member,
+                title='My first project',
+                description='A decription for my project',
+                room_id=1
+            )
+            issue1 = Issue(
+                project=cls.project,
+                title='First issue',
+                description='This is description of first issue',
+                due_date='2020-2-20',
+                kind='feature',
+                days=1,
+                room_id=2,
+                tags=[cls.tag1]
+            )
+            session.add(issue1)
 
-        cls.draft_issue = DraftIssue()
-        session.add(cls.draft_issue)
-        session.commit()
+            cls.draft_issue = DraftIssue()
+            session.add(cls.draft_issue)
+            session.commit()
 
     def test_patch(self):
         self.login(self.member.email)

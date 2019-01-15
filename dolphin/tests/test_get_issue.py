@@ -1,3 +1,4 @@
+from auditing.context import Context as AuditLogContext
 from bddrest import status, response, when
 
 from dolphin.models import Issue, Member, Workflow, Group, Project
@@ -8,41 +9,42 @@ class TestIssue(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
-        session = cls.create_session()
+        with AuditLogContext({}):
+            session = cls.create_session()
 
-        member = Member(
-            title='First Member',
-            email='member1@example.com',
-            access_token='access token 1',
-            phone=123456789,
-            reference_id=2
-        )
-        session.add(member)
+            member = Member(
+                title='First Member',
+                email='member1@example.com',
+                access_token='access token 1',
+                phone=123456789,
+                reference_id=2
+            )
+            session.add(member)
 
-        workflow = Workflow(title='default')
-        group = Group(title='default')
+            workflow = Workflow(title='default')
+            group = Group(title='default')
 
-        project = Project(
-            workflow=workflow,
-            group=group,
-            member=member,
-            title='My first project',
-            description='A decription for my project',
-            room_id=1
-        )
-        session.add(project)
+            project = Project(
+                workflow=workflow,
+                group=group,
+                member=member,
+                title='My first project',
+                description='A decription for my project',
+                room_id=1
+            )
+            session.add(project)
 
-        issue1 = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            due_date='2020-2-20',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(issue1)
-        session.commit()
+            issue1 = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                due_date='2020-2-20',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(issue1)
+            session.commit()
 
     def test_get(self):
         self.login('member1@example.com')

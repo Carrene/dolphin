@@ -1,4 +1,4 @@
-from auditing import MiddleWareFactory
+from auditing import MiddleWare
 from auditing.logentry import ChangeAttributeLogEntry, InstantiationLogEntry
 from nanohttp import context
 
@@ -35,6 +35,5 @@ def callback(audit_log):
 
 app.configure()
 app.initialize_orm()
-middleware = MiddleWareFactory(callback)
-app = middleware(app)
+app = MiddleWare(app, callback)
 
