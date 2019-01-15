@@ -11,6 +11,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from .subscribable import Subscribable, Subscription
 from .item import Item
+from ..mixins import AuditLogMixin
 
 
 class IssueTag(DeclarativeBase):
@@ -55,7 +56,7 @@ ONTIME = 'on-time'
 
 
 class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
-            Subscribable):
+            Subscribable, AuditLogMixin):
 
     __tablename__ = 'issue'
     __mapper_args__ = {'polymorphic_identity': __tablename__}
