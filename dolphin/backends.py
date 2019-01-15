@@ -290,7 +290,6 @@ class ChatClient:
     def send_message(self, room_id, body, token, x_access_token):
 
         url = f'{settings.chat.url}/apiv1/targets/{room_id}/messages'
-
         try:
             response = requests.request(
                 'SEND',
