@@ -1,6 +1,7 @@
 from contextlib import contextmanager
 from os import path
 
+from auditing import MiddleWare
 from nanohttp import RegexRouteController, json, settings, context, HTTPStatus
 from restfulpy.application import Application
 from restfulpy.mockup import mockup_http_server
@@ -49,8 +50,13 @@ organization_fields.update(dict(
 ))
 
 
+def callback(audit_logs):
+    pass
+
+
+
 class LocalApplicationTestCase(ApplicableTestCase):
-    __application_factory__ = Dolphin
+    __application__ = MiddleWare(Dolphin(), callback)
     __story_directory__ = path.join(DATA_DIRECTORY, 'stories')
     __api_documentation_directory__ = path.join(DATA_DIRECTORY, 'markdown')
     __metadata__ = {

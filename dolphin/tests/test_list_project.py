@@ -1,3 +1,4 @@
+from auditing.context import Context as AuditLogContext
 from bddrest import status, response, when
 
 from dolphin.models import Project, Member, Workflow, Issue, Subscription, \
@@ -9,82 +10,83 @@ class TestProject(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
-        session = cls.create_session()
+        with AuditLogContext({}):
+            session = cls.create_session()
 
-        member1 = Member(
-            title='First Member',
-            email='member1@example.com',
-            access_token='access token 1',
-            phone=123456789,
-            reference_id=2
-        )
-        session.add(member1)
+            member1 = Member(
+                title='First Member',
+                email='member1@example.com',
+                access_token='access token 1',
+                phone=123456789,
+                reference_id=2
+            )
+            session.add(member1)
 
-        workflow = Workflow(title='default')
-        group = Group(title='default')
+            workflow = Workflow(title='default')
+            group = Group(title='default')
 
-        project1 = Project(
-            workflow=workflow,
-            group=group,
-            member=member1,
-            title='My first project',
-            description='A decription for my project',
-            status='active',
-            room_id=1001
-        )
-        session.add(project1)
-        session.flush()
+            project1 = Project(
+                workflow=workflow,
+                group=group,
+                member=member1,
+                title='My first project',
+                description='A decription for my project',
+                status='active',
+                room_id=1001
+            )
+            session.add(project1)
+            session.flush()
 
-        project2 = Project(
-            workflow=workflow,
-            group=group,
-            member=member1,
-            title='My second project',
-            description='A decription for my project',
-            status='on-hold',
-            room_id=1002
-        )
-        session.add(project2)
+            project2 = Project(
+                workflow=workflow,
+                group=group,
+                member=member1,
+                title='My second project',
+                description='A decription for my project',
+                status='on-hold',
+                room_id=1002
+            )
+            session.add(project2)
 
-        project3 = Project(
-            workflow=workflow,
-            group=group,
-            member=member1,
-            title='My third project',
-            description='A decription for my project',
-            removed_at='2020-2-20',
-            room_id=1000
-        )
-        session.add(project3)
+            project3 = Project(
+                workflow=workflow,
+                group=group,
+                member=member1,
+                title='My third project',
+                description='A decription for my project',
+                removed_at='2020-2-20',
+                room_id=1000
+            )
+            session.add(project3)
 
-        issue1 = Issue(
-            project=project1,
-            title='First issue',
-            description='This is description of first issue',
-            due_date='2030-2-20',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(issue1)
+            issue1 = Issue(
+                project=project1,
+                title='First issue',
+                description='This is description of first issue',
+                due_date='2030-2-20',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(issue1)
 
-        issue2 = Issue(
-            project=project2,
-            title='Second issue',
-            description='This is description of second issue',
-            due_date='2020-2-20',
-            kind='feature',
-            days=2,
-            room_id=3
-        )
-        session.add(issue2)
+            issue2 = Issue(
+                project=project2,
+                title='Second issue',
+                description='This is description of second issue',
+                due_date='2020-2-20',
+                kind='feature',
+                days=2,
+                room_id=3
+            )
+            session.add(issue2)
 
-        subscription = Subscription(
-            subscribable=project1.id,
-            member=member1.id
-        )
-        session.add(subscription)
-        session.commit()
+            subscription = Subscription(
+                subscribable=project1.id,
+                member=member1.id
+            )
+            session.add(subscription)
+            session.commit()
 
     def test_list(self):
         self.login('member1@example.com')

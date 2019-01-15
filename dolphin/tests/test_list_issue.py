@@ -1,4 +1,5 @@
 from bddrest import status, response, when
+from auditing.context import Context as AuditLogContext
 
 from dolphin.models import Issue, Project, Member, Workflow, Item, Phase, Group
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
@@ -8,113 +9,93 @@ class TestIssue(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
-        session = cls.create_session()
+        with AuditLogContext({}):
+            session = cls.create_session()
 
-        member = Member(
-            title='First Member',
-            email='member1@example.com',
-            access_token='access token 1',
-            phone=123456789,
-            reference_id=1
-        )
-        session.add(member)
+            member = Member(
+                title='First Member',
+                email='member1@example.com',
+                access_token='access token 1',
+                phone=123456789,
+                reference_id=1
+            )
+            session.add(member)
 
-        workflow = Workflow(title='default')
-        group = Group(title='default')
+            workflow = Workflow(title='default')
+            group = Group(title='default')
 
-        project = Project(
-            workflow=workflow,
-            group=group,
-            member=member,
-            title='My first project',
-            description='A decription for my project',
-            room_id=1
-        )
-        session.add(project)
+            project = Project(
+                workflow=workflow,
+                group=group,
+                member=member,
+                title='My first project',
+                description='A decription for my project',
+                room_id=1
+            )
+            session.add(project)
 
-        issue1 = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            due_date='2020-2-20',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(issue1)
+            issue1 = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                due_date='2020-2-20',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(issue1)
 
-        issue2 = Issue(
-            project=project,
-            title='Second issue',
-            description='This is description of second issue',
-            due_date='2016-2-20',
-            kind='feature',
-            days=2,
-            room_id=3
-        )
-        session.add(issue2)
+            issue2 = Issue(
+                project=project,
+                title='Second issue',
+                description='This is description of second issue',
+                due_date='2016-2-20',
+                kind='feature',
+                days=2,
+                room_id=3
+            )
+            session.add(issue2)
 
-        issue3 = Issue(
-            project=project,
-            title='Third issue',
-            description='This is description of third issue',
-            due_date='2020-2-20',
-            kind='feature',
-            days=3,
-            room_id=4
-        )
-        session.add(issue3)
+            issue3 = Issue(
+                project=project,
+                title='Third issue',
+                description='This is description of third issue',
+                due_date='2020-2-20',
+                kind='feature',
+                days=3,
+                room_id=4
+            )
+            session.add(issue3)
 
-        cls.phase1 = Phase(
-            workflow=workflow,
-            title='phase 1',
-            order=1,
-        )
-        session.add(cls.phase1)
+            cls.phase1 = Phase(
+                workflow=workflow,
+                title='phase 1',
+                order=1,
+            )
+            session.add(cls.phase1)
 
-        cls.phase2 = Phase(
-            workflow=workflow,
-            title='phase 2',
-            order=2,
-        )
-        session.add(cls.phase2)
+            cls.phase2 = Phase(
+                workflow=workflow,
+                title='phase 2',
+                order=2,
+            )
+            session.add(cls.phase1)
+            session.flush()
 
-        cls.phase3 = Phase(
-            workflow=workflow,
-            title='phase 3',
-            order=3,
-        )
-        session.add(cls.phase3)
-        session.flush()
+            item1 = Item(
+                member_id=member.id,
+                phase_id=cls.phase1.id,
+                issue_id=issue1.id,
+            )
+            session.add(item1)
 
-        item1 = Item(
-            member_id=member.id,
-            phase_id=cls.phase1.id,
-            issue_id=issue1.id,
-        )
-        session.add(item1)
-
-        item2 = Item(
-            member_id=member.id,
-            phase_id=cls.phase2.id,
-            issue_id=issue2.id,
-        )
-        session.add(item2)
-
-        item3 = Item(
-            member_id=member.id,
-            phase_id=cls.phase2.id,
-            issue_id=issue1.id,
-        )
-        session.add(item3)
-
-        item4 = Item(
-            member_id=member.id,
-            phase_id=cls.phase3.id,
-            issue_id=issue1.id,
-        )
-        session.add(item4)
-        session.commit()
+            item2 = Item(
+                member_id=member.id,
+                phase_id=cls.phase2.id,
+                issue_id=issue2.id,
+            )
+            session.add(item2)
+            session.commit()
 
     def test_list(self):
         self.login('member1@example.com')
