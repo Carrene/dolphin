@@ -8,64 +8,64 @@ from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 class TestIssue(LocalApplicationTestCase):
 
     @classmethod
+    @AuditLogContext(dict())
     def mockup(cls):
-        with AuditLogContext({}):
-            session = cls.create_session()
+        session = cls.create_session()
 
-            member = Member(
-                title='First Member',
-                email='member1@example.com',
-                access_token='access token 1',
-                phone=123456789,
-                reference_id=1
-            )
-            session.add(member)
+        member = Member(
+            title='First Member',
+            email='member1@example.com',
+            access_token='access token 1',
+            phone=123456789,
+            reference_id=1
+        )
+        session.add(member)
 
-            workflow = Workflow(title='default')
-            group = Group(title='default')
+        workflow = Workflow(title='default')
+        group = Group(title='default')
 
-            cls.project1 = Project(
-                workflow=workflow,
-                group=group,
-                member=member,
-                title='My first project',
-                description='A decription for my project',
-                room_id=1
-            )
-            session.add(cls.project1)
+        cls.project1 = Project(
+            workflow=workflow,
+            group=group,
+            member=member,
+            title='My first project',
+            description='A decription for my project',
+            room_id=1
+        )
+        session.add(cls.project1)
 
-            cls.project2 = Project(
-                workflow=workflow,
-                group=group,
-                member=member,
-                title='My second project',
-                description='A decription for my project',
-                room_id=2
-            )
-            session.add(cls.project2)
+        cls.project2 = Project(
+            workflow=workflow,
+            group=group,
+            member=member,
+            title='My second project',
+            description='A decription for my project',
+            room_id=2
+        )
+        session.add(cls.project2)
 
-            cls.project3 = Project(
-                workflow=workflow,
-                group=group,
-                member=member,
-                title='My third project',
-                description='A decription for my project',
-                room_id=3
-            )
-            cls.project3.soft_delete()
-            session.add(cls.project3)
+        cls.project3 = Project(
+            workflow=workflow,
+            group=group,
+            member=member,
+            title='My third project',
+            description='A decription for my project',
+            room_id=3
+        )
+        cls.project3.soft_delete()
+        session.add(cls.project3)
 
-            cls.issue1 = Issue(
-                project=cls.project1,
-                title='First issue',
-                description='This is description of first issue',
-                due_date='2020-2-20',
-                kind='feature',
-                days=1,
-                room_id=2
-            )
-            session.add(cls.issue1)
-            session.commit()
+        cls.issue1 = Issue(
+            project=cls.project1,
+            title='First issue',
+            description='This is description of first issue',
+            due_date='2020-2-20',
+            kind='feature',
+            days=1,
+            room_id=2
+        )
+        session.add(cls.issue1)
+        session.commit()
 
     def test_move(self):
         self.login('member1@example.com')
