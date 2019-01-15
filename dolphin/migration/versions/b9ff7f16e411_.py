@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy import orm, Table, Integer, Column
 from sqlalchemy.ext.declarative import declarative_base
 
-from dolphin.models import Skill, Group, Resource, Phase
+from dolphin.models import Skill, Group, Resource
 
 # revision identifiers, used by Alembic.
 revision = 'b9ff7f16e411'
@@ -24,7 +24,6 @@ OldResource = Table(Resource.__tablename__, Base.metadata,
     Column('id', Integer),
     Column('phase_id', Integer)
 )
-
 
 PROJECT_GROUP_ID_CONSTRAIN_NAME = 'project_group_id_fkey'
 GROUP_PUBLIC_UNIQUE_CONSTRAIN_NAME = 'group_public_key'
