@@ -1,3 +1,5 @@
+from auditing import context as AuditLogContext
+from nanohttp import context
 from restfulpy.orm import DBSession
 from restfulpy.utils import to_camel_case
 from sqlalchemy import event, inspect
@@ -15,10 +17,12 @@ class AuditLogMixin:
                 to_camel_case(attribute) in self.json_metadata()['fields'] and \
                 value != getattr(self, attribute):
 
-                    print(
-                        f'Setting Attribute: {attribute} with value: {value}, '
-                        f'Old: {getattr(self, attribute)} related to '
-                        f'{type(self).__name__} with id: {self.id}'
+                    AuditLogContext.append_change_attribute(
+                        user=context.identity.email,
+                        obj=self,
+                        attribute=attribute,
+                        old_value=getattr(self, attribute),
+                        new_value=value,
                     )
 
         super().__setattr__(attribute, value)
@@ -26,5 +30,5 @@ class AuditLogMixin:
 
 @event.listens_for(AuditLogMixin, 'after_insert', propagate=True)
 def after_insert(mapper, connection, target):
-    print(f'Creating the {type(target).__name__} with id: {target.id}')
+    AuditLogContext.append_instantiation(user='me', obj=target)
 
