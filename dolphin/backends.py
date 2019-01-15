@@ -126,7 +126,8 @@ class ChatClient:
                 except ValueError:
                     raise ChatInternallError()
 
-                return rooms[0]
+                if len(rooms) == 1:
+                    return rooms[0]
 
                 raise ChatRoomNotFound()
 
