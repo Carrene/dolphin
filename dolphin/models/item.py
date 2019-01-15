@@ -1,8 +1,7 @@
-from datetime import datetime
 
-from restfulpy.orm import Field, DeclarativeBase
+from restfulpy.orm import Field, DeclarativeBase, relationship
 from restfulpy.orm.mixins import TimestampMixin
-from sqlalchemy import DateTime, Integer, ForeignKey
+from sqlalchemy import Integer, ForeignKey
 
 
 class Item(TimestampMixin, DeclarativeBase):
@@ -12,3 +11,8 @@ class Item(TimestampMixin, DeclarativeBase):
     issue_id = Field(Integer, ForeignKey('issue.id'), primary_key=True)
     member_id = Field(Integer, ForeignKey('member.id'), primary_key=True)
 
+    issues = relationship(
+        'Issue',
+        foreign_keys=issue_id,
+        back_populates='items'
+    )

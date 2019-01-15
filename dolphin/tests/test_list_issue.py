@@ -77,7 +77,14 @@ class TestIssue(LocalApplicationTestCase):
             title='phase 2',
             order=2,
         )
-        session.add(cls.phase1)
+        session.add(cls.phase2)
+
+        cls.phase3 = Phase(
+            workflow=workflow,
+            title='phase 3',
+            order=3,
+        )
+        session.add(cls.phase3)
         session.flush()
 
         item1 = Item(
@@ -93,6 +100,20 @@ class TestIssue(LocalApplicationTestCase):
             issue_id=issue2.id,
         )
         session.add(item2)
+
+        item3 = Item(
+            member_id=member.id,
+            phase_id=cls.phase2.id,
+            issue_id=issue1.id,
+        )
+        session.add(item3)
+
+        item4 = Item(
+            member_id=member.id,
+            phase_id=cls.phase3.id,
+            issue_id=issue1.id,
+        )
+        session.add(item4)
         session.commit()
 
     def test_list(self):
@@ -104,7 +125,19 @@ class TestIssue(LocalApplicationTestCase):
             'LIST',
         ):
             assert status == 200
-            assert len(response.json) == 3
+
+            issues = response.json
+            assert len(issues) == 3
+
+            for issue in issues:
+                items = issue['items']
+                if len(items) == 0:
+                    continue
+
+                privious_item_created_at = items[0]['createdAt']
+                for item in items:
+                    assert item['createdAt'] >= privious_item_created_at
+                    privious_item_created_at = item['createdAt']
 
             when('Sort issues by title', query=dict(sort='title'))
             assert response.json[0]['title'] == 'First issue'

@@ -168,6 +168,12 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         protected=True,
     )
 
+    items = relationship(
+        'Item',
+        protected=False,
+        order_by=Item.issue_id,
+    )
+
     is_subscribed = column_property(
         select([func.count(Subscription.member)]) \
         .where(Subscription.subscribable == id) \
