@@ -9,13 +9,11 @@ from dolphin.models import Member
 
 def callback(audit_log):
 
-    print(f'verb: {audit_log[-1].verb}')
-    print(f'status: {audit_log[-1].status}')
-
     if audit_log[-1].status == '200 OK':
         chat_client = ChatClient()
         member = Member.current()
 
+        # FIXME: We will rollback if cannot send a message successfully
         for log in audit_log:
             if isinstance(log, ChangeAttributeLogEntry):
                 chat_client.send_message(
