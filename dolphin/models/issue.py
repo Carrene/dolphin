@@ -146,7 +146,6 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         back_populates='issues',
         protected=True
     )
-
     members = relationship(
         'Member',
         secondary='item',
