@@ -1,5 +1,5 @@
-from bddrest import status, when, given, response
 from auditing.context import Context as AuditLogContext
+from bddrest import status, when, response
 
 from dolphin.models import Project, Member, Group, Subscription, Workflow
 from dolphin.tests.helpers import LocalApplicationTestCase, \
@@ -9,56 +9,56 @@ from dolphin.tests.helpers import LocalApplicationTestCase, \
 class TestProject(LocalApplicationTestCase):
 
     @classmethod
+    @AuditLogContext(dict())
     def mockup(cls):
-        with AuditLogContext({}):
-            session = cls.create_session()
+        session = cls.create_session()
 
-            member = Member(
-                title='First Member',
-                email='member1@example.com',
-                access_token='access token 1',
-                phone=123456789,
-                reference_id=2
-            )
-            session.add(member)
+        member = Member(
+            title='First Member',
+            email='member1@example.com',
+            access_token='access token 1',
+            phone=123456789,
+            reference_id=2
+        )
+        session.add(member)
 
-            workflow = Workflow(title='default')
-            group = Group(title='default')
+        workflow = Workflow(title='default')
+        group = Group(title='default')
 
-            project1 = Project(
-                workflow=workflow,
-                group=group,
-                member=member,
-                title='My first project',
-                description='A decription for my project',
-                room_id=1001
-            )
-            session.add(project1)
-            session.flush()
+        project1 = Project(
+            workflow=workflow,
+            group=group,
+            member=member,
+            title='My first project',
+            description='A decription for my project',
+            room_id=1001
+        )
+        session.add(project1)
+        session.flush()
 
-            project2 = Project(
-                workflow=workflow,
-                group=group,
-                member=member,
-                title='My second project',
-                description='A decription for my project',
-                room_id=1002
-            )
-            session.add(project2)
-            session.flush()
+        project2 = Project(
+            workflow=workflow,
+            group=group,
+            member=member,
+            title='My second project',
+            description='A decription for my project',
+            room_id=1002
+        )
+        session.add(project2)
+        session.flush()
 
-            subscription1 = Subscription(
-                subscribable=project1.id,
-                member=member.id
-            )
-            session.add(subscription1)
+        subscription1 = Subscription(
+            subscribable=project1.id,
+            member=member.id
+        )
+        session.add(subscription1)
 
-            subscription2 = Subscription(
-                subscribable=project2.id,
-                member=member.id
-            )
-            session.add(subscription2)
-            session.commit()
+        subscription2 = Subscription(
+            subscribable=project2.id,
+            member=member.id
+        )
+        session.add(subscription2)
+        session.commit()
 
     def test_unsubscribe(self):
         self.login('member1@example.com')
