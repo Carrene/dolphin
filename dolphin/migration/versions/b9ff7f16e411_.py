@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy import orm, Table, Integer, Column
 from sqlalchemy.ext.declarative import declarative_base
 
-from dolphin.models import Skill, Group, Resource, Phase
+from dolphin.models import Skill, Group, Resource
 
 # revision identifiers, used by Alembic.
 revision = 'b9ff7f16e411'
@@ -25,9 +25,9 @@ OldResource = Table(Resource.__tablename__, Base.metadata,
     Column('phase_id', Integer)
 )
 
-
 PROJECT_GROUP_ID_CONSTRAIN_NAME = 'project_group_id_fkey'
 GROUP_PUBLIC_UNIQUE_CONSTRAIN_NAME = 'group_public_key'
+public_group = Group(title='Public', public=True)
 
 
 def upgrade():
@@ -35,12 +35,39 @@ def upgrade():
     bind = op.get_bind()
     session = orm.Session(bind=bind)
 
-    op.create_table('skill',
+    op.create_table(
+        'skill',
         sa.Column('phase_id', sa.Integer(), nullable=False),
         sa.Column('resource_id', sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(['phase_id'], ['phase.id'], ),
         sa.ForeignKeyConstraint(['resource_id'], ['member.id'], ),
         sa.PrimaryKeyConstraint('phase_id', 'resource_id')
+    )
+
+    op.add_column('group', sa.Column('public', sa.BOOLEAN(), nullable=True))
+    op.create_unique_constraint(
+        table_name='group',
+        columns=['public'],
+        constraint_name=GROUP_PUBLIC_UNIQUE_CONSTRAIN_NAME,
+    )
+
+    session.add(public_group)
+    session.flush()
+
+    op.add_column(
+        'project',
+        sa.Column(
+            'group_id',
+            sa.Integer(),
+            nullable=True,
+        )
+    )
+    op.create_foreign_key(
+        source_table='project',
+        referent_table='group',
+        local_cols=['group_id'],
+        remote_cols=['id'],
+        constraint_name=PROJECT_GROUP_ID_CONSTRAIN_NAME,
     )
 
     resources = session.query(OldResource) \
@@ -51,35 +78,15 @@ def upgrade():
         skill = Skill(phase_id=resource.phase_id, resource_id=resource.id)
         session.add(skill)
 
-    op.add_column('group', sa.Column('public', sa.BOOLEAN(), nullable=True))
-    op.create_unique_constraint(
-        table_name='group',
-        columns=['public'],
-        constraint_name=GROUP_PUBLIC_UNIQUE_CONSTRAIN_NAME,
+    op.execute(
+        f'UPDATE project SET group_id={public_group.id}'
     )
-
+    op.alter_column('project', 'group_id', nullable=False)
     op.drop_constraint('member_phase_id_fkey', 'member', type_='foreignkey')
     op.drop_column('member', 'phase_id')
 
-    public_group = Group(title='Public', public=True)
-    session.add(public_group)
-    session.flush()
-    op.add_column(
-        'project',
-        sa.Column(
-            'group_id',
-            sa.Integer(),
-            nullable=False,
-            default=public_group.id)
-    )
+    session.commit()
     # ### end Alembic commands ###
-    op.create_foreign_key(
-        source_table='project',
-        referent_table='group',
-        local_cols=['group_id'],
-        remote_cols=['id'],
-        constraint_name=PROJECT_GROUP_ID_CONSTRAIN_NAME,
-    )
 
 
 def downgrade():
@@ -107,6 +114,7 @@ def downgrade():
         type_='unique'
     )
     op.drop_column('group', 'public')
+    op.excute(f'DELETE FROM "group" WHERE title == {public_group.title};')
 
     bind = op.get_bind()
     session = orm.Session(bind=bind)
