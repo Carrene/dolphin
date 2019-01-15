@@ -71,10 +71,4 @@ class TestIssue(LocalApplicationTestCase):
             assert fields['priority']['required'] is not None
             assert fields['priority']['default'] is not None
 
-            assert fields['phaseId']['label'] is not None
-            assert fields['phaseId']['required'] is not None
-            assert fields['phaseId']['readonly'] is not None
-            assert fields['phaseId']['watermark'] is not None
-            assert fields['phaseId']['notNone'] is not None
-            assert fields['phaseId']['example'] is not None
 

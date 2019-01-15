@@ -146,14 +146,6 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         back_populates='issues',
         protected=True
     )
-    phases = relationship(
-        'Phase',
-        secondary='item',
-        back_populates='issues',
-        lazy='selectin',
-        protected=False,
-        order_by=Item.created_at,
-    )
     members = relationship(
         'Member',
         secondary='item',
@@ -216,16 +208,6 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             label='Subscribe',
             required=False,
             readonly=True
-        )
-        yield MetadataField(
-            'phaseId',
-            'phaseId',
-            label='Phase',
-            required=False,
-            readonly=True,
-            watermark='Choose a phase',
-            not_none=True,
-            example='Lorem Ipsum'
         )
         yield MetadataField(
             'tags',
