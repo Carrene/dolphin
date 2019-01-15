@@ -54,7 +54,6 @@ def callback(audit_logs):
     pass
 
 
-
 class LocalApplicationTestCase(ApplicableTestCase):
     __application__ = MiddleWare(Dolphin(), callback)
     __story_directory__ = path.join(DATA_DIRECTORY, 'stories')
