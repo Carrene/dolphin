@@ -87,7 +87,6 @@ def upgrade():
     op.drop_column('member', 'phase_id')
 
     session.commit()
-
     # ### end Alembic commands ###
 
 
