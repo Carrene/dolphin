@@ -210,7 +210,6 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             required=False,
             readonly=True
         )
-
         yield MetadataField(
             'tags',
             'tags',
