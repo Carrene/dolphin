@@ -1,3 +1,4 @@
+from auditing.context import Context as AuditLogContext
 from bddrest import status, response, when, Update
 
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
@@ -8,9 +9,9 @@ from dolphin.models import Member, Tag, DraftIssue, Issue, Organization, \
 class TestTag(LocalApplicationTestCase):
 
     @classmethod
+    @AuditLogContext(dict())
     def mockup(cls):
         session = cls.create_session()
-
         cls.member1 = Member(
             title='First Member',
             email='member1@example.com',

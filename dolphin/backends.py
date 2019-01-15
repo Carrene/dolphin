@@ -287,3 +287,40 @@ class ChatClient:
             member = json.loads(response.text)
             return member
 
+    def send_message(self, room_id, body, token, x_access_token):
+
+        url = f'{settings.chat.url}/apiv1/targets/{room_id}/messages'
+        try:
+            response = requests.request(
+                'SEND',
+                url,
+                data={'body': body, 'mimetype': 'text/plain'},
+                headers={
+                    'authorization': token,
+                    'X-Oauth2-Access-Token': x_access_token
+                }
+            )
+            logger.debug(
+                f'SEND {url} - ' \
+                f'response-HTTP-code={response.status_code} - ' \
+                f'target-application={self._server_name}'
+            )
+            if response.status_code == 404:
+                raise ChatServerNotFound()
+
+            # 502: Bad Gateway
+            # 503: Service Unavailbale
+            if response.status_code in (502, 503):
+                raise ChatServerNotAvailable()
+
+            if response.status_code != 200:
+                logger.exception(response.content.decode())
+                raise ChatInternallError()
+
+            member = json.loads(response.text)
+            return member
+
+        except requests.RequestException as e: # pragma: no cover
+            logger.exception(e)
+            raise ChatInternallError()
+

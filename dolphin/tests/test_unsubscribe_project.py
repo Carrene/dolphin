@@ -1,4 +1,5 @@
-from bddrest import status, when, given, response
+from auditing.context import Context as AuditLogContext
+from bddrest import status, when, response
 
 from dolphin.models import Project, Member, Group, Subscription, Workflow
 from dolphin.tests.helpers import LocalApplicationTestCase, \
@@ -8,6 +9,7 @@ from dolphin.tests.helpers import LocalApplicationTestCase, \
 class TestProject(LocalApplicationTestCase):
 
     @classmethod
+    @AuditLogContext(dict())
     def mockup(cls):
         session = cls.create_session()
 
