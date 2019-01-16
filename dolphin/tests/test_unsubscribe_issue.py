@@ -61,14 +61,14 @@ class TestIssue(LocalApplicationTestCase):
         session.flush()
 
         subscription1 = Subscription(
-            subscribable=issue1.id,
-            member=member.id
+            subscribable_id=issue1.id,
+            member_id=member.id
         )
         session.add(subscription1)
 
         subscription2 = Subscription(
-            subscribable=issue2.id,
-            member=member.id
+            subscribable_id=issue2.id,
+            member_id=member.id
         )
         session.add(subscription2)
         session.commit()

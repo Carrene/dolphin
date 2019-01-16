@@ -63,14 +63,14 @@ class TestRelease(LocalApplicationTestCase):
         session.add(project2)
 
         subscription1 = Subscription(
-            subscribable=release1.id,
-            member=member.id
+            subscribable_id=release1.id,
+            member_id=member.id
         )
         session.add(subscription1)
 
         subscription2 = Subscription(
-            subscribable=release2.id,
-            member=member.id
+            subscribable_id=release2.id,
+            member_id=member.id
         )
         session.add(subscription2)
         session.commit()
