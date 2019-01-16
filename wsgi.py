@@ -9,7 +9,7 @@ from dolphin.models import Member
 
 def callback(audit_log):
 
-    if audit_log[-1].status == '200 OK':
+    if audit_log[-1].status == '200 OK' and len(audit_log) > 1:
         chat_client = ChatClient()
         member = Member.current()
 
