@@ -1,5 +1,7 @@
+from datetime import datetime
+
 from restfulpy.orm import DeclarativeBase, Field, TimestampMixin, relationship
-from sqlalchemy import Integer, String, ForeignKey
+from sqlalchemy import Integer, String, ForeignKey, DateTime
 
 
 class Subscription(DeclarativeBase):
@@ -7,6 +9,13 @@ class Subscription(DeclarativeBase):
 
     subscribable_id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
     member_id = Field(Integer, ForeignKey('member.id'), primary_key=True)
+
+    seen_at = Field(
+        DateTime,
+        label='Seen At',
+        nullable=False,
+        default=datetime.now()
+    )
 
 
 class Subscribable(TimestampMixin, DeclarativeBase):
