@@ -115,14 +115,14 @@ class ReleaseController(ModelRestController):
 
         member = Member.current()
         if DBSession.query(Subscription).filter(
-            Subscription.subscribable == id,
-            Subscription.member == member.id
+                Subscription.subscribable_id == id,
+                Subscription.member_id == member.id
         ).one_or_none():
             raise HTTPStatus('611 Already Subscribed')
 
         subscription = Subscription(
-            subscribable=id,
-            member=member.id
+            subscribable_id=id,
+            member_id=member.id
         )
         DBSession.add(subscription)
 
@@ -148,8 +148,8 @@ class ReleaseController(ModelRestController):
 
         member = Member.current()
         subscription = DBSession.query(Subscription).filter(
-            Subscription.subscribable == id,
-            Subscription.member == member.id
+            Subscription.subscribable_id == id,
+            Subscription.member_id == member.id
         ).one_or_none()
 
         if not subscription:

@@ -82,8 +82,8 @@ class TestProject(LocalApplicationTestCase):
         session.add(issue2)
 
         subscription = Subscription(
-            subscribable=project1.id,
-            member=member1.id
+            subscribable_id=project1.id,
+            member_id=member1.id
         )
         session.add(subscription)
         session.commit()

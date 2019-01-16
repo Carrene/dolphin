@@ -125,13 +125,13 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     )
 
     is_subscribed = column_property(
-        select([func.count(Subscription.member)]) \
-        .where(Subscription.subscribable == id) \
-        .where(Subscription.member == bindparam(
+        select([func.count(Subscription.member_id)]) \
+        .where(Subscription.subscribable_id == id) \
+        .where(Subscription.member_id == bindparam(
                 'member_id',
                 callable_=lambda: context.identity.id
             )
-        ) \
+               ) \
         .correlate_except(Subscription)
     )
 

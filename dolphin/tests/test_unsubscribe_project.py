@@ -48,14 +48,14 @@ class TestProject(LocalApplicationTestCase):
         session.flush()
 
         subscription1 = Subscription(
-            subscribable=project1.id,
-            member=member.id
+            subscribable_id=project1.id,
+            member_id=member.id
         )
         session.add(subscription1)
 
         subscription2 = Subscription(
-            subscribable=project2.id,
-            member=member.id
+            subscribable_id=project2.id,
+            member_id=member.id
         )
         session.add(subscription2)
         session.commit()

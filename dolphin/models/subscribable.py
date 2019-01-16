@@ -5,8 +5,8 @@ from sqlalchemy import Integer, String, ForeignKey
 class Subscription(DeclarativeBase):
     __tablename__ = 'subscription'
 
-    subscribable = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
-    member = Field(Integer, ForeignKey('member.id'), primary_key=True)
+    subscribable_id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
+    member_id = Field(Integer, ForeignKey('member.id'), primary_key=True)
 
 
 class Subscribable(TimestampMixin, DeclarativeBase):
