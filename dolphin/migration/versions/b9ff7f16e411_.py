@@ -114,7 +114,7 @@ def downgrade():
         type_='unique'
     )
     op.drop_column('group', 'public')
-    op.excute(f'DELETE FROM "group" WHERE title == {public_group.title};')
+    op.execute(f'DELETE FROM "group" WHERE title == {public_group.title};')
 
     bind = op.get_bind()
     session = orm.Session(bind=bind)
