@@ -2,6 +2,7 @@ from datetime import datetime
 
 from restfulpy.orm import Field, relationship, ModifiedMixin, FilteringMixin, \
     OrderingMixin, PaginationMixin
+from restfulpy.orm.metadata import MetadataField
 from sqlalchemy import Integer, Enum, DateTime, ForeignKey, select, func
 from sqlalchemy.orm import column_property
 
@@ -62,6 +63,15 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
             correlate_except(Project)
     )
 
+    @classmethod
+    def iter_metadata_fields(cls):
+        yield from super().iter_metadata_fields()
+        yield MetadataField(
+            'dueDate',
+            'due date',
+            label='Target',
+        )
+
     def to_dict(self):
         project_dict = super().to_dict()
         project_dict['dueDate'] = self.due_date
@@ -69,3 +79,4 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
 
     def __repr__(self):
         return f'\tTitle: {self.title}\n'
+
