@@ -11,12 +11,14 @@ from dolphin.backends import ChatClient
 from dolphin.models import Member
 
 
+AUDIT_LOG_MIMETYPE = 'application/x-auditlog'
+
+
 def callback(audit_log):
 
     if audit_log[-1].status == '200 OK' and len(audit_log) > 1:
         chat_client = ChatClient()
         member = Member.current()
-
         # FIXME: We will rollback if cannot send a message successfully
         for log in audit_log:
             if isinstance(log, ChangeAttributeLogEntry):
@@ -31,7 +33,7 @@ def callback(audit_log):
                 chat_client.send_message(
                     room_id=log.obj.room_id,
                     body=json.dumps(message),
-                    mimetype='application/x-auditlog',
+                    mimetype=AUDIT_LOG_MIMETYPE,
                     token=context.environ['HTTP_AUTHORIZATION'],
                     x_access_token=member.access_token,
                 )
@@ -46,7 +48,7 @@ def callback(audit_log):
                 chat_client.send_message(
                     room_id=log.obj.room_id,
                     body=json.dumps(message),
-                    mimetype='application/x-auditlog',
+                    mimetype=AUDIT_LOG_MIMETYPE,
                     token=context.environ['HTTP_AUTHORIZATION'],
                     x_access_token=member.access_token,
                 )
