@@ -25,7 +25,8 @@ def upgrade():
     op.execute(
         'UPDATE subscription SET seen_at=subscribable.created_at '
         'FROM subscribable '
-        'WHERE subscription.subscribable_id = subscribable.id')
+        'WHERE subscription.subscribable_id = subscribable.id'
+    )
     # ### end Alembic commands ###
 
 
