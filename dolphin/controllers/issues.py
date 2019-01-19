@@ -1,6 +1,7 @@
 from datetime import datetime
 
-from nanohttp import HTTPStatus, json, context, HTTPNotFound, HTTPUnauthorized
+from nanohttp import HTTPStatus, json, context, HTTPNotFound, \
+    HTTPUnauthorized, int_or_notfound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import DBSession, commit
@@ -11,7 +12,7 @@ from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound, \
     ChatRoomNotFound
 from ..models import Issue, Subscription, Phase, Item, Member, Project
 from ..validators import issue_validator, update_issue_validator, \
-    assign_issue_validator, issue_move_validator
+    assign_issue_validator, issue_move_validator, unassign_issue_validator
 from .phases import PhaseController
 from .tag import TagController
 
@@ -378,6 +379,30 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         )
 
         DBSession.add(item)
+        return issue
+
+    @authorize
+    @json
+    @unassign_issue_validator
+    @Issue.expose
+    @commit
+    def unassign(self, id):
+        id = int_or_notfound(id)
+        issue = DBSession.query(Issue).get(id)
+        if issue is None:
+            raise HTTPNotFound()
+
+        item = DBSession.query(Item) \
+            .filter(
+                Item.issue_id == id,
+                Item.member_id == context.form.get('memberId'),
+                Item.phase_id == context.form.get('phaseId')
+            ) \
+            .one_or_none()
+        if not item:
+            raise HTTPStatus('636 Not Assign Yet')
+
+        DBSession.delete(item)
         return issue
 
     @authorize

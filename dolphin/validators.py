@@ -424,6 +424,22 @@ assign_issue_validator = validate(
 )
 
 
+unassign_issue_validator = validate(
+    memberId=dict(
+        not_none='769 Resource Id Is None',
+        required='715 Resource Id Not In Form',
+        type_=(int, '716 Invalid Resource Id Type'),
+        callback=member_exists_validator
+    ),
+    phaseId=dict(
+        not_none='770 Phase Id Is None',
+        required='737 Phase Id Not In Form',
+        type_=(int, '738 Invalid Phase Id Type'),
+        callback=phase_exists_validator
+    )
+)
+
+
 organization_create_validator = validate(
     title=dict(
         required='710 Title Not In Form',
