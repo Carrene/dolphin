@@ -26,7 +26,7 @@ class TestIssue(LocalApplicationTestCase):
             reference_id=1,
         )
 
-        workflow = Workflow(title='default')
+        workflow = Workflow(title='Default')
         group = Group(title='default')
 
         phase1 = Phase(

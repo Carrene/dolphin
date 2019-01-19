@@ -29,7 +29,7 @@ class TestProject(LocalApplicationTestCase):
         )
         session.add(member2)
 
-        workflow = Workflow(title='default')
+        workflow = Workflow(title='Default')
         group = Group(title='default')
 
         project1 = Project(

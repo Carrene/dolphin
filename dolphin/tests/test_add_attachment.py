@@ -26,7 +26,7 @@ class TestProject(LocalApplicationTestCase):
             reference_id=2
         )
 
-        workflow = Workflow(title='default')
+        workflow = Workflow(title='Default')
         group = Group(title='default')
 
         project1 = Project(
