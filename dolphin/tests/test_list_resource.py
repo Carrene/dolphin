@@ -10,7 +10,7 @@ class TestResource(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        workflow = Workflow(title='default')
+        workflow = Workflow(title='Default')
 
         cls.phase1 = Phase(
             title='backlog',

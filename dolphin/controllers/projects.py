@@ -79,7 +79,7 @@ class ProjectController(ModelRestController):
             project.workflow_id = form['workflowId']
         else:
             default_workflow = DBSession.query(Workflow) \
-                .filter(Workflow.title == 'default') \
+                .filter(Workflow.title == 'Default') \
                 .one()
             project.workflow_id = default_workflow.id
 

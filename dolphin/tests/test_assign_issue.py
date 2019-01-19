@@ -20,7 +20,7 @@ class TestIssue(LocalApplicationTestCase):
             reference_id=1
         )
 
-        workflow = Workflow(title='default')
+        workflow = Workflow(title='Default')
         session.add(workflow)
 
         phase1 = Phase(

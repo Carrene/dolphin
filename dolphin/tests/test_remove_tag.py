@@ -27,7 +27,7 @@ class TestTag(LocalApplicationTestCase):
         session.add(organization)
         session.flush()
 
-        workflow = Workflow(title='default')
+        workflow = Workflow(title='Default')
         group = Group(title='default')
 
         organization_member = OrganizationMember(

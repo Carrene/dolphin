@@ -25,7 +25,7 @@ class TestProject(LocalApplicationTestCase):
             cutoff='2030-2-20',
         )
 
-        cls.workflow = Workflow(title='default')
+        cls.workflow = Workflow(title='Default')
         cls.group = Group(title='Public', public=True)
 
         project1 = Project(
@@ -63,6 +63,12 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['status'] == 'active'
             assert response.json['boarding'] == None
             assert response.json['dueDate'] == None
+
+            when(
+                'Workflow id is not in form',
+                form=given - 'workflowId' | dict(title='New Project')
+            )
+            assert status == 200
 
             when(
                 'Workflow id is in form but not found(alphabetical)',
