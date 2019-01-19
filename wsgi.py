@@ -31,7 +31,7 @@ def callback(audit_log):
                 chat_client.send_message(
                     room_id=log.obj.room_id,
                     body=json.dumps(message),
-                    minetype='application/x-auditlog',
+                    mimetype='application/x-auditlog',
                     token=context.environ['HTTP_AUTHORIZATION'],
                     x_access_token=member.access_token,
                 )
@@ -46,7 +46,7 @@ def callback(audit_log):
                 chat_client.send_message(
                     room_id=log.obj.room_id,
                     body=json.dumps(message),
-                    minetype='application/x-auditlog',
+                    mimetype='application/x-auditlog',
                     token=context.environ['HTTP_AUTHORIZATION'],
                     x_access_token=member.access_token,
                 )

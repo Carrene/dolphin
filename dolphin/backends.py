@@ -287,14 +287,14 @@ class ChatClient:
             member = json.loads(response.text)
             return member
 
-    def send_message(self, room_id, body, minetype, token, x_access_token):
+    def send_message(self, room_id, body, mimetype, token, x_access_token):
 
         url = f'{settings.chat.url}/apiv1/targets/{room_id}/messages'
         try:
             response = requests.request(
                 'SEND',
                 url,
-                data={'body': body, 'mimetype': minetype},
+                data={'body': body, 'mimetype': mimetype},
                 headers={
                     'authorization': token,
                     'X-Oauth2-Access-Token': x_access_token
