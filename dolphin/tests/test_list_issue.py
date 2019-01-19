@@ -1,7 +1,10 @@
+from datetime import datetime
+
 from auditing.context import Context as AuditLogContext
 from bddrest import status, response, when
 
-from dolphin.models import Issue, Project, Member, Workflow, Item, Phase, Group
+from dolphin.models import Issue, Project, Member, Workflow, Item, Phase, \
+    Group, Subscription
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -44,6 +47,14 @@ class TestIssue(LocalApplicationTestCase):
             room_id=2
         )
         session.add(issue1)
+        session.flush()
+
+        subscription_issue1 = Subscription(
+            subscribable_id=issue1.id,
+            member_id=member.id,
+            seen_at=datetime.utcnow(),
+        )
+        session.add(subscription_issue1)
 
         issue2 = Issue(
             project=project,
@@ -55,6 +66,14 @@ class TestIssue(LocalApplicationTestCase):
             room_id=3
         )
         session.add(issue2)
+        session.flush()
+
+        subscription_issue2 = Subscription(
+            subscribable_id=issue2.id,
+            member_id=member.id,
+            seen_at=None,
+        )
+        session.add(subscription_issue2)
 
         issue3 = Issue(
             project=project,
@@ -63,9 +82,10 @@ class TestIssue(LocalApplicationTestCase):
             due_date='2020-2-20',
             kind='feature',
             days=3,
-            room_id=4
+            room_id=4,
         )
         session.add(issue3)
+        session.flush()
 
         cls.phase1 = Phase(
             workflow=workflow,
@@ -119,6 +139,9 @@ class TestIssue(LocalApplicationTestCase):
                 for item in items:
                     assert item['createdAt'] >= privious_item_created_at
                     privious_item_created_at = item['createdAt']
+
+            when('Unread messages', query=dict(seenAt=None))
+            assert len(response.json) == 1
 
             when('Sort issues by title', query=dict(sort='title'))
             assert response.json[0]['title'] == 'First issue'

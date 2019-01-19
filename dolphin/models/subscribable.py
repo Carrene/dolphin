@@ -7,14 +7,17 @@ from sqlalchemy import Integer, String, ForeignKey, DateTime
 class Subscription(DeclarativeBase):
     __tablename__ = 'subscription'
 
-    subscribable_id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
+    subscribable_id = Field(
+        Integer,
+        ForeignKey('subscribable.id'),
+        primary_key=True
+    )
     member_id = Field(Integer, ForeignKey('member.id'), primary_key=True)
 
     seen_at = Field(
         DateTime,
         label='Seen At',
-        nullable=False,
-        default=datetime.now()
+        nullable=True,
     )
 
 
