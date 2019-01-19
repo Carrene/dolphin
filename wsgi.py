@@ -1,6 +1,9 @@
+import json
+from datetime import datetime
 from auditing import MiddleWare
 from auditing.logentry import ChangeAttributeLogEntry, InstantiationLogEntry
 from nanohttp import context
+from restfulpy.datetimehelpers import format_datetime
 
 from dolphin import dolphin as app
 from dolphin.backends import ChatClient
@@ -16,18 +19,33 @@ def callback(audit_log):
         # FIXME: We will rollback if cannot send a message successfully
         for log in audit_log:
             if isinstance(log, ChangeAttributeLogEntry):
+                message = dict(
+                    action='Update',
+                    attribute=log.attribute,
+                    old=format_datetime(log.old_value) \
+                        if isinstance(log.old_value, datetime) else log.old_value,
+                    new=format_datetime(log.new_value) \
+                        if isinstance(log.new_value, datetime) else log.new_value,
+                )
                 chat_client.send_message(
                     room_id=log.obj.room_id,
-                    body=f'Update the {log.attribute} by {member.title} '
-                         f'from {log.old_value} to {log.new_value}.',
+                    body=json.dumps(message),
+                    minetype='application/x-auditlog',
                     token=context.environ['HTTP_AUTHORIZATION'],
                     x_access_token=member.access_token,
                 )
 
             elif isinstance(log, InstantiationLogEntry):
-                 chat_client.send_message(
+                message = dict(
+                    action='Create',
+                    attribute=None,
+                    old=None,
+                    new=None,
+                )
+                chat_client.send_message(
                     room_id=log.obj.room_id,
-                    body=f'Created by {member.title}.',
+                    body=json.dumps(message),
+                    minetype='application/x-auditlog',
                     token=context.environ['HTTP_AUTHORIZATION'],
                     x_access_token=member.access_token,
                 )
