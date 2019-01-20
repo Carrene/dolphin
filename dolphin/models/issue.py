@@ -220,7 +220,17 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             watermark='Lorem Ipsum',
             example='Lorem Ipsum'
         )
-
+        yield MetadataField(
+            name='phaseId',
+            key='phase id',
+            label='Phase',
+            required=False,
+            not_none=False,
+            readonly=True,
+            watermark='Lorem Ipsum',
+            example='Lorem Ipsum',
+            message='Lorem Ipsum',
+        )
 
     def to_dict(self):
         issue_dict = super().to_dict()
@@ -238,5 +248,4 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             query = cls._filter_by_column_value(query, Item.phase_id, value)
 
         return query
-
 
