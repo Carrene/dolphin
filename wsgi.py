@@ -1,4 +1,3 @@
-import json
 from datetime import datetime
 
 from auditing import MiddleWare
@@ -32,7 +31,7 @@ def callback(audit_log):
                 )
                 chat_client.send_message(
                     room_id=log.obj.room_id,
-                    body=json.dumps(message),
+                    body=message,
                     mimetype=AUDIT_LOG_MIMETYPE,
                     token=context.environ['HTTP_AUTHORIZATION'],
                     x_access_token=member.access_token,
@@ -47,7 +46,7 @@ def callback(audit_log):
                 )
                 chat_client.send_message(
                     room_id=log.obj.room_id,
-                    body=json.dumps(message),
+                    body=message,
                     mimetype=AUDIT_LOG_MIMETYPE,
                     token=context.environ['HTTP_AUTHORIZATION'],
                     x_access_token=member.access_token,
