@@ -396,7 +396,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             .filter(
                 Item.issue_id == id,
                 Item.member_id == context.form.get('memberId'),
-                Item.phase_id == context.form.get('phaseId')
+                Item.phase_id == context.form.get('phaseId'),
             ) \
             .one_or_none()
         if not item:
