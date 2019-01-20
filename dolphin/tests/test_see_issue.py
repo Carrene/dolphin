@@ -6,7 +6,7 @@ from dolphin.models import Issue, Project, Member, Workflow, Group, \
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
-class TestIssue(LocalApplicationTestCase):
+class TestSeeIssue(LocalApplicationTestCase):
 
     @classmethod
     @AuditLogContext(dict())
@@ -66,7 +66,7 @@ class TestIssue(LocalApplicationTestCase):
         session.commit()
         session.expunge(cls.subscription_issue1)
 
-    def test_list(self):
+    def test_see(self):
         self.login('member1@example.com')
 
         with oauth_mockup_server(), self.given(
