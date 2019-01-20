@@ -67,9 +67,15 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
     def iter_metadata_fields(cls):
         yield from super().iter_metadata_fields()
         yield MetadataField(
-            'dueDate',
-            'due date',
+            name='dueDate',
+            key='due date',
             label='Target',
+            readonly=True,
+            example='Lorem Ipsum',
+            watermark='Lorem Ipsum',
+            message='Lorem Ipsum',
+            not_none=True,
+            required=True,
         )
 
     def to_dict(self):
