@@ -400,7 +400,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             ) \
             .one_or_none()
         if not item:
-            raise HTTPStatus('636 Not Assign Yet')
+            raise HTTPStatus('636 Not Assigned Yet')
 
         DBSession.delete(item)
         return issue
