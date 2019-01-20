@@ -97,7 +97,7 @@ class TestSeeIssue(LocalApplicationTestCase):
                 'Sending from',
                 form=dict(whyDidYouDoThat='IDK'),
             )
-            assert status == 709
+            assert status == '709 Form Not Allowed'
 
             self.logout()
             when(
