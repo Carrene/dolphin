@@ -45,12 +45,14 @@ class TestProject(LocalApplicationTestCase):
             assert fields['organizationId']['example'] is not None
             assert fields['organizationId']['name'] is not None
             assert fields['organizationId']['notNone'] is not None
+            assert fields['organizationId']['readonly'] is not None
             assert fields['organizationId']['required'] is not None
 
             assert fields['byMemberId']['label'] is not None
             assert fields['byMemberId']['watermark'] is not None
             assert fields['byMemberId']['example'] is not None
             assert fields['byMemberId']['name'] is not None
+            assert fields['byMemberId']['readonly'] is not None
             assert fields['byMemberId']['notNone'] is not None
             assert fields['byMemberId']['required'] is not None
 

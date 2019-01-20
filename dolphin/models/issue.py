@@ -63,6 +63,14 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     _boarding = ['on-time', 'delayed']
 
+    id = Field(
+        Integer,
+        ForeignKey('subscribable.id'),
+        primary_key=True,
+        label='ID',
+        readonly=True,
+    )
+
     project_id = Field(
         Integer,
         ForeignKey('project.id'),
@@ -74,9 +82,8 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         required=False,
         example='Lorem Ipsum'
     )
-    room_id = Field(Integer)
+    room_id = Field(Integer, readonly=True)
 
-    id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True, label='ID')
     due_date = Field(
         DateTime,
         python_type=datetime,
@@ -122,7 +129,6 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         default='on-hold',
         example='lorem ipsum',
     )
-
     priority = Field(
         Enum(*issue_priorities, name='priority'),
         python_type=str,

@@ -73,5 +73,6 @@ class TestIssue(LocalApplicationTestCase):
 
             assert fields['issueId']['name'] is not None
             assert fields['issueId']['notNone'] is not None
+            assert fields['boarding']['readonly'] is not None
             assert fields['issueId']['required'] is not None
 

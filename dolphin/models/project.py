@@ -26,7 +26,12 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     _boarding = ['on-time', 'delayed', 'at-risk']
 
-    id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
+    id = Field(
+        Integer,
+        ForeignKey('subscribable.id'),
+        primary_key=True,
+        readonly=True,
+    )
 
     workflow_id = Field(
         Integer,
@@ -59,6 +64,7 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         label='Member',
         nullable=False,
         not_none=False,
+        readonly=True,
         required=True
     )
     group_id = Field(
@@ -73,7 +79,7 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         message='Lorem Ipsum'
     )
 
-    room_id = Field(Integer)
+    room_id = Field(Integer, readonly=True)
 
     status = Field(
         Enum(*project_statuses, name='project_status'),
@@ -174,7 +180,8 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     def to_dict(self):
         project_dict = super().to_dict()
         project_dict['boarding'] = self.boardings
-        project_dict['dueDate'] = self.due_date.isoformat() if self.due_date else None
         project_dict['isSubscribed'] = True if self.is_subscribed else False
+        project_dict['dueDate'] = self.due_date.isoformat() \
+            if self.due_date else None
         return project_dict
 

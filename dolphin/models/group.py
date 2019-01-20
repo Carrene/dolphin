@@ -5,7 +5,7 @@ from sqlalchemy import Integer, String, BOOLEAN
 class Group(DeclarativeBase):
     __tablename__ = 'group'
 
-    id = Field(Integer, primary_key=True)
+    id = Field(Integer, primary_key=True, readonly=True)
 
     title = Field(
         String,
@@ -28,3 +28,4 @@ class Group(DeclarativeBase):
 
     def __repr__(self):
         return f'\tTitle: {self.title}, Public: {self.public}'
+

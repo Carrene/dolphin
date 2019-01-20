@@ -8,7 +8,7 @@ from .skill import Skill
 class Phase(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
     __tablename__ = 'phase'
 
-    id = Field(Integer, primary_key=True)
+    id = Field(Integer, primary_key=True, readonly=True)
 
     workflow_id = Field(
         Integer,
@@ -77,3 +77,4 @@ class Phase(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
 
     def __repr__(self):
         return f'\tTitle: {self.title}\n'
+

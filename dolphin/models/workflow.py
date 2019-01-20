@@ -9,7 +9,7 @@ class Workflow(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     __tablename__ = 'workflow'
 
-    id = Field(Integer, primary_key=True)
+    id = Field(Integer, primary_key=True, readonly=True)
     title = Field(
         String,
         max_length=50,
@@ -39,3 +39,4 @@ class Workflow(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     def __repr__(self):
         return f'\tTitle: {self.title}\n'
+
