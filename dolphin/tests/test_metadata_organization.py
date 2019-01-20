@@ -57,8 +57,9 @@ class TestMember(LocalApplicationTestCase):
             assert fields['membersCount']['label'] is not None
             assert fields['membersCount']['required'] is not None
             assert fields['membersCount']['example'] is not None
-            assert fields['membersCount']['watermark'] is not None
             assert fields['membersCount']['type'] is not None
+            assert fields['membersCount']['watermark'] is not None
+            assert fields['membersCount']['readonly'] is not None
             assert fields['membersCount']['name'] is not None
 
             assert fields['role']['protected'] is not None

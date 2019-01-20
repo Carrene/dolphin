@@ -72,7 +72,7 @@ class Organization(OrderingMixin, FilteringMixin, PaginationMixin,
 
     __tablename__ = 'organization'
 
-    id = Field(Integer, primary_key=True)
+    id = Field(Integer, primary_key=True, readonly=True)
 
     title = Field(
         Unicode(50),
@@ -127,6 +127,7 @@ class Organization(OrderingMixin, FilteringMixin, PaginationMixin,
         Logo.as_mutable(JSON),
         nullable=True,
         not_none=False,
+        readonly=True,
         required=False,
         label='Logo',
         protected=False,

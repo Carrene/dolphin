@@ -7,9 +7,13 @@ class Tag(DeclarativeBase, OrderingMixin, FilteringMixin, PaginationMixin):
 
     __tablename__ = 'tag'
 
-    id = Field(Integer, primary_key=True)
+    id = Field(Integer, primary_key=True, readonly=True)
 
-    organization_id = Field(Integer, ForeignKey('organization.id'))
+    organization_id = Field(
+        Integer,
+        ForeignKey('organization.id'),
+        readonly=True,
+    )
 
     title = Field(
         String,
@@ -44,3 +48,4 @@ class Tag(DeclarativeBase, OrderingMixin, FilteringMixin, PaginationMixin):
 
     def __repr__(self):
         return f'\tTitle: {self.title}\n'
+

@@ -24,13 +24,13 @@ class Subscription(DeclarativeBase):
 class Subscribable(TimestampMixin, DeclarativeBase):
     __tablename__ = 'subscribable'
 
-    type_ = Field(String(50))
+    type_ = Field(String(50), readonly=True)
     __mapper_args__ = {
         'polymorphic_on': type_,
         'polymorphic_identity': __tablename__
     }
 
-    id = Field(Integer, primary_key=True)
+    id = Field(Integer, primary_key=True, readonly=True)
     title = Field(
         String,
         max_length=50,

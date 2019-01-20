@@ -19,7 +19,7 @@ class Invitation(OrderingMixin, FilteringMixin, PaginationMixin,
 
     __tablename__ = 'invitation'
 
-    id = Field(Integer, primary_key=True)
+    id = Field(Integer, primary_key=True, readonly=True)
 
     organization_id = Field(
         Integer,
@@ -27,6 +27,7 @@ class Invitation(OrderingMixin, FilteringMixin, PaginationMixin,
         python_type=int,
         watermark='Choose a organization',
         label='Organization',
+        readonly=True,
         not_none=True,
         required=False,
         example='Lorem Ipsum'
@@ -37,6 +38,7 @@ class Invitation(OrderingMixin, FilteringMixin, PaginationMixin,
         python_type=int,
         watermark='Choose a member',
         label='Member',
+        readonly=True,
         not_none=True,
         required=False,
         example='Lorem Ipsum'
@@ -50,7 +52,7 @@ class Invitation(OrderingMixin, FilteringMixin, PaginationMixin,
         required=True,
         example='Lorem Ipsum'
     )
-    accepted = Field(Boolean, default=False)
+    accepted = Field(Boolean, default=False, readonly=True)
     expired_date = Field(
         DateTime,
         python_type=datetime,
@@ -61,6 +63,7 @@ class Invitation(OrderingMixin, FilteringMixin, PaginationMixin,
         pattern_description='ISO format and format like "yyyy-mm-dd" is valid',
         example='2018-02-02T1:12:12.000Z',
         watermark='lorem ipsum',
+        readonly=True,
         nullable=False,
         not_none=True,
         required=True,

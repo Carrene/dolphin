@@ -52,4 +52,5 @@ class TestRelease(LocalApplicationTestCase):
             assert fields['dueDate']['notNone'] is not None
             assert fields['dueDate']['required'] is not None
             assert fields['dueDate']['example'] is not None
+            assert fields['dueDate']['readonly'] is not None
 

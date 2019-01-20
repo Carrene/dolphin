@@ -23,13 +23,14 @@ class DraftIssue(ModifiedMixin, DeclarativeBase):
 
     __tablename__ = 'draft_issue'
 
-    id = Field(Integer, primary_key=True)
+    id = Field(Integer, primary_key=True, readonly=True)
 
     issue_id = Field(
         Integer,
         ForeignKey('issue.id'),
         nullable=True,
         required=False,
+        readonly=True,
         not_none=False
     )
 
