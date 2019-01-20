@@ -1,7 +1,10 @@
+from datetime import datetime
+
 from nanohttp import HTTPStatus, json, context, HTTPNotFound, HTTPUnauthorized
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import DBSession, commit
+from sqlalchemy import and_
 
 from ..backends import ChatClient
 from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound, \
@@ -190,13 +193,37 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                     )
 
         issue.update_from_request()
+
+        subscriptions = DBSession.query(Subscription) \
+            .filter(
+                and_(
+                    Subscription.member_id != context.identity.id,
+                    Subscription.subscribable_id == issue.id,
+                )
+            ).all()
+
+        for subscription in subscriptions:
+            subscription.seen_at = None
+
         return issue
 
     @authorize
     @json
     @Issue.expose
     def list(self):
-        return DBSession.query(Issue)
+        query = DBSession.query(Issue)
+        if 'seenAt' in context.query:
+            query = query \
+                .join(
+                    Subscription,
+                    and_(
+                        Subscription.subscribable_id == Issue.id,
+                        Subscription.seen_at.is_(None),
+                    )
+                ) \
+                .filter(Subscription.member_id == context.identity.id)
+
+        return query
 
     @authorize
     @json(prevent_form='709 Form Not Allowed')
@@ -223,7 +250,8 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         subscription = Subscription(
             subscribable_id=issue.id,
-            member_id=member.id
+            member_id=member.id,
+            seen_at=datetime.utcnow()
         )
         DBSession.add(subscription)
 
