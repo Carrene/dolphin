@@ -439,3 +439,25 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         issue.project_id = context.form.get('projectId')
         return issue
 
+    @authorize
+    @json(prevent_form='709 Form Not Allowed')
+    @Issue.expose
+    @commit
+    def see(self, id):
+        id = int_or_notfound(id)
+        issue = DBSession.query(Issue).get(id)
+
+        if issue is None:
+            raise HTTPNotFound()
+
+        subscription = DBSession.query(Subscription) \
+            .filter(
+                and_(
+                    Subscription.member_id == context.identity.id,
+                    Subscription.subscribable_id == issue.id
+                )
+        ).one_or_none()
+        if subscription is None:
+            raise HTTPStatus('637 Not Subscribed Issue')
+        subscription.seen_at = datetime.utcnow()
+        return issue
