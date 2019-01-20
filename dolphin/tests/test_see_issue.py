@@ -94,3 +94,16 @@ class TestIssue(LocalApplicationTestCase):
                 url_parameters=dict(id=0),
             )
             assert status == 404
+
+            when(
+                'Sending from',
+                form=dict(whyDidYouDoThat='IDK'),
+            )
+            assert status == 709
+
+            self.logout()
+            when(
+                'Trying with an unauthorized member',
+                authorization=None
+            )
+            assert status == 401
