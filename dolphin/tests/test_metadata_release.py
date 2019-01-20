@@ -11,9 +11,9 @@ class TestRelease(LocalApplicationTestCase):
             '/apiv1/releases',
             'METADATA'
         ):
-            fields = response.json['fields']
-
             assert status == 200
+
+            fields = response.json['fields']
 
             assert fields['title']['maxLength'] is not None
             assert fields['title']['minLength'] is not None
@@ -45,4 +45,11 @@ class TestRelease(LocalApplicationTestCase):
             assert fields['cutoff']['required'] is not None
             assert fields['cutoff']['pattern'] is not None
             assert fields['cutoff']['example'] is not None
+
+            assert fields['dueDate']['label'] is not None
+            assert fields['dueDate']['watermark'] is not None
+            assert fields['dueDate']['name'] is not None
+            assert fields['dueDate']['notNone'] is not None
+            assert fields['dueDate']['required'] is not None
+            assert fields['dueDate']['example'] is not None
 
