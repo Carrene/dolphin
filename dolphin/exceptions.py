@@ -69,6 +69,10 @@ class HTTPAlreadyTagRemoved(HTTPKnownStatus):
     status = '635 Already Tag Removed'
 
 
+class HTTPNotSubscribedIssue(HTTPKnownStatus):
+    status = '637 Not Subscribed Issue'
+
+
 class HTTPResourceNotFound(HTTPKnownStatus):
 
     def __init__(self, resource_id):
