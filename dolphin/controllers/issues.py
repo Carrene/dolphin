@@ -446,7 +446,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     def see(self, id):
         id = int_or_notfound(id)
         issue = DBSession.query(Issue).get(id)
-
         if issue is None:
             raise HTTPNotFound()
 

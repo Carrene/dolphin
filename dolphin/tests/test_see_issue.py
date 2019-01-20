@@ -1,10 +1,8 @@
-from datetime import datetime
-
 from auditing.context import Context as AuditLogContext
-from bddrest import status, response, when
+from bddrest import status, when
 
-from dolphin.models import Issue, Project, Member, Workflow, Item, Phase, \
-    Group, Subscription
+from dolphin.models import Issue, Project, Member, Workflow, Group, \
+    Subscription
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
