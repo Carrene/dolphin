@@ -9,7 +9,7 @@ from sqlalchemy import and_
 
 from ..backends import ChatClient
 from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound, \
-    ChatRoomNotFound
+    ChatRoomNotFound, HTTPNotSubscribedIssue
 from ..models import Issue, Subscription, Phase, Item, Member, Project
 from ..validators import issue_validator, update_issue_validator, \
     assign_issue_validator, issue_move_validator, unassign_issue_validator
@@ -458,7 +458,31 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         ).one_or_none()
 
         if subscription is None:
-            raise HTTPStatus('637 Not Subscribed Issue')
+            raise HTTPNotSubscribedIssue()
 
         subscription.seen_at = datetime.utcnow()
+        return issue
+
+    @authorize
+    @json(prevent_form='709 Form Not Allowed')
+    @Issue.expose
+    @commit
+    def unsee(self, id):
+        id = int_or_notfound(id)
+        issue = DBSession.query(Issue).get(id)
+        if issue is None:
+            raise HTTPNotFound()
+
+        subscription = DBSession.query(Subscription) \
+            .filter(
+                and_(
+                    Subscription.member_id == context.identity.id,
+                    Subscription.subscribable_id == issue.id
+                )
+        ).one_or_none()
+
+        if subscription is None:
+            raise HTTPNotSubscribedIssue()
+
+        subscription.seen_at = None
         return issue
