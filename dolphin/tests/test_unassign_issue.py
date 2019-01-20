@@ -131,7 +131,7 @@ class TestIssue(LocalApplicationTestCase):
                 'Issue not assigned yet',
                 url_parameters=dict(id=self.issue2.id)
             )
-            assert status == '636 Not Assign Yet'
+            assert status == '636 Not Assigned Yet'
 
             when('Request is not authorized', authorization=None)
             assert status == 401
