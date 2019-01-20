@@ -457,7 +457,9 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                     Subscription.subscribable_id == issue.id
                 )
         ).one_or_none()
+
         if subscription is None:
             raise HTTPStatus('637 Not Subscribed Issue')
+
         subscription.seen_at = datetime.utcnow()
         return issue
