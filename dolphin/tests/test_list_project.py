@@ -2,7 +2,7 @@ from auditing.context import Context as AuditLogContext
 from bddrest import status, response, when
 
 from dolphin.models import Project, Member, Workflow, Issue, Subscription, \
-    Group
+    Group, Release
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -25,7 +25,14 @@ class TestProject(LocalApplicationTestCase):
         workflow = Workflow(title='Default')
         group = Group(title='default')
 
+        release = Release(
+            title='My first release',
+            description='A decription for my first release',
+            cutoff='2030-2-20',
+        )
+
         project1 = Project(
+            release=release,
             workflow=workflow,
             group=group,
             member=member1,
@@ -38,6 +45,7 @@ class TestProject(LocalApplicationTestCase):
         session.flush()
 
         project2 = Project(
+            release=release,
             workflow=workflow,
             group=group,
             member=member1,
@@ -49,6 +57,7 @@ class TestProject(LocalApplicationTestCase):
         session.add(project2)
 
         project3 = Project(
+            release=release,
             workflow=workflow,
             group=group,
             member=member1,

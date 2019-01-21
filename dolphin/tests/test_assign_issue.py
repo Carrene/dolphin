@@ -1,8 +1,9 @@
 from auditing.context import Context as AuditLogContext
 from bddrest import status, when, given, response
 
-from dolphin.models import Issue, Project, Member, Phase, Group, Workflow
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.models import Issue, Project, Member, Phase, Group, Workflow, \
+    Release
 
 
 class TestIssue(LocalApplicationTestCase):
@@ -39,7 +40,14 @@ class TestIssue(LocalApplicationTestCase):
 
         group = Group(title='default')
 
-        project = Project(
+        release = Release(
+            title='My first release',
+            description='A decription for my first release',
+            cutoff='2030-2-20',
+        )
+
+        cls.project = Project(
+            release=release,
             workflow=workflow,
             group=group,
             member=member,
@@ -48,8 +56,8 @@ class TestIssue(LocalApplicationTestCase):
             room_id=1
         )
 
-        issue1 = Issue(
-            project=project,
+        cls.issue1 = Issue(
+            project=cls.project,
             title='First issue',
             description='This is description of first issue',
             due_date='2020-2-20',
@@ -57,21 +65,20 @@ class TestIssue(LocalApplicationTestCase):
             days=1,
             room_id=2
         )
-        session.add(issue1)
+        session.add(cls.issue1)
         session.commit()
-        cls.project = project
 
     def test_assign(self):
         self.login('member1@example.com')
 
         with oauth_mockup_server(), self.given(
             'Assign an issue to a resource',
-            '/apiv1/issues/id:2',
+            f'/apiv1/issues/id:{self.issue1.id}',
             'ASSIGN',
             form=dict(memberId=1, phaseId=1)
         ):
             assert status == 200
-            assert response.json['id'] == 2
+            assert response.json['id'] == self.issue1.id
 
             when(
                 'Intended issue with string type not found',
@@ -127,7 +134,7 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Issue is already assigned',
-                url_parameters=dict(id=2),
+                url_parameters=dict(id=3),
                 form=given | dict(resourceId=1)
             )
             assert status == '602 Already Assigned'

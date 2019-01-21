@@ -1,6 +1,6 @@
 from bddrest import status, response, Update, when, Remove, given
 
-from dolphin.models import Project, Member, Group, Workflow
+from dolphin.models import Project, Member, Group, Workflow, Release
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status, \
     room_mockup_server
@@ -24,7 +24,14 @@ class TestProject(LocalApplicationTestCase):
         workflow = Workflow(title='Default')
         group = Group(title='default')
 
-        project1 = Project(
+        release = Release(
+            title='My first release',
+            description='A decription for my first release',
+            cutoff='2030-2-20',
+        )
+
+        cls.project1 = Project(
+            release=release,
             workflow=workflow,
             group=group,
             member=member1,
@@ -32,9 +39,10 @@ class TestProject(LocalApplicationTestCase):
             description='A decription for my project',
             room_id=1001
         )
-        session.add(project1)
+        session.add(cls.project1)
 
         project2 = Project(
+            release=release,
             workflow=workflow,
             group=group,
             member=member1,
@@ -50,11 +58,11 @@ class TestProject(LocalApplicationTestCase):
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Subscribe project',
-            '/apiv1/projects/id:1',
+            f'/apiv1/projects/id:{self.project1.id}',
             'SUBSCRIBE',
         ):
             assert status == 200
-            assert response.json['id'] == 1
+            assert response.json['id'] == self.project1.id
             assert response.json['isSubscribed'] == True
 
             when(
@@ -71,7 +79,7 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Project is already subscribed',
-                url_parameters=dict(id=1),
+                url_parameters=dict(id=2),
             )
             assert status == '611 Already Subscribed'
 
@@ -87,28 +95,28 @@ class TestProject(LocalApplicationTestCase):
             with chat_server_status('404 Not Found'):
                 when(
                     'Chat server is not found',
-                    url_parameters=dict(id=2)
+                    url_parameters=dict(id=3)
                 )
                 assert status == '617 Chat Server Not Found'
 
             with chat_server_status('503 Service Not Available'):
                 when(
                     'Chat server is not available',
-                    url_parameters=dict(id=2)
+                    url_parameters=dict(id=3)
                 )
                 assert status == '800 Chat Server Not Available'
 
             with chat_server_status('500 Internal Service Error'):
                 when(
                     'Chat server faces with internal error',
-                    url_parameters=dict(id=2)
+                    url_parameters=dict(id=3)
                 )
                 assert status == '801 Chat Server Internal Error'
 
             with room_mockup_server():
                 when(
                     'Room member is already added to room',
-                    url_parameters=dict(id=2)
+                    url_parameters=dict(id=3)
                 )
                 assert status == 200
 

@@ -1,6 +1,6 @@
 from bddrest import status, response, when
 
-from dolphin.models import Project, Member, Workflow, Group
+from dolphin.models import Project, Member, Workflow, Group, Release
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -21,7 +21,14 @@ class TestProject(LocalApplicationTestCase):
         workflow = Workflow(title='Default')
         group = Group(title='default')
 
-        project1 = Project(
+        release = Release(
+            title='My first release',
+            description='A decription for my first release',
+            cutoff='2030-2-20',
+        )
+
+        cls.project = Project(
+            release=release,
             workflow=workflow,
             group=group,
             member=member1,
@@ -29,7 +36,7 @@ class TestProject(LocalApplicationTestCase):
             description='A decription for my project',
             room_id=1001
         )
-        session.add(project1)
+        session.add(cls.project)
         session.commit()
 
     def test_get(self):
@@ -37,11 +44,11 @@ class TestProject(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             'Getting a project',
-            '/apiv1/projects/id:1',
+            f'/apiv1/projects/id:{self.project.id}',
             'GET'
         ):
             assert status == 200
-            assert response.json['id'] == 1
+            assert response.json['id'] == self.project.id
             assert response.json['title'] == 'My first project'
 
             when(

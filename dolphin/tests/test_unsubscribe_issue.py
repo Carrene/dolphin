@@ -2,7 +2,7 @@ from auditing.context import Context as AuditLogContext
 from bddrest import status, when, response
 
 from dolphin.models import Issue, Project, Member, Subscription, Workflow, \
-    Group
+    Group, Release
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
@@ -26,7 +26,14 @@ class TestIssue(LocalApplicationTestCase):
         workflow = Workflow(title='Default')
         group = Group(title='default')
 
+        release = Release(
+            title='My first release',
+            description='A decription for my first release',
+            cutoff='2030-2-20',
+        )
+
         project = Project(
+            release=release,
             workflow=workflow,
             group=group,
             member=member,
@@ -36,7 +43,7 @@ class TestIssue(LocalApplicationTestCase):
         )
         session.add(project)
 
-        issue1 = Issue(
+        cls.issue1 = Issue(
             project=project,
             title='First issue',
             description='This is description of first issue',
@@ -45,7 +52,7 @@ class TestIssue(LocalApplicationTestCase):
             days=1,
             room_id=2
         )
-        session.add(issue1)
+        session.add(cls.issue1)
         session.flush()
 
         issue2 = Issue(
@@ -61,7 +68,7 @@ class TestIssue(LocalApplicationTestCase):
         session.flush()
 
         subscription1 = Subscription(
-            subscribable_id=issue1.id,
+            subscribable_id=cls.issue1.id,
             member_id=member.id
         )
         session.add(subscription1)
@@ -78,11 +85,11 @@ class TestIssue(LocalApplicationTestCase):
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Unsubscribe an issue',
-            '/apiv1/issues/id:2',
+            f'/apiv1/issues/id:{self.issue1.id}',
             'UNSUBSCRIBE',
         ):
             assert status == 200
-            assert response.json['id'] == 2
+            assert response.json['id'] == self.issue1.id
 
             when(
                 'Intended issue with string type not found',
@@ -104,7 +111,7 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Issue is not subscribed yet',
-                url_parameters=dict(id=2),
+                url_parameters=dict(id=3),
             )
             assert status == '612 Not Subscribed Yet'
 
@@ -114,28 +121,28 @@ class TestIssue(LocalApplicationTestCase):
             with chat_server_status('404 Not Found'):
                 when(
                     'Chat server is not found',
-                    url_parameters=dict(id=3)
+                    url_parameters=dict(id=4)
                 )
                 assert status == '617 Chat Server Not Found'
 
             with chat_server_status('503 Service Not Available'):
                 when(
                     'Chat server is not available',
-                    url_parameters=dict(id=3)
+                    url_parameters=dict(id=4)
                 )
                 assert status == '800 Chat Server Not Available'
 
             with chat_server_status('500 Internal Service Error'):
                 when(
                     'Chat server faces with internal error',
-                    url_parameters=dict(id=3)
+                    url_parameters=dict(id=4)
                 )
                 assert status == '801 Chat Server Internal Error'
 
             with chat_server_status('611 Room Member Not Found'):
                 when(
                     'Room member not found',
-                    url_parameters=dict(id=3)
+                    url_parameters=dict(id=4)
                 )
                 assert status == 200
 

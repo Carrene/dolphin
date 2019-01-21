@@ -10,14 +10,14 @@ class TestProject(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        member1 = Member(
+        cls.member = Member(
             title='First Member',
             email='member1@example.com',
             access_token='access token 1',
             phone=123456789,
             reference_id=2
         )
-        session.add(member1)
+        session.add(cls.member)
         session.commit()
 
     def test_get(self):
@@ -25,11 +25,11 @@ class TestProject(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             'Getting a project',
-            '/apiv1/members/id:1',
+            f'/apiv1/members/id:{self.member.id}',
             'GET'
         ):
             assert status == 200
-            assert response.json['id'] == 1
+            assert response.json['id'] == self.member.id
             assert response.json['title'] == 'member1'
 
             when(

@@ -24,12 +24,12 @@ class TestRelease(LocalApplicationTestCase):
         workflow = Workflow(title='Default')
         group = Group(title='default')
 
-        release1 = Release(
+        cls.release1 = Release(
             title='My first release',
             description='A decription for my first release',
             cutoff='2030-2-20',
         )
-        session.add(release1)
+        session.add(cls.release1)
         session.flush()
 
         release2 = Release(
@@ -39,34 +39,12 @@ class TestRelease(LocalApplicationTestCase):
         )
         session.add(release2)
 
-        project1 = Project(
-            workflow=workflow,
-            group=group,
-            member=member,
-            release=release1,
-            title='My first project',
-            description='A decription for my project',
-            room_id=1000
-        )
-        session.add(project1)
-        session.flush()
-
-        project2 = Project(
-            workflow=workflow,
-            group=group,
-            member=member,
-            release=release2,
-            title='My first project',
-            description='A decription for my project',
-            room_id=1000
-        )
-        session.add(project2)
-
         subscription1 = Subscription(
-            subscribable_id=release1.id,
+            subscribable_id=cls.release1.id,
             member_id=member.id
         )
         session.add(subscription1)
+        session.flush()
 
         subscription2 = Subscription(
             subscribable_id=release2.id,
@@ -80,11 +58,11 @@ class TestRelease(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             'Unsubscribe release',
-            '/apiv1/releases/id:1',
+            f'/apiv1/releases/id:{self.release1.id}',
             'UNSUBSCRIBE',
         ):
             assert status == 200
-            assert response.json['id'] == 1
+            assert response.json['id'] == self.release1.id
 
             when(
                 'Intended release with string type not found',

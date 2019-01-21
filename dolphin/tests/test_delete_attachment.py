@@ -3,7 +3,7 @@ from os.path import join, dirname, abspath
 from bddrest import status, response, when, Update
 from sqlalchemy_media import StoreManager
 
-from dolphin.models import Project, Member, Attachment, Workflow, Group
+from dolphin.models import Project, Member, Attachment, Workflow, Group, Release
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -31,7 +31,14 @@ class TestProject(LocalApplicationTestCase):
             workflow = Workflow(title='default')
             group = Group(title='default')
 
+            release = Release(
+                title='My first release',
+                description='A decription for my first release',
+                cutoff='2030-2-20',
+            )
+
             cls.project1 = Project(
+                release=release,
                 workflow=workflow,
                 group=group,
                 member=member1,
@@ -48,7 +55,7 @@ class TestProject(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             'Delete a project attachment',
-            '/apiv1/projects/project_id:1/files/id:1',
+            f'/apiv1/projects/project_id:{self.project1.id}/files/id:1',
             'DELETE',
         ):
             assert status == 200

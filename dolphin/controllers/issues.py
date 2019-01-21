@@ -82,7 +82,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     ))
     @issue_validator
     @Issue.expose
-
     @commit
     def define(self):
         PENDING = -1

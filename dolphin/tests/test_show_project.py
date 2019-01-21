@@ -1,6 +1,6 @@
 from bddrest import status, when, response
 
-from dolphin.models import Project, Member, Workflow, Group
+from dolphin.models import Project, Member, Workflow, Group, Release
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -22,7 +22,14 @@ class TestProject(LocalApplicationTestCase):
         workflow = Workflow(title='Default')
         group = Group(title='default')
 
-        project1 = Project(
+        release = Release(
+            title='My first release',
+            description='A decription for my first release',
+            cutoff='2030-2-20',
+        )
+
+        cls.project1 = Project(
+            release=release,
             workflow=workflow,
             group=group,
             member=member1,
@@ -30,9 +37,10 @@ class TestProject(LocalApplicationTestCase):
             description='A decription for my project',
             room_id=1001
         )
-        session.add(project1)
+        session.add(cls.project1)
 
-        hidden_project = Project(
+        cls.hidden_project = Project(
+            release=release,
             workflow=workflow,
             group=group,
             member=member1,
@@ -41,7 +49,7 @@ class TestProject(LocalApplicationTestCase):
             removed_at='2020-2-20',
             room_id=1000
         )
-        session.add(hidden_project)
+        session.add(cls.hidden_project)
         session.commit()
 
     def test_show(self):
@@ -49,7 +57,7 @@ class TestProject(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             'Showing a unhidden project',
-            '/apiv1/projects/id:2',
+            f'/apiv1/projects/id:{self.hidden_project.id}',
             'SHOW'
         ):
             assert status == 200

@@ -23,12 +23,12 @@ class TestRelease(LocalApplicationTestCase):
         workflow = Workflow(title='Default')
         group = Group(title='default')
 
-        release1 = Release(
+        cls.release1 = Release(
             title='My first release',
             description='A decription for my first release',
             cutoff='2030-2-20',
         )
-        session.add(release1)
+        session.add(cls.release1)
 
         release2 = Release(
             title='My second release',
@@ -36,28 +36,6 @@ class TestRelease(LocalApplicationTestCase):
             cutoff='2030-2-20',
         )
         session.add(release2)
-
-        project1 = Project(
-            workflow=workflow,
-            group=group,
-            member=member,
-            release=release1,
-            title='My first project',
-            description='A decription for my project',
-            room_id=1000
-        )
-        session.add(project1)
-
-        project2 = Project(
-            workflow=workflow,
-            group=group,
-            member=member,
-            release=release2,
-            title='My first project',
-            description='A decription for my project',
-            room_id=1000
-        )
-        session.add(project2)
         session.commit()
 
     def test_subscribe(self):
@@ -65,11 +43,11 @@ class TestRelease(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             'Subscribe release',
-            '/apiv1/releases/id:1',
+            f'/apiv1/releases/id:{self.release1.id}',
             'SUBSCRIBE',
         ):
             assert status == 200
-            assert response.json['id'] == 1
+            assert response.json['id'] == self.release1.id
 
             when(
                 'Intended release with string type not found',

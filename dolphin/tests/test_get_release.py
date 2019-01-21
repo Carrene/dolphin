@@ -19,12 +19,12 @@ class TestRelease(LocalApplicationTestCase):
         )
         session.add(member)
 
-        release = Release(
+        cls.release = Release(
             title='My first release',
             description='A decription for my first release',
             cutoff='2030-2-20',
         )
-        session.add(release)
+        session.add(cls.release)
         session.commit()
 
     def test_get(self):
@@ -32,11 +32,11 @@ class TestRelease(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             'Getting a release',
-            '/apiv1/releases/id:1',
+            f'/apiv1/releases/id:{self.release.id}',
             'GET'
         ):
             assert status == 200
-            assert response.json['id'] == 1
+            assert response.json['id'] == self.release.id
             assert response.json['title'] == 'My first release'
 
             when(
