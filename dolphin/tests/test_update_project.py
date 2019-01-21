@@ -38,7 +38,7 @@ class TestProject(LocalApplicationTestCase):
             cutoff='2030-2-20',
         )
 
-        project1 = Project(
+        cls.project1 = Project(
             release=release,
             workflow=workflow,
             group=group,
@@ -47,7 +47,7 @@ class TestProject(LocalApplicationTestCase):
             description='A decription for my project',
             room_id=1001
         )
-        session.add(project1)
+        session.add(cls.project1)
 
         project2 = Project(
             release=release,
@@ -78,7 +78,7 @@ class TestProject(LocalApplicationTestCase):
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Updating a project',
-            '/apiv1/projects/id:2',
+            f'/apiv1/projects/id:{self.project1.id}',
             'UPDATE',
             form=dict(
                 title='My interesting project',

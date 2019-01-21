@@ -74,7 +74,7 @@ class TestProject(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             'List attachments of a project',
-            '/apiv1/projects/project_id:2/files',
+            f'/apiv1/projects/project_id:{self.project1.id}/files',
             'LIST',
         ):
             assert status == 200

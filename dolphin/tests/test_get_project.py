@@ -48,7 +48,7 @@ class TestProject(LocalApplicationTestCase):
             'GET'
         ):
             assert status == 200
-            assert response.json['id'] == 2
+            assert response.json['id'] == self.project.id
             assert response.json['title'] == 'My first project'
 
             when(

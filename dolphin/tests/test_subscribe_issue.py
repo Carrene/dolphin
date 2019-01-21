@@ -41,7 +41,7 @@ class TestIssue(LocalApplicationTestCase):
         )
         session.add(project)
 
-        issue1 = Issue(
+        cls.issue1 = Issue(
             project=project,
             title='First issue',
             description='This is description of first issue',
@@ -50,7 +50,7 @@ class TestIssue(LocalApplicationTestCase):
             days=1,
             room_id=2
         )
-        session.add(issue1)
+        session.add(cls.issue1)
 
         issue2 = Issue(
             project=project,
@@ -69,11 +69,11 @@ class TestIssue(LocalApplicationTestCase):
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Subscribe an issue',
-            '/apiv1/issues/id:3',
+            f'/apiv1/issues/id:{self.issue1.id}',
             'SUBSCRIBE',
         ):
             assert status == 200
-            assert response.json['id'] == 3
+            assert response.json['id'] == self.issue1.id
 
             when(
                 'Intended issue with string type not found',

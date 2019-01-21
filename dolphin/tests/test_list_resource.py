@@ -44,7 +44,7 @@ class TestResource(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
            f'Getting list of resources',
-           f'/apiv1/phases/id: {self.phase1.id}/resources',
+           f'/apiv1/phases/id:{self.phase1.id}/resources',
            f'LIST',
         ):
             assert status == 200

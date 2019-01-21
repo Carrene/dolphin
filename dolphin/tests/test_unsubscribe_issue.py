@@ -43,7 +43,7 @@ class TestIssue(LocalApplicationTestCase):
         )
         session.add(project)
 
-        issue1 = Issue(
+        cls.issue1 = Issue(
             project=project,
             title='First issue',
             description='This is description of first issue',
@@ -52,7 +52,7 @@ class TestIssue(LocalApplicationTestCase):
             days=1,
             room_id=2
         )
-        session.add(issue1)
+        session.add(cls.issue1)
         session.flush()
 
         issue2 = Issue(
@@ -68,7 +68,7 @@ class TestIssue(LocalApplicationTestCase):
         session.flush()
 
         subscription1 = Subscription(
-            subscribable_id=issue1.id,
+            subscribable_id=cls.issue1.id,
             member_id=member.id
         )
         session.add(subscription1)
@@ -85,11 +85,11 @@ class TestIssue(LocalApplicationTestCase):
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Unsubscribe an issue',
-            '/apiv1/issues/id:3',
+            f'/apiv1/issues/id:{self.issue1.id}',
             'UNSUBSCRIBE',
         ):
             assert status == 200
-            assert response.json['id'] == 3
+            assert response.json['id'] == self.issue1.id
 
             when(
                 'Intended issue with string type not found',

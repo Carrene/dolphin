@@ -61,7 +61,7 @@ class TestIssue(LocalApplicationTestCase):
             'GET'
         ):
             assert status == 200
-            assert response.json['id'] == 3
+            assert response.json['id'] == self.issue.id
             assert response.json['title'] == 'First issue'
 
             when(

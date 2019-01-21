@@ -78,7 +78,7 @@ class TestIssue(LocalApplicationTestCase):
             form=dict(memberId=1, phaseId=1)
         ):
             assert status == 200
-            assert response.json['id'] == 3
+            assert response.json['id'] == self.issue1.id
 
             when(
                 'Intended issue with string type not found',

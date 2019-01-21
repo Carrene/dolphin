@@ -30,7 +30,7 @@ class TestProject(LocalApplicationTestCase):
             cutoff='2030-2-20',
         )
 
-        project1 = Project(
+        cls.project1 = Project(
             release=release,
             workflow=workflow,
             group=group,
@@ -39,7 +39,7 @@ class TestProject(LocalApplicationTestCase):
             description='A decription for my project',
             room_id=1001
         )
-        session.add(project1)
+        session.add(cls.project1)
 
         project2 = Project(
             release=release,
@@ -58,11 +58,11 @@ class TestProject(LocalApplicationTestCase):
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Subscribe project',
-            '/apiv1/projects/id:2',
+            f'/apiv1/projects/id:{self.project1.id}',
             'SUBSCRIBE',
         ):
             assert status == 200
-            assert response.json['id'] == 2
+            assert response.json['id'] == self.project1.id
             assert response.json['isSubscribed'] == True
 
             when(

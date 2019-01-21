@@ -52,7 +52,7 @@ class TestIssue(LocalApplicationTestCase):
         )
         session.add(issue1)
 
-        issue2 = Issue(
+        cls.issue2 = Issue(
             project=project1,
             title='Second issue',
             description='This is description of second issue',
@@ -61,7 +61,7 @@ class TestIssue(LocalApplicationTestCase):
             days=2,
             room_id=3
         )
-        session.add(issue2)
+        session.add(cls.issue2)
         session.commit()
 
     def test_update(self):
@@ -69,7 +69,7 @@ class TestIssue(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             'Update a issue',
-            '/apiv1/issues/id:4',
+            f'/apiv1/issues/id:{self.issue2.id}',
             'UPDATE',
             form=dict(
                 title='New issue',
@@ -82,7 +82,7 @@ class TestIssue(LocalApplicationTestCase):
             )
         ):
             assert status == 200
-            assert response.json['id'] == 4
+            assert response.json['id'] == self.issue2.id
             assert response.json['priority'] == 'high'
             assert response.json['tags'] is not None
 

@@ -19,12 +19,12 @@ class TestRelease(LocalApplicationTestCase):
         )
         session.add(member)
 
-        release1 = Release(
+        cls.release = Release(
             title='My first release',
             description='A decription for my first release',
             cutoff='2030-2-20',
         )
-        session.add(release1)
+        session.add(cls.release)
         session.commit()
 
     def test_abort(self):
@@ -32,11 +32,11 @@ class TestRelease(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             'Aborting a release',
-            '/apiv1/releases/id:1',
+            f'/apiv1/releases/id:{self.release.id}',
             'ABORT'
         ):
             assert status == 200
-            assert response.json['id'] == 1
+            assert response.json['id'] == self.release.id
 
             when(
                 'Intended release with string type not found',

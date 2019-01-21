@@ -32,7 +32,7 @@ class TestProject(LocalApplicationTestCase):
             cutoff='2030-2-20',
         )
 
-        project1 = Project(
+        cls.project1 = Project(
             release=release,
             workflow=workflow,
             group=group,
@@ -41,7 +41,7 @@ class TestProject(LocalApplicationTestCase):
             description='A decription for my project',
             room_id=1001
         )
-        session.add(project1)
+        session.add(cls.project1)
         session.flush()
 
         project2 = Project(
@@ -57,7 +57,7 @@ class TestProject(LocalApplicationTestCase):
         session.flush()
 
         subscription1 = Subscription(
-            subscribable_id=project1.id,
+            subscribable_id=cls.project1.id,
             member_id=member.id
         )
         session.add(subscription1)
@@ -74,11 +74,11 @@ class TestProject(LocalApplicationTestCase):
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Unsubscribe an project',
-            '/apiv1/projects/id:2',
+            f'/apiv1/projects/id:{self.project1.id}',
             'UNSUBSCRIBE',
         ):
             assert status == 200
-            assert response.json['id'] == 2
+            assert response.json['id'] == self.project1.id
             assert response.json['isSubscribed'] == False
 
             when(

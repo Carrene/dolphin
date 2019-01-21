@@ -55,7 +55,7 @@ class TestProject(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             'Delete a project attachment',
-            '/apiv1/projects/project_id:2/files/id:1',
+            f'/apiv1/projects/project_id:{self.project1.id}/files/id:1',
             'DELETE',
         ):
             assert status == 200

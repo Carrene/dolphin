@@ -138,7 +138,8 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
                 callable_=lambda: context.identity.id
             )
                ) \
-        .correlate_except(Subscription)
+        .correlate_except(Subscription),
+        deferred=True
     )
 
     @property
