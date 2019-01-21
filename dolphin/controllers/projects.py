@@ -155,7 +155,7 @@ class ProjectController(ModelRestController):
         if 'title' in form:
             release = project.release
 
-            if 'releaseId' in form and form['releaseId'] != project.release.id:
+            if 'releaseId' in form and form['releaseId'] != release.id:
                 release = DBSession.query(Release).get(form['releaseId'])
 
             for i in release.projects:

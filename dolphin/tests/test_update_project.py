@@ -32,7 +32,7 @@ class TestProject(LocalApplicationTestCase):
         workflow = Workflow(title='Default')
         group = Group(title='default')
 
-        release1 = Release(
+        cls.release1 = Release(
             title='My first release',
             description='A decription for my first release',
             cutoff='2030-2-20',
@@ -45,7 +45,7 @@ class TestProject(LocalApplicationTestCase):
         )
 
         cls.project1 = Project(
-            release=release1,
+            release=cls.release1,
             workflow=workflow,
             group=group,
             member=member1,
@@ -56,7 +56,7 @@ class TestProject(LocalApplicationTestCase):
         session.add(cls.project1)
 
         project2 = Project(
-            release=release1,
+            release=cls.release1,
             workflow=workflow,
             group=group,
             member=member1,
@@ -89,7 +89,7 @@ class TestProject(LocalApplicationTestCase):
         session.add(project2)
 
         cls.hidden_project = Project(
-            release=release1,
+            release=cls.release1,
             workflow=workflow,
             group=group,
             member=member1,
@@ -142,7 +142,10 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Title is repetetive in another release',
-                form=given | dict(title='My second project', releaseId=1)
+                form=given | dict(
+                    title='My second project',
+                    releaseId=self.release1.id
+                )
             )
             assert status == 600
             assert status.text.startswith('Another project with title')
@@ -193,7 +196,7 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Update a hidden project',
-                url_parameters=dict(id=7)
+                url_parameters=dict(id=self.hidden_project.id)
             )
             assert status == '746 Hidden Project Is Not Editable'
 
