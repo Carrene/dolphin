@@ -32,14 +32,20 @@ class TestProject(LocalApplicationTestCase):
         workflow = Workflow(title='Default')
         group = Group(title='default')
 
-        release = Release(
+        release1 = Release(
             title='My first release',
             description='A decription for my first release',
             cutoff='2030-2-20',
         )
 
+        cls.release2 = Release(
+            title='My second release',
+            description='A decription for my second release',
+            cutoff='2030-2-20',
+        )
+
         cls.project1 = Project(
-            release=release,
+            release=release1,
             workflow=workflow,
             group=group,
             member=member1,
@@ -50,7 +56,7 @@ class TestProject(LocalApplicationTestCase):
         session.add(cls.project1)
 
         project2 = Project(
-            release=release,
+            release=release1,
             workflow=workflow,
             group=group,
             member=member1,
@@ -60,8 +66,30 @@ class TestProject(LocalApplicationTestCase):
         )
         session.add(project2)
 
+        project3 = Project(
+            release=cls.release2,
+            workflow=workflow,
+            group=group,
+            member=member1,
+            title='My third project',
+            description='A decription for my project',
+            room_id=1003
+        )
+        session.add(project2)
+
+        project4 = Project(
+            release=cls.release2,
+            workflow=workflow,
+            group=group,
+            member=member1,
+            title='My fourth project',
+            description='A decription for my project',
+            room_id=1004
+        )
+        session.add(project2)
+
         cls.hidden_project = Project(
-            release=release,
+            release=release1,
             workflow=workflow,
             group=group,
             member=member1,
@@ -84,6 +112,7 @@ class TestProject(LocalApplicationTestCase):
                 title='My interesting project',
                 description='A updated project description',
                 status='active',
+                releaseId=self.release2.id
             )
         ):
             assert status == 200
@@ -106,10 +135,18 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Title is repetetive',
-                form=Update(title='My second project')
+                form=given - 'releaseId' | dict(title='My fourth project')
             )
             assert status == 600
             assert status.text.startswith('Another project with title')
+
+            when(
+                'Title is repetetive in another release',
+                form=given | dict(title='My second project', releaseId=1)
+            )
+            assert status == 600
+            assert status.text.startswith('Another project with title')
+
 
             when(
                 'Title format is wrong',
@@ -156,7 +193,7 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Update a hidden project',
-                url_parameters=dict(id=4)
+                url_parameters=dict(id=7)
             )
             assert status == '746 Hidden Project Is Not Editable'
 

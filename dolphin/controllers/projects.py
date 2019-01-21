@@ -8,7 +8,7 @@ from .files import FileController
 from ..backends import ChatClient
 from ..exceptions import ChatRoomNotFound, RoomMemberAlreadyExist, \
     RoomMemberNotFound
-from ..models import Project, Member, Subscription, Workflow, Group
+from ..models import Project, Member, Subscription, Workflow, Group, Release
 from ..validators import project_validator, update_project_validator
 
 
@@ -126,9 +126,9 @@ class ProjectController(ModelRestController):
     @json(
         prevent_empty_form='708 No Parameter Exists In The Form',
         form_whitelist=(
-            ['groupId', 'title', 'description', 'status'],
+            ['groupId', 'title', 'description', 'status', 'releaseId'],
             '707 Invalid field, only following fields are accepted: ' \
-            'groupId, title, description and status'
+            'groupId, title, description, status and releaseId'
         )
     )
     @update_project_validator
@@ -152,14 +152,18 @@ class ProjectController(ModelRestController):
         if project.is_deleted:
             raise HTTPStatus('746 Hidden Project Is Not Editable')
 
-        if 'title' in form and DBSession.query(Project).filter(
-            Project.id != id,
-            Project.title == form['title']
-        ).one_or_none():
-            raise HTTPStatus(
-                f'600 Another project with title: ' \
-                f'"{form["title"]}" is already exists.'
-            )
+        if 'title' in form:
+            release = project.release
+
+            if 'releaseId' in form and form['releaseId'] != project.release.id:
+                release = DBSession.query(Release).get(form['releaseId'])
+
+            for i in release.projects:
+                if i.title == form['title'] and i.id != id:
+                    raise HTTPStatus(
+                        f'600 Another project with title: ' \
+                        f'"{form["title"]}" is already exists.'
+                    )
 
         project.update_from_request()
         return project
