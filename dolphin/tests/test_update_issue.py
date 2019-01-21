@@ -1,7 +1,7 @@
 from auditing.context import Context as AuditLogContext
 from bddrest import status, when, given, response, Update
 
-from dolphin.models import Issue, Project, Member, Workflow, Group
+from dolphin.models import Issue, Project, Member, Workflow, Group, Release
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -24,7 +24,14 @@ class TestIssue(LocalApplicationTestCase):
         workflow = Workflow(title='Default')
         group = Group(title='default')
 
+        release = Release(
+            title='My first release',
+            description='A decription for my first release',
+            cutoff='2030-2-20',
+        )
+
         project1 = Project(
+            release=release,
             workflow=workflow,
             group=group,
             member=member,
@@ -33,16 +40,6 @@ class TestIssue(LocalApplicationTestCase):
             room_id=1
         )
         session.add(project1)
-
-        project2 = Project(
-            workflow=workflow,
-            group=group,
-            member=member,
-            title='My second project',
-            description='A decription for my project',
-            room_id=1
-        )
-        session.add(project2)
 
         issue1 = Issue(
             project=project1,
@@ -55,16 +52,16 @@ class TestIssue(LocalApplicationTestCase):
         )
         session.add(issue1)
 
-        issue3 = Issue(
-            project=project2,
-            title='Third issue',
+        issue2 = Issue(
+            project=project1,
+            title='Second issue',
             description='This is description of second issue',
             due_date='2020-2-20',
             kind='feature',
             days=2,
             room_id=3
         )
-        session.add(issue3)
+        session.add(issue2)
         session.commit()
 
     def test_update(self):
@@ -72,7 +69,7 @@ class TestIssue(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             'Update a issue',
-            '/apiv1/issues/id:3',
+            '/apiv1/issues/id:4',
             'UPDATE',
             form=dict(
                 title='New issue',
@@ -85,7 +82,7 @@ class TestIssue(LocalApplicationTestCase):
             )
         ):
             assert status == 200
-            assert response.json['id'] == 3
+            assert response.json['id'] == 4
             assert response.json['priority'] == 'high'
             assert response.json['tags'] is not None
 
@@ -111,7 +108,7 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Title is repetitive',
-                form=given | dict(title='Third issue')
+                form=given | dict(title='First issue')
             )
             assert status == 600
             assert status.text.startswith('Another issue with title')

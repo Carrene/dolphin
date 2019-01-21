@@ -1,7 +1,7 @@
 from auditing.context import Context as AuditLogContext
 from bddrest import status, response, when
 
-from dolphin.models import Issue, Member, Workflow, Group, Project
+from dolphin.models import Issue, Member, Workflow, Group, Project, Release
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -24,7 +24,14 @@ class TestIssue(LocalApplicationTestCase):
         workflow = Workflow(title='default')
         group = Group(title='default')
 
+        release = Release(
+            title='My first release',
+            description='A decription for my first release',
+            cutoff='2030-2-20',
+        )
+
         project = Project(
+            release=release,
             workflow=workflow,
             group=group,
             member=member,
@@ -32,9 +39,8 @@ class TestIssue(LocalApplicationTestCase):
             description='A decription for my project',
             room_id=1
         )
-        session.add(project)
 
-        issue1 = Issue(
+        cls.issue = Issue(
             project=project,
             title='First issue',
             description='This is description of first issue',
@@ -43,7 +49,7 @@ class TestIssue(LocalApplicationTestCase):
             days=1,
             room_id=2
         )
-        session.add(issue1)
+        session.add(cls.issue)
         session.commit()
 
     def test_get(self):
@@ -51,11 +57,11 @@ class TestIssue(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             'Getting a issue',
-            '/apiv1/issues/id:2',
+            f'/apiv1/issues/id:{self.issue.id}',
             'GET'
         ):
             assert status == 200
-            assert response.json['id'] == 2
+            assert response.json['id'] == 3
             assert response.json['title'] == 'First issue'
 
             when(

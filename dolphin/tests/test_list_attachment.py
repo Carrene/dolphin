@@ -3,7 +3,7 @@ from os.path import join, dirname, abspath
 from bddrest import status, response, when
 from sqlalchemy_media import StoreManager
 
-from dolphin.models import Project, Member, Attachment, Workflow, Group
+from dolphin.models import Project, Member, Attachment, Workflow, Group, Release
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -39,7 +39,14 @@ class TestProject(LocalApplicationTestCase):
             workflow = Workflow(title='Default')
             group = Group(title='default')
 
+            release = Release(
+                title='My first release',
+                description='A decription for my first release',
+                cutoff='2030-2-20',
+            )
+
             cls.project1 = Project(
+                release=release,
                 workflow=workflow,
                 group=group,
                 member=member1,
@@ -49,6 +56,7 @@ class TestProject(LocalApplicationTestCase):
                 attachments=[attachment1, attachment2, attachment3]
             )
             cls.project2 = Project(
+                release=release,
                 workflow=workflow,
                 group=group,
                 member=member1,
@@ -66,7 +74,7 @@ class TestProject(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             'List attachments of a project',
-            '/apiv1/projects/project_id:1/files',
+            '/apiv1/projects/project_id:2/files',
             'LIST',
         ):
             assert status == 200

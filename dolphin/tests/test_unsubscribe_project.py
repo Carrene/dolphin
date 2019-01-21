@@ -1,7 +1,8 @@
 from auditing.context import Context as AuditLogContext
 from bddrest import status, when, response
 
-from dolphin.models import Project, Member, Group, Subscription, Workflow
+from dolphin.models import Project, Member, Group, Subscription, Workflow, \
+    Release
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
@@ -25,7 +26,14 @@ class TestProject(LocalApplicationTestCase):
         workflow = Workflow(title='Default')
         group = Group(title='default')
 
+        release = Release(
+            title='My first release',
+            description='A decription for my first release',
+            cutoff='2030-2-20',
+        )
+
         project1 = Project(
+            release=release,
             workflow=workflow,
             group=group,
             member=member,
@@ -37,6 +45,7 @@ class TestProject(LocalApplicationTestCase):
         session.flush()
 
         project2 = Project(
+            release=release,
             workflow=workflow,
             group=group,
             member=member,
@@ -65,11 +74,11 @@ class TestProject(LocalApplicationTestCase):
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Unsubscribe an project',
-            '/apiv1/projects/id:1',
+            '/apiv1/projects/id:2',
             'UNSUBSCRIBE',
         ):
             assert status == 200
-            assert response.json['id'] == 1
+            assert response.json['id'] == 2
             assert response.json['isSubscribed'] == False
 
             when(
@@ -86,7 +95,7 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Issue is not subscribed yet',
-                url_parameters=dict(id=1),
+                url_parameters=dict(id=2),
             )
             assert status == '612 Not Subscribed Yet'
 
@@ -102,28 +111,28 @@ class TestProject(LocalApplicationTestCase):
             with chat_server_status('404 Not Found'):
                 when(
                     'Chat server is not found',
-                    url_parameters=dict(id=2)
+                    url_parameters=dict(id=3)
                 )
                 assert status == '617 Chat Server Not Found'
 
             with chat_server_status('503 Service Not Available'):
                 when(
                     'Chat server is not available',
-                    url_parameters=dict(id=2)
+                    url_parameters=dict(id=3)
                 )
                 assert status == '800 Chat Server Not Available'
 
             with chat_server_status('500 Internal Service Error'):
                 when(
                     'Chat server faces with internal error',
-                    url_parameters=dict(id=2)
+                    url_parameters=dict(id=3)
                 )
                 assert status == '801 Chat Server Internal Error'
 
             with chat_server_status('611 Room Member Not Found'):
                 when(
                     'Room member not found',
-                    url_parameters=dict(id=2)
+                    url_parameters=dict(id=3)
                 )
                 assert status == 200
 

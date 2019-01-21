@@ -3,7 +3,8 @@ from bddrest import status, response, when, Update
 
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
 from dolphin.models import Member, Tag, DraftIssue, Issue, Organization, \
-    OrganizationMember, Project, DraftIssueTag, IssueTag, Workflow, Group
+    OrganizationMember, Project, DraftIssueTag, IssueTag, Workflow, Group, \
+    Release
 
 
 class TestTag(LocalApplicationTestCase):
@@ -54,7 +55,14 @@ class TestTag(LocalApplicationTestCase):
 
         group = Group(title='default')
 
+        release = Release(
+            title='My first release',
+            description='A decription for my first release',
+            cutoff='2030-2-20',
+        )
+
         project = Project(
+            release=release,
             workflow_id=workflow.id,
             group=group,
             member=cls.member1,

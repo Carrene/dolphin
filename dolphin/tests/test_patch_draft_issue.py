@@ -2,7 +2,7 @@ from auditing.context import Context as AuditLogContext
 from bddrest import status, response, when
 
 from dolphin.models import Issue, Project, Member, Workflow, Phase, Tag, \
-    Organization, DraftIssue, Group
+    Organization, DraftIssue, Group, Release
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server
 
@@ -49,7 +49,14 @@ class TestIssue(LocalApplicationTestCase):
         cls.tag2 = Tag(title='tag2', organization=organization)
         session.add(cls.tag2)
 
+        release = Release(
+            title='My first release',
+            description='A decription for my first release',
+            cutoff='2030-2-20',
+        )
+
         cls.project = Project(
+            release=release,
             workflow=workflow,
             group=group,
             member=cls.member,

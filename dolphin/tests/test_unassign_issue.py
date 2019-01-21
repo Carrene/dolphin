@@ -1,7 +1,8 @@
 from auditing.context import Context as AuditLogContext
 from bddrest import status, when, response, Update, Remove
 
-from dolphin.models import Issue, Project, Member, Phase, Group, Workflow, Item
+from dolphin.models import Issue, Project, Member, Phase, Group, Workflow, \
+    Item, Release
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -31,7 +32,14 @@ class TestIssue(LocalApplicationTestCase):
 
         group = Group(title='Default')
 
+        release = Release(
+            title='My first release',
+            description='A decription for my first release',
+            cutoff='2030-2-20',
+        )
+
         project = Project(
+            release=release,
             workflow=workflow,
             group=group,
             member=cls.member,

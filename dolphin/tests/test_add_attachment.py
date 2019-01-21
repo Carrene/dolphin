@@ -3,7 +3,7 @@ from os.path import join, dirname, abspath
 
 from bddrest import status, response, when, Update, Remove
 
-from dolphin.models import Project, Member, Workflow, Group
+from dolphin.models import Project, Member, Workflow, Group, Release
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -29,7 +29,14 @@ class TestProject(LocalApplicationTestCase):
         workflow = Workflow(title='Default')
         group = Group(title='default')
 
-        project1 = Project(
+        release = Release(
+            title='My first release',
+            description='A decription for my first release',
+            cutoff='2030-2-20',
+        )
+
+        cls.project = Project(
+            release=release,
             workflow=workflow,
             group=group,
             member=member1,
@@ -37,7 +44,7 @@ class TestProject(LocalApplicationTestCase):
             description='A decription for my project',
             room_id=1001
         )
-        session.add(project1)
+        session.add(cls.project)
         session.commit()
 
     def test_add_attachment(self):
@@ -45,7 +52,7 @@ class TestProject(LocalApplicationTestCase):
 
         with oauth_mockup_server(), open(image_path, 'rb') as f, self.given(
             'add an attachment to a project',
-            '/apiv1/projects/id:1/files',
+            f'/apiv1/projects/id:{self.project.id}/files',
             'ATTACH',
             multipart=dict(
                 title='example',

@@ -49,11 +49,11 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         Integer,
         ForeignKey('release.id'),
         python_type=int,
-        nullable=True,
+        nullable=False,
         watermark='Choose a launch',
         label='Launch',
-        not_none=False,
-        required=False,
+        not_none=True,
+        required=True,
         example='Lorem Ipsum'
     )
     member_id = Field(
