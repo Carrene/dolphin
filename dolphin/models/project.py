@@ -177,6 +177,14 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             readonly=True,
             watermark='This will be calculated by its Nuggets automaticaly.',
         )
+        yield MetadataField(
+            'isSubscribed',
+            'is subscribed',
+            label='is subscribed',
+            required=False,
+            readonly=True,
+            watermark='Lorem Ipsum',
+        )
 
     def to_dict(self):
         project_dict = super().to_dict()
