@@ -60,7 +60,7 @@ class TestProject(LocalApplicationTestCase):
         )
         session.add(project2)
 
-        hidden_project = Project(
+        cls.hidden_project = Project(
             release=release,
             workflow=workflow,
             group=group,
@@ -70,7 +70,7 @@ class TestProject(LocalApplicationTestCase):
             removed_at='2020-2-20',
             room_id=1000
         )
-        session.add(hidden_project)
+        session.add(cls.hidden_project)
         session.commit()
 
     def test_update(self):
