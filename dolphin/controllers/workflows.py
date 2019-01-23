@@ -1,10 +1,11 @@
 from nanohttp import json, context, HTTPNotFound
 from restfulpy.controllers import ModelRestController
 from restfulpy.authorization import authorize
-from restfulpy.orm import DBSession
+from restfulpy.orm import DBSession, commit
 
 from ..models import Workflow
 from .phases import PhaseController
+from ..validators import workflow_create_validator
 
 
 class WorkflowController(ModelRestController):
@@ -32,4 +33,14 @@ class WorkflowController(ModelRestController):
     def list(self):
         query = DBSession.query(Workflow)
         return query
+
+    @authorize
+    @json(prevent_empty_form='708 Empty Form')
+    @workflow_create_validator
+    @commit
+    def create(self):
+        workflow = Workflow(
+            title=context.form.get('title')
+        )
+        return workflow
 

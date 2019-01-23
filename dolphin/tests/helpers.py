@@ -11,7 +11,7 @@ from restfulpy.testing import ApplicableTestCase
 from dolphin import Dolphin
 from dolphin.authentication import Authenticator
 from dolphin.models import Member, Project, Release, Issue, Item, \
-    Organization, Invitation, Group
+    Organization, Invitation, Group, Workflow
 
 
 HERE = path.abspath(path.dirname(__file__))
@@ -263,4 +263,11 @@ def create_group(title='already exist'):
         title=title,
     )
     return group
+
+
+def create_workflow(title='already exist'):
+    workflow = Workflow(
+        title=title,
+    )
+    return workflow
 
