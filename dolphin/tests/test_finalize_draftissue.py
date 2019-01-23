@@ -131,36 +131,33 @@ class TestIssue(LocalApplicationTestCase):
             assert status == '768 Priority Not In Form'
 
             when('Invalid the priority value', form=Update(priority='lorem'))
-            assert status == 767
-            assert status.text.startswith('Invalid priority, only one of')
+            assert status == '767 Invalid priority, only one of "low, '\
+                'normal, high" will be accepted'
 
             when(
                 'Phase id is in form but not found(alphabetical)',
                 form=given | dict(title='New title', phaseId='Alphabetical')
             )
-            assert status == 613
-            assert status.text.startswith('Phase not found with id')
+            assert status == '613 Phase not found with id: Alphabetical'
 
             when(
                 'Phase id is in form but not found(numeric)',
                 form=given | dict(title='New title', phaseId=0)
             )
-            assert status == 613
+            assert status == '613 Phase not found with id: 0'
             assert status.text.startswith('Phase not found with id')
 
             when(
                 'Member id is in form but not found(alphabetical)',
                 form=given | dict(title='New title', memberId='Alphabetical')
             )
-            assert status == 609
-            assert status.text.startswith('Resource not found with id')
+            assert status == '609 Resource not found with id: Alphabetical'
 
             when(
                 'Member id is in form but not found(numeric)',
                 form=given | dict(title='New title', memberId=0)
             )
-            assert status == 609
-            assert status.text.startswith('Resource not found with id')
+            assert status == '609 Resource not found with id: 0'
 
             when(
                 'Project id not in form',
@@ -178,8 +175,7 @@ class TestIssue(LocalApplicationTestCase):
                 'Project not found with integer type',
                 form=given | dict(projectId=0, title='New title')
             )
-            assert status == 601
-            assert status.text.startswith('Project not found')
+            assert status == '601 Project not found with id: 0'
 
             when(
                 'Title is not in form',
@@ -197,8 +193,8 @@ class TestIssue(LocalApplicationTestCase):
                 'Title is repetitive',
                 form=Update(title='First issue')
             )
-            assert status == 600
-            assert status.text.startswith('Another issue with title')
+            assert status == '600 Another issue with title: "First issue" '\
+                'is already exists.'
 
             when(
                 'Title length is more than limit',
@@ -256,16 +252,16 @@ class TestIssue(LocalApplicationTestCase):
                 'Invalid kind value is in form',
                 form=given | dict(kind='enhancing', title='Another title')
             )
-            assert status == 717
-            assert status.text.startswith('Invalid kind')
+            assert status == '717 Invalid kind, only one of "feature, bug" '\
+                'will be accepted'
 
             when(
                 'Invalid status value is in form',
                 form=given | dict(status='progressing') | \
                     dict(title='Another title')
             )
-            assert status == 705
-            assert status.text.startswith('Invalid status')
+            assert status == '705 Invalid status, only one of "in-progress, '\
+                'on-hold, to-do, done, complete" will be accepted'
 
             when('Request is not authorized', authorization=None)
             assert status == 401

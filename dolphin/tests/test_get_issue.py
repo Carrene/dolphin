@@ -80,7 +80,7 @@ class TestIssue(LocalApplicationTestCase):
                 'Form parameter is sent with request',
                 form=dict(parameter='Invalid form parameter')
             )
-            assert status == 709
+            assert status == '709 Form Not Allowed'
 
             when('Request is not authorized', authorization=None)
             assert status == 401

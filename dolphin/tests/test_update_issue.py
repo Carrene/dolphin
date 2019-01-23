@@ -110,8 +110,8 @@ class TestIssue(LocalApplicationTestCase):
                 'Title is repetitive',
                 form=given | dict(title='First issue')
             )
-            assert status == 600
-            assert status.text.startswith('Another issue with title')
+            assert status == '600 Another issue with title: "First issue" '\
+                'is already exists.'
 
             when(
                 'Title format is wrong',
@@ -148,23 +148,24 @@ class TestIssue(LocalApplicationTestCase):
                 'Invalid kind value is in form',
                 form=given | dict(kind='enhancing', title='Another title')
             )
-            assert status == 717
-            assert status.text.startswith('Invalid kind')
+            assert status == '717 Invalid kind, only one of "feature, '\
+                'bug" will be accepted'
 
             when(
                 'Invalid status value is in form',
                 form=given + dict(status='progressing') | \
                     dict(title='Another title')
             )
-            assert status == 705
+            assert status == '705 Invalid status, only one of "in-progress, '\
+                'on-hold, to-do, done, complete" will be accepted'
             assert status.text.startswith('Invalid status')
 
             when(
                 'Invalid priority value is in form',
                 form=Update(priority='no_priority')
             )
-            assert status == 767
-            assert status.text.startswith('Invalid priority')
+            assert status == '767 Invalid priority, only one of "low, '\
+                'normal, high" will be accepted'
 
 
             when(
@@ -172,8 +173,9 @@ class TestIssue(LocalApplicationTestCase):
                 form=given + dict(invalid_param='External parameter') | \
                     dict(title='Another title')
             )
-            assert status == 707
-            assert status.text.startswith('Invalid field')
+            assert status == \
+                '707 Invalid field, only following fields are accepted: '\
+                'title, days, dueDate, kind, description, status, priority'
 
             when('Request is not authorized', authorization=None)
             assert status == 401

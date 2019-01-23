@@ -137,8 +137,8 @@ class TestProject(LocalApplicationTestCase):
                 'Title is repetetive',
                 form=given - 'releaseId' | dict(title='My fourth project')
             )
-            assert status == 600
-            assert status.text.startswith('Another project with title')
+            assert status == '600 Another project with title: "My fourth '\
+                'project" is already exists.'
 
             when(
                 'Title is repetetive in another release',
@@ -147,9 +147,8 @@ class TestProject(LocalApplicationTestCase):
                     releaseId=self.release1.id
                 )
             )
-            assert status == 600
-            assert status.text.startswith('Another project with title')
-
+            assert status == '600 Another project with title: '\
+                '"My second project" is already exists.'
 
             when(
                 'Title format is wrong',
@@ -180,16 +179,17 @@ class TestProject(LocalApplicationTestCase):
                     status='progressing',
                 )
             )
-            assert status == 705
-            assert status.text.startswith('Invalid status')
+            assert status == '705 Invalid status value, only one of "active, '\
+                'on-hold, queued, done" will be accepted'
 
             when(
                 'Invalid parameter is in the form',
                 form=given + \
                     dict(invalid_param='External parameter')
             )
-            assert status == 707
-            assert status.text.startswith('Invalid field')
+            assert status == \
+                '707 Invalid field, only following fields are accepted: '\
+                'groupId, title, description, status and releaseId'
 
             when('Request is not authorized', authorization=None)
             assert status == 401

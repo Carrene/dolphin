@@ -104,8 +104,7 @@ class TestIssue(LocalApplicationTestCase):
             assert status == 404
 
             when('Resource not found', form=Update(memberId=0))
-            assert status == 609
-            assert status.text.startswith('Resource not found')
+            assert status == '609 Resource not found with id: 0'
 
             when(
                 'Trying to pass without resource id',
@@ -123,8 +122,7 @@ class TestIssue(LocalApplicationTestCase):
                 'Intended phase with integer type not found',
                 form=Update(phaseId=0)
             )
-            assert status == 613
-            assert status.text.startswith('Phase not found')
+            assert status == '613 Phase not found with id: 0'
 
             when('Phase id is not in form', form=Remove('phaseId'))
             assert status == '737 Phase Id Not In Form'

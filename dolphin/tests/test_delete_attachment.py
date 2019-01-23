@@ -63,7 +63,7 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['file']['url'] is None
 
             when('Try to delete the same attachment')
-            assert status == 629
+            assert status == '629 Attachment Already Deleted'
 
             when('The attachment is not exist', url_parameters=Update(id=2))
             assert status == 404
