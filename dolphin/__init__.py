@@ -77,6 +77,9 @@ class Dolphin(Application):
     def insert_mockup(self, *args):
         mockup.insert()
 
+    def register_cli_launchers(self, subparsers):
+        EmailLauncher.register(subparsers)
+
     @classmethod
     def initialize_orm(cls, engine=None):
         StoreManager.register(

@@ -18,13 +18,13 @@ class SendEmailLauncher(Launcher):  # pragma: no cover
         )
         parser.add_argument(
             '-o',
-            '--organization',
+            '--organization_id',
             required=True,
             help='Organization id'
         )
         parser.add_argument(
             '-i',
-            '--inviter',
+            '--inviter_id',
             required=True,
             help='By member'
         )
@@ -46,8 +46,8 @@ class SendEmailLauncher(Launcher):  # pragma: no cover
     def launch(self):
         token = OrganizationInvitationToken(dict(
             email=self.args.email,
-            organizationId=self.args.organization,
-            byMemberReferenceId=self.args.inviter,
+            organizationId=self.args.organization_id,
+            byMemberReferenceId=self.args.inviter_id,
             role=self.args.role,
         ))
         email = OrganizationInvitationEmail(
@@ -57,7 +57,7 @@ class SendEmailLauncher(Launcher):  # pragma: no cover
                 'token': token.dump().decode('utf-8'),
                 'callback_url':
                     settings.organization_invitation.callback_url,
-                'state': self.args.organization,
+                'state': self.args.organization_id,
                 'email': self.args.email,
                 'application_id': 1,
                 'scopes': 'title,email,name,phone,avatar',
