@@ -74,15 +74,13 @@ class TestProject(LocalApplicationTestCase):
                 'Workflow id is in form but not found(alphabetical)',
                 form=given | dict(title='New title', workflowId='Alphabetical')
             )
-            assert status == 743
-            assert status.text.startswith('Invalid Workflow Id Type')
+            assert status == '743 Invalid Workflow Id Type'
 
             when(
                 'Workflow id is in form but not found(numeric)',
-                form=given | dict(title='New title', workflowId=100)
+                form=given | dict(title='New title', workflowId=0)
             )
-            assert status == 616
-            assert status.text.startswith('Workflow not found with id')
+            assert status == '616 Workflow not found with id: 0'
 
             when(
                 'Title format is wrong',
@@ -94,8 +92,8 @@ class TestProject(LocalApplicationTestCase):
                 'Title is repetetive',
                 form=given | dict(title='My first project')
             )
-            assert status == 600
-            assert status.text.startswith('Another project with title')
+            assert status == '600 Another project with title: My first '\
+                'project is already exists.'
 
             when(
                 'Release ID type is wrong',
@@ -105,10 +103,9 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Release not found with integer type',
-                form=given | dict(releaseId=100, title='New title')
+                form=given | dict(releaseId=0, title='New title')
             )
-            assert status == 607
-            assert status.text.startswith('Release not found')
+            assert status == '607 Release not found with id: 0'
 
             when(
                 'Title is not in form',
@@ -139,8 +136,8 @@ class TestProject(LocalApplicationTestCase):
                     title='Another title'
                 )
             )
-            assert status == 705
-            assert status.text.startswith('Invalid status')
+            assert status == '705 Invalid status value, only one of "active, '\
+                'on-hold, queued, done" will be accepted'
 
             when('Request is not authorized', authorization=None)
             assert status == 401
