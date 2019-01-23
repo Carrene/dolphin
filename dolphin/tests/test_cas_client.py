@@ -125,5 +125,5 @@ class TestToken(LocalApplicationTestCase):
 
                 with chat_server_status('404 Not Found'):
                     when('Server is not found')
-                    assert status == 617
+                    assert status == '617 Chat Server Not Found'
 
