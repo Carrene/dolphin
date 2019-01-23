@@ -11,7 +11,7 @@ from restfulpy.testing import ApplicableTestCase
 from dolphin import Dolphin
 from dolphin.authentication import Authenticator
 from dolphin.models import Member, Project, Release, Issue, Item, \
-    Organization, Invitation
+    Organization, Invitation, Group
 
 
 HERE = path.abspath(path.dirname(__file__))
@@ -256,4 +256,11 @@ def oauth_server_status(status):
     _oauth_server_status = status
     yield
     _oauth_server_status = 'idle'
+
+
+def create_group(title='already exist'):
+    group = Group(
+        title=title,
+    )
+    return group
 

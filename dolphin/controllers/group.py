@@ -1,9 +1,10 @@
-from nanohttp import json, HTTPNotFound, int_or_notfound
+from nanohttp import json, context, HTTPNotFound, int_or_notfound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
-from restfulpy.orm import DBSession
+from restfulpy.orm import DBSession, commit
 
 from ..models import Group
+from ..validators import group_create_validator
 
 
 class GroupController(ModelRestController):
@@ -25,5 +26,15 @@ class GroupController(ModelRestController):
         if not group:
             raise HTTPNotFound()
 
+        return group
+
+    @authorize
+    @json(prevent_empty_form='708 Empty Form')
+    @group_create_validator
+    @commit
+    def create(self):
+        group = Group(
+            title=context.form.get('title')
+        )
         return group
 
