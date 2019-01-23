@@ -226,7 +226,7 @@ def group_exists_validator(title, project, field):
     return title
 
 
-def workflow_exists_validator(title, project, field):
+def workflow_exists_validator_by_title(title, project, field):
 
     workflow = DBSession.query(Workflow) \
         .filter(Workflow.title == title) \
@@ -545,7 +545,7 @@ workflow_create_validator = validate(
         required='710 Title Not In Form',
         max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
         pattern=(WORKFLOW_TITLE_PATTERN, '747 Invalid Title Format'),
-        callback=workflow_exists_validator,
+        callback=workflow_exists_validator_by_title,
     )
 )
 
