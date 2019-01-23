@@ -77,8 +77,8 @@ class TestRelease(LocalApplicationTestCase):
                 'Title is repetitive',
                 form=given | dict(title='My second release')
             )
-            assert status == 600
-            assert status.text.startswith('Another release with title')
+            assert status == '600 Another release with title: "My second '\
+                'release" is already exists.'
 
             when(
                 'Title format is wrong',
@@ -109,8 +109,8 @@ class TestRelease(LocalApplicationTestCase):
                     status='progressing',
                 )
             )
-            assert status == 705
-            assert status.text.startswith('Invalid status')
+            assert status == '705 Invalid status value, only one of '\
+                '"in-progress, on-hold, delayed, complete" will be accepted'
 
             when('Request is not authorized', authorization=None)
             assert status == 401
