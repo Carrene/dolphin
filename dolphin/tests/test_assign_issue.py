@@ -3,7 +3,7 @@ from bddrest import status, when, given, response
 
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 from dolphin.models import Issue, Project, Member, Phase, Group, Workflow, \
-    Release
+    Release, Skill
 
 
 class TestIssue(LocalApplicationTestCase):
@@ -24,17 +24,20 @@ class TestIssue(LocalApplicationTestCase):
         workflow = Workflow(title='Default')
         session.add(workflow)
 
+        skill = Skill(title='First Skill')
         phase1 = Phase(
             title='backlog',
             order=-1,
-            workflow=workflow
+            workflow=workflow,
+            skill=skill,
         )
         session.add(phase1)
 
         phase2 = Phase(
             title='triage',
             order=0,
-            workflow=workflow
+            workflow=workflow,
+            skill=skill,
         )
         session.add(phase2)
 

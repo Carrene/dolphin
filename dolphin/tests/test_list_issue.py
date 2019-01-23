@@ -3,9 +3,9 @@ from datetime import datetime
 from auditing.context import Context as AuditLogContext
 from bddrest import status, response, when
 
-from dolphin.models import Issue, Project, Member, Workflow, Item, Phase, \
-    Group, Subscription, Release
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.models import Issue, Project, Member, Workflow, Item, Phase, \
+    Group, Subscription, Release, Skill
 
 
 class TestIssue(LocalApplicationTestCase):
@@ -25,6 +25,7 @@ class TestIssue(LocalApplicationTestCase):
         session.add(member)
 
         workflow = Workflow(title='Default')
+        skill = Skill(title='First Skill')
         group = Group(title='default')
 
         release = Release(
@@ -98,6 +99,7 @@ class TestIssue(LocalApplicationTestCase):
             workflow=workflow,
             title='phase 1',
             order=1,
+            skill=skill,
         )
         session.add(cls.phase1)
 
@@ -105,6 +107,7 @@ class TestIssue(LocalApplicationTestCase):
             workflow=workflow,
             title='phase 2',
             order=2,
+            skill=skill
         )
         session.add(cls.phase1)
         session.flush()

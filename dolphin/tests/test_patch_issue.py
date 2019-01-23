@@ -2,7 +2,7 @@ from auditing.context import Context as AuditLogContext
 from bddrest import status, response, when
 
 from dolphin.models import Issue, Project, Member, Workflow, Phase, Tag, \
-    Organization, Group, Release
+    Organization, Group, Release, Skill
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server
 
@@ -27,19 +27,22 @@ class TestIssue(LocalApplicationTestCase):
         )
 
         workflow = Workflow(title='default')
+        skill = Skill(title='First Skill')
         group = Group(title='default')
 
         phase1 = Phase(
             title='Backlog',
             order=-1,
-            workflow=workflow
+            workflow=workflow,
+            skill=skill,
         )
         session.add(phase1)
 
         phase2 = Phase(
             title='Triage',
             order=0,
-            workflow=workflow
+            workflow=workflow,
+            skill=skill,
         )
         session.add(phase2)
 
