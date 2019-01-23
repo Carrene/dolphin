@@ -216,6 +216,15 @@ def organization_value_of_role_validator(role, container, field):
     return role
 
 
+def group_exists_validator(title, project, field):
+
+    group = DBSession.query(Group).filter(Group.title == title).one_or_none()
+    if group is not None:
+        raise HTTPStatus('600 Repetitive Title')
+
+    return title
+
+
 release_validator = validate(
     title=dict(
         required='710 Title Not In Form',
@@ -504,6 +513,16 @@ attachment_validator = validate(
     ),
     attachment=dict(
         required='758 File Not In Form'
+    )
+)
+
+
+group_create_validator = validate(
+    title=dict(
+        not_none='727 Title Is None',
+        required='710 Title Not In Form',
+        max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
+        callback=group_exists_validator,
     )
 )
 

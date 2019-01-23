@@ -14,6 +14,10 @@ class Group(DeclarativeBase):
         not_none=False,
         required=True,
         unique=True,
+        readonly=True,
+        watermark='lorem ipsum',
+        message='lorem ipsum',
+        example='lorem ipsum',
     )
     public = Field(
         BOOLEAN,
@@ -21,7 +25,7 @@ class Group(DeclarativeBase):
         nullable=True,
         required=False,
         not_none=False,
-        label='Public'
+        label='Public',
     )
 
     projects = relationship('Project', back_populates='group', protected=True)
