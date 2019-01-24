@@ -38,7 +38,7 @@ class TestProject(LocalApplicationTestCase):
         )
         session.add(cls.project)
 
-        hidden_project = Project(
+        cls.hidden_project = Project(
             release=release,
             workflow=workflow,
             group=group,
@@ -48,7 +48,7 @@ class TestProject(LocalApplicationTestCase):
             removed_at='2020-2-20',
             room_id=1000
         )
-        session.add(hidden_project)
+        session.add(cls.hidden_project)
         session.commit()
 
     def test_hide(self):
@@ -61,6 +61,12 @@ class TestProject(LocalApplicationTestCase):
         ):
             assert status == 200
             assert response.json['removedAt'] != None
+
+            when(
+                'Hiding a hidden project',
+                url_parameters=dict(id=self.hidden_project.id)
+            )
+            assert status == 638
 
             when(
                 'Intended issue with string type not found',
