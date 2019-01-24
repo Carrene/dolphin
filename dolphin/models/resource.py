@@ -13,23 +13,15 @@ class TeamResource(DeclarativeBase):
 
 
 class Resource(Member):
-    __tablename__ = 'resource'
     __mapper_args__ = {'polymorphic_identity': 'resource'}
-
-    id = Field(
-        Integer,
-        ForeignKey('member.id'),
-        primary_key=True,
-        readonly=True,
-    )
 
     skill_id = Field(
         Integer,
         ForeignKey('skill.id'),
         label='Skill ID',
         required=True,
-        nullable=False,
-        not_none=True,
+        nullable=True,
+        not_none=False,
     )
 
     teams = relationship(
