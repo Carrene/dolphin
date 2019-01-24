@@ -66,7 +66,7 @@ class TestProject(LocalApplicationTestCase):
                 'Hiding a hidden project',
                 url_parameters=dict(id=self.hidden_project.id)
             )
-            assert status == 638
+            assert status == '638 Project Already Hidden'
 
             when(
                 'Intended issue with string type not found',
