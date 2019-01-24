@@ -6,6 +6,7 @@ from sqlalchemy import and_, exists
 
 from ..exceptions import HTTPAlreadyTagAdded, HTTPAlreadyTagRemoved
 from ..models import Tag, DraftIssueTag, IssueTag
+from ..validators import tag_create_validator
 
 
 class TagController(ModelRestController, JsonPatchControllerMixin):
@@ -115,5 +116,17 @@ class TagController(ModelRestController, JsonPatchControllerMixin):
         else:
             raise HTTPForbidden()
 
+        return tag
+
+    @authorize
+    @json(prevent_empty_form='708 Empty Form')
+    @tag_create_validator
+    @commit
+    def create(self):
+        tag = Tag(
+            title=context.form.get('title'),
+            organization_id=context.identity.payload['organizationId'],
+        )
+        DBSession.add(tag)
         return tag
 
