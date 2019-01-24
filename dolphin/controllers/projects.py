@@ -186,6 +186,9 @@ class ProjectController(ModelRestController):
         if not project:
             raise HTTPNotFound()
 
+        if project.removed_at is not None:
+            raise HTTPStatus('638 Project Already Hidden')
+
         project.soft_delete()
         return project
 
