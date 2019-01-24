@@ -19,6 +19,7 @@ ORGANIZATION_TITLE_PATTERN = re.compile(
 USER_EMAIL_PATTERN = re.compile(
     r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'
 )
+WORKFLOW_TITLE_PATTERN = re.compile(r'^[^\s].+[^\s]$')
 
 
 def release_exists_validator(releaseId, project, field):
@@ -220,6 +221,17 @@ def group_exists_validator(title, project, field):
 
     group = DBSession.query(Group).filter(Group.title == title).one_or_none()
     if group is not None:
+        raise HTTPStatus('600 Repetitive Title')
+
+    return title
+
+
+def workflow_exists_validator_by_title(title, project, field):
+
+    workflow = DBSession.query(Workflow) \
+        .filter(Workflow.title == title) \
+        .one_or_none()
+    if workflow is not None:
         raise HTTPStatus('600 Repetitive Title')
 
     return title
@@ -523,6 +535,17 @@ group_create_validator = validate(
         required='710 Title Not In Form',
         max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
         callback=group_exists_validator,
+    )
+)
+
+
+workflow_create_validator = validate(
+    title=dict(
+        not_none='727 Title Is None',
+        required='710 Title Not In Form',
+        max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
+        pattern=(WORKFLOW_TITLE_PATTERN, '747 Invalid Title Format'),
+        callback=workflow_exists_validator_by_title,
     )
 )
 
