@@ -56,12 +56,18 @@ class TestProject(LocalApplicationTestCase):
         self.login('member1@example.com')
 
         with oauth_mockup_server(), self.given(
-            'Showing a unhidden project',
+            'Showing a hidden project',
             f'/apiv1/projects/id:{self.hidden_project.id}',
             'SHOW'
         ):
             assert status == 200
             assert response.json['removedAt'] == None
+
+            when(
+                'Showing a unhidden project',
+                url_parameters=dict(id=self.project1.id)
+            )
+            assert status == '639 Project Already Shown'
 
             when(
                 'Project not found',
