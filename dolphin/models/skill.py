@@ -1,25 +1,33 @@
-from restfulpy.orm import DeclarativeBase, Field
-from sqlalchemy import Integer, ForeignKey
+from restfulpy.orm import DeclarativeBase, Field, relationship
+from sqlalchemy import Integer, ForeignKey, String
 
 
 class Skill(DeclarativeBase):
     __tablename__ = 'skill'
 
-    phase_id = Field(
-        Integer,
-        ForeignKey('phase.id'),
-        primary_key=True,
-        label='Phase ID',
-        required=True,
+    id = Field(Integer, primary_key=True, readonly=True)
+
+    title = Field(
+        String(50),
+        max_length=50,
+        min_length=1,
+        label='Name',
+        watermark='Enter the name',
+        example='Sample Title',
         nullable=False,
         not_none=True,
-    )
-    resource_id = Field(
-        Integer,
-        ForeignKey('member.id'),
-        primary_key=True,
-        label='Resource ID',
         required=True,
-        nullable=False,
-        not_none=True,
+        python_type=str
     )
+
+    phases = relationship(
+        'Phase',
+        back_populates='skill',
+        protected=True
+    )
+    resources = relationship(
+        'Resource',
+        back_populates='skill',
+        protected=True
+    )
+

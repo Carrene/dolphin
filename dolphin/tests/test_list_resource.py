@@ -1,6 +1,6 @@
 from bddrest import when, response, status
 
-from ..models import Workflow, Phase, Resource
+from ..models import Workflow, Phase, Resource, Skill
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -11,12 +11,15 @@ class TestResource(LocalApplicationTestCase):
         session = cls.create_session()
 
         workflow = Workflow(title='Default')
+        skill = Skill(title='First Skill')
 
         cls.phase1 = Phase(
             title='backlog',
             order=-1,
-            workflow=workflow
+            workflow=workflow,
+            skill=skill
         )
+        session.add(cls.phase1)
 
         cls.resource1 = Resource(
             title='First Resource',
@@ -24,7 +27,7 @@ class TestResource(LocalApplicationTestCase):
             access_token='access token 1',
             phone=222222222,
             reference_id=2,
-            phases=[cls.phase1],
+            skill=skill
         )
         session.add(cls.resource1)
 
@@ -34,7 +37,7 @@ class TestResource(LocalApplicationTestCase):
             access_token='access token 2',
             phone=333333333,
             reference_id=3,
-            phases=[cls.phase1],
+            skill=skill
         )
         session.add(resource2)
         session.commit()

@@ -15,10 +15,7 @@ class TestSkill(LocalApplicationTestCase):
 
             fields = response.json['fields']
 
-            assert fields['phaseId']['label'] is not None
-            assert fields['phaseId']['notNone'] is not None
-            assert fields['phaseId']['required'] is not None
+            assert fields['title']['label'] is not None
+            assert fields['title']['notNone'] is not None
+            assert fields['title']['required'] is not None
 
-            assert fields['resourceId']['label'] is not None
-            assert fields['resourceId']['notNone'] is not None
-            assert fields['resourceId']['required'] is not None

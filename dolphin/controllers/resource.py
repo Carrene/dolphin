@@ -17,6 +17,6 @@ class ResourceController(ModelRestController):
     @Resource.expose
     def list(self):
         return DBSession.query(Resource) \
-            .join(Skill, Resource.id == Skill.resource_id) \
-            .filter(Skill.phase_id == self.phase.id)
+            .join(Skill, Resource.skill_id == Skill.id) \
+            .filter(Skill.id == self.phase.skill_id)
 

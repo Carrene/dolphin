@@ -10,6 +10,14 @@ class Phase(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
 
     id = Field(Integer, primary_key=True, readonly=True)
 
+    skill_id = Field(
+        Integer,
+        ForeignKey('skill.id'),
+        label='Skill ID',
+        required=True,
+        nullable=False,
+        not_none=True,
+    )
     workflow_id = Field(
         Integer,
         ForeignKey('workflow.id'),
@@ -66,13 +74,10 @@ class Phase(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
         lazy='selectin',
         protected=True
     )
-
-    resources = relationship(
-        'Resource',
-        secondary='skill',
-        lazy='selectin',
+    skill = relationship(
+        'Skill',
         back_populates='phases',
-        protected=True,
+        protected=True
     )
 
     def __repr__(self):
