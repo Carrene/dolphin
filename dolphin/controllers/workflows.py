@@ -42,5 +42,6 @@ class WorkflowController(ModelRestController):
         workflow = Workflow(
             title=context.form.get('title')
         )
+        DBSession.add(workflow)
         return workflow
 

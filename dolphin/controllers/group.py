@@ -36,5 +36,6 @@ class GroupController(ModelRestController):
         group = Group(
             title=context.form.get('title')
         )
+        DBSession.add(group)
         return group
 
