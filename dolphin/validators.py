@@ -5,7 +5,7 @@ from restfulpy.orm import DBSession
 
 from .models import *
 from .models.organization import roles
-from .exceptions import HTTPResourceNotFound
+from .exceptions import HTTPResourceNotFound, HTTPRepetitiveTitle
 
 
 TITLE_PATTERN = re.compile(r'^(?!\s).*[^\s]$')
@@ -235,6 +235,21 @@ def workflow_exists_validator_by_title(title, project, field):
         raise HTTPStatus('600 Repetitive Title')
 
     return title
+
+
+def tag_exists_validator(title, project, field):
+
+    tag = DBSession.query(Tag) \
+        .filter(
+            Tag.title == title,
+            Tag.organization_id == context.identity.payload['organizationId']
+        ) \
+        .one_or_none()
+    if tag is not None:
+        raise HTTPRepetitiveTitle()
+
+    return title
+
 
 
 release_validator = validate(
@@ -546,6 +561,16 @@ workflow_create_validator = validate(
         max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
         pattern=(WORKFLOW_TITLE_PATTERN, '747 Invalid Title Format'),
         callback=workflow_exists_validator_by_title,
+    )
+)
+
+
+tag_create_validator = validate(
+    title=dict(
+        not_none='727 Title Is None',
+        required='710 Title Not In Form',
+        max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
+        callback=tag_exists_validator,
     )
 )
 

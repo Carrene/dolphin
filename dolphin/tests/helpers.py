@@ -68,10 +68,12 @@ class LocalApplicationTestCase(ApplicableTestCase):
         r'^/apiv1/invitations.*': invitation_fields,
     }
 
-    def login(self, email):
+    def login(self, email, organization_id=None):
         session = self.create_session()
         member = session.query(Member).filter(Member.email == email).one()
-        token = member.create_jwt_principal().dump()
+        principal = member.create_jwt_principal()
+        principal.payload['organizationId'] = organization_id
+        token = principal.dump()
         self._authentication_token = token.decode('utf-8')
 
 
