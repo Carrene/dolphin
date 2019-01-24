@@ -36,6 +36,7 @@ class TestWorkflow(LocalApplicationTestCase):
         ):
             assert status == 200
             assert response.json['title'] == title
+            assert response.json['id'] is not None
 
             when('Trying to pass without form parameters', json={})
             assert status == '708 Empty Form'
