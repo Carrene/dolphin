@@ -127,5 +127,6 @@ class TagController(ModelRestController, JsonPatchControllerMixin):
             title=context.form.get('title'),
             organization_id=context.identity.payload['organizationId'],
         )
+        DBSession.add(tag)
         return tag
 
