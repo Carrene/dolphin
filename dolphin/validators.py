@@ -251,7 +251,6 @@ def tag_exists_validator(title, project, field):
     return title
 
 
-
 release_validator = validate(
     title=dict(
         required='710 Title Not In Form',
