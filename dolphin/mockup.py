@@ -27,7 +27,6 @@ def insert(): # pragma: no cover
             email='user1@example.com',
             reference_id=2,
             access_token='access token 2',
-            phases=[phase],
         )
         DBSession.add(resource1)
 
@@ -37,7 +36,6 @@ def insert(): # pragma: no cover
             email='user2@example.com',
             reference_id=3,
             access_token='access token 3',
-            phases=[phase],
         )
         DBSession.add(resource2)
 
@@ -47,7 +45,6 @@ def insert(): # pragma: no cover
             email='user3@example.com',
             reference_id=4,
             access_token='access token 4',
-            phases=[phase],
         )
         DBSession.add(resource3)
         DBSession.commit()
