@@ -22,7 +22,10 @@ depends_on = None
 
 Base = declarative_base()
 
-OldSkill = Table(Skill.__tablename__, Base.metadata,
+
+OldSkill = Table(
+    Skill.__tablename__,
+    Base.metadata,
     Column('phase_id', Integer),
     Column('resource_id', Integer)
 )
@@ -127,6 +130,5 @@ def downgrade():
         ['phase_id'],
         ['id']
     )
-
     # ### end Alembic commands ###
 
