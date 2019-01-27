@@ -49,7 +49,7 @@ def insert(): # pragma: no cover
     public_group = Group(title='Public', public=True)
     DBSession.add(public_group)
 
-    skill = Skill(title='Developing')
+    skill = Skill(title='Project Manager')
 
     phase1 = Phase(
         title='Backlog',
