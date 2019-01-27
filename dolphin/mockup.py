@@ -3,7 +3,7 @@ from nanohttp.contexts import Context
 from restfulpy.orm import DBSession
 from sqlalchemy_media import StoreManager
 
-from .models import Resource, Phase, Member
+from .models import Resource, Phase, Member, Organization, OrganizationMember
 
 
 def insert(): # pragma: no cover
@@ -19,6 +19,9 @@ def insert(): # pragma: no cover
 
         context.identity = Identity
 
+        organization = DBSession.query(Organization) \
+            .filter(Organization.title == 'carrene') \
+            .one()
         phase = DBSession.query(Phase).filter(Phase.title == 'Backlog').one()
 
         resource1 = Resource(
@@ -30,6 +33,13 @@ def insert(): # pragma: no cover
         )
         DBSession.add(resource1)
 
+        organization_resource1 = OrganizationMember(
+            organization_id=organization.id,
+            member_id=resource1.id,
+            role='member',
+        )
+        DBSession.add(organization_resource1)
+
         resource2 = Resource(
             id=3,
             title='User_2',
@@ -39,6 +49,13 @@ def insert(): # pragma: no cover
         )
         DBSession.add(resource2)
 
+        organization_resource2 = OrganizationMember(
+            organization_id=organization.id,
+            member_id=resource2.id,
+            role='member',
+        )
+        DBSession.add(organization_resource2)
+
         resource3 = Resource(
             id=4,
             title='User_3',
@@ -47,6 +64,13 @@ def insert(): # pragma: no cover
             access_token='access token 4',
         )
         DBSession.add(resource3)
+
+        organization_resource3 = OrganizationMember(
+            organization_id=organization.id,
+            member_id=resource3.id,
+            role='member',
+        )
+        DBSession.add(organization_resource3)
         DBSession.commit()
 
         print('Following resource has been added:')
