@@ -12,6 +12,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from dolphin.models import Skill, Group, Resource
 
+
 # revision identifiers, used by Alembic.
 revision = 'b9ff7f16e411'
 down_revision = 'e371cfc0cb1e'
