@@ -81,11 +81,6 @@ def downgrade():
     bind = op.get_bind()
     session = orm.Session(bind=bind)
 
-    op.execute('DELETE FROM skill')
-
-    op.drop_column('skill', 'title')
-    op.drop_column('skill', 'id')
-
     op.drop_constraint(
         PHASE_SKILL_ID_CONSTRAINT_NAME,
         'phase',
@@ -100,11 +95,38 @@ def downgrade():
     )
     op.drop_column('member', 'skill_id')
 
-    op.add_column('skill', sa.Column('resource_id', sa.INTEGER(), autoincrement=False, nullable=False))
-    op.add_column('skill', sa.Column('phase_id', sa.INTEGER(), autoincrement=False, nullable=False))
+    op.drop_column('skill', 'title')
+    op.drop_column('skill', 'id')
 
-    op.create_foreign_key('skill_resource_id_fkey', 'skill', 'member', ['resource_id'], ['id'])
-    op.create_foreign_key('skill_phase_id_fkey', 'skill', 'phase', ['phase_id'], ['id'])
+    op.execute('DELETE FROM skill')
+
+    op.add_column('skill', sa.Column(
+        'resource_id',
+        sa.INTEGER(),
+        autoincrement=False,
+        nullable=False
+    ))
+    op.add_column('skill', sa.Column(
+        'phase_id',
+        sa.INTEGER(),
+        autoincrement=False,
+        nullable=False
+    ))
+
+    op.create_foreign_key(
+        'skill_resource_id_fkey',
+        'skill',
+        'member',
+        ['resource_id'],
+        ['id']
+    )
+    op.create_foreign_key(
+        'skill_phase_id_fkey',
+        'skill',
+        'phase',
+        ['phase_id'],
+        ['id']
+    )
 
     # ### end Alembic commands ###
 
