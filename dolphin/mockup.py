@@ -32,6 +32,7 @@ def insert(): # pragma: no cover
             access_token='access token 2',
         )
         DBSession.add(resource1)
+        DBSession.flush()
 
         organization_resource1 = OrganizationMember(
             organization_id=organization.id,
@@ -48,6 +49,7 @@ def insert(): # pragma: no cover
             access_token='access token 3',
         )
         DBSession.add(resource2)
+        DBSession.flush()
 
         organization_resource2 = OrganizationMember(
             organization_id=organization.id,
@@ -64,6 +66,7 @@ def insert(): # pragma: no cover
             access_token='access token 4',
         )
         DBSession.add(resource3)
+        DBSession.flush()
 
         organization_resource3 = OrganizationMember(
             organization_id=organization.id,
