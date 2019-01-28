@@ -79,9 +79,10 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
         )
 
     def to_dict(self):
-        project_dict = super().to_dict()
-        project_dict['dueDate'] = self.due_date
-        return project_dict
+        release_dict = super().to_dict()
+        release_dict['dueDate'] = self.due_date.isoformat() \
+            if self.due_date else None
+        return release_dict
 
     def __repr__(self):
         return f'\tTitle: {self.title}\n'
