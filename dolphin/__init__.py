@@ -61,6 +61,14 @@ class Dolphin(Application):
       storage:
         local_directory: %(root_path)s/data/assets
         base_url: http://localhost:8080/assets
+
+      attachments:
+        files:
+          max_length: 50 # KB
+          min_length: 1  # KB
+        organizations:
+          max_length: 50 # KB
+          min_length: 1  # KB
    '''
 
     def __init__(self, application_name='dolphin', root=Root()):
