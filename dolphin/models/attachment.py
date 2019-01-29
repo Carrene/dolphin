@@ -17,7 +17,6 @@ is_mine_fieldinfo = FieldInfo(Boolean, not_none=True, readonly=True)
 class FileAttachment(File):
 
     _internal_max_length = None
-
     _internal_min_length = None
 
     __pre_processors__ = [
