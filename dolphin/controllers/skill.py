@@ -5,3 +5,4 @@ from ..models import Skill
 
 class SkillController(ModelRestController):
     __model__ = Skill
+

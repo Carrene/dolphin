@@ -1,4 +1,5 @@
-from nanohttp import json, HTTPNotFound, HTTPUnauthorized, context
+from nanohttp import json, HTTPNotFound, HTTPUnauthorized, context, \
+    int_or_notfound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
@@ -26,11 +27,7 @@ class PhaseController(ModelRestController):
         self.issue = issue
 
     def _get_phase(self, id):
-        try:
-            id = int(id)
-
-        except (ValueError, TypeError):
-            raise HTTPNotFound()
+        id = int_or_notfound(id)
 
         phase = DBSession.query(Phase).get(id)
         if phase is None:
@@ -51,9 +48,9 @@ class PhaseController(ModelRestController):
     @Phase.expose
     @commit
     def set(self, id):
-        phase = DBSession.query(Phase) \
-            .filter(Phase.id == id) \
-            .one_or_none()
+        id = int_or_notfound(id)
+
+        phase = DBSession.query(Phase).get(id)
         if phase is None:
             raise HTTPNotFound()
 

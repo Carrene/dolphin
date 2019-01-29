@@ -1,4 +1,5 @@
-from nanohttp import json, context, HTTPNotFound, HTTPUnauthorized
+from nanohttp import json, context, HTTPNotFound, HTTPUnauthorized, \
+    int_or_notfound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import commit, DBSession
@@ -40,11 +41,7 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
             if not context.identity:
                 raise HTTPUnauthorized()
 
-            try:
-                id = int(remaining_paths[0])
-
-            except (ValueError, TypeError):
-                raise HTTPNotFound()
+            id = int_or_notfound(remaining_paths[0])
 
             draft_issue = DBSession.query(DraftIssue).get(id)
             if draft_issue is None:
@@ -77,11 +74,7 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
     @DraftIssue.expose
     @commit
     def finalize(self, id):
-        try:
-            id = int(id)
-
-        except (ValueError, TypeError):
-            raise HTTPNotFound()
+        id = int_or_notfound(id)
 
         draft_issue = DBSession.query(DraftIssue).get(id)
         if draft_issue is None:

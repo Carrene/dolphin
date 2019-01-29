@@ -1,4 +1,4 @@
-from nanohttp import json, context, HTTPNotFound, HTTPStatus
+from nanohttp import json, context, HTTPNotFound, HTTPStatus, int_or_notfound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
@@ -43,15 +43,9 @@ class ReleaseController(ModelRestController):
     @commit
     def update(self, id):
         form = context.form
+        id = int_or_notfound(id)
 
-        try:
-            id = int(id)
-        except (TypeError, ValueError):
-            raise HTTPNotFound()
-
-        release = DBSession.query(Release) \
-            .filter(Release.id == id) \
-            .one_or_none()
+        release = DBSession.query(Release).get(id)
         if not release:
             raise HTTPNotFound()
 
@@ -72,15 +66,9 @@ class ReleaseController(ModelRestController):
     @Release.expose
     @commit
     def abort(self, id):
+        id = int_or_notfound(id)
 
-        try:
-            id = int(id)
-        except (TypeError, ValueError):
-            raise HTTPNotFound()
-
-        release = DBSession.query(Release) \
-            .filter(Release.id == id) \
-            .one_or_none()
+        release = DBSession.query(Release).get(id)
         if not release:
             raise HTTPNotFound()
 
@@ -91,9 +79,7 @@ class ReleaseController(ModelRestController):
     @json
     @Release.expose
     def list(self):
-
-        query = DBSession.query(Release)
-        return query
+        return DBSession.query(Release)
 
     @authorize
     @json(prevent_form='709 Form Not Allowed')
@@ -101,15 +87,9 @@ class ReleaseController(ModelRestController):
     @commit
     def subscribe(self, id):
         token = context.environ['HTTP_AUTHORIZATION']
+        id = int_or_notfound(id)
 
-        try:
-            id = int(id)
-        except (TypeError, ValueError):
-            raise HTTPNotFound()
-
-        release = DBSession.query(Release) \
-            .filter(Release.id == id) \
-            .one_or_none()
+        release = DBSession.query(Release).get(id)
         if not release:
             raise HTTPNotFound()
 
@@ -134,15 +114,9 @@ class ReleaseController(ModelRestController):
     @commit
     def unsubscribe(self, id):
         token = context.environ['HTTP_AUTHORIZATION']
+        id = int_or_notfound(id)
 
-        try:
-            id = int(id)
-        except (TypeError, ValueError):
-            raise HTTPNotFound()
-
-        release = DBSession.query(Release) \
-            .filter(Release.id == id) \
-            .one_or_none()
+        release = DBSession.query(Release).get(id)
         if not release:
             raise HTTPNotFound()
 
@@ -156,20 +130,15 @@ class ReleaseController(ModelRestController):
             raise HTTPStatus('612 Not Subscribed Yet')
 
         DBSession.delete(subscription)
-
         return release
 
     @authorize
     @json(prevent_form='709 Form Not Allowed')
     @Release.expose
     def get(self, id):
+        id = int_or_notfound(id)
 
-        try:
-            id = int(id)
-        except (ValueError, TypeError):
-            raise HTTPNotFound()
-
-        release = DBSession.query(Release).filter(Release.id == id).one_or_none()
+        release = DBSession.query(Release).get(id)
         if not release:
             raise HTTPNotFound()
 
