@@ -2,6 +2,7 @@ from datetime import datetime
 
 from nanohttp import HTTPStatus, json, context, HTTPNotFound, \
     HTTPUnauthorized, int_or_notfound
+
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import DBSession, commit
@@ -15,6 +16,7 @@ from ..validators import issue_validator, update_issue_validator, \
     assign_issue_validator, issue_move_validator, unassign_issue_validator
 from .phases import PhaseController
 from .tag import TagController
+from .activity import ActivityController
 
 
 PENDING = -1
@@ -37,6 +39,9 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
             elif remaining_paths[1] == 'tags':
                 return TagController(issue=issue)(*remaining_paths[2:])
+
+            elif remaining_paths[1] == 'activities':
+                return ActivityController(issue=issue)(*remaining_paths[2:])
 
         return super().__call__(*remaining_paths)
 
