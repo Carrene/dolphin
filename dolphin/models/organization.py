@@ -48,7 +48,6 @@ class OrganizationMember(DeclarativeBase):
 class Logo(Image):
 
     _internal_max_length = None
-
     _internal_min_length = None
 
     __pre_processors__ = [
