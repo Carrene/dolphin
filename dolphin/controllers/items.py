@@ -1,4 +1,4 @@
-from nanohttp import json, context, HTTPNotFound
+from nanohttp import json, context, HTTPNotFound, int_or_notfound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
@@ -16,19 +16,12 @@ class ItemController(ModelRestController):
     @Item.expose
     @commit
     def update(self, id):
-        status = context.form['status']
+        id = int_or_notfound(id)
 
-        try:
-            id = int(id)
-        except (TypeError, ValueError):
-            raise HTTPNotFound()
-
-        item = DBSession.query(Item) \
-            .filter(Item.id == id) \
-            .one_or_none()
+        item = DBSession.query(Item).get(id)
         if not item:
             raise HTTPNotFound()
 
-        item.status = status
+        item.status = context.form['status']
         return item
 

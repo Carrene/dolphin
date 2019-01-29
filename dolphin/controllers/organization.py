@@ -1,5 +1,5 @@
 from nanohttp import context, json, HTTPForbidden, HTTPNotFound, settings, \
-    HTTPUnauthorized
+    HTTPUnauthorized, int_or_notfound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import commit, DBSession
@@ -30,12 +30,7 @@ class OrganizationController(ModelRestController):
             if not context.identity:
                 raise HTTPUnauthorized()
 
-            try:
-                id = int(remaining_paths[0])
-
-            except (ValueError, TypeError):
-                raise HTTPNotFound()
-
+            id = int_or_notfound(remaining_paths[0])
             member = Member.current()
             organization = DBSession.query(Organization) \
                .filter(Organization.id == id) \

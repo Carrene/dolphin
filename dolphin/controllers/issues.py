@@ -41,11 +41,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         return super().__call__(*remaining_paths)
 
     def _get_issue(self, id):
-        try:
-            id = int(id)
-
-        except (ValueError, TypeError):
-            raise HTTPNotFound()
+        id = int_or_notfound(id)
 
         issue = DBSession.query(Issue).filter(Issue.id == id).one_or_none()
 
@@ -168,12 +164,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     @commit
     def update(self, id):
         form = context.form
-
-        try:
-            id = int(id)
-
-        except (TypeError, ValueError):
-            raise HTTPNotFound()
+        id = int_or_notfound(id)
 
         issue = DBSession.query(Issue).get(id)
         if not issue:
@@ -231,11 +222,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     @commit
     def subscribe(self, id):
         token = context.environ['HTTP_AUTHORIZATION']
-
-        try:
-            id = int(id)
-        except (TypeError, ValueError):
-            raise HTTPNotFound()
+        id = int_or_notfound(id)
 
         issue = DBSession.query(Issue).filter(Issue.id == id).one_or_none()
         if not issue:
@@ -290,11 +277,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     @commit
     def unsubscribe(self, id):
         token = context.environ['HTTP_AUTHORIZATION']
-
-        try:
-            id = int(id)
-        except (TypeError, ValueError):
-            raise HTTPNotFound()
+        id = int_or_notfound(id)
 
         issue = DBSession.query(Issue).filter(Issue.id == id).one_or_none()
         if not issue:
@@ -346,11 +329,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     @commit
     def assign(self, id):
         form = context.form
-
-        try:
-            id = int(id)
-        except (TypeError, ValueError):
-            raise HTTPNotFound()
+        id = int_or_notfound(id)
 
         issue = DBSession.query(Issue).filter(Issue.id == id).one_or_none()
         if not issue:
@@ -408,11 +387,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     @json(prevent_form='709 Form Not Allowed')
     @Issue.expose
     def get(self, id):
-
-        try:
-            id = int(id)
-        except (ValueError, TypeError):
-            raise HTTPNotFound()
+        id = int_or_notfound(id)
 
         issue = DBSession.query(Issue).filter(Issue.id == id).one_or_none()
         if not issue:
@@ -425,11 +400,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     @issue_move_validator
     @commit
     def move(self, id):
-        try:
-            id = int(id)
-
-        except (ValueError, TypeError):
-            raise HTTPNotFound()
+        id = int_or_notfound(id)
 
         issue = DBSession.query(Issue).get(id)
         if not issue:
@@ -485,3 +456,4 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         subscription.seen_at = None
         return issue
+

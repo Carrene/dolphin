@@ -1,4 +1,4 @@
-from nanohttp import HTTPStatus, json, context, HTTPNotFound
+from nanohttp import HTTPStatus, json, context, HTTPNotFound, int_or_notfound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
@@ -138,14 +138,9 @@ class ProjectController(ModelRestController):
         form = context.form
         token = context.environ['HTTP_AUTHORIZATION']
 
-        try:
-            id = int(id)
-        except (ValueError, TypeError):
-            raise HTTPNotFound()
+        id = int_or_notfound(id)
 
-        project = DBSession.query(Project) \
-            .filter(Project.id == id) \
-            .one_or_none()
+        project = DBSession.query(Project).get(id)
         if not project:
             raise HTTPNotFound()
 
@@ -174,15 +169,9 @@ class ProjectController(ModelRestController):
     @commit
     def hide(self, id):
         form = context.form
+        id = int_or_notfound(id)
 
-        try:
-            id = int(id)
-        except ValueError:
-            raise HTTPNotFound()
-
-        project = DBSession.query(Project) \
-            .filter(Project.id == id) \
-            .one_or_none()
+        project = DBSession.query(Project).get(id)
         if not project:
             raise HTTPNotFound()
 
@@ -198,15 +187,9 @@ class ProjectController(ModelRestController):
     @commit
     def show(self, id):
         form = context.form
+        id = int_or_notfound(id)
 
-        try:
-            id = int(id)
-        except ValueError:
-            raise HTTPNotFound()
-
-        project = DBSession.query(Project) \
-            .filter(Project.id == id) \
-            .one_or_none()
+        project = DBSession.query(Project).get(id)
         if not project:
             raise HTTPNotFound()
 
@@ -220,9 +203,7 @@ class ProjectController(ModelRestController):
     @json
     @Project.expose
     def list(self):
-
-        query = DBSession.query(Project)
-        return query
+        return DBSession.query(Project)
 
     @authorize
     @json(prevent_form='709 Form Not Allowed')
@@ -231,15 +212,9 @@ class ProjectController(ModelRestController):
     def subscribe(self, id):
         token = context.environ['HTTP_AUTHORIZATION']
         identity = context.identity
+        id = int_or_notfound(id)
 
-        try:
-            id = int(id)
-        except ValueError:
-            raise HTTPNotFound()
-
-        project = DBSession.query(Project) \
-            .filter(Project.id == id) \
-            .one_or_none()
+        project = DBSession.query(Project).get(id)
         if not project:
             raise HTTPNotFound()
 
@@ -291,15 +266,9 @@ class ProjectController(ModelRestController):
     def unsubscribe(self, id):
         token = context.environ['HTTP_AUTHORIZATION']
         identity = context.identity
+        id = int_or_notfound(id)
 
-        try:
-            id = int(id)
-        except ValueError:
-            raise HTTPNotFound()
-
-        project = DBSession.query(Project) \
-            .filter(Project.id == id) \
-            .one_or_none()
+        project = DBSession.query(Project).get(id)
         if not project:
             raise HTTPNotFound()
 
@@ -345,15 +314,9 @@ class ProjectController(ModelRestController):
     @json(prevent_form='709 Form Not Allowed')
     @Project.expose
     def get(self, id):
+        id = int_or_notfound(id)
 
-        try:
-            id = int(id)
-        except (ValueError, TypeError):
-            raise HTTPNotFound()
-
-        project = DBSession.query(Project) \
-            .filter(Project.id == id) \
-            .one_or_none()
+        project = DBSession.query(Project).get(id)
         if not project:
             raise HTTPNotFound()
 

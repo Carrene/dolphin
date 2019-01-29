@@ -1,4 +1,5 @@
-from nanohttp import json, HTTPNotFound, context, HTTPUnauthorized
+from nanohttp import json, HTTPNotFound, context, HTTPUnauthorized, \
+    int_or_notfound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession
@@ -16,16 +17,8 @@ class MemberController(ModelRestController):
             if not context.identity:
                 raise HTTPUnauthorized()
 
-            try:
-                id = int(remaining_paths[0])
-
-            except (ValueError, TypeError):
-                raise HTTPNotFound()
-
-            member = DBSession.query(Member) \
-                .filter(Member.id == id) \
-                .one_or_none()
-
+            id = int_or_notfound(remaining_paths[0])
+            member = DBSession.query(Member).get(id)
             if member is None \
                     or member.reference_id != context.identity.reference_id:
                 raise HTTPNotFound()
@@ -45,13 +38,9 @@ class MemberController(ModelRestController):
     @json(prevent_form='709 Form Not Allowed')
     @Member.expose
     def get(self, id):
+        id = int_or_notfound(id)
 
-        try:
-            id = int(id)
-        except (ValueError, TypeError):
-            raise HTTPNotFound()
-
-        member = DBSession.query(Member).filter(Member.id == id).one_or_none()
+        member = DBSession.query(Member).get(id)
         if not member:
             raise HTTPNotFound()
 

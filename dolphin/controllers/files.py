@@ -1,4 +1,4 @@
-from nanohttp import json, HTTPNotFound, context, HTTPStatus
+from nanohttp import json, HTTPNotFound, context, HTTPStatus, int_or_notfound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
@@ -43,14 +43,9 @@ class FileController(ModelRestController):
     @Attachment.expose
     @commit
     def delete(self, id):
-        try:
-            id = int(id)
-        except (ValueError, TypeError):
-            raise HTTPNotFound()
+        id = int_or_notfound(id)
 
-        attachment = DBSession.query(Attachment) \
-            .filter(Attachment.id == id) \
-            .one_or_none()
+        attachment = DBSession.query(Attachment).get(id)
         if attachment is None:
             raise HTTPNotFound()
 
