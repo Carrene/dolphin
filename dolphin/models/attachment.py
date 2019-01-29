@@ -1,4 +1,4 @@
-from nanohttp import HTTPStatus, context
+from nanohttp import settings, HTTPStatus, context
 from sqlalchemy import Integer, JSON, ForeignKey, String, Boolean
 from restfulpy.orm.metadata import FieldInfo
 from restfulpy.orm import Field, DeclarativeBase, FilteringMixin, \
@@ -15,6 +15,10 @@ is_mine_fieldinfo = FieldInfo(Boolean, not_none=True, readonly=True)
 
 
 class FileAttachment(File):
+
+    _internal_max_length = None
+    _internal_min_length = None
+
     __pre_processors__ = [
         MagicAnalyzer(),
         ContentTypeValidator([
@@ -25,8 +29,29 @@ class FileAttachment(File):
         ])
     ]
 
-    __max_length__ = 50 * KB
-    __min_length__ = 1 * KB
+    @property
+    def __max_length__(self):
+        if self._internal_max_length is None:
+            self._internal_max_length = \
+                settings.attachments.files.max_length * KB
+
+        return self._internal_max_length
+
+    @__max_length__.setter
+    def __max_length__(self, v):
+        self._internal_max_length = v
+
+    @property
+    def __min_length__(self):
+        if self._internal_min_length is None:
+            self._internal_min_length = \
+                settings.attachments.files.min_length * KB
+
+        return self._internal_min_length
+
+    @__min_length__.setter
+    def __min_length__(self, v):
+        self._internal_min_length = v
 
 
 class Attachment(SoftDeleteMixin, FilteringMixin, OrderingMixin,

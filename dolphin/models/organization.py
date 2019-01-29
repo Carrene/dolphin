@@ -1,4 +1,4 @@
-from nanohttp import HTTPStatus, context
+from nanohttp import settings, HTTPStatus, context
 from restfulpy.orm import DeclarativeBase, Field, relationship, \
     ModifiedMixin, TimestampMixin, FilteringMixin, OrderingMixin, \
     PaginationMixin
@@ -46,6 +46,10 @@ class OrganizationMember(DeclarativeBase):
 
 
 class Logo(Image):
+
+    _internal_max_length = None
+    _internal_min_length = None
+
     __pre_processors__ = [
         MagicAnalyzer(),
         ContentTypeValidator([
@@ -62,9 +66,31 @@ class Logo(Image):
         ),
     ]
 
-    __max_length__ = 50 * KB
-    __min_length__ = 1 * KB
     __prefix__ = 'logo'
+
+    @property
+    def __max_length__(self):
+        if self._internal_max_length is None:
+            self._internal_max_length = \
+                settings.attachments.organizations.logos.max_length * KB
+
+        return self._internal_max_length
+
+    @__max_length__.setter
+    def __max_length__(self, v):
+        self._internal_max_length = v
+
+    @property
+    def __min_length__(self):
+        if self._internal_min_length is None:
+            self._internal_min_length = \
+                settings.attachments.organizations.logos.min_length * KB
+
+        return self._internal_min_length
+
+    @__min_length__.setter
+    def __min_length__(self, v):
+        self._internal_min_length = v
 
 
 class Organization(OrderingMixin, FilteringMixin, PaginationMixin,
