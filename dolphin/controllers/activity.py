@@ -11,6 +11,7 @@ from ..models import Activity, Member, Phase, Item
 from ..validators import DATETIME_PATTERN, iso_to_datetime
 
 
+
 class ActivityController(ModelRestController):
     __model__ = Activity
 
@@ -61,9 +62,12 @@ class ActivityController(ModelRestController):
         )
         DBSession.add(activity)
         return activity
-        
+
     @authorize
-    @json
+    @json(prevent_form='709 Form Not Allowed')
     @Activity.expose
     def list(self):
-        return DBSession.query(Activity)
+        member = Member.current()
+        return DBSession.query(Activity) \
+            .join(Item, Item.id == Activity.item_id) \
+            .filter(Item.issue_id == self.issue.id, Item.member_id == member.id)

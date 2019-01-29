@@ -1,11 +1,9 @@
-from datetime import datetime
-
 from auditing.context import Context as AuditLogContext
 from bddrest import status, response, when
 
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 from dolphin.models import Issue, Project, Member, Workflow, Item, Phase, \
-    Group, Subscription, Release, Skill, Activity
+    Group, Release, Skill, Activity
+from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
 class TestActivity(LocalApplicationTestCase):
@@ -15,14 +13,23 @@ class TestActivity(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        cls.member = Member(
+        cls.member1 = Member(
             title='First Member',
             email='member1@example.com',
             access_token='access token 1',
             phone=123456789,
             reference_id=1
         )
-        session.add(cls.member)
+        session.add(cls.member1)
+
+        cls.member2 = Member(
+            title='Second Member',
+            email='member2@example.com',
+            access_token='access token 1',
+            phone=123456788,
+            reference_id=2
+        )
+        session.add(cls.member2)
 
         workflow = Workflow(title='Default')
         skill = Skill(title='First Skill')
@@ -38,14 +45,14 @@ class TestActivity(LocalApplicationTestCase):
             release=release,
             workflow=workflow,
             group=group,
-            member=cls.member,
+            member=cls.member1,
             title='My first project',
             description='A decription for my project',
             room_id=1
         )
         session.add(project)
 
-        issue1 = Issue(
+        cls.issue1 = Issue(
             project=project,
             title='First issue',
             description='This is description of first issue',
@@ -54,15 +61,8 @@ class TestActivity(LocalApplicationTestCase):
             days=1,
             room_id=2
         )
-        session.add(issue1)
+        session.add(cls.issue1)
         session.flush()
-
-        subscription_issue1 = Subscription(
-            subscribable_id=issue1.id,
-            member_id=member.id,
-            seen_at=datetime.utcnow(),
-        )
-        session.add(subscription_issue1)
 
         issue2 = Issue(
             project=project,
@@ -76,25 +76,6 @@ class TestActivity(LocalApplicationTestCase):
         session.add(issue2)
         session.flush()
 
-        subscription_issue2 = Subscription(
-            subscribable_id=issue2.id,
-            member_id=cls.member.id,
-            seen_at=None,
-        )
-        session.add(subscription_issue2)
-
-        issue3 = Issue(
-            project=project,
-            title='Third issue',
-            description='This is description of third issue',
-            due_date='2020-2-20',
-            kind='feature',
-            days=3,
-            room_id=4,
-        )
-        session.add(issue3)
-        session.flush()
-
         cls.phase1 = Phase(
             workflow=workflow,
             title='phase 1',
@@ -102,26 +83,18 @@ class TestActivity(LocalApplicationTestCase):
             skill=skill,
         )
         session.add(cls.phase1)
-
-        cls.phase2 = Phase(
-            workflow=workflow,
-            title='phase 2',
-            order=2,
-            skill=skill
-        )
-        session.add(cls.phase1)
         session.flush()
 
         item1 = Item(
-            member_id=cls.member.id,
+            member_id=cls.member1.id,
             phase_id=cls.phase1.id,
-            issue_id=issue1.id,
+            issue_id=cls.issue1.id,
         )
         session.add(item1)
 
         item2 = Item(
-            member_id=cls.member.id,
-            phase_id=cls.phase2.id,
+            member_id=cls.member1.id,
+            phase_id=cls.phase1.id,
             issue_id=issue2.id,
         )
         session.add(item2)
@@ -132,79 +105,50 @@ class TestActivity(LocalApplicationTestCase):
         session.add(activity1)
 
         activity2 = Activity(
-            item=item2
+            item=item1
         )
         session.add(activity2)
+
+        activity3 = Activity(
+            item=item2
+        )
+        session.add(activity3)
         session.commit()
 
     def test_list(self):
-        self.login(email=self.member.email)
+        self.login(email=self.member1.email)
 
         with oauth_mockup_server(), self.given(
-            'List issues',
-            '/apiv1/issues',
-            'LIST',
+            f'List activities',
+            f'/apiv1/issues/id:{self.issue1.id}/activities',
+            f'LIST',
         ):
             assert status == 200
-
-            issues = response.json
-            assert len(issues) == 3
-
-            for issue in issues:
-                items = issue['items']
-                if len(items) == 0:
-                    continue
-
-                privious_item_created_at = items[0]['createdAt']
-                for item in items:
-                    assert item['createdAt'] >= privious_item_created_at
-                    privious_item_created_at = item['createdAt']
-
-            when('Unread messages', query=dict(seenAt=None))
-            assert len(response.json) == 1
-
-            when('Sort issues by title', query=dict(sort='title'))
-            assert response.json[0]['title'] == 'First issue'
-
-            when(
-                'Reverse sorting titles by alphabet',
-                query=dict(sort='-title')
-            )
-            assert response.json[0]['title'] == 'Third issue'
-
-            when('Filter issues', query=dict(title='First issue'))
-            assert response.json[0]['title'] == 'First issue'
-
-            when(
-                'List issues except one of them',
-                query=dict(title='!Second issue')
-            )
             assert len(response.json) == 2
 
-            when(
-                'Filter based on a hybrid property',
-                query=dict(boarding='delayed')
-            )
+            when('The request with form parameter', form=dict(param='param'))
+            assert status == '709 Form Not Allowed'
+
+            when('Trying to sorting response', query=dict(sort='id'))
+            assert response.json[0]['id'] == 1
+            assert response.json[1]['id'] == 2
+
+            when('Sorting the response descending', query=dict(sort='-id'))
+            assert response.json[0]['id'] == 2
+            assert response.json[1]['id'] == 1
+
+            when('Trying filtering response', query=dict(id=1))
+            assert response.json[0]['id'] == 1
             assert len(response.json) == 1
 
-            when('Issues pagination', query=dict(take=1, skip=2))
-            assert response.json[0]['title'] == 'Third issue'
-
-            when(
-                'Manipulate sorting and pagination',
-                query=dict(sort='-title', take=1, skip=2)
-            )
-            assert response.json[0]['title'] == 'First issue'
-
-            when('Filter by phase id', query=dict(phaseId=self.phase1.id))
-            assert len(response.json) == 1
-
-            when(
-                'Filter by phase id with IN function',
-                query=dict(phaseId=f'IN({self.phase1.id}, {self.phase2.id})')
-            )
-            assert len(response.json) == 2
-
+            self.logout()
             when('Request is not authorized', authorization=None)
             assert status == 401
+
+            self.login(email=self.member2.email)
+            when(
+                'There is no time card for someone else',
+                authorization=self._authentication_token
+            )
+            assert len(response.json) == 0
 
