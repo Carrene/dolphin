@@ -62,3 +62,8 @@ class ActivityController(ModelRestController):
         DBSession.add(activity)
         return activity
         
+    @authorize
+    @json
+    @Activity.expose
+    def list(self):
+        return DBSession.query(Activity)
