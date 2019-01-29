@@ -73,7 +73,7 @@ class Logo(Image):
     def __max_length__(self):
         if self._internal_max_length is None:
             self._internal_max_length = \
-                settings.attachments.organizations.logo.max_length * KB
+                settings.attachments.organizations.logos.max_length * KB
 
         return self._internal_max_length
 
@@ -85,7 +85,7 @@ class Logo(Image):
     def __min_length__(self):
         if self._internal_min_length is None:
             self._internal_min_length = \
-                settings.attachments.organizations.logo.min_length * KB
+                settings.attachments.organizations.logos.min_length * KB
 
         return self._internal_min_length
 

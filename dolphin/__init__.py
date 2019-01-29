@@ -67,8 +67,9 @@ class Dolphin(Application):
           max_length: 50 # KB
           min_length: 1  # KB
         organizations:
-          max_length: 50 # KB
-          min_length: 1  # KB
+          logos:
+            max_length: 50 # KB
+            min_length: 1  # KB
    '''
 
     def __init__(self, application_name='dolphin', root=Root()):
