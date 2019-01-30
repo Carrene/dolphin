@@ -23,7 +23,6 @@ class ActivityController(ModelRestController):
     @Activity.expose
     @commit
     def create(self):
-
         member = Member.current()
 
         item = DBSession.query(Item) \
@@ -56,3 +55,4 @@ class ActivityController(ModelRestController):
         )
         DBSession.add(activity)
         return activity
+        

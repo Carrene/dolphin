@@ -9,7 +9,6 @@ from dolphin.tests.helpers import create_group, LocalApplicationTestCase, \
     oauth_mockup_server, create_workflow
 
 
-
 class TestActivity(LocalApplicationTestCase):
 
     @classmethod
@@ -191,3 +190,4 @@ class TestActivity(LocalApplicationTestCase):
                 url_parameters=Update(id=0)
             )
             assert status == 404
+            
