@@ -6,12 +6,14 @@ from restfulpy.orm import commit, DBSession
 
 from ..backends import ChatClient
 from ..exceptions import RoomMemberAlreadyExist, ChatRoomNotFound
-from ..models import Issue, Phase, Item, Member, DraftIssue, DraftIssueTag, Tag
+from ..models import Issue, Phase, Item, Member, DraftIssue, DraftIssueTag, \
+    Tag, Skill, Resource
 from ..validators import draft_issue_finalize_validator
 from .tag import TagController
 
 
 PENDING = -1
+UNKOWN_ASSIGNEE = -1
 
 
 class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
@@ -134,14 +136,11 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
             )
             raise
 
-        member_id = form['memberId'] \
-            if 'memberId' in form else current_member.id
-
         if 'phaseId' in form:
             item = Item(
                 phase_id=form['phaseId'],
                 issue_id=issue.id,
-                member_id=member_id,
+                member_id=UNKOWN_ASSIGNEE,
             )
 
         else:
@@ -151,8 +150,18 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
             item = Item(
                 phase_id=default_phase.id,
                 issue_id=issue.id,
-                member_id=member_id,
+                member_id=UNKOWN_ASSIGNEE,
             )
+
+        if 'memberId' in form:
+            item.member_id = form['memberId']
+
+        else:
+            resource = DBSession.query(Resource) \
+                .join(Skill, Resource.skill_id == Skill.id) \
+                .filter(Skill.title == 'Project Manager') \
+                .one()
+            item.member_id = resource.id
 
         draft_issue.issue_id = issue.id
         return draft_issue

@@ -1,8 +1,8 @@
 from auditing.context import Context as AuditLogContext
 from bddrest import status, response, Update, when, given, Remove
 
-from dolphin.models import Issue, Project, Member, Workflow, Phase, Tag, \
-    DraftIssue, Organization, OrganizationMember, Group, Release, Skill
+from dolphin.models import Issue, Project, Workflow, Phase, Tag, \
+    DraftIssue, Organization, OrganizationMember, Group, Release, Skill, Resource
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
@@ -14,17 +14,18 @@ class TestIssue(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        cls.member = Member(
+        skill = Skill(title='Project Manager')
+
+        cls.member = Resource(
             title='First Member',
             email='member1@example.com',
             access_token='access token 1',
             phone=123456789,
-            reference_id=1
+            reference_id=1,
+            skill=skill,
         )
 
         workflow1 = Workflow(title='default')
-
-        skill = Skill(title='First Skill')
 
         phase1 = Phase(
             title='Backlog',
