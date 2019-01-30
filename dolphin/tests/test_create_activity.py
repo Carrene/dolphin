@@ -125,8 +125,8 @@ class TestActivity(LocalApplicationTestCase):
             f'/apiv1/issues/id: {self.issue1.id}/activities',
             f'CREATE',
             form=dict(
-                start_time=datetime.utcnow().isoformat(),
-                end_time=(datetime.utcnow() + timedelta(minutes=1)).isoformat(),
+                startTime=datetime.utcnow().isoformat(),
+                endTime=(datetime.utcnow() + timedelta(minutes=1)).isoformat(),
                 description='I worked for 1 minute',
             ),
         ):
@@ -155,22 +155,22 @@ class TestActivity(LocalApplicationTestCase):
             when(
                 'startTime > endTime',
                 form=dict(
-                    start_time=(datetime.utcnow() + timedelta(weeks=1))
+                    startTime=(datetime.utcnow() + timedelta(weeks=1))
                         .isoformat(),
-                    end_time=datetime.utcnow().isoformat(),
+                    endTime=datetime.utcnow().isoformat(),
                 ),
             )
             assert status == '640 endTime Must be Greater Than startTime'
 
             when(
                 'Invalid startTime Format',
-                form=Update(start_time='abcd')
+                form=Update(startTime='abcd')
             )
             assert status == '771 Invalid startTime Format'
 
             when(
                 'Invalid endTime Format',
-                form=Update(end_time='abcd')
+                form=Update(endTime='abcd')
             )
             assert status == '772 Invalid endTime Format'
 

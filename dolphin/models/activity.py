@@ -6,7 +6,11 @@ from sqlalchemy import Integer, ForeignKey, DateTime, Unicode, func, \
     CheckConstraint
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from ..validators import DATETIME_PATTERN
+from ..validators import DATETIME_PATTERN, iso_to_datetime
+
+
+DESCRIPTION_LENGTH = 256
+ISO_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
 
 
 class Activity(ModifiedMixin, TimestampMixin, FilteringMixin, OrderingMixin,
@@ -24,11 +28,10 @@ class Activity(ModifiedMixin, TimestampMixin, FilteringMixin, OrderingMixin,
         required=False,
         default=None,
         label='Start Time',
-        name='start_time',
-        pattern=DATETIME_PATTERN,
         watermark='lorem ipson',
         example='2019-01-28T13:18:42.717091',
-        pattern_description='%Y-%m-%dT%H:%M:%S.%f'
+        pattern_description=ISO_FORMAT,
+        python_type=(iso_to_datetime, '771 Invalid startTime Format')
     )
     end_time = Field(
         DateTime,
@@ -36,20 +39,18 @@ class Activity(ModifiedMixin, TimestampMixin, FilteringMixin, OrderingMixin,
         nullable=True,
         required=False,
         default=None,
-        pattern=DATETIME_PATTERN,
         label='End Time',
-        name='end_time',
-        python_type=datetime,
         watermark='lorem ipson',
         example='2019-01-28T13:18:42.717091',
-        pattern_description='%Y-%m-%dT%H:%M:%S.%f'
+        pattern_description=ISO_FORMAT,
+        python_type=(iso_to_datetime, '772 Invalid endTime Format')
     )
     description = Field(
-        Unicode(256),
+        Unicode(DESCRIPTION_LENGTH),
+        max_length=(DESCRIPTION_LENGTH, '773 Invalid description Format'),
         nullable=True,
         required=False,
         default='',
-        min_length=0,
         label='description',
         name='description',
         python_type=str,

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from nanohttp import json, context
+from nanohttp import json, context, validate
 from nanohttp.exceptions import HTTPForbidden, HTTPStatus
 from restfulpy.orm import DBSession, commit
 from restfulpy.authorization import authorize
@@ -11,13 +11,6 @@ from ..models import Activity, Member, Phase, Item
 from ..validators import DATETIME_PATTERN, iso_to_datetime
 
 
-def int_or_false(arg):
-    try:
-        return int(arg)
-    except (TypeError, ValueError):
-        return False
-
-
 class ActivityController(ModelRestController):
     __model__ = Activity
 
@@ -25,20 +18,7 @@ class ActivityController(ModelRestController):
         self.issue = issue
 
     @authorize
-    @Activity.validate(
-        strict=True,
-        fields=dict(
-            start_time=dict(
-                type_=(iso_to_datetime, '771 Invalid startTime Format')
-            ),
-            end_time=dict(
-                type_=(iso_to_datetime, '772 Invalid endTime Format')
-            ),
-            description=dict(
-                max_length=(256, '773 Invalid description Format')
-            )
-        )
-    )
+    @Activity.validate(strict=False)
     @json
     @Activity.expose
     @commit
@@ -60,8 +40,8 @@ class ActivityController(ModelRestController):
             raise HTTPForbidden()
 
         form = context.form
-        start_time = form.get('start_time', None)
-        end_time = form.get('end_time', None)
+        start_time = form.get('startTime', None)
+        end_time = form.get('endTime', None)
         description = form.get('description', '')
 
         if start_time and end_time:
