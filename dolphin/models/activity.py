@@ -1,7 +1,10 @@
+from datetime import datetime
+
 from restfulpy.orm import DeclarativeBase, TimestampMixin, ModifiedMixin, \
-    FilteringMixin, OrderingMixin, Field, relationship
-from sqlalchemy import Integer, ForeignKey, DateTime, Unicode, CheckConstraint, \
-    func
+    FilteringMixin, OrderingMixin, Field, relationship, MetadataField
+from sqlalchemy import Integer, ForeignKey, DateTime, Unicode, func, \
+    CheckConstraint
+
 from sqlalchemy.ext.hybrid import hybrid_property
 
 
@@ -14,14 +17,38 @@ class Activity(ModifiedMixin, TimestampMixin, FilteringMixin, OrderingMixin,
 
     item_id = Field(Integer, ForeignKey('item.id'), protected=True)
 
-    start_time = Field(DateTime, nullable=True, required=False)
-    end_time = Field(DateTime, nullable=True, required=False)
+    start_time = Field(
+        DateTime,
+        nullable=True,
+        required=False,
+        default=None,
+        label='Start Time',
+        name='startTime',
+        python_type=datetime,
+        watermark='lorem ipson',
+    )
+    end_time = Field(
+        DateTime,
+        nullable=True,
+        required=False,
+        default=None,
+        label='End Time',
+        name='endTime',
+        python_type=datetime,
+        watermark='lorem ipson',
+    )
     description = Field(
         Unicode(256),
         nullable=True,
         required=False,
-        default=''
+        default='',
+        min_length=0,
+        label='description',
+        name='description',
+        python_type=str,
+        watermark='lorem ipson',
     )
+
 
     item = relationship(
         'Item',
@@ -31,16 +58,15 @@ class Activity(ModifiedMixin, TimestampMixin, FilteringMixin, OrderingMixin,
         readonly=True,
     )
 
-    # TODO: Rename this to better name
     @hybrid_property
-    def time(self):
+    def time_span(self):
         try:
             return (self.end_time > self.start_time).seconds
         except TypeError:
             return None
 
-    @time.expression
-    def time(self):
+    @time_span.expression
+    def time_span(self):
         # 'EPOCH' is used to convert timedelta to seconds
         func.extract('EPOCH', self.end_time > self.start_time)
 
@@ -50,13 +76,14 @@ class Activity(ModifiedMixin, TimestampMixin, FilteringMixin, OrderingMixin,
     def iter_metadata_fields(cls):
         yield from super().iter_metadata_fields()
         yield MetadataField(
-            name='time',
-            key='time',
-            label='Hours',
+            name='timeSpan',
+            key='time_span',
+            label='Time Span',
             required=False,
             readonly=True,
             protected=False,
             type_=int,
+            message='Activity duration in seconds',
             watermark='lorem ipsum',
-            example='10'
+            example='3600'
         )
