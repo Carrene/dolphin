@@ -140,7 +140,7 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
             item = Item(
                 phase_id=form['phaseId'],
                 issue_id=issue.id,
-                member_id=UNKOWN_ASSIGNEE,
+                member_id=form['memberId'],
             )
 
         else:
@@ -150,7 +150,7 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
             item = Item(
                 phase_id=default_phase.id,
                 issue_id=issue.id,
-                member_id=UNKOWN_ASSIGNEE,
+                member_id=form['memberId'],
             )
 
         if 'memberId' in form:
