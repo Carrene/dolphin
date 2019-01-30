@@ -24,8 +24,11 @@ class Activity(ModifiedMixin, TimestampMixin, FilteringMixin, OrderingMixin,
 
     start_time = Field(
         DateTime,
+        CheckConstraint('end_time > start_time'),
+        CheckConstraint('start_time <= now() at time zone \'utc\''),
         nullable=True,
         required=False,
+            # '642 startTime Is Greater Than Current Time'
         default=None,
         label='Start Time',
         watermark='lorem ipson',
@@ -36,8 +39,10 @@ class Activity(ModifiedMixin, TimestampMixin, FilteringMixin, OrderingMixin,
     end_time = Field(
         DateTime,
         CheckConstraint('end_time > start_time'),
+        CheckConstraint('end_time <= now() at time zone \'utc\''),
         nullable=True,
         required=False,
+            # '643 endTime Must Be Smaller Than Current Time'
         default=None,
         label='End Time',
         watermark='lorem ipson',

@@ -113,7 +113,6 @@ class TestActivity(LocalApplicationTestCase):
         )
         session.add(cls.item)
 
-
         session.commit()
 
     def test_create(self):
@@ -124,8 +123,10 @@ class TestActivity(LocalApplicationTestCase):
             f'/apiv1/issues/id: {self.issue1.id}/activities',
             f'CREATE',
             form=dict(
-                startTime=datetime.utcnow().isoformat(),
-                endTime=(datetime.utcnow() + timedelta(minutes=1)).isoformat(),
+                startTime=(
+                    datetime.utcnow() - timedelta(minutes=1)
+                ).isoformat(),
+                endTime=datetime.utcnow().isoformat(),
                 description='I worked for 1 minute',
             ),
         ):
@@ -168,6 +169,28 @@ class TestActivity(LocalApplicationTestCase):
             assert status == '771 Invalid startTime Format'
 
             when(
+                'startTime Is Greater Than Current Time',
+                form=Update(
+                    startTime=(datetime.utcnow() + timedelta(seconds=1))
+                        .isoformat(),
+                    endTime=(datetime.utcnow() + timedelta(seconds=3))
+                        .isoformat()
+                )
+            )
+            assert status == '642 startTime Must Be Smaller Than Current Time'
+
+            when(
+                'endTime Is Greater Than Current Time',
+                form=Update(
+                    startTime=(datetime.utcnow() - timedelta(seconds=1))
+                        .isoformat(),
+                    endTime=(datetime.utcnow() + timedelta(seconds=2))
+                        .isoformat()
+                )
+            )
+            assert status == '643 endTime Must Be Smaller Than Current Time'
+
+            when(
                 'Invalid endTime Format',
                 form=Update(endTime='abcd')
             )
@@ -190,4 +213,4 @@ class TestActivity(LocalApplicationTestCase):
                 url_parameters=Update(id=0)
             )
             assert status == 404
-            
+
