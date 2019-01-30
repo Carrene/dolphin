@@ -68,7 +68,6 @@ class ActivityController(ModelRestController):
             if start_time >= end_time:
                 raise HTTPStatus('640 endTime Must be Greater Than startTime')
 
-
         activity = Activity(
             item=item,
             start_time=start_time,
@@ -77,4 +76,3 @@ class ActivityController(ModelRestController):
         )
         DBSession.add(activity)
         return activity
-

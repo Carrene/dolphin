@@ -59,3 +59,4 @@ class Root(RootController):
     apiv1 = Apiv1()
     assets = Static(attachment_storage)
 
+

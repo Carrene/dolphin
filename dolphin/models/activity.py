@@ -27,6 +27,8 @@ class Activity(ModifiedMixin, TimestampMixin, FilteringMixin, OrderingMixin,
         name='start_time',
         pattern=DATETIME_PATTERN,
         watermark='lorem ipson',
+        example='2019-01-28T13:18:42.717091',
+        pattern_description='%Y-%m-%dT%H:%M:%S.%f'
     )
     end_time = Field(
         DateTime,
@@ -39,6 +41,8 @@ class Activity(ModifiedMixin, TimestampMixin, FilteringMixin, OrderingMixin,
         name='end_time',
         python_type=datetime,
         watermark='lorem ipson',
+        example='2019-01-28T13:18:42.717091',
+        pattern_description='%Y-%m-%dT%H:%M:%S.%f'
     )
     description = Field(
         Unicode(256),
@@ -72,8 +76,6 @@ class Activity(ModifiedMixin, TimestampMixin, FilteringMixin, OrderingMixin,
     def time_span(self):
         # 'EPOCH' is used to convert timedelta to seconds
         func.extract('EPOCH', self.end_time - self.start_time)
-
-    # CheckConstraint('end_time > start_time', name='time_never_goes_back')
 
     @classmethod
     def iter_metadata_fields(cls):
