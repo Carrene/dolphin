@@ -19,3 +19,4 @@ from .draft_issue import DraftIssue, DraftIssueTag
 from .tag import Tag
 from .attachment import Attachment
 from .skill import Skill
+from .activity import Activity
