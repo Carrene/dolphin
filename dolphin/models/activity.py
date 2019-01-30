@@ -4,8 +4,9 @@ from restfulpy.orm import DeclarativeBase, TimestampMixin, ModifiedMixin, \
     FilteringMixin, OrderingMixin, Field, relationship, MetadataField
 from sqlalchemy import Integer, ForeignKey, DateTime, Unicode, func, \
     CheckConstraint
-
 from sqlalchemy.ext.hybrid import hybrid_property
+
+from ..validators import DATETIME_PATTERN
 
 
 class Activity(ModifiedMixin, TimestampMixin, FilteringMixin, OrderingMixin,
@@ -23,17 +24,19 @@ class Activity(ModifiedMixin, TimestampMixin, FilteringMixin, OrderingMixin,
         required=False,
         default=None,
         label='Start Time',
-        name='startTime',
-        python_type=datetime,
+        name='start_time',
+        pattern=DATETIME_PATTERN,
         watermark='lorem ipson',
     )
     end_time = Field(
         DateTime,
+        CheckConstraint('end_time > start_time'),
         nullable=True,
         required=False,
         default=None,
+        pattern=DATETIME_PATTERN,
         label='End Time',
-        name='endTime',
+        name='end_time',
         python_type=datetime,
         watermark='lorem ipson',
     )
@@ -61,16 +64,16 @@ class Activity(ModifiedMixin, TimestampMixin, FilteringMixin, OrderingMixin,
     @hybrid_property
     def time_span(self):
         try:
-            return (self.end_time > self.start_time).seconds
+            return (self.end_time - self.start_time).seconds
         except TypeError:
             return None
 
     @time_span.expression
     def time_span(self):
         # 'EPOCH' is used to convert timedelta to seconds
-        func.extract('EPOCH', self.end_time > self.start_time)
+        func.extract('EPOCH', self.end_time - self.start_time)
 
-    CheckConstraint('end_time > start_time', name='time_never_goes_back')
+    # CheckConstraint('end_time > start_time', name='time_never_goes_back')
 
     @classmethod
     def iter_metadata_fields(cls):

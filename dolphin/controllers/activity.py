@@ -1,12 +1,14 @@
-from nanohttp import json, context
-from sqlalchemy import and_
+from datetime import datetime
 
-from nanohttp.exceptions import HTTPForbidden
+from nanohttp import json, context
+from nanohttp.exceptions import HTTPForbidden, HTTPStatus
 from restfulpy.orm import DBSession, commit
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
+from sqlalchemy import and_
 
 from ..models import Activity, Member, Phase, Item
+from ..validators import DATETIME_PATTERN, iso_to_datetime
 
 
 def int_or_false(arg):
@@ -23,7 +25,20 @@ class ActivityController(ModelRestController):
         self.issue = issue
 
     @authorize
-    @Activity.validate(strict=True)
+    @Activity.validate(
+        strict=True,
+        fields=dict(
+            start_time=dict(
+                type_=(iso_to_datetime, '771 Invalid startTime Format')
+            ),
+            end_time=dict(
+                type_=(iso_to_datetime, '772 Invalid endTime Format')
+            ),
+            description=dict(
+                max_length=(256, '773 Invalid description Format')
+            )
+        )
+    )
     @json
     @Activity.expose
     @commit
@@ -45,9 +60,14 @@ class ActivityController(ModelRestController):
             raise HTTPForbidden()
 
         form = context.form
-        start_time = getattr(form, 'starTime', None)
-        end_time = getattr(form, 'endTime', None)
-        description = getattr(form, 'description', '')
+        start_time = form.get('start_time', None)
+        end_time = form.get('end_time', None)
+        description = form.get('description', '')
+
+        if start_time and end_time:
+            if start_time >= end_time:
+                raise HTTPStatus('640 endTime Must be Greater Than startTime')
+
 
         activity = Activity(
             item=item,
