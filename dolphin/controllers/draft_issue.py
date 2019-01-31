@@ -13,7 +13,6 @@ from .tag import TagController
 
 
 PENDING = -1
-UNKOWN_ASSIGNEE = -1
 
 
 class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
