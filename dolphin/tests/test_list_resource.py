@@ -11,13 +11,15 @@ class TestResource(LocalApplicationTestCase):
         session = cls.create_session()
 
         workflow = Workflow(title='Default')
-        skill = Skill(title='First Skill')
+        skill1 = Skill(title='First Skill')
+
+        skill2 = Skill(title='Second Skill')
 
         cls.phase1 = Phase(
             title='backlog',
             order=-1,
             workflow=workflow,
-            skill=skill
+            skill=skill1
         )
         session.add(cls.phase1)
 
@@ -27,7 +29,7 @@ class TestResource(LocalApplicationTestCase):
             access_token='access token 1',
             phone=222222222,
             reference_id=2,
-            skill=skill
+            skill=skill1
         )
         session.add(cls.resource1)
 
@@ -37,9 +39,19 @@ class TestResource(LocalApplicationTestCase):
             access_token='access token 2',
             phone=333333333,
             reference_id=3,
-            skill=skill
+            skill=skill1
         )
         session.add(resource2)
+
+        resource3 = Resource(
+            title='Third Resource',
+            email='resource3@example.com',
+            access_token='access token 3',
+            phone=444444444,
+            reference_id=4,
+            skill=skill2
+        )
+        session.add(resource3)
         session.commit()
 
     def test_list(self):
