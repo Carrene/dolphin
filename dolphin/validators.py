@@ -373,6 +373,10 @@ issue_validator = validate(
 
 
 draft_issue_finalize_validator = validate(
+    memberId=dict(
+        required='739 Member Id Not In Form',
+        callback=member_exists_validator
+    ),
     priority=dict(
         required='768 Priority Not In Form',
         callback=issue_priority_value_validator
@@ -409,9 +413,6 @@ draft_issue_finalize_validator = validate(
     phaseId=dict(
         callback=phase_exists_validator
     ),
-    memberId=dict(
-        callback=member_exists_validator
-    )
 )
 
 

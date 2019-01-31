@@ -125,12 +125,16 @@ class TestIssue(LocalApplicationTestCase):
                 days=3,
                 projectId=self.project.id,
                 priority='high',
+                memberId=self.member.id,
             )
         ):
             assert status == 200
             assert response.json['id'] == self.draft_issue.id
             assert response.json['issueId'] is not None
             assert len(response.json['tags']) == 2
+
+            when('Member ID is not in form', form=Remove('memberId'))
+            assert status == '739 Member Id Not In Form'
 
             when('Priority value not in form', form=Remove('priority'))
             assert status == '768 Priority Not In Form'
