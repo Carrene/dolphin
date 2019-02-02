@@ -314,7 +314,8 @@ project_validator = validate(
     ),
     memberId=dict(
         required='739 Member Id Not In Form',
-        callback=member_exists_validator
+        callback=member_exists_validator,
+        not_none='774 Member ID Is Null',
     )
 )
 
