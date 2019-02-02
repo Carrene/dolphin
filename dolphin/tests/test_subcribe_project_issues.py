@@ -1,9 +1,9 @@
 from auditing.context import Context as AuditLogContext
 from bddrest import status, when, response
 
-from dolphin.models import Issue, Project, Member, Workflow, Group, Release
-from dolphin.tests.helpers import LocalApplicationTestCase, \
-    oauth_mockup_server, chat_mockup_server, chat_server_status
+from dolphin.models import Issue, Project, Member, Workflow, Group, Release, \
+    Subscription
+from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
 class TestIssue(LocalApplicationTestCase):
@@ -51,6 +51,7 @@ class TestIssue(LocalApplicationTestCase):
             room_id=2
         )
         session.add(cls.issue1)
+        session.flush()
 
         issue2 = Issue(
             project=cls.project,
@@ -62,16 +63,28 @@ class TestIssue(LocalApplicationTestCase):
             room_id=3
         )
         session.add(issue2)
+
+        subscription = Subscription(
+            subscribable_id=cls.issue1.id,
+            member_id=member.id
+        )
+        session.add(subscription)
         session.commit()
 
     def test_subscribe(self):
         self.login('member1@example.com')
 
         with oauth_mockup_server(), self.given(
-            'Subscribe an issue',
-            f'/apiv1/projects/{self.project.id}/issues',
+            'Subscribe all issues of a project',
+            f'/apiv1/projects/id:{self.project.id}/issues',
             'SUBSCRIBE',
         ):
             assert status == 200
+            assert response.json == {}
 
+            when('Project is not found', url_parameters=dict(id=0))
+            assert status == 404
+
+            when('Request is not authorized', authorization=None)
+            assert status == 401
 
