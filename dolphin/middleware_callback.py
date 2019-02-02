@@ -10,7 +10,7 @@ from dolphin.models import Member
 
 
 AUDIT_LOG_MIMETYPE = 'application/x-auditlog'
-BLACKLIST_OF_ATTRIBUTE = ['modified_at']
+ATTRIBUTES_BLACKLIST = ['modified_at']
 
 def callback(audit_log):
 
@@ -20,7 +20,7 @@ def callback(audit_log):
         # FIXME: We will rollback if cannot send a message successfully
         for log in audit_log:
             if isinstance(log, ChangeAttributeLogEntry) and \
-                    log.attribute not in BLACKLIST_OF_ATTRIBUTE:
+                    log.attribute not in ATTRIBUTES_BLACKLIST:
                 message = dict(
                     action='Update',
                     attribute=log.attribute,
