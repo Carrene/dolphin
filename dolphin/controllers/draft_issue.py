@@ -66,10 +66,9 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
     @authorize
     @json(form_whitelist=(
         ['title', 'description', 'kind', 'days', 'status', 'projectId',
-         'dueDate', 'phaseId', 'memberId', 'priority'],
+         'dueDate', 'priority'],
         '707 Invalid field, only following fields are accepted: ' \
-        'title, description, kind, days, status, projectId, dueDate, ' \
-        'phaseId, memberId and priority'
+        'title, description, kind, days, status, projectId, dueDate, priority'
     ))
     @draft_issue_finalize_validator
     @DraftIssue.expose
@@ -134,33 +133,6 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
                 current_member.access_token
             )
             raise
-
-        if 'phaseId' in form:
-            item = Item(
-                phase_id=form['phaseId'],
-                issue_id=issue.id,
-                member_id=form['memberId'],
-            )
-
-        else:
-            default_phase = DBSession.query(Phase) \
-                .filter(Phase.title == 'Backlog') \
-                .one()
-            item = Item(
-                phase_id=default_phase.id,
-                issue_id=issue.id,
-                member_id=form['memberId'],
-            )
-
-        if 'memberId' in form:
-            item.member_id = form['memberId']
-
-        else:
-            resource = DBSession.query(Resource) \
-                .join(Skill, Resource.skill_id == Skill.id) \
-                .filter(Skill.title == 'Project Manager') \
-                .one()
-            item.member_id = resource.id
 
         draft_issue.issue_id = issue.id
         return draft_issue
