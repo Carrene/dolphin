@@ -12,6 +12,10 @@ from ..models import Project, Member, Subscription, Workflow, Group, Release
 from ..validators import project_validator, update_project_validator
 
 
+# FIXME: create room before creating project and remove PENDING
+PENDING = -1
+
+
 class ProjectController(ModelRestController):
     __model__ = Project
 
@@ -51,7 +55,8 @@ class ProjectController(ModelRestController):
 
     @authorize
     @json(form_whitelist=(
-        ['title', 'description', 'status', 'releaseId', 'workflowId', 'groupId'],
+        ['title', 'description', 'status', 'releaseId', 'workflowId', 'groupId',
+         'memberId'],
         '707 Invalid field, only following fields are accepted: ' \
         'title, description, status, releaseId, workflowId and groupId' \
     ))
@@ -59,10 +64,9 @@ class ProjectController(ModelRestController):
     @Project.expose
     @commit
     def create(self):
-        PENDING = -1
         form = context.form
         token = context.environ['HTTP_AUTHORIZATION']
-        member = Member.current()
+        member = DBSession.query(Member).get(form['memberId'])
 
         project = Project()
         project.update_from_request()
