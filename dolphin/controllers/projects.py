@@ -12,6 +12,7 @@ from ..models import Project, Member, Subscription, Workflow, Group, Release
 from ..validators import project_validator, update_project_validator
 
 
+# FIXME: create room before creating project and remove PENDING
 PENDING = -1
 
 
