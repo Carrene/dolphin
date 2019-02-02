@@ -3,12 +3,34 @@ from nanohttp.contexts import Context
 from restfulpy.orm import DBSession
 from sqlalchemy_media import StoreManager
 
-from .models import Resource, Phase, Member, Organization, OrganizationMember
+from .models import Resource, Phase, Member, Organization, OrganizationMember, \
+    Skill, Workflow
 
 
 def insert(): # pragma: no cover
     # These mockup datas are shared between panda and dolphin.
     # The GOD id is 1.
+
+    skill = DBSession.query(Skill) \
+        .filter(Skill.title == 'Project Manager') \
+        .one()
+
+    workflow = DBSession.query(Workflow) \
+        .filter(Workflow.title == 'Default') \
+        .one()
+
+    phase1 = Phase(
+        title='First Phase',
+        order=1,
+        workflow_id=workflow.id,
+        skill_id=skill.id,
+    )
+    phase2 = Phase(
+        title='Second Phase',
+        order=2,
+        workflow_id=workflow.id,
+        skill_id=skill.id,
+    )
 
     with Context(dict()), StoreManager(DBSession):
         god = DBSession.query(Member).filter(Member.title == 'GOD').one()
@@ -30,6 +52,7 @@ def insert(): # pragma: no cover
             email='user1@example.com',
             reference_id=2,
             access_token='access token 2',
+            skill_id=skill.id,
         )
         DBSession.add(resource1)
         DBSession.flush()
@@ -47,6 +70,7 @@ def insert(): # pragma: no cover
             email='user2@example.com',
             reference_id=3,
             access_token='access token 3',
+            skill_id=skill.id,
         )
         DBSession.add(resource2)
         DBSession.flush()
@@ -64,6 +88,7 @@ def insert(): # pragma: no cover
             email='user3@example.com',
             reference_id=4,
             access_token='access token 4',
+            skill_id=skill.id,
         )
         DBSession.add(resource3)
         DBSession.flush()
