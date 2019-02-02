@@ -70,10 +70,11 @@ class Authenticator(StatefulAuthenticator):
             return context.identity.payload
 
         if 'HTTP_AUTHORIZATION' in context.environ:
+            token = context.environ['HTTP_AUTHORIZATION']
+            token = token.split(' ')[1] if token.startswith('Bearer') else token
+
             jsonWebSerializer = JSONWebSignatureSerializer('secret')
-            payload = jsonWebSerializer.loads_unsafe(
-                context.environ['HTTP_AUTHORIZATION']
-            )
+            payload = jsonWebSerializer.loads_unsafe(token)
             return payload[1]
 
         return {}
