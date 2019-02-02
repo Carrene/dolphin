@@ -48,7 +48,7 @@ class TestProject(LocalApplicationTestCase):
             'Createing a project',
             '/apiv1/projects',
             'CREATE',
-            form=dict(
+            json=dict(
                 workflowId=self.workflow.id,
                 releaseId=1,
                 title='My awesome project',
@@ -65,76 +65,82 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['dueDate'] == None
 
             when(
+                'Member ID is null',
+                json=given | dict(title='New Project', memberId=None)
+            )
+            assert status == '774 Member ID Is Null'
+
+            when(
                 'Member is not found',
-                form=given | dict(title='New Project', memberId=0)
+                json=given | dict(title='New Project', memberId=0)
             )
             assert status == 609
             assert status.text.startswith('Resource not found with id')
 
             when(
                 'Member ID is not in form',
-                form=given - 'memberId' | dict(title='New Project')
+                json=given - 'memberId' | dict(title='New Project')
             )
             assert status == '739 Member Id Not In Form'
 
             when(
                 'Workflow id is not in form',
-                form=given - 'workflowId' | dict(title='New Project')
+                json=given - 'workflowId' | dict(title='New Project')
             )
             assert status == 200
 
             when(
                 'Workflow id is in form but not found(alphabetical)',
-                form=given | dict(title='New title', workflowId='Alphabetical')
+                json=given | dict(title='New title', workflowId='Alphabetical')
             )
             assert status == '743 Invalid Workflow Id Type'
 
             when(
                 'Workflow id is in form but not found(numeric)',
-                form=given | dict(title='New title', workflowId=0)
+                json=given | dict(title='New title', workflowId=0)
             )
             assert status == '616 Workflow not found with id: 0'
 
             when(
                 'Title format is wrong',
-                form=given | dict(title=' Invalid Format ')
+                json=given | dict(title=' Invalid Format ')
             )
             assert status == '747 Invalid Title Format'
 
             when(
                 'Title is repetetive',
-                form=given | dict(title='My first project')
+                json=given | dict(title='My first project')
             )
             assert status == '600 Another project with title: My first '\
                 'project is already exists.'
 
             when(
                 'Release ID type is wrong',
-                form=given | dict(releaseId='Alphabetical', title='New title')
+                json=given | dict(releaseId='Alphabetical', title='New title')
             )
             assert status == '750 Invalid Release Id Type'
 
             when(
                 'Release not found with integer type',
-                form=given | dict(releaseId=0, title='New title')
+                json=given | dict(releaseId=0, title='New title')
             )
             assert status == '607 Release not found with id: 0'
 
             when(
                 'Title is not in form',
-                form=Remove('title')
+                json=Remove('title')
             )
             assert status == '710 Title Not In Form'
 
             when(
                 'Title length is more than limit',
-                form=given | dict(title=((50 + 1) * 'a'))
+                json=given | dict(title=((50 + 1) * 'a'))
             )
             assert status == '704 At Most 50 Characters Are Valid For Title'
 
             when(
                 'Description length is less than limit',
-                form=given | dict(
+                json=given | dict(
                     description=((512 + 1) * 'a'),
                     title='Another title'
                 )
@@ -144,7 +150,7 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Status value is invalid',
-                form=given | dict(
+                json=given | dict(
                     status='progressing',
                     title='Another title'
                 )
@@ -158,35 +164,35 @@ class TestProject(LocalApplicationTestCase):
             with chat_server_status('404 Not Found'):
                 when(
                     'Chat server is not found',
-                    form=given | dict(title='Another title')
+                    json=given | dict(title='Another title')
                 )
                 assert status == '617 Chat Server Not Found'
 
             with chat_server_status('503 Service Not Available'):
                 when(
                     'Chat server is not available',
-                    form=given | dict(title='Another title')
+                    json=given | dict(title='Another title')
                 )
                 assert status == '800 Chat Server Not Available'
 
             with chat_server_status('500 Internal Service Error'):
                 when(
                     'Chat server faces with internal error',
-                    form=given | dict(title='Another title')
+                    json=given | dict(title='Another title')
                 )
                 assert status == '801 Chat Server Internal Error'
 
             with chat_server_status('615 Room Already Exists'):
                 when(
                     'Chat server faces with internal error',
-                    form=given | dict(title='Another title')
+                    json=given | dict(title='Another title')
                 )
                 assert status == 200
 
             with chat_server_status('604 Already Added To Target'):
                 when(
                     'Chat server faces with internal error',
-                    form=given | dict(title='Awesome project')
+                    json=given | dict(title='Awesome project')
                 )
                 assert status == 200
 
