@@ -329,54 +329,7 @@ update_project_validator = validate(
 )
 
 
-issue_validator = validate(
-    priority=dict(
-        required='768 Priority Not In Form',
-        callback=issue_priority_value_validator
-    ),
-    projectId=dict(
-        required='713 Project Id Not In Form',
-        type_=(int, '714 Invalid Project Id Type'),
-        callback=project_accessible_validator,
-    ),
-    title=dict(
-        required='710 Title Not In Form',
-        max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
-        pattern=(TITLE_PATTERN, '747 Invalid Title Format'),
-        callback=issue_not_exists_validator
-    ),
-    description=dict(
-        max_length=(512, '703 At Most 512 Characters Are Valid For Description')
-    ),
-    dueDate=dict(
-        pattern=(DATETIME_PATTERN, '701 Invalid Due Date Format'),
-        required='711 Due Date Not In Form'
-    ),
-    kind=dict(
-        required='718 Kind Not In Form',
-        callback=kind_value_validator
-    ),
-    status=dict(
-        callback=issue_status_value_validator
-    ),
-    days=dict(
-        type_=(int, '721 Invalid Days Type'),
-        required='720 Days Not In Form'
-    ),
-    phaseId=dict(
-        callback=phase_exists_validator
-    ),
-    memberId=dict(
-        callback=member_exists_validator
-    )
-)
-
-
 draft_issue_finalize_validator = validate(
-    memberId=dict(
-        required='739 Member Id Not In Form',
-        callback=member_exists_validator
-    ),
     priority=dict(
         required='768 Priority Not In Form',
         callback=issue_priority_value_validator
@@ -409,9 +362,6 @@ draft_issue_finalize_validator = validate(
     days=dict(
         type_=(int, '721 Invalid Days Type'),
         required='720 Days Not In Form'
-    ),
-    phaseId=dict(
-        callback=phase_exists_validator
     ),
 )
 

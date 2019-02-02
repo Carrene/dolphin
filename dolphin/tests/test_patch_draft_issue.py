@@ -111,7 +111,6 @@ class TestIssue(LocalApplicationTestCase):
                     'days': 3,
                     'projectId': self.project.id,
                     'priority': 'high',
-                    'memberId': self.member.id
                }
               )
             ]

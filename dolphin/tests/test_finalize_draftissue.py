@@ -125,7 +125,6 @@ class TestIssue(LocalApplicationTestCase):
                 days=3,
                 projectId=self.project.id,
                 priority='high',
-                memberId=self.member.id,
             )
         ):
             assert status == 200
@@ -133,40 +132,12 @@ class TestIssue(LocalApplicationTestCase):
             assert response.json['issueId'] is not None
             assert len(response.json['tags']) == 2
 
-            when('Member ID is not in form', form=Remove('memberId'))
-            assert status == '739 Member Id Not In Form'
-
             when('Priority value not in form', form=Remove('priority'))
             assert status == '768 Priority Not In Form'
 
             when('Invalid the priority value', form=Update(priority='lorem'))
             assert status == '767 Invalid priority, only one of "low, '\
                 'normal, high" will be accepted'
-
-            when(
-                'Phase id is in form but not found(alphabetical)',
-                form=given | dict(title='New title', phaseId='Alphabetical')
-            )
-            assert status == '613 Phase not found with id: Alphabetical'
-
-            when(
-                'Phase id is in form but not found(numeric)',
-                form=given | dict(title='New title', phaseId=0)
-            )
-            assert status == '613 Phase not found with id: 0'
-            assert status.text.startswith('Phase not found with id')
-
-            when(
-                'Member id is in form but not found(alphabetical)',
-                form=given | dict(title='New title', memberId='Alphabetical')
-            )
-            assert status == '609 Resource not found with id: Alphabetical'
-
-            when(
-                'Member id is in form but not found(numeric)',
-                form=given | dict(title='New title', memberId=0)
-            )
-            assert status == '609 Resource not found with id: 0'
 
             when(
                 'Project id not in form',

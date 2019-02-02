@@ -12,8 +12,8 @@ from ..backends import ChatClient
 from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound, \
     ChatRoomNotFound, HTTPNotSubscribedIssue
 from ..models import Issue, Subscription, Phase, Item, Member, Project
-from ..validators import issue_validator, update_issue_validator, \
-    assign_issue_validator, issue_move_validator, unassign_issue_validator
+from ..validators import update_issue_validator, assign_issue_validator, \
+    issue_move_validator, unassign_issue_validator
 from .phases import PhaseController
 from .tag import TagController
 from .activity import ActivityController
@@ -72,87 +72,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 create_room_error = 1
 
         return room
-
-    @authorize
-    @json(form_whitelist=(
-        ['title', 'description', 'kind', 'days', 'status', 'projectId',
-         'dueDate', 'phaseId', 'memberId', 'priority'],
-        '707 Invalid field, only following fields are accepted: ' \
-        'title, description, kind, days, status, projectId, dueDate, ' \
-        'phaseId, memberId and priority'
-    ))
-    @issue_validator
-    @Issue.expose
-    @commit
-    def define(self):
-        PENDING = -1
-        UNKNOWN_ASSIGNEE = -1
-        form = context.form
-        token = context.environ['HTTP_AUTHORIZATION']
-
-        issue = Issue()
-        issue.update_from_request()
-        DBSession.add(issue)
-        issue.room_id = PENDING
-        DBSession.flush()
-
-        member = Member.current()
-        room = self._ensure_room(form['title'], token, member.access_token)
-
-        chat_client = ChatClient()
-        issue.room_id = room['id']
-        try:
-            chat_client.add_member(
-                issue.room_id,
-                member.reference_id,
-                token,
-                member.access_token
-            )
-        except RoomMemberAlreadyExist:
-            # Exception is passed because it means `add_member()` is already
-            # called and `member` successfully added to room. So there is
-            # no need to call `add_member()` API again and re-add the member to
-            # room.
-            pass
-
-        # The exception type is not specified because after consulting with
-        # Mr.Mardani, the result got: there must be no specification on
-        # exception type because nobody knows what exception may be raised
-        try:
-            issue.room_id = room['id']
-            DBSession.flush()
-        except:
-            chat_client.delete_room(
-                issue.room_id,
-                token,
-                member.access_token
-            )
-            raise
-
-        if 'phaseId' in form:
-            item = Item(
-                phase_id=form['phaseId'],
-                issue_id=issue.id,
-                member_id=UNKNOWN_ASSIGNEE,
-            )
-        else:
-            default_phase = DBSession.query(Phase) \
-                .filter(Phase.title == 'Backlog') \
-                .one()
-            item = Item(
-                phase_id=default_phase.id,
-                issue_id=issue.id,
-                member_id=UNKNOWN_ASSIGNEE,
-            )
-
-        if 'memberId' in form:
-            item.member_id=form['memberId']
-
-        else:
-            item.member_id=context.identity.id
-
-        DBSession.add(item)
-        return issue
 
     @authorize
     @json(
