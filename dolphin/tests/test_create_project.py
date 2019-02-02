@@ -11,7 +11,7 @@ class TestProject(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        member1 = Member(
+        cls.member = Member(
             title='First Member',
             email='member1@example.com',
             access_token='access token 1',
@@ -32,7 +32,7 @@ class TestProject(LocalApplicationTestCase):
             workflow=cls.workflow,
             group=cls.group,
             release=release1,
-            member=member1,
+            member=cls.member,
             title='My first project',
             description='A decription for my project',
             room_id=1001
@@ -40,7 +40,6 @@ class TestProject(LocalApplicationTestCase):
         session.add(project1)
         session.commit()
 
-        cls.member = member1
 
     def test_create(self):
         self.login('member1@example.com')
@@ -54,7 +53,8 @@ class TestProject(LocalApplicationTestCase):
                 releaseId=1,
                 title='My awesome project',
                 description='A decription for my project',
-                status='active'
+                status='active',
+                memberId=self.member.id,
             )
         ):
             assert status == 200
@@ -63,6 +63,19 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['status'] == 'active'
             assert response.json['boarding'] == None
             assert response.json['dueDate'] == None
+
+            when(
+                'Member is not found',
+                form=given | dict(title='New Project', memberId=0)
+            )
+            assert status == 609
+            assert status.text.startswith('Resource not found with id')
+
+            when(
+                'Member ID is not in form',
+                form=given - 'memberId' | dict(title='New Project')
+            )
+            assert status == '739 Member Id Not In Form'
 
             when(
                 'Workflow id is not in form',
