@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from nanohttp import context
 from restfulpy.orm import DeclarativeBase, TimestampMixin, ModifiedMixin, \
     FilteringMixin, OrderingMixin, Field, relationship, MetadataField
 from sqlalchemy import Integer, ForeignKey, DateTime, Unicode, func, \
@@ -28,7 +29,7 @@ class Activity(ModifiedMixin, TimestampMixin, FilteringMixin, OrderingMixin,
         CheckConstraint('start_time <= now() at time zone \'utc\''),
         nullable=True,
         required=False,
-            # '642 startTime Is Greater Than Current Time'
+        not_none=False,
         default=None,
         label='Start Time',
         watermark='lorem ipson',
@@ -42,7 +43,7 @@ class Activity(ModifiedMixin, TimestampMixin, FilteringMixin, OrderingMixin,
         CheckConstraint('end_time <= now() at time zone \'utc\''),
         nullable=True,
         required=False,
-            # '643 endTime Must Be Smaller Than Current Time'
+        not_none=False,
         default=None,
         label='End Time',
         watermark='lorem ipson',
@@ -97,3 +98,20 @@ class Activity(ModifiedMixin, TimestampMixin, FilteringMixin, OrderingMixin,
             watermark='lorem ipsum',
             example='3600'
         )
+
+    @classmethod
+    def extract_data_from_request(cls):
+        for c in cls.iter_json_columns(
+                include_protected_columns=False,
+                include_readonly_columns=False
+        ):
+            info = cls.get_column_info(c)
+            param_name = info.get('json')
+
+            if param_name in context.form:
+
+                if hasattr(c, 'property') and hasattr(c.property, 'mapper'):
+                    raise HTTPBadRequest('Invalid attribute')
+
+                value = context.form[param_name]
+                yield c, value
