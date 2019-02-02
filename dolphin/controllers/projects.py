@@ -5,6 +5,7 @@ from restfulpy.orm import DBSession, commit
 from restfulpy.utils import to_camel_case
 
 from .files import FileController
+from .issues import IssueController
 from ..backends import ChatClient
 from ..exceptions import ChatRoomNotFound, RoomMemberAlreadyExist, \
     RoomMemberNotFound
@@ -23,6 +24,10 @@ class ProjectController(ModelRestController):
         if len(remaining_paths) > 1 and remaining_paths[1] == 'files':
             project = self._get_project(remaining_paths[0])
             return FileController(project=project)(*remaining_paths[2:])
+
+        if len(remaining_paths) > 1 and remaining_paths[1] == 'issues':
+            project = self._get_project(remaining_paths[0])
+            return IssueController(project)(*remaining_paths[2:])
 
         return super().__call__(*remaining_paths)
 
