@@ -35,7 +35,7 @@ class Subscribable(TimestampMixin, DeclarativeBase):
         String,
         max_length=128,
         min_length=1,
-        label='Title',
+        label='Name',
         watermark='Enter the title',
         pattern=r'^[^\s].+[^\s]$',
         pattern_description='Spaces at the first and end of title is not valid',

@@ -28,9 +28,6 @@ UNKNOWN_ASSIGNEE = -1
 class IssueController(ModelRestController, JsonPatchControllerMixin):
     __model__ = Issue
 
-    def __init__(self, project=None):
-        self.project = project
-
     def __call__(self, *remaining_paths):
         if len(remaining_paths) > 1:
 
@@ -153,13 +150,14 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
     @authorize
     @json(prevent_form='709 Form Not Allowed')
+    @Issue.expose
     @commit
     def subscribe(self, id=None):
         token = context.environ['HTTP_AUTHORIZATION']
         member = Member.current()
         chat_client = ChatClient()
 
-        if context.query.get('id'):
+        if context.query:
             query = DBSession.query(Issue)
             requested_issues = Issue.filter_by_request(query).all()
 
@@ -227,59 +225,23 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 member.access_token
             )
 
-        if self.project:
-            subscribed_issues_id = DBSession.query(Issue) \
-                .join(Subscription, Subscription.subscribable_id == Issue.id) \
-                .all()
+        except RoomMemberAlreadyExist:
+            # Exception is passed because it means `add_member()` is already
+            # called and `member` successfully added to room. So there is
+            # no need to call `add_member()` API again and re-add the member to
+            # room.
+            pass
 
-
-        return self.project
-#        id = int_or_notfound(id)
-#
-#        issue = DBSession.query(Issue).filter(Issue.id == id).one_or_none()
-#        if not issue:
-#            raise HTTPNotFound()
-#
-#        member = Member.current()
-#        if DBSession.query(Subscription).filter(
-#                Subscription.subscribable_id == id,
-#                Subscription.member_id == member.id
-#        ).one_or_none():
-#            raise HTTPStatus('611 Already Subscribed')
-#
-#        subscription = Subscription(
-#            subscribable_id=issue.id,
-#            member_id=member.id,
-#            seen_at=datetime.utcnow()
-#        )
-#        DBSession.add(subscription)
-#
-#        chat_client = ChatClient()
-#        try:
-#            chat_client.add_member(
-#                issue.room_id,
-#                context.identity.reference_id,
-#                token,
-#                member.access_token
-#            )
-#
-#        except RoomMemberAlreadyExist:
-#            # Exception is passed because it means `add_member()` is already
-#            # called and `member` successfully added to room. So there is
-#            # no need to call `add_member()` API again and re-add the member to
-#            # room.
-#            pass
-#
-#        try:
-#            DBSession.flush()
-#        except:
-#            chat_client.kick_member(
-#                issue.room_id,
-#                context.identity.reference_id,
-#                token,
-#                member.access_token
-#            )
-#            raise
+        try:
+            DBSession.flush()
+        except:
+            chat_client.kick_member(
+                issue.room_id,
+                context.identity.reference_id,
+                token,
+                member.access_token
+            )
+            raise
 
         return issue
 

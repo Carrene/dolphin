@@ -67,67 +67,66 @@ class TestIssue(LocalApplicationTestCase):
     def test_subscribe(self):
         self.login('member1@example.com')
 
+        with oauth_mockup_server(), chat_mockup_server(), self.given(
+            'Subscribe an issue',
+            f'/apiv1/issues/id:{self.issue1.id}',
+            'SUBSCRIBE',
+        ):
+            assert status == 200
+            assert response.json['id'] == self.issue1.id
 
-#        with oauth_mockup_server(), chat_mockup_server(), self.given(
-#            'Subscribe an issue',
-#            f'/apiv1/issues/id:{self.issue1.id}',
-#            'SUBSCRIBE',
-#        ):
-#            assert status == 200
-#            assert response.json['id'] == self.issue1.id
-#
-#            when(
-#                'Intended issue with string type not found',
-#                url_parameters=dict(id='Alphabetical'),
-#            )
-#            assert status == 404
-#
-#            when(
-#                'Intended issue with integer type not found',
-#                url_parameters=dict(id=100),
-#            )
-#            assert status == 404
-#
-#            when(
-#                'There is parameter in form',
-#                form=dict(parameter='Any parameter')
-#            )
-#            assert status == '709 Form Not Allowed'
-#
-#            when(
-#                'Issue is already subscribed',
-#                url_parameters=dict(id=3),
-#            )
-#            assert status == '611 Already Subscribed'
-#
-#            when('Request is not authorized',authorization=None)
-#            assert status == 401
-#
-#            with chat_server_status('404 Not Found'):
-#                when(
-#                    'Chat server is not found',
-#                    url_parameters=dict(id=4)
-#                )
-#                assert status == '617 Chat Server Not Found'
-#
-#            with chat_server_status('503 Service Not Available'):
-#                when(
-#                    'Chat server is not available',
-#                    url_parameters=dict(id=4)
-#                )
-#                assert status == '800 Chat Server Not Available'
-#
-#            with chat_server_status('500 Internal Service Error'):
-#                when(
-#                    'Chat server faces with internal error',
-#                    url_parameters=dict(id=4)
-#                )
-#                assert status == '801 Chat Server Internal Error'
-#
-#            with chat_server_status('604 Already Added To Target'):
-#                when(
-#                    'Member is already added to room',
-#                    url_parameters=dict(id=4)
-#                )
-#                assert status == 200
-#
+            when(
+                'Intended issue with string type not found',
+                url_parameters=dict(id='Alphabetical'),
+            )
+            assert status == 404
+
+            when(
+                'Intended issue with integer type not found',
+                url_parameters=dict(id=100),
+            )
+            assert status == 404
+
+            when(
+                'There is parameter in form',
+                form=dict(parameter='Any parameter')
+            )
+            assert status == '709 Form Not Allowed'
+
+            when(
+                'Issue is already subscribed',
+                url_parameters=dict(id=3),
+            )
+            assert status == '611 Already Subscribed'
+
+            when('Request is not authorized',authorization=None)
+            assert status == 401
+
+            with chat_server_status('404 Not Found'):
+                when(
+                    'Chat server is not found',
+                    url_parameters=dict(id=4)
+                )
+                assert status == '617 Chat Server Not Found'
+
+            with chat_server_status('503 Service Not Available'):
+                when(
+                    'Chat server is not available',
+                    url_parameters=dict(id=4)
+                )
+                assert status == '800 Chat Server Not Available'
+
+            with chat_server_status('500 Internal Service Error'):
+                when(
+                    'Chat server faces with internal error',
+                    url_parameters=dict(id=4)
+                )
+                assert status == '801 Chat Server Internal Error'
+
+            with chat_server_status('604 Already Added To Target'):
+                when(
+                    'Member is already added to room',
+                    url_parameters=dict(id=4)
+                )
+                assert status == 200
+
