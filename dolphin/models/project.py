@@ -63,8 +63,8 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         watermark='Choose a member',
         label='Member',
         nullable=False,
-        not_none=False,
-        readonly=True,
+        not_none=True,
+        readonly=False,
         required=True
     )
     group_id = Field(
