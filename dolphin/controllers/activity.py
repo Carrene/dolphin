@@ -96,3 +96,4 @@ class ActivityController(ModelRestController):
             raise HTTPStatus('642 startTime Must Be Smaller Than Current Time')
         if end_time and end_time > datetime.utcnow():
             raise HTTPStatus('643 endTime Must Be Smaller Than Current Time')
+
