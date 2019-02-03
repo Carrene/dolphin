@@ -70,8 +70,15 @@ class FileController(ModelRestController):
     @Attachment.expose
     @commit
     def list(self):
-        query = DBSession.query(Attachment) \
-            .filter(Attachment.project_id == self.project.id)
+        if not (self.project or self.issue):
+            raise HTTPNotFound()
+
+        if self.project:
+            query = DBSession.query(Attachment) \
+                .filter(Attachment.project_id == self.project.id)
+        else:
+            query = DBSession.query(Attachment) \
+                .filter(Attachment.issue_id == self.issue.id)
 
         return Attachment.exclude_deleted(query)
 

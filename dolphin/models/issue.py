@@ -142,6 +142,8 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         example='lorem ipsum',
     )
 
+    attachments = relationship('Attachment', lazy='selectin')
+
     tags = relationship(
         'Tag',
         secondary='issue_tag',
@@ -183,7 +185,8 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
                 callable_=lambda: context.identity.id
             )
                ) \
-        .correlate_except(Subscription)
+        .correlate_except(Subscription),
+        deferred=True
     )
 
     @hybrid_property

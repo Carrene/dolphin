@@ -69,12 +69,12 @@ class Attachment(SoftDeleteMixin, FilteringMixin, OrderingMixin,
         required=True,
         example='Lorem Ipsum'
     )
-    release_id = Field(
+    issue_id = Field(
         Integer,
-        ForeignKey('release.id'),
+        ForeignKey('issue.id'),
         python_type=int,
-        watermark='Choose a release',
-        label='Project',
+        watermark='Choose a issue',
+        label='Issue',
         nullable=True,
         not_none=False,
         required=True,
