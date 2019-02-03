@@ -21,7 +21,7 @@ class TestIssue(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session(expire_on_commit=True)
         with StoreManager(session):
-            attachment1 = Attachment(title='image', file=image_path)
+            cls.attachment1 = Attachment(title='image', file=image_path)
             attachment2 = Attachment(title='image2', file=image_path)
             attachment3 = Attachment(title='image3', file=image_path)
             attachment4 = Attachment(title='image4', file=image_path)
@@ -32,7 +32,7 @@ class TestIssue(LocalApplicationTestCase):
                 phone=123456789,
                 reference_id=2,
                 attachments=[
-                    attachment1,
+                    cls.attachment1,
                     attachment2,
                     attachment3,
                     attachment4
@@ -68,7 +68,7 @@ class TestIssue(LocalApplicationTestCase):
                 kind='feature',
                 days=1,
                 room_id=2,
-                attachments=[attachment1, attachment2, attachment3]
+                attachments=[cls.attachment1, attachment2, attachment3]
             )
             session.add(cls.issue1)
 
@@ -90,7 +90,8 @@ class TestIssue(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             'Delete a project attachment',
-            f'/apiv1/issues/issue_id:{self.issue1.id}/files/id:1',
+            f'/apiv1/issues/issue_id:{self.issue1.id}/'
+            f'files/id:{self.attachment1.id}',
             'DELETE',
         ):
             assert status == 200
