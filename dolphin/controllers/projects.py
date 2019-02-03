@@ -22,7 +22,7 @@ class ProjectController(ModelRestController):
     def __call__(self, *remaining_paths):
         if len(remaining_paths) > 1 and remaining_paths[1] == 'files':
             project = self._get_project(remaining_paths[0])
-            return FileController(project)(*remaining_paths[2:])
+            return FileController(project=project)(*remaining_paths[2:])
 
         return super().__call__(*remaining_paths)
 

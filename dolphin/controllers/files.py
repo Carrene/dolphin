@@ -40,7 +40,7 @@ class FileController(ModelRestController):
         if self.project:
             attachment.project_id = self.project.id
 
-        elif self.issue:
+        else:
             attachment.issue_id = self.issue.id
 
         DBSession.add(attachment)
