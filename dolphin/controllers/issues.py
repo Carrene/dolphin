@@ -154,9 +154,10 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     def subscribe(self, id=None):
         token = context.environ['HTTP_AUTHORIZATION']
         member = Member.current()
+        chat_client = ChatClient()
 
         if self.project:
-            subscribed_issues = DBSession.query(Issue.id) \
+            subscribed_issues = DBSession.query(Issue) \
                 .join(Subscription, Subscription.subscribable_id == Issue.id) \
                 .filter(Issue.project_id == self.project.id) \
                 .all()
@@ -165,12 +166,25 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
             project_issues_id = {i.id for i in self.project.issues}
 
-            for each_issue_id in (project_issues_id - subscribed_issues_id):
+            if subscribed_issues == project_issues_id:
+                raise HTTPStatus('644 Already Subscribed Issues Of Project')
+
+            not_subscribed_issues = DBSession.query(Issue) \
+                .filter(
+                    Issue.id.in_(project_issues_id - subscribed_issues_id)
+                ) \
+                .all()
+
+            not_added_to_rooms = []
+            for each_issue in not_subscribed_issues:
                 subscription = Subscription(
-                    subscribable_id=each_issue_id,
+                    subscribable_id=each_issue.id,
                     member_id=member.id
                 )
+                DBSession.add(subscription)
+                not_added_to_rooms.append(each_issue.room_id)
 
+            chat_client.add_member_to_rooms(not_added_to_rooms, member)
             return dict()
 
         id = int_or_notfound(id)
@@ -192,7 +206,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         )
         DBSession.add(subscription)
 
-        chat_client = ChatClient()
         try:
             chat_client.add_member(
                 issue.room_id,

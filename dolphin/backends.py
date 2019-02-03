@@ -1,7 +1,7 @@
 import json
 
 import requests
-from nanohttp import settings, HTTPForbidden, HTTPUnauthorized
+from nanohttp import settings, HTTPForbidden, HTTPUnauthorized, context
 from restfulpy.logging_ import get_logger
 
 from .exceptions import *
@@ -324,5 +324,48 @@ class ChatClient:
 
         except requests.RequestException as e: # pragma: no cover
             logger.exception(e)
+            raise ChatInternallError()
+
+    def add_member_to_rooms(self, rooms_id, member):
+        token = context.environ['HTTP_AUTHORIZATION']
+
+        try:
+            requests_list = []
+            for room_id in rooms_id:
+                requests_list.append(dict(
+                    op='ADD',
+                    path=f'{room_id}',
+                    value={'userId': member.reference_id}
+                ))
+
+            response = requests.patch(
+                url=f'{settings.chat.url}/apiv1/rooms',
+                headers={
+                    'authorization': token,
+                    'X-Oauth2-Access-Token': member.access_token
+                },
+                data=requests_list
+            )
+
+            if response.status_code == 404:
+                raise ChatServerNotFound()
+
+            # 502: Bad Gateway
+            # 503: Service Unavailbale
+            if response.status_code in (502, 503):
+                raise ChatServerNotAvailable()
+
+            # 604: Already Added To Target
+            # Carrene/jaguar#3
+            if response.status_code == 604:
+                raise RoomMemberAlreadyExist()
+
+            if response.status_code != 200:
+                logger.exception(response.content.decode())
+                raise ChatInternallError()
+
+        except requests.RequestException as e: # pragma: no cover
+            logger.exception(e)
+            # FIXME: ChatInternalError is wrong
             raise ChatInternallError()
 
