@@ -49,6 +49,7 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
         required=True
     )
 
+    attachments = relationship('Attachment', lazy='selectin')
     projects = relationship(
         'Project',
         primaryjoin=id == Project.release_id,

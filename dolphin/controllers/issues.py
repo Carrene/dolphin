@@ -17,6 +17,7 @@ from ..validators import update_issue_validator, assign_issue_validator, \
 from .phases import PhaseController
 from .tag import TagController
 from .activity import ActivityController
+from .files import FileController
 
 
 PENDING = -1
@@ -39,6 +40,9 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
             elif remaining_paths[1] == 'tags':
                 return TagController(issue=issue)(*remaining_paths[2:])
+
+            elif remaining_paths[1] == 'files':
+                return FileController(issue=issue)(*remaining_paths[2:])
 
             elif remaining_paths[1] == 'activities':
                 return ActivityController(issue=issue)(*remaining_paths[2:])

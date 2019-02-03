@@ -11,28 +11,37 @@ from ..validators import attachment_validator
 class FileController(ModelRestController):
     __model__ = Attachment
 
-    def __init__(self, project=None):
+    def __init__(self, project=None, issue=None):
         self.project = project
+        self.issue = issue
 
     @authorize
     @store_manager(DBSession)
     @json
     @attachment_validator
-    @Attachment.expose
     @commit
     def attach(self):
         form=context.form
+
+        if not (self.project or self.issue):
+            raise HTTPNotFound()
+
         current_member = DBSession.query(Member) \
             .filter(Member.reference_id == context.identity.reference_id) \
             .one()
         attachment = Attachment(
             file=form['attachment'],
-            project_id=self.project.id,
             caption=form['caption'] if 'caption' in form else None,
             sender_id=current_member.id
         )
         attachment.title = form['title'] \
             if 'title' in form else attachment.file.original_filename
+
+        if self.project:
+            attachment.project_id = self.project.id
+
+        elif self.issue:
+            attachment.issue_id = self.issue.id
 
         DBSession.add(attachment)
         return attachment

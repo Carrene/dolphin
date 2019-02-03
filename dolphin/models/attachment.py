@@ -64,8 +64,20 @@ class Attachment(SoftDeleteMixin, FilteringMixin, OrderingMixin,
         python_type=int,
         watermark='Choose a project',
         label='Project',
-        not_none=True,
-        required=False,
+        nullable=True,
+        not_none=False,
+        required=True,
+        example='Lorem Ipsum'
+    )
+    release_id = Field(
+        Integer,
+        ForeignKey('release.id'),
+        python_type=int,
+        watermark='Choose a release',
+        label='Project',
+        nullable=True,
+        not_none=False,
+        required=True,
         example='Lorem Ipsum'
     )
 
@@ -100,12 +112,11 @@ class Attachment(SoftDeleteMixin, FilteringMixin, OrderingMixin,
         protected=False,
         json='file'
     )
+    sender_id = Field(Integer, ForeignKey('member.id'))
 
     @property
     def is_mine(self):
         return self.sender_id == Member.current().id
-
-    sender_id = Field(Integer, ForeignKey('member.id'))
 
     @property
     def file(self):
