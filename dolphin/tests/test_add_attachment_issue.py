@@ -100,7 +100,6 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert status == '704 At Most 50 Characters Are Valid For Title'
 
-
             with open(maximum_image_path, 'rb') as f:
                 when(
                     'Image size is more than maximum length',
@@ -142,4 +141,7 @@ class TestIssue(LocalApplicationTestCase):
                 multipart=Update(title=(50 + 1) * 'a')
             )
             assert status == '704 At Most 50 Characters Are Valid For Title'
+
+            when('Request is not authorized', authorization=None)
+            assert status == 401
 
