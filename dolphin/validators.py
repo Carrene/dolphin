@@ -1,5 +1,4 @@
 import re
-from datetime import datetime
 
 from nanohttp import validate, HTTPStatus, context
 from restfulpy.orm import DBSession
@@ -10,7 +9,6 @@ from .exceptions import HTTPResourceNotFound, HTTPRepetitiveTitle
 
 
 TITLE_PATTERN = re.compile(r'^(?!\s).*[^\s]$')
-ISO_PATTERN = '%Y-%m-%dT%H:%M:%S.%f'
 DATETIME_PATTERN = re.compile(
     r'^(\d{4})-(0[1-9]|1[012]|[1-9])-(0[1-9]|[12]\d{1}|3[01]|[1-9])' \
     r'(T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z)?)?$'
@@ -22,9 +20,6 @@ USER_EMAIL_PATTERN = re.compile(
     r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'
 )
 WORKFLOW_TITLE_PATTERN = re.compile(r'^[^\s].+[^\s]$')
-
-def iso_to_datetime(iso):
-    return datetime.strptime(iso, ISO_PATTERN)
 
 
 def release_exists_validator(releaseId, project, field):
