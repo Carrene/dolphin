@@ -27,18 +27,6 @@ def upgrade():
         'item',
         ['phase_id', 'issue_id', 'member_id']
     )
-
-    op.create_table('activity',
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('modified_at', sa.DateTime(), nullable=True),
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('item_id', sa.Integer(), nullable=False),
-    sa.Column('start_time', sa.DateTime(), nullable=True),
-    sa.Column('end_time', sa.DateTime(), nullable=True),
-    sa.Column('description', sa.Unicode(length=256), nullable=True),
-    sa.ForeignKeyConstraint(['item_id'], ['item.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
     # ### end Alembic commands ###
 
 
@@ -49,6 +37,5 @@ def downgrade():
         'item',
         type_='unique'
     )
-    op.drop_table('activity')
     op.drop_column('item', 'id')
     # ### end Alembic commands ###

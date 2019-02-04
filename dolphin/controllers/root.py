@@ -21,7 +21,6 @@ from .files import FileController
 from .resource import ResourceController
 from .skill import SkillController
 from .group import GroupController
-from .activity import ActivityController
 
 
 here = abspath(dirname(__file__))
@@ -48,7 +47,6 @@ class Apiv1(Controller):
     files = FileController()
     skills = SkillController()
     groups = GroupController()
-    activities = ActivityController()
 
     @json
     def version(self):

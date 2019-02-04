@@ -11,7 +11,6 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from .subscribable import Subscribable, Subscription
 from .item import Item
-from .member import Member
 from ..mixins import AuditLogMixin
 
 
@@ -173,9 +172,8 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     items = relationship(
         'Item',
         protected=False,
-        order_by=Item.created_at,
+        order_by=Item.issue_id,
     )
-
 
     is_subscribed = column_property(
         select([func.count(Subscription.member_id)]) \
