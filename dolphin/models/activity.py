@@ -62,7 +62,6 @@ class Activity(ModifiedMixin, TimestampMixin, FilteringMixin, OrderingMixin,
         watermark='lorem ipson',
     )
 
-
     item = relationship(
         'Item',
         protected=False,
