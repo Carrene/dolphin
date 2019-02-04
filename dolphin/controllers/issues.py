@@ -2,7 +2,6 @@ from datetime import datetime
 
 from nanohttp import HTTPStatus, json, context, HTTPNotFound, \
     HTTPUnauthorized, int_or_notfound
-
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import DBSession, commit

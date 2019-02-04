@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta
 
-from bddrest import status, response, when, given, Update
+from bddrest import status, response, when, Update
 from auditing.context import Context as AuditLogContext
+
 from dolphin.models import Member, Skill, Phase, Release, \
     Project, Issue, Item, Activity
-
 from dolphin.tests.helpers import create_group, LocalApplicationTestCase, \
     oauth_mockup_server, create_workflow
 

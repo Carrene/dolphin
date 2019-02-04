@@ -151,4 +151,3 @@ class TestActivity(LocalApplicationTestCase):
                 authorization=self._authentication_token
             )
             assert len(response.json) == 0
-

@@ -1,15 +1,13 @@
 from datetime import datetime
 
-from nanohttp import json, context, validate, int_or_notfound
-from nanohttp.exceptions import HTTPForbidden, HTTPStatus, HTTPNotFound
+from nanohttp import context, int_or_notfound, json
+from nanohttp.exceptions import HTTPForbidden, HTTPNotFound, HTTPStatus
 from restfulpy.orm import DBSession, commit
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from sqlalchemy import and_
 
-from ..models import Activity, Member, Phase, Item
-from ..validators import DATETIME_PATTERN, iso_to_datetime
-
+from ..models import Activity, Member, Item
 
 
 class ActivityController(ModelRestController):
@@ -19,7 +17,7 @@ class ActivityController(ModelRestController):
         self.issue = issue
 
     @authorize
-    @Activity.validate(strict=False)
+    @Activity.validate(strict=True)
     @json
     @Activity.expose
     @commit
@@ -56,7 +54,7 @@ class ActivityController(ModelRestController):
         return activity
 
     @authorize
-    @Activity.validate(strict=False)
+    @Activity.validate(strict=True)
     @json(prevent_empty_form='708 No Parameter Exists In The Form')
     @Activity.expose
     @commit
@@ -85,15 +83,18 @@ class ActivityController(ModelRestController):
         member = Member.current()
         return DBSession.query(Activity) \
             .join(Item, Item.id == Activity.item_id) \
-            .filter(Item.issue_id == self.issue.id, Item.member_id == member.id)
-
+            .filter(
+                Item.issue_id == self.issue.id,
+                Item.member_id == member.id
+            )
 
     def check_times(self, start_time, end_time):
         if start_time and end_time:
             if start_time >= end_time:
                 raise HTTPStatus('640 endTime Must be Greater Than startTime')
+
         if start_time and start_time > datetime.utcnow():
             raise HTTPStatus('642 startTime Must Be Smaller Than Current Time')
+
         if end_time and end_time > datetime.utcnow():
             raise HTTPStatus('643 endTime Must Be Smaller Than Current Time')
-

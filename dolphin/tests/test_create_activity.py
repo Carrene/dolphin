@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta
 
-from bddrest import status, response, when, given, Update
+from bddrest import status, response, when, Update
 from auditing.context import Context as AuditLogContext
+
 from dolphin.models import Member, Skill, Phase, Release, \
     Project, Issue, Item
-
 from dolphin.tests.helpers import create_group, LocalApplicationTestCase, \
     oauth_mockup_server, create_workflow
 
@@ -150,7 +150,7 @@ class TestActivity(LocalApplicationTestCase):
             assert response.json['description'] == ''
             assert response.json['startTime'] is None
             assert response.json['endTime'] is None
-            assert response.json['timeSpan'] == None
+            assert response.json['timeSpan'] is None
 
             when(
                 'startTime > endTime',
@@ -213,4 +213,3 @@ class TestActivity(LocalApplicationTestCase):
                 url_parameters=Update(id=0)
             )
             assert status == 404
-

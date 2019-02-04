@@ -1,17 +1,19 @@
 from datetime import datetime
 
-from nanohttp import context
+from nanohttp import context, HTTPBadRequest
 from restfulpy.orm import DeclarativeBase, TimestampMixin, ModifiedMixin, \
     FilteringMixin, OrderingMixin, Field, relationship, MetadataField
 from sqlalchemy import Integer, ForeignKey, DateTime, Unicode, func, \
     CheckConstraint
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from ..validators import DATETIME_PATTERN, iso_to_datetime
-
 
 DESCRIPTION_LENGTH = 256
 ISO_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
+
+
+def iso_to_datetime(iso_string):
+    return datetime.strptime(iso_string, ISO_FORMAT)
 
 
 class Activity(ModifiedMixin, TimestampMixin, FilteringMixin, OrderingMixin,
@@ -51,7 +53,10 @@ class Activity(ModifiedMixin, TimestampMixin, FilteringMixin, OrderingMixin,
     )
     description = Field(
         Unicode(DESCRIPTION_LENGTH),
-        max_length=(DESCRIPTION_LENGTH, '773 Invalid description Format'),
+        max_length=(
+            DESCRIPTION_LENGTH,
+            '773 Invalid description Format'
+        ),
         nullable=True,
         required=False,
         default='',
@@ -107,7 +112,6 @@ class Activity(ModifiedMixin, TimestampMixin, FilteringMixin, OrderingMixin,
             param_name = info.get('json')
 
             if param_name in context.form:
-
                 if hasattr(c, 'property') and hasattr(c.property, 'mapper'):
                     raise HTTPBadRequest('Invalid attribute')
 
