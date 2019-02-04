@@ -172,7 +172,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     items = relationship(
         'Item',
         protected=False,
-        order_by=Item.issue_id,
+        order_by=Item.created_at,
     )
 
     is_subscribed = column_property(
