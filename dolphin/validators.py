@@ -403,7 +403,6 @@ update_item_validator = validate(
 assign_issue_validator = validate(
     memberId=dict(
         not_none='769 Resource Id Is None',
-        required='715 Resource Id Not In Form',
         type_=(int, '716 Invalid Resource Id Type'),
         callback=member_exists_validator
     ),

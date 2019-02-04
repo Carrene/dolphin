@@ -255,17 +255,14 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         form = context.form
         id = int_or_notfound(id)
 
-        issue = DBSession.query(Issue).filter(Issue.id == id).one_or_none()
+        issue = DBSession.query(Issue).get(id)
         if not issue:
             raise HTTPNotFound()
 
-        member = DBSession.query(Member) \
-            .filter(Member.id == form['memberId']) \
-            .one_or_none()
+        member = DBSession.query(Member).get(form['memberId']) \
+            if 'memberId' in form else Member.current()
 
-        phase = DBSession.query(Phase) \
-            .filter(Phase.id == form['phaseId']) \
-            .one_or_none()
+        phase = DBSession.query(Phase).get(form['phaseId'])
 
         if DBSession.query(Item).filter(
             Item.phase_id == phase.id,
@@ -279,7 +276,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             member_id=member.id,
             issue_id=issue.id
         )
-
         DBSession.add(item)
         return issue
 
