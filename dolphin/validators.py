@@ -23,6 +23,7 @@ USER_EMAIL_PATTERN = re.compile(
 )
 WORKFLOW_TITLE_PATTERN = re.compile(r'^[^\s].+[^\s]$')
 
+
 def iso_to_datetime(iso):
     return datetime.strptime(iso, ISO_PATTERN)
 
