@@ -161,9 +161,9 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             query = DBSession.query(Issue)
             requested_issues = Issue.filter_by_request(query).all()
 
-            if len(requested_issues) >= settings.issue_subscription.max_length:
+            if len(requested_issues) >= settings.issue.subscription.max_length:
                 raise HTTPStatus(
-                    f'776 Maximum {settings.issue_subscription.max_length} '
+                    f'776 Maximum {settings.issue.subscription.max_length} '
                     f'Issues To Subscribe At A Time'
                 )
 
@@ -177,12 +177,11 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 ) \
                 .filter(Subscribable.type_ == 'issue') \
                 .all()
-
             subscribed_issues_id = {i.subscribable_id for i in subscribed_issues}
 
-            flush_counter = 0
             not_subscribed_issues_id = requested_issues_id - subscribed_issues_id
 
+            flush_counter = 0
             for each_issue_id in not_subscribed_issues_id:
                 flush_counter += 1
                 subscription = Subscription(
