@@ -399,12 +399,12 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         if relation_issue is None:
             raise HTTPStatus('605 Issue Not Found')
 
-        is_related = DBSession \
-            .query(exists().where(and_(
+        is_related = DBSession.query(exists().where(
+            and_(
                 RelatedIssue.issue_id == issue.id,
-                RelatedIssue.related_issue_id == relation_issue.id))
-            ) \
-            .scalar()
+                RelatedIssue.related_issue_id == relation_issue.id
+            )
+        )).scalar()
         if is_related:
             raise HTTPStatus('645 Already Is Related')
 
