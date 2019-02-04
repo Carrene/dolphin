@@ -25,6 +25,9 @@ class ChatInternallError(HTTPKnownStatus):
     status = '801 Chat Server Internal Error'
 
 
+class OutOfLimitRoomSubscription(HTTPKnownStatus):
+    status = '804 Number Of Chat Room Subscription Is Out Of Limit'
+
 class CASServerNotFound(HTTPKnownStatus):
     status = '619 CAS Server Not Found'
 

@@ -26,6 +26,9 @@ class Dolphin(Application):
         directory: %(root_path)s/migration
         ini: %(root_path)s/alembic.ini
 
+      issue_subscription:
+        max_length: 100
+
       logging:
         loggers:
           backends:

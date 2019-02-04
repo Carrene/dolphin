@@ -326,26 +326,24 @@ class ChatClient:
             logger.exception(e)
             raise ChatInternallError()
 
-    def add_member_to_rooms(self, rooms_id, member):
+    def subscribe_rooms(self, rooms_id, member):
         token = context.environ['HTTP_AUTHORIZATION']
+        string_rooms_id = (str(i) + ', ' for i in rooms_id)
+        sequential_rooms_id = ''.join(string_rooms_id)[:-2]
 
         try:
-            requests_list = []
-            for room_id in rooms_id:
-                requests_list.append(dict(
-                    op='ADD',
-                    path=f'{room_id}',
-                    value={'userId': member.reference_id}
-                ))
-
-            response = requests.patch(
-                url=f'{settings.chat.url}/apiv1/rooms',
+            response = requests.request(
+                'SUBSCRIBE',
+                url=f'{settings.chat.url}/apiv1/rooms' \
+                    f'?id=IN({sequential_rooms_id})',
                 headers={
                     'authorization': token,
                     'X-Oauth2-Access-Token': member.access_token
                 },
-                data=requests_list
             )
+
+            if response.status_code == 716:
+                raise OutOfLimitRoomSubscription()
 
             if response.status_code == 404:
                 raise ChatServerNotFound()

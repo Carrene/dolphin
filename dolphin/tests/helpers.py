@@ -67,6 +67,10 @@ class LocalApplicationTestCase(ApplicableTestCase):
         r'^/apiv1/organizations.*': organization_fields,
         r'^/apiv1/invitations.*': invitation_fields,
     }
+    __configuration__ = '''
+            issue_subscription:
+              max_length: 5
+        '''
 
     def login(self, email, organization_id=None):
         session = self.create_session()
@@ -172,7 +176,7 @@ def chat_mockup_server():
                 ('/apiv1/members', self.ensure),
             ])
 
-        @json(verbs=['create', 'delete', 'add', 'kick', 'list'])
+        @json(verbs=['create', 'delete', 'add', 'kick', 'list', 'subscribe'])
         def create(self):
             if _chat_server_status == '615 Room Already Exists' and \
                     context.method == 'list':
@@ -188,6 +192,9 @@ def chat_mockup_server():
 
             if _chat_server_status != 'idle':
                 raise HTTPStatus(_chat_server_status)
+
+            if context.method == 'subscribe':
+                return [dict(id=1, title='First chat room')]
 
             return dict(id=1, title='First chat room')
 

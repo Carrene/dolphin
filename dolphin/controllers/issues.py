@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from nanohttp import HTTPStatus, json, context, HTTPNotFound, \
-    HTTPUnauthorized, int_or_notfound
+    HTTPUnauthorized, int_or_notfound, settings
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import DBSession, commit
@@ -11,7 +11,7 @@ from ..backends import ChatClient
 from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound, \
     ChatRoomNotFound, HTTPNotSubscribedIssue
 from ..models import Issue, Subscription, Phase, Item, Member, Project, \
-    RelatedIssue
+    RelatedIssue, Subscribable
 from ..validators import update_issue_validator, assign_issue_validator, \
     issue_move_validator, unassign_issue_validator, issue_relate_validator
 from .files import FileController
@@ -150,45 +150,57 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
     @authorize
     @json(prevent_form='709 Form Not Allowed')
+    @Issue.expose
     @commit
     def subscribe(self, id=None):
         token = context.environ['HTTP_AUTHORIZATION']
         member = Member.current()
         chat_client = ChatClient()
 
-        if self.project:
-            subscribed_issues = DBSession.query(Issue) \
-                .join(Subscription, Subscription.subscribable_id == Issue.id) \
-                .filter(Issue.project_id == self.project.id) \
-                .all()
+        if context.query.get('id'):
+            query = DBSession.query(Issue)
+            requested_issues = Issue.filter_by_request(query).all()
 
-            subscribed_issues_id = {i.id for i in subscribed_issues}
+            if len(requested_issues) >= settings.issue_subscription.max_length:
+                raise HTTPStatus(
+                    f'776 Maximum {settings.issue_subscription.max_length} '
+                    f'Issues To Subscribe At A Time'
+                )
 
-            project_issues_id = {i.id for i in self.project.issues}
+            requested_issues_id = {i.id for i in requested_issues}
 
-            if subscribed_issues == project_issues_id:
-                raise HTTPStatus('644 Already Subscribed Issues Of Project')
-
-            not_subscribed_issues = DBSession.query(Issue) \
-                .filter(
-                    Issue.id.in_(project_issues_id - subscribed_issues_id)
+            subscribed_issues = DBSession.query(Subscription) \
+                .filter(Subscription.member_id == member.id) \
+                .join(
+                    Subscribable,
+                    Subscribable.id == Subscription.subscribable_id
                 ) \
+                .filter(Subscribable.type_ == 'issue') \
                 .all()
 
-            not_added_to_rooms = []
-            for each_issue in not_subscribed_issues:
+            subscribed_issues_id = {i.subscribable_id for i in subscribed_issues}
+
+            flush_counter = 0
+            not_subscribed_issues_id = requested_issues_id - subscribed_issues_id
+
+            for each_issue_id in not_subscribed_issues_id:
+                flush_counter += 1
                 subscription = Subscription(
-                    subscribable_id=each_issue.id,
+                    subscribable_id=each_issue_id,
                     member_id=member.id
                 )
                 DBSession.add(subscription)
-                not_added_to_rooms.append(each_issue.room_id)
+                if flush_counter % 10 == 0:
+                    DBSession.flush()
 
-            chat_client.add_member_to_rooms(not_added_to_rooms, member)
-            return dict()
+            not_subscribed_issues = DBSession.query(Issue) \
+                .filter(Issue.id.in_(not_subscribed_issues_id))
+
+            requested_rooms_id = [i.room_id for i in not_subscribed_issues]
+            chat_client.subscribe_rooms(requested_rooms_id, member)
+            return not_subscribed_issues
 
         id = int_or_notfound(id)
-
         issue = DBSession.query(Issue).filter(Issue.id == id).one_or_none()
         if not issue:
             raise HTTPNotFound()
