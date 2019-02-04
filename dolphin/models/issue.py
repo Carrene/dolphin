@@ -179,7 +179,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     items = relationship(
         'Item',
         protected=False,
-        order_by=Item.issue_id,
+        order_by=Item.created_at,
     )
 
     relations = relationship(
