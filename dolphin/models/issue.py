@@ -1,18 +1,17 @@
-import inspect
 from datetime import datetime
 
 from nanohttp import context
 from restfulpy.orm import Field, DeclarativeBase, relationship, \
     ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin
 from restfulpy.orm.metadata import MetadataField
-from sqlalchemy.orm import column_property, backref
 from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
-    DateTime, String, Column, Table, case
+    DateTime, case
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import column_property
 
-from .subscribable import Subscribable, Subscription
-from .item import Item
 from ..mixins import AuditLogMixin
+from .item import Item
+from .subscribable import Subscribable, Subscription
 
 
 class IssueTag(DeclarativeBase):

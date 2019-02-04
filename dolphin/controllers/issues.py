@@ -17,6 +17,8 @@ from ..validators import update_issue_validator, assign_issue_validator, \
 from .phases import PhaseController
 from .tag import TagController
 from .files import FileController
+from .phases import PhaseController
+from .tag import TagController
 
 
 PENDING = -1
