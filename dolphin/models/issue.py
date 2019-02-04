@@ -29,13 +29,6 @@ class IssueTag(DeclarativeBase):
     )
 
 
-class RelatedIssue(DeclarativeBase):
-    __tablename__ = 'related_issue'
-
-    issue_id = Field(Integer, ForeignKey('issue.id'), primary_key=True)
-    related_issue_id = Field(Integer, ForeignKey('issue.id'), primary_key=True)
-
-
 issue_statuses = [
     'in-progress',
     'on-hold',
@@ -182,14 +175,6 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         order_by=Item.issue_id,
     )
 
-    relations = relationship(
-        'Issue',
-        secondary='related_issue',
-        primaryjoin=id == RelatedIssue.issue_id,
-        secondaryjoin=id == RelatedIssue.related_issue_id,
-        lazy='selectin',
-    )
-
     is_subscribed = column_property(
         select([func.count(Subscription.member_id)]) \
         .where(Subscription.subscribable_id == id) \
@@ -256,17 +241,10 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             message='Lorem Ipsum',
         )
 
-    def to_dict(self, include_relations=True):
+    def to_dict(self):
         issue_dict = super().to_dict()
         issue_dict['boarding'] = self.boarding
         issue_dict['isSubscribed'] = True if self.is_subscribed else False
-
-        if include_relations:
-            issue_dict['relations'] = []
-            for x in self.relations:
-                issue_dict['relations'].append(
-                    x.to_dict(include_relations=False)
-                )
 
         return issue_dict
 
