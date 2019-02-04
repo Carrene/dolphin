@@ -219,5 +219,6 @@ class TestActivity(LocalApplicationTestCase):
             when('Request is not authorized', authorization=None)
             assert status == 401
 
-            when('Updating project with empty form', form=dict())
-            assert status == '708 No Parameter Exists In The Form'
+            when('Updating project with empty form', form={})
+            assert status == '708 Empty Form'
+
