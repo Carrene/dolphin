@@ -257,22 +257,17 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             message='Lorem Ipsum',
         )
 
-    @classmethod
-    def prepare_for_export(cls, column, v):
-        info = cls.get_column_info(column)
-        param_name = info.get('json')
-
-        if param_name != 'relations':
-            return super().prepare_for_export(column, v)
-
-    def to_dict(self):
+    def to_dict(self, include_relations=True):
         issue_dict = super().to_dict()
         issue_dict['boarding'] = self.boarding
         issue_dict['isSubscribed'] = True if self.is_subscribed else False
 
-        issue_dict['relations'] = []
-        for x in self.relations:
-            issue_dict['relations'].append(x.to_dict())
+        if include_relations:
+            issue_dict['relations'] = []
+            for x in self.relations:
+                issue_dict['relations'].append(
+                    x.to_dict(include_relations=False)
+                )
 
         return issue_dict
 

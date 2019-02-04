@@ -91,13 +91,13 @@ class TestIssue(LocalApplicationTestCase):
             f'RELATE',
             json=dict(issueId=self.issue2.id)
         ):
-            import pudb; pudb.set_trace()  # XXX BREAKPOINT
             assert status == 200
             assert response.json['id'] == self.issue1.id
+            assert len(response.json['relations']) == 2
 
             when(
                 'Intended project with string type not found',
-                url_parameters=dict(id='Alphabetical')
+                url_parameters=dict(id='not-integer')
             )
             assert status == 404
 
