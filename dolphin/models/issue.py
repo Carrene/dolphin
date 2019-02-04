@@ -4,14 +4,14 @@ from nanohttp import context
 from restfulpy.orm import Field, DeclarativeBase, relationship, \
     ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin
 from restfulpy.orm.metadata import MetadataField
-from sqlalchemy.orm import column_property
 from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
-    DateTime, String, Column, Table, case
+    DateTime, case
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import column_property
 
-from .subscribable import Subscribable, Subscription
-from .item import Item
 from ..mixins import AuditLogMixin
+from .item import Item
+from .subscribable import Subscribable, Subscription
 
 
 class IssueTag(DeclarativeBase):
@@ -27,6 +27,13 @@ class IssueTag(DeclarativeBase):
         ForeignKey('issue.id'),
         primary_key=True
     )
+
+
+class RelatedIssue(DeclarativeBase):
+    __tablename__ = 'related_issue'
+
+    issue_id = Field(Integer, ForeignKey('issue.id'), primary_key=True)
+    related_issue_id = Field(Integer, ForeignKey('issue.id'), primary_key=True)
 
 
 issue_statuses = [
@@ -175,6 +182,14 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         order_by=Item.issue_id,
     )
 
+    relations = relationship(
+        'Issue',
+        secondary='related_issue',
+        primaryjoin=id == RelatedIssue.issue_id,
+        secondaryjoin=id == RelatedIssue.related_issue_id,
+        lazy='selectin',
+    )
+
     is_subscribed = column_property(
         select([func.count(Subscription.member_id)]) \
         .where(Subscription.subscribable_id == id) \
@@ -241,10 +256,18 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             message='Lorem Ipsum',
         )
 
-    def to_dict(self):
+    def to_dict(self, include_relations=True):
         issue_dict = super().to_dict()
         issue_dict['boarding'] = self.boarding
         issue_dict['isSubscribed'] = True if self.is_subscribed else False
+
+        if include_relations:
+            issue_dict['relations'] = []
+            for x in self.relations:
+                issue_dict['relations'].append(
+                    x.to_dict(include_relations=False)
+                )
+
         return issue_dict
 
     @classmethod

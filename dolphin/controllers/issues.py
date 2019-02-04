@@ -5,17 +5,18 @@ from nanohttp import HTTPStatus, json, context, HTTPNotFound, \
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import DBSession, commit
-from sqlalchemy import and_
+from sqlalchemy import and_, exists
 
 from ..backends import ChatClient
 from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound, \
     ChatRoomNotFound, HTTPNotSubscribedIssue
-from ..models import Issue, Subscription, Phase, Item, Member, Project
+from ..models import Issue, Subscription, Phase, Item, Member, Project, \
+    RelatedIssue
 from ..validators import update_issue_validator, assign_issue_validator, \
-    issue_move_validator, unassign_issue_validator
+    issue_move_validator, unassign_issue_validator, issue_relate_validator
+from .files import FileController
 from .phases import PhaseController
 from .tag import TagController
-from .files import FileController
 
 
 PENDING = -1
@@ -378,5 +379,37 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             raise HTTPNotSubscribedIssue()
 
         subscription.seen_at = None
+        return issue
+
+    @authorize
+    @json(prevent_empty_form='708 Empty Form')
+    @issue_relate_validator
+    @commit
+    def relate(self, id):
+        id = int_or_notfound(id)
+        relation_issue_id = context.form.get('issueId')
+
+        issue = DBSession.query(Issue).get(id)
+        if issue is None:
+            raise HTTPNotFound()
+
+        relation_issue = DBSession.query(Issue).get(relation_issue_id)
+        if relation_issue is None:
+            raise HTTPStatus('605 Issue Not Found')
+
+        is_related = DBSession.query(exists().where(
+            and_(
+                RelatedIssue.issue_id == issue.id,
+                RelatedIssue.related_issue_id == relation_issue.id
+            )
+        )).scalar()
+        if is_related:
+            raise HTTPStatus('645 Already Is Related')
+
+        related_issue = RelatedIssue(
+            issue_id=issue.id,
+            related_issue_id=relation_issue.id,
+        )
+        DBSession.add(related_issue)
         return issue
 

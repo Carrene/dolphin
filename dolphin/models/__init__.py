@@ -3,7 +3,7 @@ from .subscribable import Subscribable, Subscription
 from .project import Project, project_statuses
 from .release import Release, release_statuses
 from .issue import Issue, issue_kinds, issue_statuses, issue_priorities, \
-    IssueTag
+    IssueTag, RelatedIssue
 from .phase import Phase
 from .resource import Resource
 from .guest import Guest
