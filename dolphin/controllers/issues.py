@@ -14,8 +14,6 @@ from ..models import Issue, Subscription, Phase, Item, Member, Project, \
     RelatedIssue
 from ..validators import update_issue_validator, assign_issue_validator, \
     issue_move_validator, unassign_issue_validator, issue_relate_validator
-from .phases import PhaseController
-from .tag import TagController
 from .files import FileController
 from .phases import PhaseController
 from .tag import TagController
