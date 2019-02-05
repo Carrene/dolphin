@@ -131,6 +131,9 @@ dolphin [-c path/to/config.yml] db create --drop
 ```bash
 dolphin [-c path/to/config.yml] db schema      
 ```
+### Running tests
+
+    $ pytest
 
 ### Serving
 
