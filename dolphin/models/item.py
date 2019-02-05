@@ -20,4 +20,3 @@ class Item(TimestampMixin, DeclarativeBase):
     )
 
     UniqueConstraint(phase_id, issue_id, member_id)
-

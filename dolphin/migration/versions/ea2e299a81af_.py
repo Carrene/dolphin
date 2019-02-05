@@ -52,6 +52,7 @@ def downgrade():
         'item',
         type_='unique'
     )
+    op.drop_column('activity', 'item_id')
     op.drop_column('item', 'id')
     op.execute(
         'ALTER TABLE item ADD PRIMARY KEY (phase_id,issue_id,member_id)'
