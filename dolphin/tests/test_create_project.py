@@ -134,18 +134,18 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Title length is more than limit',
-                json=given | dict(title=((50 + 1) * 'a'))
+                json=given | dict(title=((128 + 1) * 'a'))
             )
-            assert status == '704 At Most 50 Characters Are Valid For Title'
+            assert status == '704 At Most 128 Characters Are Valid For Title'
 
             when(
                 'Description length is less than limit',
                 json=given | dict(
-                    description=((512 + 1) * 'a'),
+                    description=((8192 + 1) * 'a'),
                     title='Another title'
                 )
             )
-            assert status == '703 At Most 512 Characters Are Valid For '\
+            assert status == '703 At Most 8192 Characters Are Valid For '\
                 'Description'
 
             when(

@@ -33,7 +33,7 @@ class Subscribable(TimestampMixin, DeclarativeBase):
     id = Field(Integer, primary_key=True, readonly=True)
     title = Field(
         String,
-        max_length=50,
+        max_length=128,
         min_length=1,
         label='Title',
         watermark='Enter the title',
@@ -48,7 +48,7 @@ class Subscribable(TimestampMixin, DeclarativeBase):
     description = Field(
         String,
         min_length=1,
-        max_length=512,
+        max_length=8192,
         label='Description',
         watermark='Enter the description',
         not_none=False,
