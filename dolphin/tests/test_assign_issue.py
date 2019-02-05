@@ -1,9 +1,9 @@
 from auditing.context import Context as AuditLogContext
-from bddrest import status, when, given, response
+from bddrest import status, when, response, Remove, Update
 
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 from dolphin.models import Issue, Project, Member, Phase, Group, Workflow, \
     Release, Skill
+from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
 class TestIssue(LocalApplicationTestCase):
@@ -13,13 +13,22 @@ class TestIssue(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        member = Member(
+        cls.member1 = Member(
             title='First Member',
             email='member1@example.com',
             access_token='access token 1',
             phone=123456789,
             reference_id=1
         )
+
+        cls.member2 = Member(
+            title='Second Member',
+            email='member2@example.com',
+            access_token='access token 2',
+            phone=123456788,
+            reference_id=2
+        )
+        session.add(cls.member2)
 
         workflow = Workflow(title='Default')
         session.add(workflow)
@@ -53,7 +62,7 @@ class TestIssue(LocalApplicationTestCase):
             release=release,
             workflow=workflow,
             group=group,
-            member=member,
+            member=cls.member1,
             title='My first project',
             description='A decription for my project',
             room_id=1
@@ -72,13 +81,13 @@ class TestIssue(LocalApplicationTestCase):
         session.commit()
 
     def test_assign(self):
-        self.login('member1@example.com')
+        self.login(self.member1.email)
 
         with oauth_mockup_server(), self.given(
             'Assign an issue to a resource',
             f'/apiv1/issues/id:{self.issue1.id}',
             'ASSIGN',
-            form=dict(memberId=1, phaseId=1)
+            form=dict(memberId=self.member2.id, phaseId=1)
         ):
             assert status == 200
             assert response.json['id'] == self.issue1.id
@@ -86,57 +95,45 @@ class TestIssue(LocalApplicationTestCase):
             when(
                 'Intended issue with string type not found',
                 url_parameters=dict(id='Alphabetical'),
-                form=given | dict(title='Another issue')
             )
             assert status == 404
 
             when(
                 'Intended issue with integer type not found',
-                url_parameters=dict(id=100),
-                form=given | dict(title='Another issue')
+                url_parameters=dict(id=0),
             )
             assert status == 404
 
-            when(
-                'Member not found',
-                form=given | dict(memberId=0)
-            )
+            when('Member not found', form=Update(memberId=0))
             assert status == '609 Resource not found with id: 0'
 
             when(
                 'Member id is not in form',
-                form=given - 'memberId'
+                form=Remove('memberId'),
             )
-            assert status == '715 Resource Id Not In Form'
+            assert len(response.json['items']) == 2
 
             when(
                 'Member id type is not valid',
-                form=given | dict(memberId='Alphabetical')
+                form=Update(memberId='Alphabetical'),
             )
             assert status == '716 Invalid Resource Id Type'
 
-            when(
-                'Phase not found',
-                form=given | dict(phaseId=0)
-            )
+            when('Phase not found', form=Update(phaseId=0))
             assert status == '613 Phase not found with id: 0'
 
-            when(
-                'Phase id is not in form',
-                form=given - 'phaseId'
-            )
+            when('Phase id is not in form', form=Remove('phaseId'))
             assert status == '737 Phase Id Not In Form'
 
             when(
                 'Phase id type is not valid',
-                form=given | dict(phaseId='Alphabetical')
+                form=Update(phaseId='Alphabetical')
             )
             assert status == '738 Invalid Phase Id Type'
 
             when(
                 'Issue is already assigned',
-                url_parameters=dict(id=3),
-                form=given | dict(resourceId=1)
+                url_parameters=dict(id=self.issue1.id),
             )
             assert status == '602 Already Assigned'
 
