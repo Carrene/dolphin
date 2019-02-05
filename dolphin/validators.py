@@ -254,12 +254,12 @@ def tag_exists_validator(title, project, field):
 release_validator = validate(
     title=dict(
         required='710 Title Not In Form',
-        max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
+        max_length=(128, '704 At Most 128 Characters Are Valid For Title'),
         pattern=(TITLE_PATTERN, '747 Invalid Title Format'),
         callback=release_not_exists_validator
     ),
     description=dict(
-        max_length=(512, '703 At Most 512 Characters Are Valid For Description')
+        max_length=(8192, '703 At Most 8192 Characters Are Valid For Description')
     ),
     cutoff=dict(
         pattern=(DATETIME_PATTERN, '702 Invalid Cutoff Format'),
@@ -273,11 +273,11 @@ release_validator = validate(
 
 update_release_validator = validate(
     title=dict(
-        max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
+        max_length=(128, '704 At Most 128 Characters Are Valid For Title'),
         pattern=(TITLE_PATTERN, '747 Invalid Title Format'),
     ),
     description=dict(
-        max_length=(512, '703 At Most 512 Characters Are Valid For Description')
+        max_length=(8192, '703 At Most 8192 Characters Are Valid For Description')
     ),
     cutoff=dict(
         pattern=(DATETIME_PATTERN, '702 Invalid Cutoff Format'),
@@ -292,11 +292,11 @@ project_validator = validate(
     title=dict(
         required='710 Title Not In Form',
         callback=project_not_exists_validator,
-        max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
+        max_length=(128, '704 At Most 128 Characters Are Valid For Title'),
         pattern=(TITLE_PATTERN, '747 Invalid Title Format'),
     ),
     description=dict(
-        max_length=(512, '703 At Most 512 Characters Are Valid For Description')
+        max_length=(8192, '703 At Most 8192 Characters Are Valid For Description')
     ),
     status=dict(
         callback=project_status_value_validator
@@ -317,11 +317,11 @@ project_validator = validate(
 
 update_project_validator = validate(
     title=dict(
-        max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
+        max_length=(128, '704 At Most 128 Characters Are Valid For Title'),
         pattern=(TITLE_PATTERN, '747 Invalid Title Format'),
     ),
     description=dict(
-        max_length=(512, '703 At Most 512 Characters Are Valid For Description')
+        max_length=(8192, '703 At Most 8192 Characters Are Valid For Description')
     ),
     status=dict(
         callback=project_status_value_validator
@@ -341,12 +341,12 @@ draft_issue_finalize_validator = validate(
     ),
     title=dict(
         required='710 Title Not In Form',
-        max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
+        max_length=(128, '704 At Most 128 Characters Are Valid For Title'),
         pattern=(TITLE_PATTERN, '747 Invalid Title Format'),
         callback=issue_not_exists_validator
     ),
     description=dict(
-        max_length=(512, '703 At Most 512 Characters Are Valid For Description')
+        max_length=(8192, '703 At Most 8192 Characters Are Valid For Description')
     ),
     dueDate=dict(
         pattern=(DATETIME_PATTERN, '701 Invalid Due Date Format'),
@@ -368,11 +368,11 @@ draft_issue_finalize_validator = validate(
 
 update_issue_validator = validate(
     title=dict(
-        max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
+        max_length=(128, '704 At Most 128 Characters Are Valid For Title'),
         pattern=(TITLE_PATTERN, '747 Invalid Title Format'),
     ),
     description=dict(
-        max_length=(512, '703 At Most 512 Characters Are Valid For Description')
+        max_length=(8192, '703 At Most 8192 Characters Are Valid For Description')
     ),
     dueDate=dict(
         pattern=(DATETIME_PATTERN, '701 Invalid Due Date Format'),
@@ -490,7 +490,7 @@ issue_move_validator = validate(
 
 attachment_validator = validate(
     title=dict(
-        max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
+        max_length=(128, '704 At Most 128 Characters Are Valid For Title'),
         pattern=(TITLE_PATTERN, '747 Invalid Title Format'),
     ),
     attachment=dict(
@@ -503,7 +503,7 @@ group_create_validator = validate(
     title=dict(
         not_none='727 Title Is None',
         required='710 Title Not In Form',
-        max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
+        max_length=(128, '704 At Most 128 Characters Are Valid For Title'),
         callback=group_exists_validator,
     )
 )

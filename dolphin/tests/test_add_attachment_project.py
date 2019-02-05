@@ -82,10 +82,10 @@ class TestProject(LocalApplicationTestCase):
             assert status == '758 File Not In Form'
 
             when(
-                'Title is more than 50 charecters',
-                multipart=Update(title=(50 + 1) * 'a')
+                'Title is more than 128 charecters',
+                multipart=Update(title=(128 + 1) * 'a')
             )
-            assert status == '704 At Most 50 Characters Are Valid For Title'
+            assert status == '704 At Most 128 Characters Are Valid For Title'
 
 
             with open(maximum_image_path, 'rb') as f:
@@ -104,10 +104,10 @@ class TestProject(LocalApplicationTestCase):
             assert status == '758 File Not In Form'
 
             when(
-                'Title is more than 50 charecters',
-                multipart=Update(title=(50 + 1) * 'a')
+                'Title is more than 128 charecters',
+                multipart=Update(title=(128 + 1) * 'a')
             )
-            assert status == '704 At Most 50 Characters Are Valid For Title'
+            assert status == '704 At Most 128 Characters Are Valid For Title'
 
             with open(maximum_image_path, 'rb') as f:
                 when(
@@ -125,8 +125,8 @@ class TestProject(LocalApplicationTestCase):
             assert status == '758 File Not In Form'
 
             when(
-                'Title is more than 50 charecters',
-                multipart=Update(title=(50 + 1) * 'a')
+                'Title is more than 128 charecters',
+                multipart=Update(title=(128 + 1) * 'a')
             )
-            assert status == '704 At Most 50 Characters Are Valid For Title'
+            assert status == '704 At Most 128 Characters Are Valid For Title'
 
