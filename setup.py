@@ -12,6 +12,9 @@ with open(join(dirname(__file__), 'dolphin', '__init__.py')) as v_file:
 
 dependencies = [
     'restfulpy >= 2.6.14',
+
+    # FIXME: Remove this line when the bug on bddrest v2.2.0 fixed
+    'bddrest == 2.1.5',
     'sqlalchemy_media >= 0.17.1',
 #    'cas-common',
 
