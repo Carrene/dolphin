@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from nanohttp import HTTPStatus, json, context, HTTPNotFound, \
-    HTTPUnauthorized, int_or_notfound
+    HTTPUnauthorized, int_or_notfound, settings
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import DBSession, commit
@@ -11,7 +11,7 @@ from ..backends import ChatClient
 from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound, \
     ChatRoomNotFound, HTTPNotSubscribedIssue
 from ..models import Issue, Subscription, Phase, Item, Member, Project, \
-    RelatedIssue
+    RelatedIssue, Subscribable
 from ..validators import update_issue_validator, assign_issue_validator, \
     issue_move_validator, unassign_issue_validator, issue_relate_validator
 from .files import FileController
@@ -49,6 +49,9 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 return ActivityController(issue=issue)(*remaining_paths[2:])
 
         return super().__call__(*remaining_paths)
+
+    def __init__(self, project=None):
+        self.project = project
 
     def _get_issue(self, id):
         id = int_or_notfound(id)
@@ -149,15 +152,58 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     @json(prevent_form='709 Form Not Allowed')
     @Issue.expose
     @commit
-    def subscribe(self, id):
+    def subscribe(self, id=None):
         token = context.environ['HTTP_AUTHORIZATION']
-        id = int_or_notfound(id)
+        member = Member.current()
+        chat_client = ChatClient()
 
+        if context.query.get('id'):
+            query = DBSession.query(Issue)
+            requested_issues = Issue.filter_by_request(query).all()
+
+            if len(requested_issues) >= settings.issue.subscription.max_length:
+                raise HTTPStatus(
+                    f'776 Maximum {settings.issue.subscription.max_length} '
+                    f'Issues To Subscribe At A Time'
+                )
+
+            requested_issues_id = {i.id for i in requested_issues}
+
+            subscribed_issues = DBSession.query(Subscription) \
+                .filter(Subscription.member_id == member.id) \
+                .join(
+                    Subscribable,
+                    Subscribable.id == Subscription.subscribable_id
+                ) \
+                .filter(Subscribable.type_ == 'issue') \
+                .all()
+            subscribed_issues_id = {i.subscribable_id for i in subscribed_issues}
+
+            not_subscribed_issues_id = requested_issues_id - subscribed_issues_id
+
+            flush_counter = 0
+            for each_issue_id in not_subscribed_issues_id:
+                flush_counter += 1
+                subscription = Subscription(
+                    subscribable_id=each_issue_id,
+                    member_id=member.id
+                )
+                DBSession.add(subscription)
+                if flush_counter % 10 == 0:
+                    DBSession.flush()
+
+            not_subscribed_issues = DBSession.query(Issue) \
+                .filter(Issue.id.in_(not_subscribed_issues_id))
+
+            requested_rooms_id = [i.room_id for i in not_subscribed_issues]
+            chat_client.subscribe_rooms(requested_rooms_id, member)
+            return not_subscribed_issues
+
+        id = int_or_notfound(id)
         issue = DBSession.query(Issue).filter(Issue.id == id).one_or_none()
         if not issue:
             raise HTTPNotFound()
 
-        member = Member.current()
         if DBSession.query(Subscription).filter(
                 Subscription.subscribable_id == id,
                 Subscription.member_id == member.id
@@ -171,7 +217,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         )
         DBSession.add(subscription)
 
-        chat_client = ChatClient()
         try:
             chat_client.add_member(
                 issue.room_id,
