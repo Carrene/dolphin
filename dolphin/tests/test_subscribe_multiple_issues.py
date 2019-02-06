@@ -129,8 +129,8 @@ class TestSubscribeIssues(LocalApplicationTestCase):
 
     def test_subscribe_multiple_issues(self):
          self.login('member1@example.com')
-         issues = (str(i)+', ' for i in range(self.issue1.id, self.issue6.id))
-         issues_string = ''.join(issues)
+         issues = (str(i) for i in range(self.issue1.id, self.issue6.id))
+         issues_string = ', '.join(issues)
 
          with oauth_mockup_server(), chat_mockup_server(), self.given(
              'Subscribe multiple issues',

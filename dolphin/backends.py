@@ -328,13 +328,13 @@ class ChatClient:
 
     def subscribe_rooms(self, rooms_id, member):
         token = context.environ['HTTP_AUTHORIZATION']
-        string_rooms_id = (str(i) + ', ' for i in rooms_id)
-        sequential_rooms_id = ''.join(string_rooms_id)[:-2]
+        string_rooms_id = (str(i) for i in rooms_id)
+        sequential_rooms_id = ', '.join(string_rooms_id)
 
         try:
             response = requests.request(
                 'SUBSCRIBE',
-                url=f'{settings.chat.url}/apiv1/rooms' \
+                url=f'{settings.chat.url}/apiv1/rooms'
                     f'?id=IN({sequential_rooms_id})',
                 headers={
                     'authorization': token,
