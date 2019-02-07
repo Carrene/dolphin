@@ -196,7 +196,9 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 .filter(Issue.id.in_(not_subscribed_issues_id))
 
             requested_rooms_id = [i.room_id for i in requested_issues]
-            chat_client.subscribe_rooms(requested_rooms_id, member)
+            if requested_issues_id:
+                chat_client.subscribe_rooms(requested_rooms_id, member)
+
             return not_subscribed_issues
 
         id = int_or_notfound(id)
