@@ -195,7 +195,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             not_subscribed_issues = DBSession.query(Issue) \
                 .filter(Issue.id.in_(not_subscribed_issues_id))
 
-            requested_rooms_id = [i.room_id for i in not_subscribed_issues]
+            requested_rooms_id = [i.room_id for i in requested_issues]
             chat_client.subscribe_rooms(requested_rooms_id, member)
             return not_subscribed_issues
 
