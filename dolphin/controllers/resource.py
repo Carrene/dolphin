@@ -19,6 +19,6 @@ class ResourceController(ModelRestController):
         query = DBSession.query(Resource) \
             .join(Skill, Resource.skill_id == Skill.id) \
             .join(Phase, Phase.skill_id == Skill.id) \
-            .filter(Skill.id == self.phase.skill_id)
+            .order_by(Phase.skill_id != self.phase.id)
         return query
 
