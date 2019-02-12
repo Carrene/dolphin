@@ -242,7 +242,7 @@ class Organization(OrderingMixin, FilteringMixin, PaginationMixin,
         yield from super().iter_metadata_fields()
         yield MetadataField(
             name='membersCount',
-            key='membersCount',
+            key='members_count',
             label='Members count',
             required=False,
             readonly=True,

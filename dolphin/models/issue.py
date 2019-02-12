@@ -221,22 +221,22 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     def iter_metadata_fields(cls):
         yield from super().iter_metadata_fields()
         yield MetadataField(
-            'boarding',
-            'boarding',
+            name='boarding',
+            key='boarding',
             label='Pace',
             required=False,
             readonly=True
         )
         yield MetadataField(
-            'isSubscribed',
-            'isSubscribed',
+            name='isSubscribed',
+            key='is_subscribed',
             label='Subscribe',
             required=False,
             readonly=True
         )
         yield MetadataField(
-            'tags',
-            'tags',
+            name='tags',
+            key='tags',
             label='Tags',
             required=False,
             readonly=True,
@@ -246,7 +246,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         )
         yield MetadataField(
             name='phaseId',
-            key='phase id',
+            key='phase_id',
             label='Phase',
             required=False,
             not_none=False,
