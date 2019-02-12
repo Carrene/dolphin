@@ -68,7 +68,7 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
         yield from super().iter_metadata_fields()
         yield MetadataField(
             name='dueDate',
-            key='due date',
+            key='due_date',
             label='Target',
             readonly=True,
             example='Lorem Ipsum',
