@@ -157,7 +157,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         member = Member.current()
         chat_client = ChatClient()
 
-        if context.query.get('id'):
+        if context.query:
             query = DBSession.query(Issue)
             requested_issues = Issue.filter_by_request(query).all()
 
@@ -195,8 +195,10 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             not_subscribed_issues = DBSession.query(Issue) \
                 .filter(Issue.id.in_(not_subscribed_issues_id))
 
-            requested_rooms_id = [i.room_id for i in not_subscribed_issues]
-            chat_client.subscribe_rooms(requested_rooms_id, member)
+            requested_rooms_id = [i.room_id for i in requested_issues]
+            if requested_issues_id:
+                chat_client.subscribe_rooms(requested_rooms_id, member)
+
             return not_subscribed_issues
 
         id = int_or_notfound(id)
