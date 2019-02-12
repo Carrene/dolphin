@@ -70,7 +70,7 @@ class TestOrganization(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             f'Inviting to the organization has successfully created',
-            f'/apiv1/organizations/id: {self.organization.id} /invitations',
+            f'/apiv1/organizations/id: {self.organization.id}/invitations',
             f'CREATE',
             form=dict(
                 email=self.member3.email,
