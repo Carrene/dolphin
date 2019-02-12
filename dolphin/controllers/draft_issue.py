@@ -12,9 +12,6 @@ from ..validators import draft_issue_finalize_validator
 from .tag import TagController
 
 
-PENDING = -1
-
-
 class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
     __model__ = DraftIssue
 
@@ -92,8 +89,6 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
         issue.tags = tags
         issue.update_from_request()
         DBSession.add(issue)
-        issue.room_id = PENDING
-        DBSession.flush()
 
         current_member = Member.current()
         room = self._ensure_room(

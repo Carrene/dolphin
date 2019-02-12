@@ -21,10 +21,6 @@ from .files import FileController
 from .activity import ActivityController
 
 
-PENDING = -1
-UNKNOWN_ASSIGNEE = -1
-
-
 class IssueController(ModelRestController, JsonPatchControllerMixin):
     __model__ = Issue
 
