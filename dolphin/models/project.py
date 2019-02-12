@@ -162,23 +162,23 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     def iter_metadata_fields(cls):
         yield from super().iter_metadata_fields()
         yield MetadataField(
-            'boarding',
-            'boarding',
+            name='boarding',
+            key='boarding',
             label='Pace',
             required=False,
             readonly=True
         )
         yield MetadataField(
-            'dueDate',
-            'due date',
+            name='dueDate',
+            key='due_date',
             label='Target',
             required=False,
             readonly=True,
             watermark='This will be calculated by its Nuggets automaticaly.',
         )
         yield MetadataField(
-            'isSubscribed',
-            'is subscribed',
+            name='isSubscribed',
+            key='is_subscribed',
             label='is subscribed',
             required=False,
             readonly=True,

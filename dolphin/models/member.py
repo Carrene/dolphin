@@ -149,3 +149,4 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     def __repr__(self):
         return f'\tTitle: {self.title}, Email: {self.email}\n'
+
