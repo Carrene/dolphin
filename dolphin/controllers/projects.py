@@ -61,7 +61,7 @@ class ProjectController(ModelRestController):
     @authorize
     @json(form_whitelist=(
         ['title', 'description', 'status', 'releaseId', 'workflowId', 'groupId',
-         'memberId'],
+         'managerReferenceId'],
         '707 Invalid field, only following fields are accepted: ' \
         'title, description, status, releaseId, workflowId and groupId' \
     ))
@@ -71,7 +71,11 @@ class ProjectController(ModelRestController):
     def create(self):
         form = context.form
         token = context.environ['HTTP_AUTHORIZATION']
-        member = DBSession.query(Member).get(form['memberId'])
+        member = DBSession.query(Member) \
+            .filter(Member.reference_id == form['managerReferenceId']) \
+            .one_or_none()
+        if member is None:
+            raise HTTPStatus('608 Manager Not Found')
 
         project = Project()
         project.update_from_request()
@@ -92,7 +96,7 @@ class ProjectController(ModelRestController):
                 .one()
             project.workflow_id = default_workflow.id
 
-        project.member_id = member.id
+        project.manager_id = member.id
         DBSession.add(project)
         project.room_id = PENDING
         DBSession.flush()

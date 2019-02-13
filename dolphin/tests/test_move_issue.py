@@ -34,7 +34,7 @@ class TestIssue(LocalApplicationTestCase):
             release=release,
             workflow=workflow,
             group=group,
-            member=member,
+            manager=member,
             title='My first project',
             description='A decription for my project',
             room_id=1
@@ -45,7 +45,7 @@ class TestIssue(LocalApplicationTestCase):
             release=release,
             workflow=workflow,
             group=group,
-            member=member,
+            manager=member,
             title='My second project',
             description='A decription for my project',
             room_id=2
@@ -56,7 +56,7 @@ class TestIssue(LocalApplicationTestCase):
             release=release,
             workflow=workflow,
             group=group,
-            member=member,
+            manager=member,
             title='My third project',
             description='A decription for my project',
             room_id=3

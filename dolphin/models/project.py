@@ -55,7 +55,7 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         required=True,
         example='Lorem Ipsum'
     )
-    member_id = Field(
+    manager_id = Field(
         Integer,
         ForeignKey('member.id'),
         python_type=int,
@@ -97,9 +97,9 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         protected=True
     )
 
-    member = relationship(
+    manager = relationship(
         'Member',
-        foreign_keys=[member_id],
+        foreign_keys=[manager_id],
         back_populates='projects',
         protected=True
     )
@@ -183,6 +183,17 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             required=False,
             readonly=True,
             watermark='Lorem Ipsum',
+        )
+        yield MetadataField(
+            name='managerReferenceId',
+            key='manager_reference_id',
+            label='Lorem Ipsum',
+            required=True,
+            not_none=True,
+            readonly=False,
+            watermark='Lorem Ipsum',
+            example='Lorem Ipsum',
+            message='Lorem Ipsum',
         )
 
     def to_dict(self):

@@ -58,3 +58,13 @@ class TestProject(LocalApplicationTestCase):
             assert fields['releaseId']['notNone'] is not None
             assert fields['releaseId']['watermark'] is not None
 
+            assert fields['managerReferenceId']['label'] is not None
+            assert fields['managerReferenceId']['name'] is not None
+            assert fields['managerReferenceId']['type'] is not None
+            assert fields['managerReferenceId']['required'] is not None
+            assert fields['managerReferenceId']['notNone'] is not None
+            assert fields['managerReferenceId']['watermark'] is not None
+            assert fields['managerReferenceId']['message'] is not None
+            assert fields['managerReferenceId']['example'] is not None
+            assert fields['managerReferenceId']['readonly'] is not None
+

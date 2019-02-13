@@ -41,7 +41,7 @@ class TestProject(LocalApplicationTestCase):
                 release=release,
                 workflow=workflow,
                 group=group,
-                member=member1,
+                manager=member1,
                 title='My first project',
                 description='A decription for my project',
                 room_id=1001,
