@@ -31,7 +31,7 @@ class TestProject(LocalApplicationTestCase):
             release=release,
             workflow=workflow,
             group=group,
-            member=member1,
+            manager=member1,
             title='My first project',
             description='A decription for my project',
             room_id=1001
@@ -42,7 +42,7 @@ class TestProject(LocalApplicationTestCase):
             release=release,
             workflow=workflow,
             group=group,
-            member=member1,
+            manager=member1,
             title='My hidden project',
             description='A decription for my project',
             removed_at='2020-2-20',

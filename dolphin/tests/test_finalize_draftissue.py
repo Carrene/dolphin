@@ -55,7 +55,7 @@ class TestIssue(LocalApplicationTestCase):
             release=release,
             workflow=workflow1,
             group=group,
-            member=cls.member,
+            manager=cls.member,
             title='My first project',
             description='A decription for my project',
             room_id=1

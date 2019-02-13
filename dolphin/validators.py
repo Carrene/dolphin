@@ -307,10 +307,10 @@ project_validator = validate(
     releaseId=dict(
         callback=release_exists_validator
     ),
-    memberId=dict(
-        required='739 Member Id Not In Form',
-        callback=member_exists_validator,
-        not_none='774 Member ID Is Null',
+    managerReferenceId=dict(
+        type_=(int, '608 Manager Not Found'),
+        required='777 Manager Reference Id Not In Form',
+        not_none='778 Manager Reference Id Is Null',
     )
 )
 

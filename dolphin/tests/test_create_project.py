@@ -1,4 +1,4 @@
-from bddrest import status, response, when, Remove, given
+from bddrest import status, response, when, Remove, given, Update
 
 from dolphin.models import Project, Member, Workflow, Release, Group
 from dolphin.tests.helpers import LocalApplicationTestCase, \
@@ -32,7 +32,7 @@ class TestProject(LocalApplicationTestCase):
             workflow=cls.workflow,
             group=cls.group,
             release=release1,
-            member=cls.member,
+            manager=cls.member,
             title='My first project',
             description='A decription for my project',
             room_id=1001
@@ -54,7 +54,7 @@ class TestProject(LocalApplicationTestCase):
                 title='My awesome project',
                 description='A decription for my project',
                 status='active',
-                memberId=self.member.id,
+                managerReferenceId=self.member.reference_id,
             )
         ):
             assert status == 200
@@ -63,25 +63,25 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['status'] == 'active'
             assert response.json['boarding'] == None
             assert response.json['dueDate'] == None
+            assert response.json['managerId'] == self.member.id
 
             when(
-                'Member ID is null',
-                json=given | dict(title='New Project', memberId=None)
+                'Manager reference id is null',
+                json=Update(title='New Project', managerReferenceId=None)
             )
-            assert status == '774 Member ID Is Null'
+            assert status == '778 Manager Reference Id Is Null'
 
             when(
-                'Member is not found',
-                json=given | dict(title='New Project', memberId=0)
+                'Manager is not found',
+                json=Update(title='New Project', managerReferenceId=0)
             )
-            assert status == 609
-            assert status.text.startswith('Resource not found with id')
+            assert status == '608 Manager Not Found'
 
             when(
-                'Member ID is not in form',
-                json=given - 'memberId' | dict(title='New Project')
+                'Maneger reference id is not in form',
+                json=given - 'managerReferenceId' | dict(title='New Project')
             )
-            assert status == '739 Member Id Not In Form'
+            assert status == '777 Manager Reference Id Not In Form'
 
             when(
                 'Workflow id is not in form',

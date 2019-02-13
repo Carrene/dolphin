@@ -37,7 +37,7 @@ class TestUnseeIssue(LocalApplicationTestCase):
             release=release,
             workflow=workflow,
             group=group,
-            member=member,
+            manager=member,
             title='My first project',
             description='A decription for my project',
             room_id=1

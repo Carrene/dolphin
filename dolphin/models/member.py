@@ -90,7 +90,7 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         back_populates='members',
     )
 
-    projects = relationship('Project', back_populates='member', protected=True)
+    projects = relationship('Project', back_populates='manager', protected=True)
 
     phases = relationship(
         'Phase',

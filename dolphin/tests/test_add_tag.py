@@ -65,7 +65,7 @@ class TestTag(LocalApplicationTestCase):
             release=release,
             workflow_id=workflow.id,
             group=group,
-            member=cls.member1,
+            manager=cls.member1,
             title='My first project',
             description='A decription for my project',
             room_id=1
