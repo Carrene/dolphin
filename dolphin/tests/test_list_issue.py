@@ -5,7 +5,7 @@ from bddrest import status, response, when
 
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 from dolphin.models import Issue, Project, Member, Workflow, Item, Phase, \
-    Group, Subscription, Release, Skill
+    Group, Subscription, Release, Skill, Organization, Tag
 
 
 class TestIssue(LocalApplicationTestCase):
@@ -15,6 +15,12 @@ class TestIssue(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
+        cls.organization = Organization(
+            title='organization title',
+        )
+        session.add(cls.organization)
+        session.flush()
+
         member = Member(
             title='First Member',
             email='member1@example.com',
@@ -23,6 +29,18 @@ class TestIssue(LocalApplicationTestCase):
             reference_id=1
         )
         session.add(member)
+
+        cls.tag1 = Tag(
+            title='First tag',
+            organization_id=cls.organization.id,
+        )
+        session.add(cls.tag1)
+
+        cls.tag2 = Tag(
+            title='Second tag',
+            organization_id=cls.organization.id,
+        )
+        session.add(cls.tag2)
 
         workflow = Workflow(title='Default')
         skill = Skill(title='First Skill')
@@ -45,39 +63,41 @@ class TestIssue(LocalApplicationTestCase):
         )
         session.add(project)
 
-        issue1 = Issue(
+        cls.issue1 = Issue(
             project=project,
             title='First issue',
             description='This is description of first issue',
             due_date='2020-2-20',
             kind='feature',
             days=1,
-            room_id=2
+            room_id=2,
+            tags=[cls.tag1],
         )
-        session.add(issue1)
+        session.add(cls.issue1)
         session.flush()
 
         subscription_issue1 = Subscription(
-            subscribable_id=issue1.id,
+            subscribable_id=cls.issue1.id,
             member_id=member.id,
             seen_at=datetime.utcnow(),
         )
         session.add(subscription_issue1)
 
-        issue2 = Issue(
+        cls.issue2 = Issue(
             project=project,
             title='Second issue',
             description='This is description of second issue',
             due_date='2016-2-20',
             kind='feature',
             days=2,
-            room_id=3
+            room_id=3,
+            tags=[cls.tag2],
         )
-        session.add(issue2)
+        session.add(cls.issue2)
         session.flush()
 
         subscription_issue2 = Subscription(
-            subscribable_id=issue2.id,
+            subscribable_id=cls.issue2.id,
             member_id=member.id,
             seen_at=None,
         )
@@ -115,16 +135,23 @@ class TestIssue(LocalApplicationTestCase):
         item1 = Item(
             member_id=member.id,
             phase_id=cls.phase1.id,
-            issue_id=issue1.id,
+            issue_id=cls.issue1.id,
         )
         session.add(item1)
 
         item2 = Item(
             member_id=member.id,
             phase_id=cls.phase2.id,
-            issue_id=issue2.id,
+            issue_id=cls.issue2.id,
         )
         session.add(item2)
+
+        item3 = Item(
+            member_id=member.id,
+            phase_id=cls.phase2.id,
+            issue_id=cls.issue1.id,
+        )
+        session.add(item3)
         session.commit()
 
     def test_list(self):
@@ -194,6 +221,30 @@ class TestIssue(LocalApplicationTestCase):
                 query=dict(phaseId=f'IN({self.phase1.id}, {self.phase2.id})')
             )
             assert len(response.json) == 2
+
+            when(
+                'Filtering the issues by phase title',
+                query=dict(phaseTitle=self.phase1.title)
+            )
+            assert len(response.json) == 1
+            assert response.json[0]['id'] == self.issue1.id
+            assert response.json[0]['title'] == self.issue1.title
+
+            when(
+                'Filtering the issues by tag id',
+                query=dict(tagId=self.tag1.id)
+            )
+            assert len(response.json) == 1
+            assert response.json[0]['id'] == self.issue1.id
+            assert response.json[0]['title'] == self.issue1.title
+
+            when(
+                'Filtering the issues by tag title',
+                query=dict(tagTitle=self.tag1.title)
+            )
+            assert len(response.json) == 1
+            assert response.json[0]['id'] == self.issue1.id
+            assert response.json[0]['title'] == self.issue1.title
 
             when('Request is not authorized', authorization=None)
             assert status == 401
