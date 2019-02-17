@@ -278,25 +278,35 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
         if 'phaseId' in context.query:
             value = context.query['phaseId']
-            query = query.join(Item)
+            query = query.join(Item, Item.issue_id == Issue.id)
             query = cls._filter_by_column_value(query, Item.phase_id, value)
 
         if 'phaseTitle' in context.query:
             value = context.query['phaseTitle']
-            query = query.join(Phase) if 'phaseId' in context.query \
-                else query.join(Item).join(Phase)
+            if 'phaseId' in context.query:
+                query = query.join(Phase, Item.phase_id == Phase.id)
+
+            else:
+                query = query \
+                    .join(Item, Item.issue_id == Issue.id) \
+                    .join(Phase, Item.phase_id == Phase.id)
 
             query = cls._filter_by_column_value(query, Phase.title, value)
 
         if 'tagId' in context.query:
             value = context.query['tagId']
-            query = query.join(IssueTag)
+            query = query.join(IssueTag, IssueTag.issue_id == Issue.id)
             query = cls._filter_by_column_value(query, IssueTag.tag_id, value)
 
         if 'tagTitle' in context.query:
             value = context.query['tagTitle']
-            query = query.join(Tag) if 'tagId' in context.query \
-                else query.join(IssueTag).join(Tag)
+            if 'tagId' in context.query:
+                query = query.join(Tag, Tag.id == IssueTag.tag_id)
+
+            else:
+                query = query \
+                    .join(IssueTag, IssueTag.issue_id == Issue.id) \
+                    .join(Tag, Tag.id == IssueTag.tag_id)
 
             query = cls._filter_by_column_value(query, Tag.title, value)
 
