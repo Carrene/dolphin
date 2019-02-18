@@ -129,3 +129,27 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert status == 404
 
+            when(
+                'JSONPatch subscribe',
+                json=[
+                    dict(
+                        path=f'{self.issue.id}',
+                        op='subscribe',
+                        value=None,
+                    )
+                ]
+            )
+            assert status == 200
+
+
+            when(
+                'JSONPatch subscribe with form',
+                json=[
+                    dict(
+                        path=f'{self.issue.id}',
+                        op='subscribe',
+                        value=dict(form='Form'),
+                    )
+                ]
+            )
+            assert status == '709 Form Not Allowed'
