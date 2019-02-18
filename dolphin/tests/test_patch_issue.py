@@ -141,7 +141,6 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert status == 200
 
-
             when(
                 'JSONPatch subscribe with form',
                 json=[
@@ -153,3 +152,4 @@ class TestIssue(LocalApplicationTestCase):
                 ]
             )
             assert status == '709 Form Not Allowed'
+
