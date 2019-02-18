@@ -8,8 +8,8 @@ from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
     DateTime, case
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import column_property
+from auditor import observe
 
-from ..mixins import AuditLogMixin
 from .item import Item
 from .subscribable import Subscribable, Subscription
 from .phase import Phase
@@ -64,8 +64,8 @@ DELAYED = 'delayed'
 ONTIME = 'on-time'
 
 
-class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
-            Subscribable, AuditLogMixin):
+class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
+            Subscribable):
 
     __tablename__ = 'issue'
     __mapper_args__ = {'polymorphic_identity': __tablename__}
@@ -301,4 +301,8 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             query = cls._filter_by_column_value(query, Tag.title, value)
 
         return query
+
+    @classmethod
+    def __declare_last__(cls):
+        observe(cls, ['modified_at'])
 
