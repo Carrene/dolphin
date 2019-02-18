@@ -1,4 +1,4 @@
-from auditort import context as AuditLogContext
+from auditor import context as AuditLogContext
 from nanohttp import context
 from restfulpy.orm import DBSession
 from restfulpy.utils import to_camel_case
