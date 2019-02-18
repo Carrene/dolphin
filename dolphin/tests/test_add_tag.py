@@ -1,4 +1,4 @@
-from auditing.context import Context as AuditLogContext
+from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when, Update
 
 from .helpers import LocalApplicationTestCase, oauth_mockup_server

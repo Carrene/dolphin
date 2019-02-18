@@ -1,7 +1,7 @@
 from datetime import datetime
 
 import ujson
-from auditing.logentry import ChangeAttributeLogEntry, InstantiationLogEntry
+from auditor.logentry import ChangeAttributeLogEntry, InstantiationLogEntry
 from nanohttp import context
 from restfulpy.datetimehelpers import format_datetime
 

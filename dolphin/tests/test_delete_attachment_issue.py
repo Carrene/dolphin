@@ -1,6 +1,6 @@
 from os.path import join, dirname, abspath
 
-from auditing.context import Context as AuditLogContext
+from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when, Update
 from sqlalchemy_media import StoreManager
 
