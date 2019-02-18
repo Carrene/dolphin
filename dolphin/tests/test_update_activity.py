@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 from bddrest import status, response, when, Update
-from auditing.context import Context as AuditLogContext
+from auditor.context import Context as AuditLogContext
 
 from dolphin.models import Member, Skill, Phase, Release, \
     Project, Issue, Item, Activity

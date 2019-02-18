@@ -1,7 +1,7 @@
 import io
 from os.path import join, dirname, abspath
 
-from auditing.context import Context as AuditLogContext
+from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when, Update, Remove
 
 from dolphin.models import Project, Member, Workflow, Group, Release, Issue

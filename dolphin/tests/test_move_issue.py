@@ -1,4 +1,4 @@
-from auditing.context import Context as AuditLogContext
+from auditor.context import Context as AuditLogContext
 from bddrest import status, when, given, response
 
 from dolphin.models import Issue, Project, Member, Workflow, Group, Release

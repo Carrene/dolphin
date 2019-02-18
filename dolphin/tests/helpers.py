@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 from os import path
 
-from auditing import MiddleWare
+from auditor import MiddleWare
 from nanohttp import RegexRouteController, json, settings, context, HTTPStatus
 from restfulpy.application import Application
 from restfulpy.mockup import mockup_http_server

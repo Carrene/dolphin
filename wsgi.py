@@ -1,4 +1,4 @@
-from auditing import MiddleWare
+from auditor import MiddleWare
 
 from dolphin import dolphin as app
 from dolphin.middleware_callback import callback

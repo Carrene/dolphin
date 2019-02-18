@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from auditing.context import Context as AuditLogContext
+from auditor.context import Context as AuditLogContext
 from bddrest.authoring import response, when, Update, Remove, status
 
 from dolphin.models import Member, Issue, Workflow, Group, Project, \
