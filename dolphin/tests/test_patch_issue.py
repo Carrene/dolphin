@@ -82,6 +82,7 @@ class TestIssue(LocalApplicationTestCase):
 
     def test_patch(self):
         self.login(self.member.email)
+        issue_id = self.issue.id
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Testing the patch method on issue',
@@ -90,17 +91,17 @@ class TestIssue(LocalApplicationTestCase):
             json=[
                 dict(
                     op='ADD',
-                    path=f'{self.issue.id}/tags/{self.tag2.id}',
+                    path=f'{issue_id}/tags/{self.tag2.id}',
                     value={}
                 ),
                 dict(
                     op='REMOVE',
-                    path=f'{self.issue.id}/tags/{self.tag1.id}',
+                    path=f'{issue_id}/tags/{self.tag1.id}',
                     value={}
                 ),
                 dict(
                     op='UPDATE',
-                    path=f'{self.issue.id}',
+                    path=f'{issue_id}',
                     value={
                         "title": "sample title",
                         "priority": "low",
@@ -122,7 +123,7 @@ class TestIssue(LocalApplicationTestCase):
                 json=[
                     dict(
                         op='ADD',
-                        path=f'{self.issue.id}/tags/0',
+                        path=f'{issue_id}/tags/0',
                         value={}
                     )
                 ]
@@ -132,11 +133,8 @@ class TestIssue(LocalApplicationTestCase):
             when(
                 'JSONPatch subscribe',
                 json=[
-                    dict(
-                        path=f'{self.issue.id}',
-                        op='subscribe',
-                        value=None,
-                    )
+                    dict(path=f'{issue_id}', op='subscribe', value=None),
+                    dict(path=f'{issue_id}', op='unsubscribe', value=None),
                 ]
             )
             assert status == 200
@@ -145,10 +143,15 @@ class TestIssue(LocalApplicationTestCase):
                 'JSONPatch subscribe with form',
                 json=[
                     dict(
-                        path=f'{self.issue.id}',
+                        path=f'{issue_id}',
                         op='subscribe',
                         value=dict(form='Form'),
-                    )
+                    ),
+                    dict(
+                        path=f'{issue_id}',
+                        op='unsubscribe',
+                        value=dict(form='Form'),
+                    ),
                 ]
             )
             assert status == '709 Form Not Allowed'
