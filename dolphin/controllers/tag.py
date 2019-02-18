@@ -61,11 +61,7 @@ class TagController(ModelRestController, JsonPatchControllerMixin):
             if is_exist_tag:
                 raise HTTPAlreadyTagAdded()
 
-            issue_tag = IssueTag(
-                tag_id=tag.id,
-                issue_id=self.issue.id,
-            )
-            DBSession.add(issue_tag)
+            self.issue.tags.append(tag)
 
         else:
             raise HTTPForbidden()
@@ -111,7 +107,7 @@ class TagController(ModelRestController, JsonPatchControllerMixin):
                 raise HTTPAlreadyTagRemoved()
 
             else:
-                DBSession.delete(issue_tag)
+                self.issue.tags.remove(tag)
 
         else:
             raise HTTPForbidden()
