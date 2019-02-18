@@ -257,6 +257,17 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             example='Lorem Ipsum',
             message='Lorem Ipsum',
         )
+        yield MetadataField(
+            name='tagId',
+            key='tag_id',
+            label='Tag',
+            required=False,
+            not_none=False,
+            readonly=True,
+            watermark='Lorem Ipsum',
+            example='Lorem Ipsum',
+            message='Lorem Ipsum',
+        )
 
     def to_dict(self, include_relations=True):
         issue_dict = super().to_dict()
