@@ -1,7 +1,8 @@
 from datetime import datetime
 
 import ujson
-from auditor.logentry import ChangeAttributeLogEntry, InstantiationLogEntry
+from auditor.logentry import ChangeAttributeLogEntry, InstantiationLogEntry, \
+    AppendLogEntry, RemoveLogEntry, RequestLogEntry
 from nanohttp import context
 from restfulpy.datetimehelpers import format_datetime
 
@@ -10,7 +11,7 @@ from dolphin.models import Member
 
 
 AUDIT_LOG_MIMETYPE = 'application/x-auditlog'
-ATTRIBUTES_BLACKLIST = ['modified_at']
+
 
 def callback(audit_log):
 
@@ -19,8 +20,7 @@ def callback(audit_log):
         member = Member.current()
         # FIXME: We will rollback if cannot send a message successfully
         for log in audit_log:
-            if isinstance(log, ChangeAttributeLogEntry) and \
-                    log.attribute not in ATTRIBUTES_BLACKLIST:
+            if isinstance(log, ChangeAttributeLogEntry):
                 message = dict(
                     action='Update',
                     attribute=log.attribute,
@@ -28,13 +28,6 @@ def callback(audit_log):
                         if isinstance(log.old_value, datetime) else log.old_value,
                     new=format_datetime(log.new_value) \
                         if isinstance(log.new_value, datetime) else log.new_value,
-                )
-                chat_client.send_message(
-                    room_id=log.obj.room_id,
-                    body=ujson.dumps(message),
-                    mimetype=AUDIT_LOG_MIMETYPE,
-                    token=context.environ['HTTP_AUTHORIZATION'],
-                    x_access_token=member.access_token,
                 )
 
             elif isinstance(log, InstantiationLogEntry):
@@ -44,6 +37,24 @@ def callback(audit_log):
                     old=None,
                     new=None,
                 )
+
+            elif isinstance(log, AppendLogEntry):
+                message = dict(
+                    action='Append',
+                    attribute=log.attribute,
+                    old=None,
+                    new=log.value,
+                )
+
+            elif isinstance(log, RemoveLogEntry):
+                message = dict(
+                    action='Remove',
+                    attribute=log.attribute,
+                    old=log.value,
+                    new=None,
+                )
+
+            if not isinstance(log, RequestLogEntry):
                 chat_client.send_message(
                     room_id=log.obj.room_id,
                     body=ujson.dumps(message),
