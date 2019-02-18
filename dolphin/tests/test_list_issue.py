@@ -52,7 +52,7 @@ class TestIssue(LocalApplicationTestCase):
             cutoff='2030-2-20',
         )
 
-        project = Project(
+        cls.project = Project(
             release=release,
             workflow=workflow,
             group=group,
@@ -61,10 +61,10 @@ class TestIssue(LocalApplicationTestCase):
             description='A decription for my project',
             room_id=1
         )
-        session.add(project)
+        session.add(cls.project)
 
         cls.issue1 = Issue(
-            project=project,
+            project=cls.project,
             title='First issue',
             description='This is description of first issue',
             due_date='2020-2-20',
@@ -84,7 +84,7 @@ class TestIssue(LocalApplicationTestCase):
         session.add(subscription_issue1)
 
         cls.issue2 = Issue(
-            project=project,
+            project=cls.project,
             title='Second issue',
             description='This is description of second issue',
             due_date='2016-2-20',
@@ -104,7 +104,7 @@ class TestIssue(LocalApplicationTestCase):
         session.add(subscription_issue2)
 
         issue3 = Issue(
-            project=project,
+            project=cls.project,
             title='Third issue',
             description='This is description of third issue',
             due_date='2020-2-20',
@@ -245,6 +245,16 @@ class TestIssue(LocalApplicationTestCase):
             assert len(response.json) == 1
             assert response.json[0]['id'] == self.issue1.id
             assert response.json[0]['title'] == self.issue1.title
+
+            when(
+                'Filter by phase id with IN function',
+                query=dict(
+                    projectId=self.project.id,
+                    phaseId=f'IN({self.phase1.id})',
+                    sort='createdAt',
+                )
+            )
+            assert len(response.json) == 1
 
             when('Request is not authorized', authorization=None)
             assert status == 401
