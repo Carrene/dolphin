@@ -383,7 +383,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             attribute='Resource',
             value=member.title
         )
-
         return issue
 
     @authorize
