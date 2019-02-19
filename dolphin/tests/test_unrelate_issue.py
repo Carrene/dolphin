@@ -1,5 +1,5 @@
 from auditor.context import Context as AuditLogContext
-from bddrest import status, response, when, Update
+from bddrest import status, response, when, Update, given
 
 from dolphin.models import Issue, Member, Workflow, Group, Project, Release, \
     RelatedIssue
@@ -133,7 +133,7 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Form is empty',
-                json=form - 'issueId'
+                json=given - 'issueId'
             )
             assert status == '708 Empty Form'
 
