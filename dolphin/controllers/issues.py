@@ -445,20 +445,20 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     @commit
     def relate(self, id):
         id = int_or_notfound(id)
-        relation_issue_id = context.form.get('issueId')
+        target_id = context.form.get('targetIssueId')
 
         issue = DBSession.query(Issue).get(id)
         if issue is None:
             raise HTTPNotFound()
 
-        relation_issue = DBSession.query(Issue).get(relation_issue_id)
-        if relation_issue is None:
-            raise HTTPStatus('605 Issue Not Found')
+        target = DBSession.query(Issue).get(target_id)
+        if target is None:
+            raise HTTPStatus('648 Target Issue Not Found')
 
         is_related = DBSession.query(exists().where(
             and_(
                 RelatedIssue.issue_id == issue.id,
-                RelatedIssue.related_issue_id == relation_issue.id
+                RelatedIssue.related_issue_id == target.id
             )
         )).scalar()
         if is_related:
@@ -466,7 +466,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         related_issue = RelatedIssue(
             issue_id=issue.id,
-            related_issue_id=relation_issue.id,
+            related_issue_id=target.id,
         )
         DBSession.add(related_issue)
         return issue

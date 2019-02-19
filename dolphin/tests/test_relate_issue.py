@@ -89,7 +89,7 @@ class TestIssue(LocalApplicationTestCase):
             f'Getting a issue',
             f'/apiv1/issues/id:{self.issue1.id}',
             f'RELATE',
-            json=dict(issueId=self.issue2.id)
+            json=dict(targetIssueId=self.issue2.id)
         ):
             assert status == 200
             assert response.json['id'] == self.issue1.id
@@ -109,27 +109,27 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Issue already is related',
-                json=dict(issueId=self.issue3.id)
+                json=dict(targetIssueId=self.issue3.id)
             )
             assert status == '645 Already Is Related'
 
             when(
                 'Trying to pass with not exist issue',
-                json=dict(issueId=0)
+                json=dict(targetIssueId=0)
             )
-            assert status == '605 Issue Not Found'
+            assert status == '648 Target Issue Not Found'
 
             when(
                 'Trying to pass with none issue id',
-                json=dict(issueId=None)
+                json=dict(targetIssueId=None)
             )
-            assert status == '775 Issue Id Is None'
+            assert status == '779 Target Issue Id Is None'
 
             when(
                 'Trying to pass with invalid issue id type',
-                json=dict(issueId='id')
+                json=dict(targetIssueId='id')
             )
-            assert status == '722 Invalid Issue Id type'
+            assert status == '781 Invalid Target Issue Id Type'
 
             when('Form parameter is sent with request', json={})
             assert status == '708 Empty Form'
