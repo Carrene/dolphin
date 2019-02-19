@@ -117,7 +117,7 @@ class TestIssue(LocalApplicationTestCase):
                 'Related issue is not found',
                 json=dict(issueId=0)
             )
-            assert status == f'647 relatedIssue With ID 0 Not Found'
+            assert status == f'647 relatedIssue With Id 0 Not Found'
 
             when(
                 'Related issue is none',
