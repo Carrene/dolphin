@@ -9,7 +9,7 @@ from sqlalchemy import and_, exists
 
 from ..backends import ChatClient
 from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound, \
-    ChatRoomNotFound, HTTPNotSubscribedIssue, HTTPIssueNotFound
+    ChatRoomNotFound, HTTPNotSubscribedIssue, HTTPRelatedIssueNotFound
 from ..models import Issue, Subscription, Phase, Item, Member, Project, \
     RelatedIssue, Subscribable
 from ..validators import update_issue_validator, assign_issue_validator, \
@@ -444,7 +444,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         relation_issue = DBSession.query(Issue).get(relation_issue_id)
         if relation_issue is None:
-            raise HTTPIssueNotFound()
+            raise HTTPStatus('605 Issue Not Found')
 
         is_related = DBSession.query(exists().where(
             and_(
@@ -476,7 +476,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         related_issue = DBSession.query(Issue).get(related_issue_id)
         if related_issue is None:
-            raise HTTPIssueNotFound()
+            raise HTTPRelatedIssueNotFound(related_issue_id)
 
         is_related = DBSession.query(exists().where(
             and_(
