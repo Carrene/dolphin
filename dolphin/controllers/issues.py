@@ -6,6 +6,7 @@ from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import DBSession, commit
 from sqlalchemy import and_, exists
+from auditor import context as AuditLogContext
 
 from ..backends import ChatClient
 from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound, \
@@ -379,6 +380,14 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         if not issue:
             raise HTTPNotFound()
 
+        project = DBSession.query(Project).get(context.form.get('projectId'))
+        AuditLogContext.append_change_attribute(
+            user=context.identity.email,
+            obj=issue,
+            attribute='project',
+            old_value=issue.project.title,
+            new_value=project.title,
+        )
         issue.project_id = context.form.get('projectId')
         return issue
 
