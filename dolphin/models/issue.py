@@ -325,5 +325,5 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
 
     @classmethod
     def __declare_last__(cls):
-        observe(cls, ['modified_at'])
+        observe(cls, ['modified_at', 'project_id'])
 
