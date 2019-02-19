@@ -89,7 +89,7 @@ class TestIssue(LocalApplicationTestCase):
             f'Unrelating an issue from another',
             f'/apiv1/issues/id:{self.issue1.id}',
             f'UNRELATE',
-            json=dict(issueId=self.issue3.id)
+            json=dict(targetIssueId=self.issue3.id)
         ):
             assert status == 200
             assert response.json['id'] == self.issue1.id
@@ -109,33 +109,33 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Issue already is unrelated',
-                json=dict(issueId=self.issue2.id)
+                json=dict(targetIssueId=self.issue2.id)
             )
             assert status == '646 Already Unrelated'
 
             when(
                 'Related issue is not found',
-                json=dict(issueId=0)
+                json=dict(targetIssueId=0)
             )
             assert status == f'647 relatedIssue With Id 0 Not Found'
 
             when(
                 'Related issue is none',
-                json=dict(issueId=None)
+                json=dict(targetIssueId=None)
             )
-            assert status == '775 Issue Id Is None'
+            assert status == '779 Target Issue Id Is None'
 
             when(
                 'Trying to pass with invalid issue id type',
-                json=dict(issueId='id')
+                json=dict(targetIssueId='id')
             )
-            assert status == '722 Invalid Issue Id type'
+            assert status == '781 Invalid Target Issue Id Type'
 
             when(
                 'Issue id not form',
-                json=given - 'issueId' + dict(Field='field')
+                json=given - 'targetIssueId' + dict(Field='field')
             )
-            assert status == '723 Issue Id Not In Form'
+            assert status == '780 Target Issue Id Not In Form'
 
             when(
                 'Form is empty',
