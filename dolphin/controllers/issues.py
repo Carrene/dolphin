@@ -331,6 +331,19 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             issue_id=issue.id
         )
         DBSession.add(item)
+
+        AuditLogContext.append(
+            user=context.identity.email,
+            obj=issue,
+            attribute='Phase',
+            value=phase.title
+        )
+        AuditLogContext.append(
+            user=context.identity.email,
+            obj=issue,
+            attribute='Resource',
+            value=member.title
+        )
         return issue
 
     @authorize
@@ -355,6 +368,22 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             raise HTTPStatus('636 Not Assigned Yet')
 
         DBSession.delete(item)
+
+        member = DBSession.query(Member).get(context.form.get('memberId'))
+        phase = DBSession.query(Phase).get(context.form.get('phaseId'))
+        AuditLogContext.remove(
+            user=context.identity.email,
+            obj=issue,
+            attribute='Phase',
+            value=phase.title
+        )
+        AuditLogContext.remove(
+            user=context.identity.email,
+            obj=issue,
+            attribute='Resource',
+            value=member.title
+        )
+
         return issue
 
     @authorize
