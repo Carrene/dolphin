@@ -464,11 +464,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         if is_related:
             raise HTTPStatus('645 Already Is Related')
 
-        related_issue = RelatedIssue(
-            issue_id=issue.id,
-            related_issue_id=target.id,
-        )
-        DBSession.add(related_issue)
+        issue.relations.append(target)
         return issue
 
     @authorize
