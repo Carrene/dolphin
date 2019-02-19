@@ -138,6 +138,7 @@ class TestIssue(LocalApplicationTestCase):
             issue_id=cls.issue1.id,
         )
         session.add(item1)
+        session.flush()
 
         item2 = Item(
             member_id=member.id,
@@ -145,6 +146,7 @@ class TestIssue(LocalApplicationTestCase):
             issue_id=cls.issue2.id,
         )
         session.add(item2)
+        session.flush()
 
         item3 = Item(
             member_id=member.id,
@@ -152,6 +154,14 @@ class TestIssue(LocalApplicationTestCase):
             issue_id=cls.issue1.id,
         )
         session.add(item3)
+        session.flush()
+
+        item4 = Item(
+            member_id=member.id,
+            phase_id=cls.phase1.id,
+            issue_id=cls.issue2.id,
+        )
+        session.add(item4)
         session.commit()
 
     def test_list(self):
@@ -213,7 +223,8 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert response.json[0]['title'] == 'First issue'
 
-            when('Filter by phase id', query=dict(phaseId=self.phase1.id))
+            when('Filter by phase id', query=dict(phaseId=self.phase2.id))
+            assert status == 200
             assert len(response.json) == 1
 
             when(
@@ -226,9 +237,7 @@ class TestIssue(LocalApplicationTestCase):
                 'Filtering the issues by phase title',
                 query=dict(phaseTitle=self.phase1.title)
             )
-            assert len(response.json) == 1
-            assert response.json[0]['id'] == self.issue1.id
-            assert response.json[0]['title'] == self.issue1.title
+            assert len(response.json) == 2
 
             when(
                 'Filtering the issues by tag id',
