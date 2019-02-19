@@ -530,10 +530,10 @@ tag_create_validator = validate(
 
 
 issue_relate_validator = validate(
-    issueId=dict(
-        not_none='775 Issue Id Is None',
-        required='723 Issue Id Not In Form',
-        type_=(int, '722 Invalid Issue Id type'),
+    targetIssueId=dict(
+        not_none='779 Target Issue Id Is None',
+        required='780 Target Issue Id Not In Form',
+        type_=(int, '781 Invalid Target Issue Id Type'),
     )
 )
 
