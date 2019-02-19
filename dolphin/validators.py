@@ -537,3 +537,12 @@ issue_relate_validator = validate(
     )
 )
 
+
+issue_unrelate_validator = validate(
+    issueId=dict(
+        not_none='775 Issue Id Is None',
+        required='723 Issue Id Not In Form',
+        type_=(int, '722 Invalid Issue Id type'),
+    )
+)
+

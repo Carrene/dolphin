@@ -9,11 +9,12 @@ from sqlalchemy import and_, exists
 
 from ..backends import ChatClient
 from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound, \
-    ChatRoomNotFound, HTTPNotSubscribedIssue
+    ChatRoomNotFound, HTTPNotSubscribedIssue, HTTPIssueNotFound
 from ..models import Issue, Subscription, Phase, Item, Member, Project, \
     RelatedIssue, Subscribable
 from ..validators import update_issue_validator, assign_issue_validator, \
-    issue_move_validator, unassign_issue_validator, issue_relate_validator
+    issue_move_validator, unassign_issue_validator, issue_relate_validator, \
+    issue_unrelate_validator
 from .files import FileController
 from .phases import PhaseController
 from .tag import TagController
@@ -443,7 +444,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         relation_issue = DBSession.query(Issue).get(relation_issue_id)
         if relation_issue is None:
-            raise HTTPStatus('605 Issue Not Found')
+            raise HTTPIssueNotFound()
 
         is_related = DBSession.query(exists().where(
             and_(
@@ -463,7 +464,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
     @authorize
     @json(prevent_empty_form='708 Empty Form')
-    @issue_relate_validator
+    @issue_unrelate_validator
     @commit
     def unrelate(self, id):
         id = int_or_notfound(id)
@@ -475,7 +476,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         related_issue = DBSession.query(Issue).get(related_issue_id)
         if related_issue is None:
-            raise HTTPStatus('605 Issue Not Found')
+            raise HTTPIssueNotFound()
 
         is_related = DBSession.query(exists().where(
             and_(

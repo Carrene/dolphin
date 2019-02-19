@@ -132,10 +132,17 @@ class TestIssue(LocalApplicationTestCase):
             assert status == '722 Invalid Issue Id type'
 
             when(
+                'Issue id not form',
+                json=given - 'issueId' + dict(Field='field')
+            )
+            assert status == '723 Issue Id Not In Form'
+
+            when(
                 'Form is empty',
-                json=given - 'issueId'
+                json=dict()
             )
             assert status == '708 Empty Form'
 
             when('Request is not authorized', authorization=None)
             assert status == 401
+

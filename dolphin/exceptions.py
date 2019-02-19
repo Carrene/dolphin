@@ -76,9 +76,12 @@ class HTTPNotSubscribedIssue(HTTPKnownStatus):
     status = '637 Not Subscribed Issue'
 
 
+class HTTPIssueNotFound(HTTPKnownStatus):
+    status = '605 Issue Not Found'
+
+
 class HTTPResourceNotFound(HTTPKnownStatus):
 
     def __init__(self, resource_id):
         self.status = f'609 Resource not found with id: {resource_id}'
-
 
