@@ -473,25 +473,25 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     @commit
     def unrelate(self, id):
         id = int_or_notfound(id)
-        related_issue_id = context.form.get('issueId')
+        target_id = context.form.get('targetIssueId')
 
         issue = DBSession.query(Issue).get(id)
         if issue is None:
             raise HTTPNotFound()
 
-        related_issue = DBSession.query(Issue).get(related_issue_id)
-        if related_issue is None:
-            raise HTTPRelatedIssueNotFound(related_issue_id)
+        target = DBSession.query(Issue).get(target_id)
+        if target is None:
+            raise HTTPRelatedIssueNotFound(target_id)
 
         is_related = DBSession.query(exists().where(
             and_(
                 RelatedIssue.issue_id == issue.id,
-                RelatedIssue.related_issue_id == related_issue.id
+                RelatedIssue.related_issue_id == target.id
             )
         )).scalar()
         if not is_related:
             raise HTTPStatus('646 Already Unrelated')
 
-        issue.relations.remove(related_issue)
+        issue.relations.remove(target)
         return issue
 
