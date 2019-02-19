@@ -9,11 +9,12 @@ from sqlalchemy import and_, exists
 
 from ..backends import ChatClient
 from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound, \
-    ChatRoomNotFound, HTTPNotSubscribedIssue
+    ChatRoomNotFound, HTTPNotSubscribedIssue, HTTPRelatedIssueNotFound
 from ..models import Issue, Subscription, Phase, Item, Member, Project, \
     RelatedIssue, Subscribable
 from ..validators import update_issue_validator, assign_issue_validator, \
-    issue_move_validator, unassign_issue_validator, issue_relate_validator
+    issue_move_validator, unassign_issue_validator, issue_relate_validator, \
+    issue_unrelate_validator
 from .files import FileController
 from .phases import PhaseController
 from .tag import TagController
@@ -459,5 +460,33 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             related_issue_id=relation_issue.id,
         )
         DBSession.add(related_issue)
+        return issue
+
+    @authorize
+    @json(prevent_empty_form='708 Empty Form')
+    @issue_unrelate_validator
+    @commit
+    def unrelate(self, id):
+        id = int_or_notfound(id)
+        related_issue_id = context.form.get('issueId')
+
+        issue = DBSession.query(Issue).get(id)
+        if issue is None:
+            raise HTTPNotFound()
+
+        related_issue = DBSession.query(Issue).get(related_issue_id)
+        if related_issue is None:
+            raise HTTPRelatedIssueNotFound(related_issue_id)
+
+        is_related = DBSession.query(exists().where(
+            and_(
+                RelatedIssue.issue_id == issue.id,
+                RelatedIssue.related_issue_id == related_issue.id
+            )
+        )).scalar()
+        if not is_related:
+            raise HTTPStatus('646 Already Unrelated')
+
+        issue.relations.remove(related_issue)
         return issue
 
