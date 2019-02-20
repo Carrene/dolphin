@@ -336,6 +336,39 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
         return query
 
     @classmethod
+    def sort_by_request(cls, query):
+        query = super().sort_by_request(query)
+        external_columns = ('phaseId')
+        sorting_expression = context.query.get('sort', '').strip()
+
+        if not sorting_expression:
+            return query
+
+        sorting_columns = {
+                c[1:] if c.startswith('-') else c:
+                'desc' if c.startswith('-') else None
+            for c in sorting_expression.split(',') if external_columns in c
+        }
+
+        if 'phaseId' in sorting_expression:
+            item_cte = select([
+                Item.issue_id,
+                func.max(Item.id).label('max_item_id')
+            ]) \
+                .group_by(Item.issue_id) \
+                .cte()
+
+            query = query.join(Item, Item.issue_id == Issue.id)
+            query = query.join(item_cte, item_cte.c.max_item_id == Item.id)
+            query = cls._sort_by_key_value(
+                query,
+                column=Item.phase_id,
+                descending=sorting_columns['phaseId']
+            )
+
+        return query
+
+    @classmethod
     def __declare_last__(cls):
         observe(cls, ['modified_at', 'project_id'])
 
