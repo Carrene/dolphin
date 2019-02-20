@@ -289,8 +289,20 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
 
         if 'phaseId' in context.query:
             value = context.query['phaseId']
+            item_cte = select([
+                Item.issue_id,
+                func.max(Item.id).label('max_item_id')
+            ]) \
+                .group_by(Item.issue_id) \
+                .cte()
+
             query = query.join(Item, Item.issue_id == Issue.id)
-            query = cls._filter_by_column_value(query, Item.phase_id, value)
+            query = query.join(item_cte, item_cte.c.max_item_id == Item.id)
+            query = cls._filter_by_column_value(
+                query,
+                Item.phase_id,
+                value
+            )
 
         if 'phaseTitle' in context.query:
             value = context.query['phaseTitle']
