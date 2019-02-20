@@ -56,7 +56,7 @@ def callback(audit_log):
 
             if not isinstance(log, RequestLogEntry):
                 chat_client.send_message(
-                    room_id=log.obj.room_id,
+                    room_id=log.object_.room_id,
                     body=ujson.dumps(message),
                     mimetype=AUDIT_LOG_MIMETYPE,
                     token=context.environ['HTTP_AUTHORIZATION'],

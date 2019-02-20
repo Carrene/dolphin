@@ -383,7 +383,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         project = DBSession.query(Project).get(context.form.get('projectId'))
         AuditLogContext.append_change_attribute(
             user=context.identity.email,
-            obj=issue,
+            object_=issue,
             attribute='project',
             old_value=issue.project.title,
             new_value=project.title,
