@@ -2,11 +2,12 @@ from nanohttp import context
 from restfulpy.orm import Field, relationship, SoftDeleteMixin, \
     ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin
 from restfulpy.orm.metadata import MetadataField
-from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam
+from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, join
 from sqlalchemy.orm import column_property
 
 from .issue import Issue
 from .subscribable import Subscribable, Subscription
+from .member import Member
 
 
 project_statuses = [
@@ -131,12 +132,15 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     is_subscribed = column_property(
         select([func.count(Subscription.member_id)]) \
+        .select_from(
+            join(Subscription, Member, Subscription.member_id == Member.id)
+        ) \
         .where(Subscription.subscribable_id == id) \
-        .where(Subscription.member_id == bindparam(
-                'member_id',
-                callable_=lambda: context.identity.id
+        .where(Member.reference_id == bindparam(
+                'reference_id',
+                callable_=lambda: context.identity.reference_id
             )
-               ) \
+        ) \
         .correlate_except(Subscription),
         deferred=True
     )

@@ -5,7 +5,7 @@ from restfulpy.orm import Field, DeclarativeBase, relationship, \
     ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin
 from restfulpy.orm.metadata import MetadataField
 from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
-    DateTime, case
+    DateTime, case, join
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import column_property
 from auditor import observe
@@ -14,6 +14,7 @@ from .item import Item
 from .subscribable import Subscribable, Subscription
 from .phase import Phase
 from .tag import Tag
+from .member import Member
 
 
 class IssueTag(DeclarativeBase):
@@ -194,12 +195,15 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
 
     is_subscribed = column_property(
         select([func.count(Subscription.member_id)]) \
+        .select_from(
+            join(Subscription, Member, Subscription.member_id == Member.id)
+        ) \
         .where(Subscription.subscribable_id == id) \
-        .where(Subscription.member_id == bindparam(
-                'member_id',
-                callable_=lambda: context.identity.id
+        .where(Member.reference_id == bindparam(
+                'reference_id',
+                callable_=lambda: context.identity.reference_id
             )
-               ) \
+        ) \
         .correlate_except(Subscription),
         deferred=True
     )
