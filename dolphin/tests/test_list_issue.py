@@ -265,6 +265,18 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert len(response.json) == 1
 
+            when('Sort by phase id', query=dict(sort='phaseId'))
+            assert status == 200
+            assert len(response.json) == 2
+            assert response.json[0]['id'] == self.issue2.id
+            assert response.json[1]['id'] == self.issue1.id
+
+            when('Reverse sort by phase id', query=dict(sort='-phaseId'))
+            assert status == 200
+            assert len(response.json) == 2
+            assert response.json[0]['id'] == self.issue1.id
+            assert response.json[1]['id'] == self.issue2.id
+
             when('Request is not authorized', authorization=None)
             assert status == 401
 
