@@ -12,9 +12,6 @@ from ..validators import draft_issue_finalize_validator
 from .tag import TagController
 
 
-PENDING = -1
-
-
 class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
     __model__ = DraftIssue
 
@@ -91,9 +88,6 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
         issue = Issue()
         issue.tags = tags
         issue.update_from_request()
-        DBSession.add(issue)
-        issue.room_id = PENDING
-        DBSession.flush()
 
         current_member = Member.current()
         room = self._ensure_room(
@@ -124,7 +118,6 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
         # exception type because nobody knows what exception may be raised
         try:
             issue.room_id = room['id']
-            DBSession.flush()
 
         except:
             chat_client.delete_room(
@@ -134,6 +127,8 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
             )
             raise
 
+        DBSession.add(issue)
+        DBSession.flush()
         draft_issue.issue_id = issue.id
         return draft_issue
 
