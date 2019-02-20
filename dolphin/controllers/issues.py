@@ -334,13 +334,13 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         AuditLogContext.append(
             user=context.identity.email,
-            obj=issue,
+            object_=issue,
             attribute='Phase',
             value=phase.title
         )
         AuditLogContext.append(
             user=context.identity.email,
-            obj=issue,
+            object_=issue,
             attribute='Resource',
             value=member.title
         )
@@ -373,13 +373,13 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         phase = DBSession.query(Phase).get(context.form.get('phaseId'))
         AuditLogContext.remove(
             user=context.identity.email,
-            obj=issue,
+            object_=issue,
             attribute='Phase',
             value=phase.title
         )
         AuditLogContext.remove(
             user=context.identity.email,
-            obj=issue,
+            object_=issue,
             attribute='Resource',
             value=member.title
         )
