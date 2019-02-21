@@ -291,6 +291,22 @@ class TestIssue(LocalApplicationTestCase):
             assert response.json[0]['id'] == self.issue2.id
             assert response.json[1]['id'] == self.issue1.id
 
+            when('Sort by tag id and title', query=dict(sort='tagId,title'))
+            assert status == 200
+            assert len(response.json) == 2
+            assert response.json[0]['id'] == self.issue1.id
+            assert response.json[1]['id'] == self.issue2.id
+
+            when(
+                'Sort by tag id and reverse title',
+                query=dict(sort='tagId,-title')
+            )
+            assert status == 200
+            assert len(response.json) == 2
+            assert response.json[0]['id'] == self.issue2.id
+            assert response.json[1]['id'] == self.issue1.id
+
+
             when('Request is not authorized', authorization=None)
             assert status == 401
 
