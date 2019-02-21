@@ -342,7 +342,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
     @classmethod
     def sort_by_request(cls, query):
         query = super().sort_by_request(query)
-        external_columns = ('phaseId')
+        external_columns = ('phaseId', 'tagId')
         sorting_expression = context.query.get('sort', '').strip()
 
         if not sorting_expression:
@@ -351,7 +351,8 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
         sorting_columns = {
                 c[1:] if c.startswith('-') else c:
                 'desc' if c.startswith('-') else None
-            for c in sorting_expression.split(',') if external_columns in c
+            for c in sorting_expression.split(',')
+            if c.replace('-', '') in external_columns
         }
 
         if 'phaseId' in sorting_expression:
@@ -368,6 +369,14 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
                 query,
                 column=Item.phase_id,
                 descending=sorting_columns['phaseId']
+            )
+
+        if 'tagId' in sorting_expression:
+            query = query.join(IssueTag, IssueTag.issue_id == Issue.id)
+            query = cls._sort_by_key_value(
+                query,
+                column=IssueTag.tag_id,
+                descending=sorting_columns['tagId']
             )
 
         return query

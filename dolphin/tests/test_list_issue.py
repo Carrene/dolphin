@@ -35,12 +35,14 @@ class TestIssue(LocalApplicationTestCase):
             organization_id=cls.organization.id,
         )
         session.add(cls.tag1)
+        session.flush()
 
         cls.tag2 = Tag(
             title='Second tag',
             organization_id=cls.organization.id,
         )
         session.add(cls.tag2)
+        session.flush()
 
         workflow = Workflow(title='Default')
         skill = Skill(title='First Skill')
@@ -276,6 +278,34 @@ class TestIssue(LocalApplicationTestCase):
             assert len(response.json) == 2
             assert response.json[0]['id'] == self.issue1.id
             assert response.json[1]['id'] == self.issue2.id
+
+            when('Sort by tag id', query=dict(sort='tagId'))
+            assert status == 200
+            assert len(response.json) == 2
+            assert response.json[0]['id'] == self.issue1.id
+            assert response.json[1]['id'] == self.issue2.id
+
+            when('Reverse sort by tag id', query=dict(sort='-tagId'))
+            assert status == 200
+            assert len(response.json) == 2
+            assert response.json[0]['id'] == self.issue2.id
+            assert response.json[1]['id'] == self.issue1.id
+
+            when('Sort by tag id and title', query=dict(sort='tagId,title'))
+            assert status == 200
+            assert len(response.json) == 2
+            assert response.json[0]['id'] == self.issue1.id
+            assert response.json[1]['id'] == self.issue2.id
+
+            when(
+                'Sort by tag id and reverse title',
+                query=dict(sort='tagId,-title')
+            )
+            assert status == 200
+            assert len(response.json) == 2
+            assert response.json[0]['id'] == self.issue2.id
+            assert response.json[1]['id'] == self.issue1.id
+
 
             when('Request is not authorized', authorization=None)
             assert status == 401
