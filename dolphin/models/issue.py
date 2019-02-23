@@ -288,6 +288,13 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
             example='Lorem Ipsum',
             message='Lorem Ipsum',
         )
+        yield MetadataField(
+            name='seenAt',
+            key='seen_at',
+            label='seen at',
+            required=False,
+            readonly=True
+        )
 
     def to_dict(self, include_relations=True):
         issue_dict = super().to_dict()
