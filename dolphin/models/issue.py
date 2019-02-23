@@ -65,6 +65,7 @@ DELAYED = 'delayed'
 ONTIME = 'on-time'
 
 
+# FIXME: Remove the '\' from Issue inheritance definition
 class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
             Subscribable):
 
@@ -208,6 +209,21 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
         deferred=True
     )
 
+    seen_at = column_property(
+        select([Subscription.seen_at]) \
+        .select_from(
+            join(Subscription, Member, Subscription.member_id == Member.id)
+        ) \
+        .where(Subscription.subscribable_id == id) \
+        .where(Member.reference_id == bindparam(
+                'reference_id',
+                callable_=lambda: context.identity.reference_id
+            )
+        ) \
+        .correlate_except(Subscription),
+        deferred=True
+    )
+
     @hybrid_property
     def boarding(self):
         if self.due_date < datetime.now():
@@ -277,6 +293,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
         issue_dict = super().to_dict()
         issue_dict['boarding'] = self.boarding
         issue_dict['isSubscribed'] = True if self.is_subscribed else False
+        issue_dict['seenAt'] = self.seen_at.isoformat() if self.seen_at else None
 
         if include_relations:
             issue_dict['relations'] = []
