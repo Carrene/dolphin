@@ -1,5 +1,5 @@
 from auditor.context import Context as AuditLogContext
-from bddrest import status, when
+from bddrest import status, when, response
 
 from dolphin.models import Issue, Project, Member, Workflow, Group, \
     Subscription, Release
@@ -82,6 +82,7 @@ class TestSeeIssue(LocalApplicationTestCase):
             f'SEE',
         ):
             assert status == 200
+            assert response.json['seenAt'] is not None
 
             session = self.create_session()
             session.add(self.subscription_issue1)

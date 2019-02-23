@@ -89,3 +89,8 @@ class TestIssue(LocalApplicationTestCase):
             assert fields['tagId']['readonly'] is not None
             assert fields['tagId']['example'] is not None
 
+            assert fields['seenAt']['label'] is not None
+            assert fields['seenAt']['name'] is not None
+            assert fields['seenAt']['required'] is not None
+            assert fields['seenAt']['readonly'] is not None
+
