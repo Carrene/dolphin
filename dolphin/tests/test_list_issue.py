@@ -105,7 +105,7 @@ class TestIssue(LocalApplicationTestCase):
         )
         session.add(subscription_issue2)
 
-        issue3 = Issue(
+        cls.issue3 = Issue(
             project=cls.project,
             title='Third issue',
             description='This is description of third issue',
@@ -114,7 +114,7 @@ class TestIssue(LocalApplicationTestCase):
             days=3,
             room_id=4,
         )
-        session.add(issue3)
+        session.add(cls.issue3)
         session.flush()
 
         cls.phase1 = Phase(
@@ -269,15 +269,17 @@ class TestIssue(LocalApplicationTestCase):
 
             when('Sort by phase id', query=dict(sort='phaseId'))
             assert status == 200
-            assert len(response.json) == 2
+            assert len(response.json) == 3
             assert response.json[0]['id'] == self.issue2.id
             assert response.json[1]['id'] == self.issue1.id
+            assert response.json[2]['id'] == self.issue3.id
 
             when('Reverse sort by phase id', query=dict(sort='-phaseId'))
             assert status == 200
-            assert len(response.json) == 2
-            assert response.json[0]['id'] == self.issue1.id
-            assert response.json[1]['id'] == self.issue2.id
+            assert len(response.json) == 3
+            assert response.json[0]['id'] == self.issue3.id
+            assert response.json[1]['id'] == self.issue1.id
+            assert response.json[2]['id'] == self.issue2.id
 
             when('Sort by tag id', query=dict(sort='tagId'))
             assert status == 200
@@ -305,7 +307,6 @@ class TestIssue(LocalApplicationTestCase):
             assert len(response.json) == 2
             assert response.json[0]['id'] == self.issue2.id
             assert response.json[1]['id'] == self.issue1.id
-
 
             when('Request is not authorized', authorization=None)
             assert status == 401

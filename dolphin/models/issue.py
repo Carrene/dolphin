@@ -387,8 +387,12 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
                 .group_by(Item.issue_id) \
                 .cte()
 
-            query = query.join(Item, Item.issue_id == Issue.id)
-            query = query.join(item_cte, item_cte.c.max_item_id == Item.id)
+            query = query.join(Item, Item.issue_id == Issue.id, isouter=True)
+            query = query.join(
+                item_cte,
+                item_cte.c.max_item_id == Item.id,
+                isouter=True
+            )
             query = cls._sort_by_key_value(
                 query,
                 column=Item.phase_id,
