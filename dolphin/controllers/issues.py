@@ -302,11 +302,13 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         if not issue:
             raise HTTPNotFound()
 
-        if DBSession.query(Subscription).filter(
-                Subscription.subscribable_id == id,
-                Subscription.member_id == member.id,
-                Subscription.on_shot == None,
-        ).one_or_none():
+        if DBSession.query(Subscription)\
+                .filter(
+                    Subscription.subscribable_id == id,
+                    Subscription.member_id == member.id,
+                    Subscription.on_shot == None,
+                ) \
+                .one_or_none():
             raise HTTPStatus('611 Already Subscribed')
 
         subscription = Subscription(
@@ -414,11 +416,13 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         phase = DBSession.query(Phase).get(form['phaseId'])
 
-        if DBSession.query(Item).filter(
-            Item.phase_id == phase.id,
-            Item.member_id == member.id,
-            Item.issue_id == issue.id
-        ).one_or_none():
+        if DBSession.query(Item) \
+                .filter(
+                    Item.phase_id == phase.id,
+                    Item.member_id == member.id,
+                    Item.issue_id == issue.id
+                ) \
+                .one_or_none():
             raise HTTPStatus('602 Already Assigned')
 
         item = Item(
@@ -621,7 +625,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         return issue
 
     # FIXME: Add authorize decorator, #519
-    @json
+    @json(prevent_empty_form='708 Empty Form')
     @validate(
         memberId=dict(
             required='735 Member Id Not In Form',
@@ -658,8 +662,9 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     def ensure_subscription(self, issue_id, member_id):
         return DBSession.query(Subscription) \
             .filter(
-            Subscription.member_id == member_id,
-            Subscription.subscribable_id == issue_id,
-            Subscription.on_shot == None,
-        ).one_or_none()
+                Subscription.member_id == member_id,
+                Subscription.subscribable_id == issue_id,
+                Subscription.on_shot == None,
+            ) \
+            .one_or_none()
 
