@@ -231,7 +231,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                     Subscription,
                     and_(
                         Subscription.subscribable_id == Issue.id,
-                        Subscription.seen_at.is_(None),
+                        Subscription.seen_at == None,
                     )
                 ) \
                 .filter(Subscription.member_id == context.identity.id)
