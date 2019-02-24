@@ -34,7 +34,7 @@ class DraftIssue(ModifiedMixin, DeclarativeBase):
         not_none=False
     )
 
-    relate_to_issue_id = Field(
+    related_issue_id = Field(
         Integer,
         nullable=True,
         required=False,
