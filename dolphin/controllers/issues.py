@@ -443,6 +443,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         subscription.seen_at = datetime.utcnow()
         return issue
 
+    #FIXME: Add authorize decorator, #519
     @json(prevent_form='709 Form Not Allowed')
     @Issue.expose
     @commit
@@ -455,9 +456,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         subscriptions_query = DBSession.query(Subscription) \
             .filter(Subscription.subscribable_id == issue.id)
 
-        if context.identity \
-                and context.identity.id \
-                and Member._role in context.identity.roles:
+        if context.identity and context.identity.id:
             subscriptions_query = subscriptions_query \
                 .filter(Subscription.member_id == context.identity.id)
 

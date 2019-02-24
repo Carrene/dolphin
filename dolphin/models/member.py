@@ -13,13 +13,11 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
              SoftDeleteMixin, DeclarativeBase):
 
     __tablename__ = 'member'
-    _role = __tablename__
 
     role = Field(String(50))
-
     __mapper_args__ = {
         'polymorphic_on': role,
-        'polymorphic_identity': _role
+        'polymorphic_identity': __tablename__
     }
 
     reference_id = Field(Integer, unique=True)
