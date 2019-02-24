@@ -143,3 +143,4 @@ class TestUnseeIssue(LocalApplicationTestCase):
             #     authorization=None
             # )
             # assert status == 401
+
