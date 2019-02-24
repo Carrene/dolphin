@@ -13,11 +13,13 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
              SoftDeleteMixin, DeclarativeBase):
 
     __tablename__ = 'member'
+    _role = __tablename__
 
     role = Field(String(50))
+
     __mapper_args__ = {
         'polymorphic_on': role,
-        'polymorphic_identity': __tablename__
+        'polymorphic_identity': _role
     }
 
     reference_id = Field(Integer, unique=True)
@@ -119,7 +121,7 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     @property
     def roles(self):
-        return []
+        return [self.role]
 
     def create_jwt_principal(self, session_id=None):
         if session_id is None:
