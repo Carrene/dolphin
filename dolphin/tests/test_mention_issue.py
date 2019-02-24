@@ -134,6 +134,12 @@ class TestIssue(LocalApplicationTestCase):
             assert status == '735 Member Id Not In Form'
 
             when(
+                'Empty form',
+                json={},
+            )
+            assert status == '708 Empty Form'
+
+            when(
                 'Invalid memberId type',
                 json=dict(memberId='not-int'),
             )

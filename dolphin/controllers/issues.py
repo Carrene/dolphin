@@ -306,7 +306,11 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 .filter(
                     Subscription.subscribable_id == id,
                     Subscription.member_id == member.id,
+<<<<<<< 385f50ff0f0962f3b0c97497bb5325f6d36e55b6
                     Subscription.one_shot.is_(None),
+=======
+                    Subscription.on_shot == None,
+>>>>>>> Coding style
                 ) \
                 .one_or_none():
             raise HTTPStatus('611 Already Subscribed')
@@ -624,7 +628,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         return issue
 
     # FIXME: Add authorize decorator, #519
-    @json
+    @json(prevent_empty_form='708 Empty Form')
     @validate(
         memberId=dict(
             required='735 Member Id Not In Form',
