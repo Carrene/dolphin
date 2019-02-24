@@ -52,7 +52,6 @@ class DraftIssue(ModifiedMixin, DeclarativeBase):
     issue = relationship(
         'Issue',
         back_populates='draft_issues',
-        primaryjoin='Issue.id == DraftIssue.issue_id',
         protected=True
     )
 

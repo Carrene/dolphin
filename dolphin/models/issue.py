@@ -177,7 +177,6 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
     draft_issues = relationship(
         'DraftIssue',
         back_populates='issue',
-        primaryjoin='Issue.id == DraftIssue.issue_id',
         protected=True,
     )
 
