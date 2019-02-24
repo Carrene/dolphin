@@ -231,7 +231,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                     Subscription,
                     and_(
                         Subscription.subscribable_id == Issue.id,
-                        Subscription.seen_at == None,
+                        Subscription.seen_at.is_(None),
                     )
                 ) \
                 .filter(Subscription.member_id == context.identity.id)
@@ -306,11 +306,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 .filter(
                     Subscription.subscribable_id == id,
                     Subscription.member_id == member.id,
-<<<<<<< 385f50ff0f0962f3b0c97497bb5325f6d36e55b6
                     Subscription.one_shot.is_(None),
-=======
-                    Subscription.on_shot == None,
->>>>>>> Coding style
                 ) \
                 .one_or_none():
             raise HTTPStatus('611 Already Subscribed')
