@@ -124,6 +124,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 and_(
                     Subscription.member_id != context.identity.id,
                     Subscription.subscribable_id == issue.id,
+                    Subscription.on_shot == None,
                 )
             ).all()
 
@@ -233,7 +234,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                     Subscription,
                     and_(
                         Subscription.subscribable_id == Issue.id,
-                        Subscription.seen_at.is_(None),
+                        Subscription.seen_at == None,
                     )
                 ) \
                 .filter(Subscription.member_id == context.identity.id)
@@ -265,9 +266,12 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 .filter(Subscription.member_id == member.id) \
                 .join(
                     Subscribable,
-                    Subscribable.id == Subscription.subscribable_id
+                    Subscribable.id == Subscription.subscribable_id,
                 ) \
-                .filter(Subscribable.type_ == 'issue') \
+                .filter(
+                    Subscribable.type_ == 'issue',
+                    Subscription.on_shot == None,
+                ) \
                 .all()
             subscribed_issues_id = {i.subscribable_id for i in subscribed_issues}
 
@@ -300,7 +304,8 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         if DBSession.query(Subscription).filter(
                 Subscription.subscribable_id == id,
-                Subscription.member_id == member.id
+                Subscription.member_id == member.id,
+                Subscription.on_shot == None,
         ).one_or_none():
             raise HTTPStatus('611 Already Subscribed')
 
@@ -354,7 +359,8 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         member = Member.current()
         subscription = DBSession.query(Subscription).filter(
             Subscription.subscribable_id == id,
-            Subscription.member_id == member.id
+            Subscription.member_id == member.id,
+            Subscription.on_shot == None,
         ).one_or_none()
 
         if not subscription:
@@ -635,14 +641,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         if member is None:
             raise HTTPStatus('610 Member Not Found')
 
-        subscription = DBSession.query(Subscription) \
-            .filter(
-                Subscription.member_id == member.id,
-                Subscription.subscribable_id == issue.id,
-                Subscription.on_shot == None,
-            ) \
-            .order_by(Subscription.created_at.desc()) \
-            .first()
+        subscription = self.ensure_subscription(issue.id, member.id)
 
         if subscription is None:
             subscription = Subscription(
@@ -655,3 +654,12 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         subscription.seen_at = None
 
         return issue
+
+    def ensure_subscription(self, issue_id, member_id):
+        return DBSession.query(Subscription) \
+            .filter(
+            Subscription.member_id == member_id,
+            Subscription.subscribable_id == issue_id,
+            Subscription.on_shot == None,
+        ).one_or_none()
+
