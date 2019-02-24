@@ -31,8 +31,13 @@ class TestDraftIssue(LocalApplicationTestCase):
             assert response.json['id'] is not None
             assert response.json['issueId'] is None
 
-            when('Trying to pass with form parameres', form=dict(a='a'))
-            assert status == '709 Form Not Allowed'
+            when(
+                'Trying to pass with invalid form parameres',
+                form=dict(a='a'),
+            )
+            assert status == '707 Invalid field, only following fields are ' \
+                'accepted: title, description, kind, days, status, projectId,' \
+                ' dueDate, priority'
 
             when('Request is not authorized', authorization=None)
             assert status == 401
