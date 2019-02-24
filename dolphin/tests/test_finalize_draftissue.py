@@ -244,7 +244,7 @@ class TestIssue(LocalApplicationTestCase):
                 'on-hold, to-do, done, complete" will be accepted'
 
             when(
-                '',
+                'Trying to pass with invalid form parameters',
                 form=Update(a=1)
             )
             assert status == '707 Invalid field, only following fields are ' \
