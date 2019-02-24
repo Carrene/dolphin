@@ -243,6 +243,14 @@ class TestIssue(LocalApplicationTestCase):
             assert status == '705 Invalid status, only one of "in-progress, '\
                 'on-hold, to-do, done, complete" will be accepted'
 
+            when(
+                '',
+                form=Update(a=1)
+            )
+            assert status == '707 Invalid field, only following fields are ' \
+                'accepted: title, description, kind, days, status, projectId, ' \
+                'dueDate, priority'
+
             when('Request is not authorized', authorization=None)
             assert status == 401
 

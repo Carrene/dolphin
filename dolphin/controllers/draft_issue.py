@@ -12,6 +12,21 @@ from ..validators import draft_issue_finalize_validator
 from .tag import TagController
 
 
+FORM_WHITELIST = [
+    'title',
+    'description',
+    'kind',
+    'days',
+    'status',
+    'projectId',
+    'dueDate',
+    'priority'
+]
+
+
+FROM_WHITELISTS_STRING = ', '.join(FORM_WHITELIST)
+
+
 class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
     __model__ = DraftIssue
 
@@ -52,7 +67,11 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
         return super().__call__(*remaining_paths)
 
     @authorize
-    @json(prevent_form='709 Form Not Allowed')
+    @json(form_whitelist=(
+        FORM_WHITELIST,
+        f'707 Invalid field, only following fields are accepted: '
+        f'{FROM_WHITELISTS_STRING}'
+    ))
     @DraftIssue.expose
     @commit
     def define(self):
@@ -62,10 +81,9 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
 
     @authorize
     @json(form_whitelist=(
-        ['title', 'description', 'kind', 'days', 'status', 'projectId',
-         'dueDate', 'priority'],
-        '707 Invalid field, only following fields are accepted: ' \
-        'title, description, kind, days, status, projectId, dueDate, priority'
+        FORM_WHITELIST,
+        f'707 Invalid field, only following fields are accepted: '
+        f'{FROM_WHITELISTS_STRING}'
     ))
     @draft_issue_finalize_validator
     @DraftIssue.expose
