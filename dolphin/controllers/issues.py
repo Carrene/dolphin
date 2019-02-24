@@ -137,10 +137,9 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     @Issue.expose
     def list(self):
         query = DBSession.query(Issue)
+        sorting_expression = context.query.get('sort', '').strip()
 
-        # FILTER
-        if 'phaseId' in context.query:
-            value = context.query['phaseId']
+        if 'phaseId' in sorting_expression or 'phaseId' in context.query:
             item_cte = select([
                 Item.issue_id,
                 func.max(Item.id).label('max_item_id')
@@ -148,6 +147,12 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 .group_by(Item.issue_id) \
                 .cte()
 
+        if 'tagId' in sorting_expression or 'tagId' in context.query:
+            query = query.join(IssueTag, IssueTag.issue_id == Issue.id)
+
+        # FILTER
+        if 'phaseId' in context.query:
+            value = context.query['phaseId']
             query = query.join(Item, Item.issue_id == Issue.id)
             query = query.join(item_cte, item_cte.c.max_item_id == Item.id)
             query = Issue._filter_by_column_value(
@@ -170,7 +175,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         if 'tagId' in context.query:
             value = context.query['tagId']
-            query = query.join(IssueTag, IssueTag.issue_id == Issue.id)
             query = Issue._filter_by_column_value(query, IssueTag.tag_id, value)
 
         if 'tagTitle' in context.query:
@@ -187,7 +191,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         # SORT
         external_columns = ('phaseId', 'tagId')
-        sorting_expression = context.query.get('sort', '').strip()
 
         if not sorting_expression:
             return query
@@ -200,19 +203,14 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         }
 
         if 'phaseId' in sorting_expression:
-            item_cte = select([
-                Item.issue_id,
-                func.max(Item.id).label('max_item_id')
-            ]) \
-                .group_by(Item.issue_id) \
-                .cte()
+            if 'phaseId' not in context.query:
+                query = query.join(Item, Item.issue_id == Issue.id, isouter=True)
+                query = query.join(
+                    item_cte,
+                    item_cte.c.max_item_id == Item.id,
+                    isouter=True
+                )
 
-            query = query.join(Item, Item.issue_id == Issue.id, isouter=True)
-            query = query.join(
-                item_cte,
-                item_cte.c.max_item_id == Item.id,
-                isouter=True
-            )
             query = Issue._sort_by_key_value(
                 query,
                 column=Item.phase_id,
@@ -220,7 +218,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             )
 
         if 'tagId' in sorting_expression:
-            query = query.join(IssueTag, IssueTag.issue_id == Issue.id)
             query = Issue._sort_by_key_value(
                 query,
                 column=IssueTag.tag_id,
