@@ -90,8 +90,7 @@ class TestUnseeIssue(LocalApplicationTestCase):
         )
         session.add(cls.issue2)
         session.commit()
-        session.expunge(cls.subscription_issue1)
-        session.expunge(cls.subscription_issue2)
+        session.expunge_all()
 
     def test_unsee_issue(self):
         self.login('member1@example.com')
