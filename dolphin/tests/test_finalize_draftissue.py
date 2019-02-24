@@ -158,6 +158,19 @@ class TestIssue(LocalApplicationTestCase):
             assert status == '601 Project not found with id: 0'
 
             when(
+                'Relate issue not found with string type',
+                form=Update(relateToIssueId='Alphabetical', title='New title')
+            )
+            assert status == '722 Invalid Issue Id Type'
+
+            when(
+                'Relate to issue not found with integer type',
+                form=Update(relateToIssueId=0, title='New title')
+            )
+            assert status == 647
+            assert status.text.startswith('relatedIssue With Id')
+
+            when(
                 'Title is not in form',
                 form=given - 'title'
             )
@@ -249,7 +262,7 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert status == '707 Invalid field, only following fields are ' \
                 'accepted: title, description, kind, days, status, projectId, ' \
-                'dueDate, priority'
+                'dueDate, priority, relateToIssueId'
 
             when('Request is not authorized', authorization=None)
             assert status == 401

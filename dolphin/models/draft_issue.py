@@ -34,6 +34,14 @@ class DraftIssue(ModifiedMixin, DeclarativeBase):
         not_none=False
     )
 
+    relate_to_issue_id = Field(
+        Integer,
+        nullable=True,
+        required=False,
+        readonly=False,
+        not_none=False,
+    )
+
     tags = relationship(
         'Tag',
         secondary='draft_issue_tag',
@@ -44,6 +52,7 @@ class DraftIssue(ModifiedMixin, DeclarativeBase):
     issue = relationship(
         'Issue',
         back_populates='draft_issues',
+        primaryjoin='Issue.id == DraftIssue.issue_id',
         protected=True
     )
 

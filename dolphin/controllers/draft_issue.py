@@ -8,7 +8,8 @@ from ..backends import ChatClient
 from ..exceptions import RoomMemberAlreadyExist, ChatRoomNotFound
 from ..models import Issue, Phase, Item, Member, DraftIssue, DraftIssueTag, \
     Tag, Skill, Resource
-from ..validators import draft_issue_finalize_validator
+from ..validators import draft_issue_finalize_validator, \
+    draft_issue_define_validator
 from .tag import TagController
 
 
@@ -20,7 +21,8 @@ FORM_WHITELIST = [
     'status',
     'projectId',
     'dueDate',
-    'priority'
+    'priority',
+    'relateToIssueId',
 ]
 
 
@@ -72,10 +74,12 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
         f'707 Invalid field, only following fields are accepted: '
         f'{FROM_WHITELISTS_STRING}'
     ))
+    @draft_issue_define_validator
     @DraftIssue.expose
     @commit
     def define(self):
         draft_issue = DraftIssue()
+        draft_issue.update_from_request()
         DBSession.add(draft_issue)
         return draft_issue
 
@@ -106,6 +110,21 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
         issue = Issue()
         issue.tags = tags
         issue.update_from_request()
+
+        if draft_issue.relate_to_issue_id:
+            relate_issue = DBSession.query(Issue).get(
+                draft_issue.relate_to_issue_id
+            )
+
+        elif 'relateToIssueId' in context.form:
+            relate_to_issue_id = context.form.get('relateToIssueId')
+            relate_issue = DBSession.query(Issue).get(relate_to_issue_id)
+
+        else:
+            relate_issue = None
+
+        if relate_issue:
+            issue.relations.append(relate_issue)
 
         current_member = Member.current()
         room = self._ensure_room(

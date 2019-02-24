@@ -5,7 +5,8 @@ from restfulpy.orm import DBSession
 
 from .models import *
 from .models.organization import roles
-from .exceptions import HTTPResourceNotFound, HTTPRepetitiveTitle
+from .exceptions import HTTPResourceNotFound, HTTPRepetitiveTitle, \
+    HTTPRelatedIssueNotFound
 
 
 TITLE_PATTERN = re.compile(r'^(?!\s).*[^\s]$')
@@ -109,6 +110,16 @@ def issue_not_exists_validator(title, project, field):
             )
 
     return title
+
+def relate_to_issue_exists_validator(relateToIssueId, container, field):
+    if 'relateToIssueId' in context.form:
+        relate_to_issue_id = context.form.get('relateToIssueId')
+        issue = DBSession.query(Issue).get(relate_to_issue_id)
+
+        if issue is None:
+            raise HTTPRelatedIssueNotFound(relate_to_issue_id)
+
+    return relateToIssueId
 
 
 def kind_value_validator(kind, project, field):
@@ -329,6 +340,15 @@ update_project_validator = validate(
 )
 
 
+draft_issue_define_validator = validate(
+    relateToIssueId=dict(
+        type_=(int, '722 Invalid Issue Id Type'),
+        not_none='775 Issue Id Is None',
+        callback=relate_to_issue_exists_validator,
+    ),
+)
+
+
 draft_issue_finalize_validator = validate(
     priority=dict(
         required='768 Priority Not In Form',
@@ -362,6 +382,11 @@ draft_issue_finalize_validator = validate(
     days=dict(
         type_=(int, '721 Invalid Days Type'),
         required='720 Days Not In Form'
+    ),
+    relateToIssueId=dict(
+        type_=(int, '722 Invalid Issue Id Type'),
+        not_none='775 Issue Id Is None',
+        callback=relate_to_issue_exists_validator,
     ),
 )
 
