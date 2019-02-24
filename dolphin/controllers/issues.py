@@ -624,7 +624,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         return issue
 
     # FIXME: Add authorize decorator, #519
-    @json(prevent_empty_form='708 Empty Form')
+    @json
     @validate(
         memberId=dict(
             required='735 Member Id Not In Form',
@@ -666,4 +666,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 Subscription.one_shot.is_(None),
             ) \
             .one_or_none()
+
+        return issue
 
