@@ -5,14 +5,14 @@ from nanohttp import HTTPStatus, json, context, HTTPNotFound, \
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import DBSession, commit
-from sqlalchemy import and_, exists
+from sqlalchemy import and_, exists, select, func
 from auditor import context as AuditLogContext
 
 from ..backends import ChatClient
 from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound, \
     ChatRoomNotFound, HTTPNotSubscribedIssue, HTTPRelatedIssueNotFound
 from ..models import Issue, Subscription, Phase, Item, Member, Project, \
-    RelatedIssue, Subscribable
+    RelatedIssue, Subscribable, IssueTag, Tag
 from ..validators import update_issue_validator, assign_issue_validator, \
     issue_move_validator, unassign_issue_validator, issue_relate_validator, \
     issue_unrelate_validator
@@ -137,6 +137,96 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     @Issue.expose
     def list(self):
         query = DBSession.query(Issue)
+
+        # FILTER
+        if 'phaseId' in context.query:
+            value = context.query['phaseId']
+            item_cte = select([
+                Item.issue_id,
+                func.max(Item.id).label('max_item_id')
+            ]) \
+                .group_by(Item.issue_id) \
+                .cte()
+
+            query = query.join(Item, Item.issue_id == Issue.id)
+            query = query.join(item_cte, item_cte.c.max_item_id == Item.id)
+            query = Issue._filter_by_column_value(
+                query,
+                Item.phase_id,
+                value
+            )
+
+        if 'phaseTitle' in context.query:
+            value = context.query['phaseTitle']
+            if 'phaseId' in context.query:
+                query = query.join(Phase, Item.phase_id == Phase.id)
+
+            else:
+                query = query \
+                    .join(Item, Item.issue_id == Issue.id) \
+                    .join(Phase, Item.phase_id == Phase.id)
+
+            query = Issue._filter_by_column_value(query, Phase.title, value)
+
+        if 'tagId' in context.query:
+            value = context.query['tagId']
+            query = query.join(IssueTag, IssueTag.issue_id == Issue.id)
+            query = Issue._filter_by_column_value(query, IssueTag.tag_id, value)
+
+        if 'tagTitle' in context.query:
+            value = context.query['tagTitle']
+            if 'tagId' in context.query:
+                query = query.join(Tag, Tag.id == IssueTag.tag_id)
+
+            else:
+                query = query \
+                    .join(IssueTag, IssueTag.issue_id == Issue.id) \
+                    .join(Tag, Tag.id == IssueTag.tag_id)
+
+            query = Issue._filter_by_column_value(query, Tag.title, value)
+
+        # SORT
+        external_columns = ('phaseId', 'tagId')
+        sorting_expression = context.query.get('sort', '').strip()
+
+        if not sorting_expression:
+            return query
+
+        sorting_columns = {
+                c[1:] if c.startswith('-') else c:
+                'desc' if c.startswith('-') else None
+            for c in sorting_expression.split(',')
+            if c.replace('-', '') in external_columns
+        }
+
+        if 'phaseId' in sorting_expression:
+            item_cte = select([
+                Item.issue_id,
+                func.max(Item.id).label('max_item_id')
+            ]) \
+                .group_by(Item.issue_id) \
+                .cte()
+
+            query = query.join(Item, Item.issue_id == Issue.id, isouter=True)
+            query = query.join(
+                item_cte,
+                item_cte.c.max_item_id == Item.id,
+                isouter=True
+            )
+            query = Issue._sort_by_key_value(
+                query,
+                column=Item.phase_id,
+                descending=sorting_columns['phaseId']
+            )
+
+        if 'tagId' in sorting_expression:
+            query = query.join(IssueTag, IssueTag.issue_id == Issue.id)
+            query = Issue._sort_by_key_value(
+                query,
+                column=IssueTag.tag_id,
+                descending=sorting_columns['tagId']
+            )
+
         if 'seenAt' in context.query:
             query = query \
                 .join(
