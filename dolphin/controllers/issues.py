@@ -443,7 +443,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         subscription.seen_at = datetime.utcnow()
         return issue
 
-    @authorize
+    #FIXME: Add authorize decorator, #519
     @json(prevent_form='709 Form Not Allowed')
     @Issue.expose
     @commit
@@ -453,18 +453,19 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         if issue is None:
             raise HTTPNotFound()
 
-        subscription = DBSession.query(Subscription) \
-            .filter(
-                and_(
-                    Subscription.member_id == context.identity.id,
-                    Subscription.subscribable_id == issue.id
-                )
-        ).one_or_none()
+        subscriptions_query = DBSession.query(Subscription) \
+            .filter(Subscription.subscribable_id == issue.id)
 
-        if subscription is None:
+        if context.identity and context.identity.id:
+            subscriptions_query = subscriptions_query \
+                .filter(Subscription.member_id == context.identity.id)
+
+        subscriptions = subscriptions_query.all()
+        if len(subscriptions) == 0:
             raise HTTPNotSubscribedIssue()
 
-        subscription.seen_at = None
+        for subscription in subscriptions:
+            subscription.seen_at = None
         return issue
 
     @authorize

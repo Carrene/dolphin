@@ -202,7 +202,10 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
         .where(Subscription.subscribable_id == id) \
         .where(Member.reference_id == bindparam(
                 'reference_id',
-                callable_=lambda: context.identity.reference_id
+                callable_=lambda:
+                    context.identity.reference_id
+                    if context.identity else
+                    None
             )
         ) \
         .correlate_except(Subscription),
@@ -217,7 +220,10 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
         .where(Subscription.subscribable_id == id) \
         .where(Member.reference_id == bindparam(
                 'reference_id',
-                callable_=lambda: context.identity.reference_id
+                callable_=lambda:
+                    context.identity.reference_id
+                    if context.identity else
+                    None
             )
         ) \
         .correlate_except(Subscription),

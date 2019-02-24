@@ -119,7 +119,7 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     @property
     def roles(self):
-        return []
+        return [self.role]
 
     def create_jwt_principal(self, session_id=None):
         if session_id is None:

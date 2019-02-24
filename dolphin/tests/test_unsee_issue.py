@@ -15,14 +15,23 @@ class TestUnseeIssue(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        member = Member(
+        member1 = Member(
             title='First Member',
             email='member1@example.com',
             access_token='access token 1',
             phone=123456789,
             reference_id=1
         )
-        session.add(member)
+        session.add(member1)
+
+        member2 = Member(
+            title='Second Member',
+            email='member2@example.com',
+            access_token='access token 2',
+            phone=223456789,
+            reference_id=2
+        )
+        session.add(member2)
 
         workflow = Workflow(title='Default')
         group = Group(title='default')
@@ -37,7 +46,7 @@ class TestUnseeIssue(LocalApplicationTestCase):
             release=release,
             workflow=workflow,
             group=group,
-            manager=member,
+            manager=member1,
             title='My first project',
             description='A decription for my project',
             room_id=1
@@ -58,10 +67,17 @@ class TestUnseeIssue(LocalApplicationTestCase):
 
         cls.subscription_issue1 = Subscription(
             subscribable_id=cls.issue1.id,
-            member_id=member.id,
+            member_id=member1.id,
             seen_at=datetime.utcnow()
         )
         session.add(cls.subscription_issue1)
+
+        cls.subscription_issue2 = Subscription(
+            subscribable_id=cls.issue1.id,
+            member_id=member2.id,
+            seen_at=datetime.utcnow()
+        )
+        session.add(cls.subscription_issue2)
 
         cls.issue2 = Issue(
             project=project,
@@ -74,7 +90,7 @@ class TestUnseeIssue(LocalApplicationTestCase):
         )
         session.add(cls.issue2)
         session.commit()
-        session.expunge(cls.subscription_issue1)
+        session.expunge_all()
 
     def test_unsee_issue(self):
         self.login('member1@example.com')
@@ -90,6 +106,17 @@ class TestUnseeIssue(LocalApplicationTestCase):
             session.add(self.subscription_issue1)
             session.expire(self.subscription_issue1)
             assert self.subscription_issue1.seen_at is None
+
+            # FIXME: Add proper authorization, #519
+            when(
+                'Unsee an issue as jaguar',
+                url_parameters=dict(id=self.issue1.id),
+                authorization=None,
+            )
+            assert status == 200
+            session.add(self.subscription_issue2)
+            session.expire(self.subscription_issue2)
+            assert self.subscription_issue2.seen_at is None
 
             when(
                 'Unsee an unsubscribed issue',
@@ -109,9 +136,11 @@ class TestUnseeIssue(LocalApplicationTestCase):
             )
             assert status == '709 Form Not Allowed'
 
-            self.logout()
-            when(
-                'Trying with an unauthorized member',
-                authorization=None
-            )
-            assert status == 401
+            # FIXME: Commented due to issue #519
+            # self.logout()
+            # when(
+            #     'Trying with an unauthorized member',
+            #     authorization=None
+            # )
+            # assert status == 401
+
