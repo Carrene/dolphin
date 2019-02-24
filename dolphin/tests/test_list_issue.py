@@ -308,6 +308,14 @@ class TestIssue(LocalApplicationTestCase):
             assert response.json[0]['id'] == self.issue1.id
             assert response.json[1]['id'] == self.issue2.id
 
+            when(
+                'Sort and filter by phase id at the same time',
+                query=dict(sort='phaseId', phaseId=self.phase1.id)
+            )
+            assert status == 200
+            assert len(response.json) == 1
+            assert response.json[0]['id'] == self.issue2.id
+
             when('Request is not authorized', authorization=None)
             assert status == 401
 
