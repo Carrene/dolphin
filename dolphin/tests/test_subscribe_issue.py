@@ -1,7 +1,8 @@
 from auditor.context import Context as AuditLogContext
 from bddrest import status, when, response
 
-from dolphin.models import Issue, Project, Member, Workflow, Group, Release
+from dolphin.models import Issue, Project, Member, Workflow, Group, Release, \
+    Subscription
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
@@ -62,6 +63,13 @@ class TestIssue(LocalApplicationTestCase):
             room_id=3
         )
         session.add(issue2)
+
+        one_shot_subscription = Subscription(
+            member=member,
+            subscribable=cls.issue1,
+            on_shot=True
+        )
+        session.add(one_shot_subscription)
         session.commit()
 
     def test_subscribe(self):

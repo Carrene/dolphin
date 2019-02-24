@@ -20,6 +20,17 @@ class Subscription(TimestampMixin, DeclarativeBase):
 
     on_shot = Field(BOOLEAN, nullable=True)
 
+    member = relationship(
+        'Member',
+        back_populates='subscriptions',
+        uselist=False,
+    )
+    subscribable = relationship(
+        'Subscribable',
+        back_populates='subscriptions',
+        uselist=False,
+    )
+
 
 class Subscribable(TimestampMixin, DeclarativeBase):
     __tablename__ = 'subscribable'
@@ -63,5 +74,10 @@ class Subscribable(TimestampMixin, DeclarativeBase):
         secondary='subscription',
         back_populates='subscribables',
         protected=True
+    )
+
+    subscriptions = relationship(
+        'Subscription',
+        back_populates='subscribable'
     )
 

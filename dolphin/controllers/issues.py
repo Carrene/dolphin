@@ -124,7 +124,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 and_(
                     Subscription.member_id != context.identity.id,
                     Subscription.subscribable_id == issue.id,
-                    Subscription.on_shot == None,
+                    Subscription.on_shot.is_(None),
                 )
             ).all()
 
@@ -234,7 +234,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                     Subscription,
                     and_(
                         Subscription.subscribable_id == Issue.id,
-                        Subscription.seen_at == None,
+                        Subscription.seen_at.is_(None),
                     )
                 ) \
                 .filter(Subscription.member_id == context.identity.id)
@@ -270,7 +270,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 ) \
                 .filter(
                     Subscribable.type_ == 'issue',
-                    Subscription.on_shot == None,
+                    Subscription.on_shot.is_(None),
                 ) \
                 .all()
             subscribed_issues_id = {i.subscribable_id for i in subscribed_issues}
@@ -306,7 +306,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 .filter(
                     Subscription.subscribable_id == id,
                     Subscription.member_id == member.id,
-                    Subscription.on_shot == None,
+                    Subscription.on_shot.is_(None),
                 ) \
                 .one_or_none():
             raise HTTPStatus('611 Already Subscribed')
@@ -362,7 +362,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         subscription = DBSession.query(Subscription).filter(
             Subscription.subscribable_id == id,
             Subscription.member_id == member.id,
-            Subscription.on_shot == None,
+            Subscription.on_shot.is_(None),
         ).one_or_none()
 
         if not subscription:
@@ -664,7 +664,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             .filter(
                 Subscription.member_id == member_id,
                 Subscription.subscribable_id == issue_id,
-                Subscription.on_shot == None,
+                Subscription.on_shot.is_(None),
             ) \
             .one_or_none()
 
