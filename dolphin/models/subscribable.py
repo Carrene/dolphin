@@ -7,12 +7,10 @@ from sqlalchemy import Integer, String, ForeignKey, DateTime, BOOLEAN
 class Subscription(TimestampMixin, DeclarativeBase):
     __tablename__ = 'subscription'
 
-    subscribable_id = Field(
-        Integer,
-        ForeignKey('subscribable.id'),
-        primary_key=True
-    )
-    member_id = Field(Integer, ForeignKey('member.id'), primary_key=True)
+    id = Field(Integer, primary_key=True)
+
+    subscribable_id = Field(Integer, ForeignKey('subscribable.id'))
+    member_id = Field(Integer, ForeignKey('member.id'))
 
     seen_at = Field(
         DateTime,
