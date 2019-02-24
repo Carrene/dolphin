@@ -227,8 +227,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 descending=sorting_columns['tagId']
             )
 
-
-
         if 'seenAt' in context.query:
             query = query \
                 .join(
