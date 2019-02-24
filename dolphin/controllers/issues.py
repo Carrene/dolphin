@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from nanohttp import HTTPStatus, json, context, HTTPNotFound, \
-    HTTPUnauthorized, int_or_notfound, settings
+    HTTPUnauthorized, int_or_notfound, settings, validate
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import DBSession, commit
@@ -614,3 +614,44 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         issue.relations.remove(target)
         return issue
 
+    # FIXME: Add authorize decorator, #519
+    @json
+    @validate(
+        memberId=dict(
+            required='735 Member Id Not In Form',
+            type_=(int, '736 Invalid Member Id Type'),
+            not_none=('774 Member Id Is Null')
+        )
+    )
+    @commit
+    def mention(self, id):
+        id = int_or_notfound(id)
+        issue = DBSession.query(Issue).get(id)
+        if issue is None:
+            raise HTTPNotFound()
+
+        member_id = context.form['memberId']
+        member = DBSession.query(Member).get(member_id)
+        if member is None:
+            raise HTTPStatus('610 Member Not Found')
+
+        subscription = DBSession.query(Subscription) \
+            .filter(
+                Subscription.member_id == member.id,
+                Subscription.subscribable_id == issue.id,
+                Subscription.on_shot == None,
+            ) \
+            .order_by(Subscription.created_at.desc()) \
+            .first()
+
+        if subscription is None:
+            subscription = Subscription(
+                member_id=member_id,
+                subscribable_id=issue.id,
+                on_shot=True,
+            )
+            DBSession.add(subscription)
+
+        subscription.seen_at = None
+
+        return issue

@@ -1,10 +1,10 @@
 from datetime import datetime
 
 from restfulpy.orm import DeclarativeBase, Field, TimestampMixin, relationship
-from sqlalchemy import Integer, String, ForeignKey, DateTime
+from sqlalchemy import Integer, String, ForeignKey, DateTime, BOOLEAN
 
 
-class Subscription(DeclarativeBase):
+class Subscription(TimestampMixin, DeclarativeBase):
     __tablename__ = 'subscription'
 
     subscribable_id = Field(
@@ -19,6 +19,8 @@ class Subscription(DeclarativeBase):
         label='Seen At',
         nullable=True,
     )
+
+    on_shot = Field(BOOLEAN, nullable=True)
 
 
 class Subscribable(TimestampMixin, DeclarativeBase):
