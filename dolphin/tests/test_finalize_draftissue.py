@@ -159,13 +159,13 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Relate issue not found with string type',
-                form=Update(relateToIssueId='Alphabetical', title='New title')
+                form=Update(relatedIssueId='Alphabetical', title='New title')
             )
             assert status == '722 Invalid Issue Id Type'
 
             when(
                 'Relate to issue not found with integer type',
-                form=Update(relateToIssueId=0, title='New title')
+                form=Update(relatedIssueId=0, title='New title')
             )
             assert status == 647
             assert status.text.startswith('relatedIssue With Id')
@@ -262,7 +262,7 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert status == '707 Invalid field, only following fields are ' \
                 'accepted: title, description, kind, days, status, projectId, ' \
-                'dueDate, priority, relateToIssueId'
+                'dueDate, priority, relatedIssueId'
 
             when('Request is not authorized', authorization=None)
             assert status == 401

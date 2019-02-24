@@ -22,7 +22,7 @@ FORM_WHITELIST = [
     'projectId',
     'dueDate',
     'priority',
-    'relateToIssueId',
+    'relatedIssueId',
 ]
 
 
@@ -111,14 +111,14 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
         issue.tags = tags
         issue.update_from_request()
 
-        if draft_issue.relate_to_issue_id:
+        if draft_issue.related_issue_id:
             relate_issue = DBSession.query(Issue).get(
-                draft_issue.relate_to_issue_id
+                draft_issue.related_issue_id
             )
 
-        elif 'relateToIssueId' in context.form:
-            relate_to_issue_id = context.form.get('relateToIssueId')
-            relate_issue = DBSession.query(Issue).get(relate_to_issue_id)
+        elif 'relatedIssueId' in context.form:
+            related_issue_id = context.form.get('relatedIssueId')
+            relate_issue = DBSession.query(Issue).get(related_issue_id)
 
         else:
             relate_issue = None

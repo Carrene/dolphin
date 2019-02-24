@@ -60,12 +60,12 @@ class TestDraftIssue(LocalApplicationTestCase):
             'Define a draft issue',
             '/apiv1/draftissues',
             'DEFINE',
-            form=dict(relateToIssueId=self.issue.id),
+            form=dict(relatedIssueId=self.issue.id),
         ):
             assert status == 200
             assert response.json['id'] is not None
             assert response.json['issueId'] is None
-            assert response.json['relateToIssueId'] == self.issue.id
+            assert response.json['relatedIssueId'] == self.issue.id
 
             when(
                 'Trying to pass with invalid form parameres',
@@ -73,7 +73,7 @@ class TestDraftIssue(LocalApplicationTestCase):
             )
             assert status == '707 Invalid field, only following fields are ' \
                 'accepted: title, description, kind, days, status, projectId,' \
-                ' dueDate, priority, relateToIssueId'
+                ' dueDate, priority, relatedIssueId'
 
             when('Request is not authorized', authorization=None)
             assert status == 401
