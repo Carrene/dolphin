@@ -18,7 +18,7 @@ class Subscription(TimestampMixin, DeclarativeBase):
         nullable=True,
     )
 
-    on_shot = Field(BOOLEAN, nullable=True)
+    one_shot = Field(BOOLEAN, nullable=True)
 
     member = relationship(
         'Member',
