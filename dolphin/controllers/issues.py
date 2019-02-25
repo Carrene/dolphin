@@ -529,18 +529,17 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         if issue is None:
             raise HTTPNotFound()
 
-        subscription = DBSession.query(Subscription) \
+        subscriptions = DBSession.query(Subscription) \
             .filter(
                 and_(
                     Subscription.member_id == context.identity.id,
-                    Subscription.subscribable_id == issue.id
+                    Subscription.subscribable_id == issue.id,
+                    Subscription.seen_at.is_(None),
                 )
-        ).one_or_none()
+            )
+        for subscription in subscriptions:
+            subscription.seen_at = datetime.utcnow()
 
-        if subscription is None:
-            raise HTTPNotSubscribedIssue()
-
-        subscription.seen_at = datetime.utcnow()
         return issue
 
     #FIXME: Add authorize decorator, #519
