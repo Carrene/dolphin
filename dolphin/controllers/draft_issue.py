@@ -102,13 +102,14 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
         tags = DBSession.query(Tag) \
             .join(DraftIssueTag, DraftIssueTag.tag_id == Tag.id) \
             .filter(DraftIssueTag.draft_issue_id == id) \
-            .all()
 
         form = context.form
         token = context.environ['HTTP_AUTHORIZATION']
 
         issue = Issue()
-        issue.tags = tags
+        for tag in tags:
+            issue.tags.append(tag)
+
         issue.update_from_request()
 
         if draft_issue.related_issue_id:
