@@ -67,7 +67,7 @@ class TestIssue(LocalApplicationTestCase):
         one_shot_subscription = Subscription(
             member=member,
             subscribable=cls.issue1,
-            one_shot=True
+            on_shot=True
         )
         session.add(one_shot_subscription)
         session.commit()
