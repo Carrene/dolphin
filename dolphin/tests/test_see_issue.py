@@ -60,13 +60,6 @@ class TestSeeIssue(LocalApplicationTestCase):
         )
         session.add(cls.subscription_issue1)
 
-        cls.one_shot_subscription_issue1 = Subscription(
-            subscribable_id=cls.issue1.id,
-            member_id=member.id,
-            one_shot=True,
-        )
-        session.add(cls.one_shot_subscription_issue1)
-
         cls.issue2 = Issue(
             project=project,
             title='Second issue',
@@ -78,7 +71,7 @@ class TestSeeIssue(LocalApplicationTestCase):
         )
         session.add(cls.issue2)
         session.commit()
-        session.expunge_all()
+        session.expunge(cls.subscription_issue1)
 
     def test_see(self):
         self.login('member1@example.com')
@@ -93,10 +86,14 @@ class TestSeeIssue(LocalApplicationTestCase):
 
             session = self.create_session()
             session.add(self.subscription_issue1)
-            session.add(self.one_shot_subscription_issue1)
-            session.expire_all()
+            session.expire(self.subscription_issue1)
             assert self.subscription_issue1.seen_at is not None
-            assert self.one_shot_subscription_issue1.seen_at is not None
+
+            when(
+                'See an unsubscribed issue',
+                url_parameters=dict(id=self.issue2.id),
+            )
+            assert status == '637 Not Subscribed Issue'
 
             when(
                 'Issue is invalid',

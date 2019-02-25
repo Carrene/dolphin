@@ -200,7 +200,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
             join(Subscription, Member, Subscription.member_id == Member.id)
         ) \
         .where(Subscription.subscribable_id == id) \
-        .where(Subscription.one_shot.is_(None)) \
+        .where(Subscription.on_shot.is_(None)) \
         .where(Member.reference_id == bindparam(
                 'reference_id',
                 callable_=lambda:
@@ -219,7 +219,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
             join(Subscription, Member, Subscription.member_id == Member.id)
         ) \
         .where(Subscription.subscribable_id == id) \
-        .where(Subscription.one_shot.is_(None)) \
+        .where(Subscription.on_shot.is_(None)) \
         .where(Member.reference_id == bindparam(
                 'reference_id',
                 callable_=lambda:
