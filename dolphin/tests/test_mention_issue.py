@@ -111,7 +111,7 @@ class TestIssue(LocalApplicationTestCase):
                 .filter(
                     Subscription.member_id == self.member2.id,
                     Subscription.subscribable_id == self.issue1.id,
-                    Subscription.on_shot == True,
+                    Subscription.one_shot == True,
                 ).one()
             assert subscription_issue1_member2.seen_at is None
 
