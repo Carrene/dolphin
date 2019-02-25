@@ -126,7 +126,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                     Subscription.subscribable_id == issue.id,
                     Subscription.on_shot.is_(None),
                 )
-            ).all()
+            )
 
         for subscription in subscriptions:
             subscription.seen_at = None
@@ -249,9 +249,10 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         if context.query:
             query = DBSession.query(Issue)
-            requested_issues = Issue.filter_by_request(query).all()
+            requested_issues = Issue.filter_by_request(query)
 
-            if len(requested_issues) >= settings.issue.subscription.max_length:
+            if requested_issues.count() \
+                    >= settings.issue.subscription.max_length:
                 raise HTTPStatus(
                     f'776 Maximum {settings.issue.subscription.max_length} '
                     f'Issues To Subscribe At A Time'
@@ -268,11 +269,13 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 .filter(
                     Subscribable.type_ == 'issue',
                     Subscription.on_shot.is_(None),
-                ) \
-                .all()
-            subscribed_issues_id = {i.subscribable_id for i in subscribed_issues}
+                )
+            subscribed_issues_id = {
+                i.subscribable_id for i in subscribed_issues
+            }
 
-            not_subscribed_issues_id = requested_issues_id - subscribed_issues_id
+            not_subscribed_issues_id = \
+                requested_issues_id - subscribed_issues_id
 
             flush_counter = 0
             for each_issue_id in not_subscribed_issues_id:
@@ -550,15 +553,14 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         if issue is None:
             raise HTTPNotFound()
 
-        subscriptions_query = DBSession.query(Subscription) \
+        subscriptions = DBSession.query(Subscription) \
             .filter(Subscription.subscribable_id == issue.id)
 
         if context.identity and context.identity.id:
-            subscriptions_query = subscriptions_query \
+            subscriptions = subscriptions \
                 .filter(Subscription.member_id == context.identity.id)
 
-        subscriptions = subscriptions_query.all()
-        if len(subscriptions) == 0:
+        if subscriptions.count() == 0:
             raise HTTPNotSubscribedIssue()
 
         for subscription in subscriptions:
