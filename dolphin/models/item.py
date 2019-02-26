@@ -7,7 +7,17 @@ from sqlalchemy import Integer, ForeignKey, UniqueConstraint
 class Item(TimestampMixin, DeclarativeBase):
     __tablename__ = 'item'
 
-    id = Field(Integer, primary_key=True)
+    id = Field(
+        Integer,
+        primary_key=True,
+        readonly=True,
+        not_none=True,
+        required=False,
+        label='ID',
+        minimum=1,
+        example=1,
+        protected=False,
+    )
 
     phase_id = Field(Integer, ForeignKey('phase.id'))
     issue_id = Field(Integer, ForeignKey('issue.id'))

@@ -98,8 +98,17 @@ class Organization(OrderingMixin, FilteringMixin, PaginationMixin,
 
     __tablename__ = 'organization'
 
-    id = Field(Integer, primary_key=True, readonly=True)
-
+    id = Field(
+        Integer,
+        primary_key=True,
+        readonly=True,
+        not_none=True,
+        required=False,
+        label='ID',
+        minimum=1,
+        example=1,
+        protected=False,
+    )
     title = Field(
         Unicode(50),
         unique=True,

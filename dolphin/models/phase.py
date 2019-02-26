@@ -8,8 +8,17 @@ from .skill import Skill
 class Phase(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
     __tablename__ = 'phase'
 
-    id = Field(Integer, primary_key=True, readonly=True)
-
+    id = Field(
+        Integer,
+        primary_key=True,
+        readonly=True,
+        not_none=True,
+        required=False,
+        label='ID',
+        minimum=1,
+        example=1,
+        protected=False,
+    )
     skill_id = Field(
         Integer,
         ForeignKey('skill.id'),
