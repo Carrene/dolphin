@@ -119,6 +119,12 @@ class TestUnseeIssue(LocalApplicationTestCase):
             )
             assert status == 404
 
+            when(
+                'Sending from',
+                form=dict(whyDidYouDoThat='IDK'),
+            )
+            assert status == '709 Form Not Allowed'
+
             # FIXME: Commented due to issue #519
             # self.logout()
             # when(

@@ -555,6 +555,9 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     @commit
     def unsee(self, id=None):
         if context.identity and context.identity.id:
+            if context.form:
+                raise HTTPStatus('709 Form Not Allowed')
+
             id = int_or_notfound(id)
             issue = DBSession.query(Issue).get(id)
             if issue is None:
