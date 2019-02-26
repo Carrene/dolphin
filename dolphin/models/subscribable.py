@@ -31,17 +31,6 @@ class Subscription(TimestampMixin, DeclarativeBase):
         uselist=False,
     )
 
-    member = relationship(
-        'Member',
-        back_populates='subscriptions',
-        uselist=False,
-    )
-    subscribable = relationship(
-        'Subscribable',
-        back_populates='subscriptions',
-        uselist=False,
-    )
-
 
 class Subscribable(TimestampMixin, DeclarativeBase):
     __tablename__ = 'subscribable'
