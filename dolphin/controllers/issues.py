@@ -674,5 +674,3 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             ) \
             .one_or_none()
 
-        return issue
-
