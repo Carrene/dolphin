@@ -51,7 +51,6 @@ class TestUnseeIssue(LocalApplicationTestCase):
             description='A decription for my project',
             room_id=1
         )
-        session.add(project)
 
         cls.issue1 = Issue(
             project=project,
