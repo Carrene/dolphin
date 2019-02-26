@@ -78,10 +78,14 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
         Integer,
         ForeignKey('subscribable.id'),
         primary_key=True,
-        label='ID',
         readonly=True,
+        not_none=True,
+        required=False,
+        label='ID',
+        minimum=1,
+        example=1,
+        protected=False,
     )
-
     project_id = Field(
         Integer,
         ForeignKey('project.id'),

@@ -81,7 +81,17 @@ class Attachment(SoftDeleteMixin, FilteringMixin, OrderingMixin,
         example='Lorem Ipsum'
     )
 
-    id = Field(Integer, primary_key=True)
+    id = Field(
+        Integer,
+        primary_key=True,
+        readonly=True,
+        not_none=True,
+        required=False,
+        label='ID',
+        minimum=1,
+        example=1,
+        protected=False,
+    )
     title = Field(
         String(100),
         python_type=str,

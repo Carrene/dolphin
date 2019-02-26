@@ -21,7 +21,17 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     }
 
     reference_id = Field(Integer, unique=True)
-    id = Field(Integer, primary_key=True)
+    id = Field(
+        Integer,
+        primary_key=True,
+        readonly=True,
+        not_none=True,
+        required=False,
+        label='ID',
+        minimum=1,
+        example=1,
+        protected=False,
+    )
     name = Field(
         Unicode(20),
         nullable=True,

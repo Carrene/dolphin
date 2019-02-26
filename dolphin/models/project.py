@@ -31,8 +31,13 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         ForeignKey('subscribable.id'),
         primary_key=True,
         readonly=True,
+        not_none=True,
+        required=False,
+        label='ID',
+        minimum=1,
+        example=1,
+        protected=False,
     )
-
     workflow_id = Field(
         Integer,
         ForeignKey('workflow.id'),
@@ -44,7 +49,6 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         required=False,
         example='Lorem Ipsum'
     )
-
     release_id = Field(
         Integer,
         ForeignKey('release.id'),

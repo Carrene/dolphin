@@ -7,8 +7,17 @@ class Tag(DeclarativeBase, OrderingMixin, FilteringMixin, PaginationMixin):
 
     __tablename__ = 'tag'
 
-    id = Field(Integer, primary_key=True, readonly=True)
-
+    id = Field(
+        Integer,
+        primary_key=True,
+        readonly=True,
+        not_none=True,
+        required=False,
+        label='ID',
+        minimum=1,
+        example=1,
+        protected=False,
+    )
     organization_id = Field(
         Integer,
         ForeignKey('organization.id'),

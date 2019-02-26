@@ -21,8 +21,17 @@ class Activity(ModifiedMixin, TimestampMixin, FilteringMixin, OrderingMixin,
 
     __tablename__ = 'activity'
 
-    id = Field(Integer, primary_key=True,)
-
+    id = Field(
+        Integer,
+        primary_key=True,
+        readonly=True,
+        not_none=True,
+        required=False,
+        label='ID',
+        minimum=1,
+        example=1,
+        protected=False,
+    )
     item_id = Field(Integer, ForeignKey('item.id'), protected=True)
 
     start_time = Field(

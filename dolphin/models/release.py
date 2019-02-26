@@ -24,7 +24,18 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
     __tablename__ = 'release'
     __mapper_args__ = {'polymorphic_identity': __tablename__}
 
-    id = Field(Integer, ForeignKey('subscribable.id'), primary_key=True)
+    id = Field(
+        Integer,
+        ForeignKey('subscribable.id'),
+        primary_key=True,
+        readonly=True,
+        not_none=True,
+        required=False,
+        label='ID',
+        minimum=1,
+        example=1,
+        protected=False,
+    )
     status = Field(
         Enum(*release_statuses, name='release_status'),
         python_type=str,

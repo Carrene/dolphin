@@ -7,7 +7,17 @@ from sqlalchemy import Integer, String, ForeignKey, DateTime, BOOLEAN
 class Subscription(TimestampMixin, DeclarativeBase):
     __tablename__ = 'subscription'
 
-    id = Field(Integer, primary_key=True)
+    id = Field(
+        Integer,
+        primary_key=True,
+        readonly=True,
+        not_none=True,
+        required=False,
+        label='ID',
+        minimum=1,
+        example=1,
+        protected=False,
+    )
 
     subscribable_id = Field(Integer, ForeignKey('subscribable.id'))
     member_id = Field(Integer, ForeignKey('member.id'))
@@ -41,7 +51,17 @@ class Subscribable(TimestampMixin, DeclarativeBase):
         'polymorphic_identity': __tablename__
     }
 
-    id = Field(Integer, primary_key=True, readonly=True)
+    id = Field(
+        Integer,
+        primary_key=True,
+        readonly=True,
+        not_none=True,
+        required=False,
+        label='ID',
+        minimum=1,
+        example=1,
+        protected=False,
+    )
     title = Field(
         String,
         max_length=128,
