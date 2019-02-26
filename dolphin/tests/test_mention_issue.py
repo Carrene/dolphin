@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from auditor.context import Context as AuditLogContext
-from bddrest import status, when
+from bddrest import status, when, given
 
 from dolphin.models import Issue, Project, Member, Workflow, Group, \
     Subscription, Release
@@ -89,10 +89,10 @@ class TestIssue(LocalApplicationTestCase):
         self.login('member1@example.com')
 
         with oauth_mockup_server(), self.given(
-            f'Mention a member in an issues',
-            f'/apiv1/issues/id: {self.issue1.id}',
+            f'Mention a member in an issue as jaguar',
+            f'/apiv1/issues',
             f'MENTION',
-            json=dict(memberId=self.member1.id)
+            json=dict(memberId=self.member1.id, roomId=self.issue1.room_id)
         ):
             assert status == 200
 
@@ -103,7 +103,7 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Mention an unsubscribed member in an issue',
-                json=dict(memberId=self.member2.id)
+                json=dict(memberId=self.member2.id, roomId=self.issue1.room_id)
             )
             assert status == 200
             session = self.create_session()
@@ -116,38 +116,56 @@ class TestIssue(LocalApplicationTestCase):
             assert subscription_issue1_member2.seen_at is None
 
             when(
-                'Issue id is invalid',
-                url_parameters=dict(id=0),
-            )
-            assert status == 404
-
-            when(
-                'memberId id is invalid',
-                json=dict(memberId=0),
+                'memberId not found',
+                json=given | dict(memberId=0),
             )
             assert status == '610 Member Not Found'
 
             when(
-                'memberId id not in form',
-                json={0:0},
+                'memberId not in form',
+                json=given - 'memberId',
             )
             assert status == '735 Member Id Not In Form'
+
+            when(
+                'memberId type is invalid',
+                json=given | dict(memberId='not-int'),
+            )
+            assert status == '736 Invalid Member Id Type'
+
+            when(
+                'memberId is null',
+                json=given | dict(memberId=None),
+            )
+            assert status == '774 Member Id Is Null'
+
+            when(
+                'roomId not found',
+                json=given | dict(roomId=0),
+            )
+            assert status == '618 Chat Room Not Found'
+
+            when(
+                'roomId not in form',
+                json=given - 'roomId',
+            )
+            assert status == '780 roomId Not In Form'
+
+            when(
+                'roomId type is invalid',
+                json=given | dict(roomId='not-int'),
+            )
+            assert status == '781 Invalid roomId Type'
+
+            when(
+                'roomId is null',
+                json=given | dict(roomId=None),
+            )
+            assert status == '779 roomId Is None'
 
             when(
                 'Empty form',
                 json={},
             )
             assert status == '708 Empty Form'
-
-            when(
-                'Invalid memberId type',
-                json=dict(memberId='not-int'),
-            )
-            assert status == '736 Invalid Member Id Type'
-
-            when(
-                'memberId is null',
-                json=dict(memberId=None),
-            )
-            assert status == '774 Member Id Is Null'
 

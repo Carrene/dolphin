@@ -630,14 +630,21 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             required='735 Member Id Not In Form',
             type_=(int, '736 Invalid Member Id Type'),
             not_none=('774 Member Id Is Null')
+        ),
+        roomId=dict(
+            required='780 roomId Not In Form',
+            type_=(int, '781 Invalid roomId Type'),
+            not_none=('779 roomId Is None')
         )
+
     )
     @commit
-    def mention(self, id):
-        id = int_or_notfound(id)
-        issue = DBSession.query(Issue).get(id)
+    def mention(self):
+        issue = DBSession.query(Issue) \
+            .filter(Issue.room_id == context.form['roomId']) \
+            .one_or_none()
         if issue is None:
-            raise HTTPNotFound()
+            raise ChatRoomNotFound()
 
         member_id = context.form['memberId']
         member = DBSession.query(Member).get(member_id)
