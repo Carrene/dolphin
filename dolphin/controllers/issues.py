@@ -410,11 +410,13 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         phase = DBSession.query(Phase).get(form['phaseId'])
 
-        if DBSession.query(Item).filter(
-            Item.phase_id == phase.id,
-            Item.member_id == member.id,
-            Item.issue_id == issue.id
-        ).one_or_none():
+        if DBSession.query(Item) \
+                .filter(
+                    Item.phase_id == phase.id,
+                    Item.member_id == member.id,
+                    Item.issue_id == issue.id
+                ) \
+                .one_or_none():
             raise HTTPStatus('602 Already Assigned')
 
         item = Item(
