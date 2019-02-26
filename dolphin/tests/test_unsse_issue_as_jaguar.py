@@ -92,13 +92,13 @@ class TestUnseeIssue(LocalApplicationTestCase):
         session.commit()
         session.expunge_all()
 
-    def test_unsee_issue(self):
-        self.login('member1@example.com')
+    def test_unsee_issue_as_jaguar(self):
 
         with oauth_mockup_server(), self.given(
-            f'Unsee a subscribed issues',
-            f'/apiv1/issues/id: {self.issue1.id}',
+            f'Unsee a subscribed issues as jaguar',
+            f'/apiv1/issues',
             f'UNSEE',
+            json=dict(roomId=self.issue1.room_id)
         ):
             assert status == 200
 
@@ -108,16 +108,28 @@ class TestUnseeIssue(LocalApplicationTestCase):
             assert self.subscription_issue1.seen_at is None
 
             when(
-                'Unsee an unsubscribed issue',
-                url_parameters=dict(id=self.issue2.id),
+                'Issue with given roomId not found',
+                json=dict(roomId=0),
             )
-            assert status == '637 Not Subscribed Issue'
+            assert status == '618 Chat Room Not Found'
 
             when(
-                'Issue id is invalid',
-                url_parameters=dict(id=0),
+                'roomId not in form',
+                json=dict(a='a'),
             )
-            assert status == 404
+            assert status == '780 roomId Not In Form'
+
+            when(
+                'roomId is null',
+                json=dict(roomId=None),
+            )
+            assert status == '779 roomId Is None'
+
+            when(
+                'roomId must be integer',
+                json=dict(roomId='a'),
+            )
+            assert status == '781 Invalid roomId Type'
 
             # FIXME: Commented due to issue #519
             # self.logout()

@@ -544,14 +544,32 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         return issue
 
     #FIXME: Add authorize decorator, #519
-    @json(prevent_form='709 Form Not Allowed')
+    @validate(
+        roomId=dict(
+            type_=(int, '781 Invalid roomId Type'),
+            not_none='779 roomId Is None',
+        )
+    )
+    @json
     @Issue.expose
     @commit
-    def unsee(self, id):
-        id = int_or_notfound(id)
-        issue = DBSession.query(Issue).get(id)
-        if issue is None:
-            raise HTTPNotFound()
+    def unsee(self, id=None):
+        if context.identity and context.identity.id:
+            id = int_or_notfound(id)
+            issue = DBSession.query(Issue).get(id)
+            if issue is None:
+                raise HTTPNotFound()
+
+        # FIXME: Add proper condition, #519
+        else:
+            if 'roomId' not in context.form:
+                raise HTTPStatus('780 roomId Not In Form')
+
+            issue = DBSession.query(Issue) \
+                .filter(Issue.room_id == context.form['roomId']) \
+                .one_or_none()
+            if issue is None:
+                raise ChatRoomNotFound()
 
         subscriptions = DBSession.query(Subscription) \
             .filter(Subscription.subscribable_id == issue.id)
