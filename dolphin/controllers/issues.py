@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from nanohttp import HTTPStatus, json, context, HTTPNotFound, \
-    HTTPUnauthorized, int_or_notfound, settings, validate
+    HTTPUnauthorized, int_or_notfound, settings
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import DBSession, commit
@@ -124,7 +124,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 and_(
                     Subscription.member_id != context.identity.id,
                     Subscription.subscribable_id == issue.id,
-                    Subscription.one_shot.is_(None),
                 )
             )
 
@@ -268,7 +267,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 ) \
                 .filter(
                     Subscribable.type_ == 'issue',
-                    Subscription.one_shot.is_(None),
                 )
             subscribed_issues_id = {
                 i.subscribable_id for i in subscribed_issues
@@ -302,13 +300,10 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         if not issue:
             raise HTTPNotFound()
 
-        if DBSession.query(Subscription)\
-                .filter(
-                    Subscription.subscribable_id == id,
-                    Subscription.member_id == member.id,
-                    Subscription.one_shot.is_(None),
-                ) \
-                .one_or_none():
+        if DBSession.query(Subscription).filter(
+                Subscription.subscribable_id == id,
+                Subscription.member_id == member.id
+        ).one_or_none():
             raise HTTPStatus('611 Already Subscribed')
 
         subscription = Subscription(
@@ -362,7 +357,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         subscription = DBSession.query(Subscription).filter(
             Subscription.subscribable_id == id,
             Subscription.member_id == member.id,
-            Subscription.one_shot.is_(None),
         ).one_or_none()
 
         if not subscription:
@@ -416,13 +410,11 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         phase = DBSession.query(Phase).get(form['phaseId'])
 
-        if DBSession.query(Item) \
-                .filter(
-                    Item.phase_id == phase.id,
-                    Item.member_id == member.id,
-                    Item.issue_id == issue.id
-                ) \
-                .one_or_none():
+        if DBSession.query(Item).filter(
+            Item.phase_id == phase.id,
+            Item.member_id == member.id,
+            Item.issue_id == issue.id
+        ).one_or_none():
             raise HTTPStatus('602 Already Assigned')
 
         item = Item(
@@ -622,48 +614,4 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         issue.relations.remove(target)
         return issue
-
-    # FIXME: Add authorize decorator, #519
-    @json(prevent_empty_form='708 Empty Form')
-    @validate(
-        memberId=dict(
-            required='735 Member Id Not In Form',
-            type_=(int, '736 Invalid Member Id Type'),
-            not_none=('774 Member Id Is Null')
-        )
-    )
-    @commit
-    def mention(self, id):
-        id = int_or_notfound(id)
-        issue = DBSession.query(Issue).get(id)
-        if issue is None:
-            raise HTTPNotFound()
-
-        member_id = context.form['memberId']
-        member = DBSession.query(Member).get(member_id)
-        if member is None:
-            raise HTTPStatus('610 Member Not Found')
-
-        subscription = self.ensure_subscription(issue.id, member.id)
-
-        if subscription is None:
-            subscription = Subscription(
-                member_id=member_id,
-                subscribable_id=issue.id,
-                one_shot=True,
-            )
-            DBSession.add(subscription)
-
-        subscription.seen_at = None
-
-        return issue
-
-    def ensure_subscription(self, issue_id, member_id):
-        return DBSession.query(Subscription) \
-            .filter(
-                Subscription.member_id == member_id,
-                Subscription.subscribable_id == issue_id,
-                Subscription.one_shot.is_(None),
-            ) \
-            .one_or_none()
 

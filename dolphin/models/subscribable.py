@@ -1,44 +1,23 @@
 from datetime import datetime
 
 from restfulpy.orm import DeclarativeBase, Field, TimestampMixin, relationship
-from sqlalchemy import Integer, String, ForeignKey, DateTime, BOOLEAN
+from sqlalchemy import Integer, String, ForeignKey, DateTime
 
 
-class Subscription(TimestampMixin, DeclarativeBase):
+class Subscription(DeclarativeBase):
     __tablename__ = 'subscription'
 
-    id = Field(
+    subscribable_id = Field(
         Integer,
-        primary_key=True,
-        readonly=True,
-        not_none=True,
-        required=False,
-        label='ID',
-        minimum=1,
-        example=1,
-        protected=False,
+        ForeignKey('subscribable.id'),
+        primary_key=True
     )
-
-    subscribable_id = Field(Integer, ForeignKey('subscribable.id'))
-    member_id = Field(Integer, ForeignKey('member.id'))
+    member_id = Field(Integer, ForeignKey('member.id'), primary_key=True)
 
     seen_at = Field(
         DateTime,
         label='Seen At',
         nullable=True,
-    )
-
-    one_shot = Field(BOOLEAN, nullable=True)
-
-    member = relationship(
-        'Member',
-        back_populates='subscriptions',
-        uselist=False,
-    )
-    subscribable = relationship(
-        'Subscribable',
-        back_populates='subscriptions',
-        uselist=False,
     )
 
 
@@ -94,10 +73,5 @@ class Subscribable(TimestampMixin, DeclarativeBase):
         secondary='subscription',
         back_populates='subscribables',
         protected=True
-    )
-
-    subscriptions = relationship(
-        'Subscription',
-        back_populates='subscribable'
     )
 
