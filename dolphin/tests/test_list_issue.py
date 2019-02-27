@@ -283,19 +283,21 @@ class TestIssue(LocalApplicationTestCase):
 
             when('Sort by tag id', query=dict(sort='tagId'))
             assert status == 200
-            assert len(response.json) == 2
+            assert len(response.json) == 3
             assert response.json[0]['id'] == self.issue1.id
             assert response.json[1]['id'] == self.issue2.id
+            assert response.json[2]['id'] == self.issue3.id
 
             when('Reverse sort by tag id', query=dict(sort='-tagId'))
             assert status == 200
-            assert len(response.json) == 2
-            assert response.json[0]['id'] == self.issue2.id
-            assert response.json[1]['id'] == self.issue1.id
+            assert len(response.json) == 3
+            assert response.json[0]['id'] == self.issue3.id
+            assert response.json[1]['id'] == self.issue2.id
+            assert response.json[2]['id'] == self.issue1.id
 
             when('Sort by tag id and title', query=dict(sort='tagId,title'))
             assert status == 200
-            assert len(response.json) == 2
+            assert len(response.json) == 3
             assert response.json[0]['id'] == self.issue1.id
             assert response.json[1]['id'] == self.issue2.id
 
@@ -304,7 +306,7 @@ class TestIssue(LocalApplicationTestCase):
                 query=dict(sort='tagId,-title')
             )
             assert status == 200
-            assert len(response.json) == 2
+            assert len(response.json) == 3
             assert response.json[0]['id'] == self.issue1.id
             assert response.json[1]['id'] == self.issue2.id
 
