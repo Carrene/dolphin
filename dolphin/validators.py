@@ -343,7 +343,6 @@ update_project_validator = validate(
 draft_issue_define_validator = validate(
     relatedIssueId=dict(
         type_=(int, '722 Invalid Issue Id Type'),
-        not_none='775 Issue Id Is None',
         callback=relate_to_issue_exists_validator,
     ),
 )
