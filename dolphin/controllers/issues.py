@@ -147,9 +147,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 .group_by(Item.issue_id) \
                 .cte()
 
-        if 'tagId' in sorting_expression or 'tagId' in context.query:
-            query = query.join(IssueTag, IssueTag.issue_id == Issue.id)
-
         # FILTER
         if 'phaseId' in context.query:
             value = context.query['phaseId']
@@ -174,6 +171,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             query = Issue._filter_by_column_value(query, Phase.title, value)
 
         if 'tagId' in context.query:
+            query = query.join(IssueTag, IssueTag.issue_id == Issue.id)
             value = context.query['tagId']
             query = Issue._filter_by_column_value(query, IssueTag.tag_id, value)
 
@@ -218,6 +216,11 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             )
 
         if 'tagId' in sorting_expression:
+            query = query.join(
+                IssueTag,
+                IssueTag.issue_id == Issue.id,
+                isouter=True
+            )
             query = Issue._sort_by_key_value(
                 query,
                 column=IssueTag.tag_id,
