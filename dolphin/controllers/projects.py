@@ -226,8 +226,8 @@ class ProjectController(ModelRestController):
             return query
 
         sorting_columns = {
-                c[1:] if c.startswith('-') else c:
-                'desc' if c.startswith('-') else None
+            c[1:] if c.startswith('-') else c:
+            'desc' if c.startswith('-') else None
             for c in sorting_expression.split(',')
             if c.replace('-', '') in external_columns
         }
