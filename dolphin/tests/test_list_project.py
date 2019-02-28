@@ -25,14 +25,26 @@ class TestProject(LocalApplicationTestCase):
         workflow = Workflow(title='Default')
         group = Group(title='default')
 
-        release = Release(
+        cls.release1 = Release(
             title='My first release',
             description='A decription for my first release',
             cutoff='2030-2-20',
         )
 
-        project1 = Project(
-            release=release,
+        cls.release2 = Release(
+            title='My second release',
+            description='A decription for my second release',
+            cutoff='2030-2-20',
+        )
+
+        cls.release3 = Release(
+            title='My third release',
+            description='A decription for my third release',
+            cutoff='2030-2-20',
+        )
+
+        cls.project1 = Project(
+            release=cls.release1,
             workflow=workflow,
             group=group,
             manager=member1,
@@ -41,11 +53,11 @@ class TestProject(LocalApplicationTestCase):
             status='active',
             room_id=1001
         )
-        session.add(project1)
+        session.add(cls.project1)
         session.flush()
 
-        project2 = Project(
-            release=release,
+        cls.project2 = Project(
+            release=cls.release2,
             workflow=workflow,
             group=group,
             manager=member1,
@@ -54,10 +66,10 @@ class TestProject(LocalApplicationTestCase):
             status='on-hold',
             room_id=1002
         )
-        session.add(project2)
+        session.add(cls.project2)
 
-        project3 = Project(
-            release=release,
+        cls.project3 = Project(
+            release=cls.release3,
             workflow=workflow,
             group=group,
             manager=member1,
@@ -66,10 +78,10 @@ class TestProject(LocalApplicationTestCase):
             removed_at='2020-2-20',
             room_id=1000
         )
-        session.add(project3)
+        session.add(cls.project3)
 
         issue1 = Issue(
-            project=project1,
+            project=cls.project1,
             title='First issue',
             description='This is description of first issue',
             due_date='2030-2-20',
@@ -80,7 +92,7 @@ class TestProject(LocalApplicationTestCase):
         session.add(issue1)
 
         issue2 = Issue(
-            project=project2,
+            project=cls.project2,
             title='Second issue',
             description='This is description of second issue',
             due_date='2020-2-20',
@@ -91,7 +103,7 @@ class TestProject(LocalApplicationTestCase):
         session.add(issue2)
 
         subscription = Subscription(
-            subscribable_id=project1.id,
+            subscribable_id=cls.project1.id,
             member_id=member1.id
         )
         session.add(subscription)
@@ -160,6 +172,26 @@ class TestProject(LocalApplicationTestCase):
                     query=dict(sort='!isSubscribed')
                 )
                 assert response.json[0]['isSubscribed'] == True
+
+                when(
+                    'Sorting projects by release title',
+                    query=dict(sort='releaseTitle')
+                )
+                assert status == 200
+                assert len(response.json) == 3
+                assert response.json[0]['title'] == self.project1.title
+                assert response.json[1]['title'] == self.project2.title
+                assert response.json[2]['title'] == self.project3.title
+
+                when(
+                    'Reverse sorting projects by release title',
+                    query=dict(sort='-releaseTitle')
+                )
+                assert status == 200
+                assert len(response.json) == 3
+                assert response.json[0]['title'] == self.project3.title
+                assert response.json[1]['title'] == self.project2.title
+                assert response.json[2]['title'] == self.project1.title
 
             with self.given(
                 'Filter projects',
