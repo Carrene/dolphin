@@ -7,7 +7,7 @@ from restfulpy.orm import commit, DBSession
 from ..backends import ChatClient
 from ..exceptions import RoomMemberAlreadyExist, ChatRoomNotFound
 from ..models import Issue, Phase, Item, Member, DraftIssue, DraftIssueTag, \
-    Tag, Skill, Resource
+    Tag, Skill, Resource, IssueTag, RelatedIssue
 from ..validators import draft_issue_finalize_validator, \
     draft_issue_define_validator
 from .tag import TagController
@@ -99,33 +99,11 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
         if draft_issue is None:
             raise HTTPNotFound()
 
-        tags = DBSession.query(Tag) \
-            .join(DraftIssueTag, DraftIssueTag.tag_id == Tag.id) \
-            .filter(DraftIssueTag.draft_issue_id == id) \
-
         form = context.form
         token = context.environ['HTTP_AUTHORIZATION']
 
         issue = Issue()
-        for tag in tags:
-            issue.tags.append(tag)
-
         issue.update_from_request()
-
-        if draft_issue.related_issue_id:
-            relate_issue = DBSession.query(Issue).get(
-                draft_issue.related_issue_id
-            )
-
-        elif 'relatedIssueId' in context.form:
-            related_issue_id = context.form.get('relatedIssueId')
-            relate_issue = DBSession.query(Issue).get(related_issue_id)
-
-        else:
-            relate_issue = None
-
-        if relate_issue:
-            issue.relations.append(relate_issue)
 
         current_member = Member.current()
         room = self._ensure_room(
@@ -168,5 +146,36 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
         DBSession.add(issue)
         DBSession.flush()
         draft_issue.issue_id = issue.id
+
+        if draft_issue.tags:
+            tags = DBSession.query(Tag) \
+                .join(DraftIssueTag, DraftIssueTag.tag_id == Tag.id) \
+                .filter(DraftIssueTag.draft_issue_id == id) \
+
+            for tag in tags:
+                issue_tag = IssueTag(
+                    tag_id=tag.id,
+                    issue_id=issue.id,
+                )
+                DBSession.add(issue_tag)
+
+        if draft_issue.related_issue_id:
+            related_issue_id = draft_issue.related_issue_id
+
+        elif 'relatedIssueId' in context.form:
+            related_issue_id = context.form.get('relatedIssueId')
+
+        else:
+            related_issue_id = None
+
+        if related_issue_id:
+            issue.relations.append(relate_issue)
+
+        if related_issue_id:
+            related_issue = RelatedIssue(
+                issue_id=issue.id,
+                related_issue_id=related_issue_id,
+            )
+            DBSession.add(related_issue)
         return draft_issue
 

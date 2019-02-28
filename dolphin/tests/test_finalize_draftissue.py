@@ -1,13 +1,22 @@
+from auditor import MiddleWare
 from auditor.context import Context as AuditLogContext
+from auditor.logentry import RequestLogEntry, InstantiationLogEntry
 from bddrest import status, response, Update, when, given, Remove
 
+from dolphin import Dolphin
 from dolphin.models import Issue, Project, Workflow, Phase, Tag, \
     DraftIssue, Organization, OrganizationMember, Group, Release, Skill, Resource
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
 
+def callback(audit_logs):
+    global logs
+    logs = audit_logs
+
+
 class TestIssue(LocalApplicationTestCase):
+    __application__ = MiddleWare(Dolphin(), callback)
 
     @classmethod
     @AuditLogContext(dict())
@@ -131,6 +140,10 @@ class TestIssue(LocalApplicationTestCase):
             assert response.json['id'] == self.draft_issue.id
             assert response.json['issueId'] is not None
             assert len(response.json['tags']) == 2
+
+            assert len(logs) == 2
+            assert isinstance(logs[0], InstantiationLogEntry)
+            assert isinstance(logs[1], RequestLogEntry)
 
             when('Priority value not in form', form=Remove('priority'))
             assert status == '768 Priority Not In Form'
