@@ -2,10 +2,12 @@ from nanohttp import context
 from restfulpy.orm import Field, relationship, SoftDeleteMixin, \
     ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin
 from restfulpy.orm.metadata import MetadataField
-from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, join
+from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
+    join, case
 from sqlalchemy.orm import column_property
+from sqlalchemy.ext.hybrid import hybrid_property
 
-from .issue import Issue
+from .issue import Issue, Boarding
 from .subscribable import Subscribable, Subscription
 from .member import Member
 
@@ -149,22 +151,28 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         deferred=True
     )
 
-    @property
-    def boardings(self):
-        if not self.issues or self.status == 'queued':
-            return None
+    boarding_value = column_property(
+        select([func.max(Issue.boarding_value)]) \
+        .where(Issue.project_id == id) \
+        .where(status == 'active')
+    )
 
-        for issue in self.issues:
-            if issue.boarding == 'at-risk':
-                return self._boarding[2]
+    @hybrid_property
+    def boarding(self):
+        if self.boarding_value == 1:
+            return Boarding.ontime[1]
 
-            if issue.boarding == 'delayed':
-                return self._boarding[1]
+        elif self.boarding_value == 2:
+            return Boarding.delayed[1]
 
-            if self.status != 'active':
-                return None
+        return None
 
-        return self._boarding[0]
+    @boarding.expression
+    def boarding(cls):
+        return case([
+            (cls.boarding_value == 1, Boarding.ontime[1]),
+            (cls.boarding_value == 2, Boarding.delayed[1])
+        ])
 
     @classmethod
     def iter_metadata_fields(cls):
@@ -206,7 +214,7 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     def to_dict(self):
         project_dict = super().to_dict()
-        project_dict['boarding'] = self.boardings
+        project_dict['boarding'] = self.boarding
         project_dict['isSubscribed'] = True if self.is_subscribed else False
         project_dict['dueDate'] = self.due_date.isoformat() \
             if self.due_date else None

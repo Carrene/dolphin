@@ -63,7 +63,7 @@ class TestProject(LocalApplicationTestCase):
             manager=member1,
             title='My second project',
             description='A decription for my project',
-            status='on-hold',
+            status='active',
             room_id=1002
         )
         session.add(cls.project2)
@@ -76,7 +76,8 @@ class TestProject(LocalApplicationTestCase):
             title='My third project',
             description='A decription for my project',
             removed_at='2020-2-20',
-            room_id=1000
+            room_id=1000,
+            status='on-hold',
         )
         session.add(cls.project3)
 
@@ -101,6 +102,17 @@ class TestProject(LocalApplicationTestCase):
             room_id=3
         )
         session.add(issue2)
+
+        issue3 = Issue(
+            project=cls.project1,
+            title='Third issue',
+            description='This is description of third issue',
+            due_date='2000-2-20',
+            kind='feature',
+            days=1,
+            room_id=2
+        )
+        session.add(issue3)
 
         subscription = Subscription(
             subscribable_id=cls.project1.id,
@@ -145,7 +157,7 @@ class TestProject(LocalApplicationTestCase):
                     'Reverse sorting titles by alphabet',
                     query=dict(sort='-status')
                 )
-                assert response.json[0]['status'] == 'queued'
+                assert response.json[0]['status'] == 'on-hold'
 
                 when(
                     'Sorting project by due dates',
@@ -218,6 +230,23 @@ class TestProject(LocalApplicationTestCase):
                     query=dict(sort='id', status='!active')
                 )
                 assert response.json[0]['status'] == 'on-hold'
+
+                when(
+                    'Filter project by boarding',
+                    query=dict(boarding='on-time')
+                )
+                assert status == 200
+                assert len(response.json) == 1
+                assert response.json[0]['title'] == self.project2.title
+
+                when(
+                    'Filter project by boarding using IN clause',
+                    query=dict(boarding='IN(on-time,delayed)')
+                )
+                assert status == 200
+                assert len(response.json) == 2
+                assert response.json[0]['title'] == self.project1.title
+                assert response.json[1]['title'] == self.project2.title
 
             with self.given(
                 'Project pagination',
