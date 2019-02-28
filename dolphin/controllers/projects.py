@@ -216,7 +216,34 @@ class ProjectController(ModelRestController):
     @json
     @Project.expose
     def list(self):
-        return DBSession.query(Project)
+        query = DBSession.query(Project)
+        sorting_expression = context.query.get('sort', '').strip()
+
+        # SORT
+        external_columns = ('releaseTitle')
+
+        if not sorting_expression:
+            return query
+
+        sorting_columns = {
+                c[1:] if c.startswith('-') else c:
+                'desc' if c.startswith('-') else None
+            for c in sorting_expression.split(',')
+            if c.replace('-', '') in external_columns
+        }
+
+        if 'releaseTitle' in sorting_expression:
+            query = query.join(
+                Release,
+                Release.id == Project.release_id
+            )
+            query = Project._sort_by_key_value(
+                query,
+                column=Release.title,
+                descending=sorting_columns['releaseTitle']
+            )
+
+        return query
 
     @authorize
     @json(prevent_form='709 Form Not Allowed')
