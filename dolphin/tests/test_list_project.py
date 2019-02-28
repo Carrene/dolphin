@@ -22,6 +22,15 @@ class TestProject(LocalApplicationTestCase):
         )
         session.add(member1)
 
+        member2 = Member(
+            title='Second Member',
+            email='member2@example.com',
+            access_token='access token 2',
+            phone=222222222,
+            reference_id=3
+        )
+        session.add(member2)
+
         workflow = Workflow(title='Default')
         group = Group(title='default')
 
@@ -60,7 +69,7 @@ class TestProject(LocalApplicationTestCase):
             release=cls.release2,
             workflow=workflow,
             group=group,
-            manager=member1,
+            manager=member2,
             title='My second project',
             description='A decription for my project',
             status='on-hold',
@@ -72,7 +81,7 @@ class TestProject(LocalApplicationTestCase):
             release=cls.release3,
             workflow=workflow,
             group=group,
-            manager=member1,
+            manager=member2,
             title='My third project',
             description='A decription for my project',
             removed_at='2020-2-20',
@@ -191,6 +200,26 @@ class TestProject(LocalApplicationTestCase):
                 assert len(response.json) == 3
                 assert response.json[0]['title'] == self.project3.title
                 assert response.json[1]['title'] == self.project2.title
+                assert response.json[2]['title'] == self.project1.title
+
+                when(
+                    'Sorting projects by manager title',
+                    query=dict(sort='managerTitle')
+                )
+                assert status == 200
+                assert len(response.json) == 3
+                assert response.json[0]['title'] == self.project1.title
+                assert response.json[1]['title'] == self.project2.title
+                assert response.json[2]['title'] == self.project3.title
+
+                when(
+                    'Reverse sorting projects by manager title',
+                    query=dict(sort='-managerTitle')
+                )
+                assert status == 200
+                assert len(response.json) == 3
+                assert response.json[0]['title'] == self.project2.title
+                assert response.json[1]['title'] == self.project3.title
                 assert response.json[2]['title'] == self.project1.title
 
             with self.given(

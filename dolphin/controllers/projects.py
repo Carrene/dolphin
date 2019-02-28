@@ -220,7 +220,7 @@ class ProjectController(ModelRestController):
         sorting_expression = context.query.get('sort', '').strip()
 
         # SORT
-        external_columns = ('releaseTitle')
+        external_columns = ('releaseTitle', 'managerTitle')
 
         if not sorting_expression:
             return query
@@ -241,6 +241,17 @@ class ProjectController(ModelRestController):
                 query,
                 column=Release.title,
                 descending=sorting_columns['releaseTitle']
+            )
+
+        if 'managerTitle' in sorting_expression:
+            query = query.join(
+                Member,
+                Member.id == Project.manager_id
+            )
+            query = Project._sort_by_key_value(
+                query,
+                column=Member.title,
+                descending=sorting_columns['managerTitle']
             )
 
         return query
