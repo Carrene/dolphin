@@ -61,8 +61,11 @@ issue_priorities = [
 ]
 
 
-DELAYED = 'delayed'
-ONTIME = 'on-time'
+class Boarding:
+    ontime =    (1, 'on-time')
+    delayed =   (2, 'delayed')
+    frozen =    (3, 'frozedn')
+    atrisk =    (4, 'at-risk')
 
 
 # FIXME: Remove the '\' from Issue inheritance definition
@@ -235,19 +238,32 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
     )
 
     @hybrid_property
+    def boarding_value(self):
+        if self.due_date < datetime.now():
+            return Boarding.delayed[0]
+
+        return Boarding.ontime[0]
+
+    @boarding_value.expression
+    def boarding_value(cls):
+        return case([
+            (cls.due_date < datetime.now(), Boarding.delayed[0]),
+            (cls.due_date > datetime.now(), Boarding.ontime[0])
+        ])
+
+    @hybrid_property
     def boarding(self):
         if self.due_date < datetime.now():
-            return DELAYED
+            return Boarding.delayed[1]
 
-        return ONTIME
+        return Boarding.ontime[1]
 
     @boarding.expression
     def boarding(cls):
         return case([
-            (cls.due_date < datetime.now(), DELAYED),
-            (cls.due_date > datetime.now(), ONTIME)
+            (cls.due_date < datetime.now(), Boarding.delayed[1]),
+            (cls.due_date > datetime.now(), Boarding.ontime[1])
         ])
-
 
     @classmethod
     def iter_metadata_fields(cls):
