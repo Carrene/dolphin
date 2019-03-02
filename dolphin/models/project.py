@@ -211,6 +211,13 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             example='Lorem Ipsum',
             message='Lorem Ipsum',
         )
+        yield MetadataField(
+            name='boardingValue',
+            key='boarding_value',
+            label='boarding value',
+            required=False,
+            readonly=True
+        )
 
     def to_dict(self):
         project_dict = super().to_dict()

@@ -110,3 +110,8 @@ class TestIssue(LocalApplicationTestCase):
             assert fields['relations']['required'] is not None
             assert fields['relations']['readonly'] is not None
 
+            assert fields['boardingValue']['label'] is not None
+            assert fields['boardingValue']['name'] is not None
+            assert fields['boardingValue']['required'] is not None
+            assert fields['boardingValue']['readonly'] is not None
+
