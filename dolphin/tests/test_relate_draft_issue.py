@@ -1,8 +1,8 @@
 from auditor.context import Context as AuditLogContext
-from bddrest import status, response, when, Update
+from bddrest import status, response, when
 
 from dolphin.models import Issue, Member, Workflow, Group, Project, Release, \
-    RelatedIssue, DraftIssue, DraftIssueIssue
+    DraftIssue, DraftIssueIssue
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 

@@ -3,7 +3,7 @@ from nanohttp import json, context, HTTPNotFound, HTTPUnauthorized, \
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import commit, DBSession
-from sqlalchemy import and_, exists, select, func
+from sqlalchemy import and_, exists
 
 from ..backends import ChatClient
 from ..exceptions import RoomMemberAlreadyExist, ChatRoomNotFound
