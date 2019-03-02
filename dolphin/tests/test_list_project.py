@@ -234,6 +234,26 @@ class TestProject(LocalApplicationTestCase):
                 assert response.json[1]['title'] == self.project3.title
                 assert response.json[2]['title'] == self.project1.title
 
+                when(
+                    'Sorting projects by boarding title',
+                    query=dict(sort='boarding')
+                )
+                assert status == 200
+                assert len(response.json) == 3
+                assert response.json[0]['title'] == self.project1.title
+                assert response.json[1]['title'] == self.project2.title
+                assert response.json[2]['title'] == self.project3.title
+
+                when(
+                    'Reverse sorting projects by boarding title',
+                    query=dict(sort='-boarding')
+                )
+                assert status == 200
+                assert len(response.json) == 3
+                assert response.json[0]['title'] == self.project3.title
+                assert response.json[1]['title'] == self.project2.title
+                assert response.json[2]['title'] == self.project1.title
+
             with self.given(
                 'Filter projects',
                 '/apiv1/projects',
