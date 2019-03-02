@@ -102,7 +102,7 @@ class ProjectController(ModelRestController):
         DBSession.flush()
 
         room = self._ensure_room(
-            project.get_room_title,
+            project.get_room_title(),
             token,
             member.access_token
         )
