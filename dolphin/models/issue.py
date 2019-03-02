@@ -348,3 +348,6 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
     def __declare_last__(cls):
         observe(cls, ['modified_at', 'project_id'])
 
+    def get_room_title(self):
+        return f'{self.title}_{self.project_id}'
+

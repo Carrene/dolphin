@@ -220,3 +220,7 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             if self.due_date else None
         return project_dict
 
+    def get_room_title(self):
+        return f'{self.title}_{self.manager_id}_{self.workflow_id}_' \
+            f'{self.release_id}_{self.group_id}'
+

@@ -101,7 +101,11 @@ class ProjectController(ModelRestController):
         project.room_id = PENDING
         DBSession.flush()
 
-        room = self._ensure_room(form['title'], token, member.access_token)
+        room = self._ensure_room(
+            project.get_room_title,
+            token,
+            member.access_token
+        )
 
         chat_client = ChatClient()
         project.room_id = room['id']

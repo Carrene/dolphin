@@ -107,7 +107,7 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
 
         current_member = Member.current()
         room = self._ensure_room(
-            form['title'],
+            issue.get_room_title(),
             token,
             current_member.access_token
         )
