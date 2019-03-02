@@ -161,12 +161,12 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
                 DBSession.add(issue_tag)
 
         if draft_issue.related_issues:
-            for issue in draft_issue.related_issues:
-                draftissue_issue = DraftIssueIssue(
-                    draft_issue_id=draft_issue.id,
-                    related_issue_id=issue.id,
+            for related_issue in draft_issue.related_issues:
+                related_issue = RelatedIssue(
+                    issue_id=draft_issue.issue_id,
+                    related_issue_id=related_issue.id,
                 )
-                DBSession.add(draftissue_issue)
+                DBSession.add(related_issue)
 
         return draft_issue
 
