@@ -570,3 +570,12 @@ issue_unrelate_validator = validate(
     )
 )
 
+
+draft_issue_relate_validator = validate(
+    targetIssueId=dict(
+        not_none='779 Target Issue Id Is None',
+        required='780 Target Issue Id Not In Form',
+        type_=(int, '781 Invalid Target Issue Id Type'),
+    )
+)
+

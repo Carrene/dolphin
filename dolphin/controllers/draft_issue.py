@@ -1,15 +1,16 @@
 from nanohttp import json, context, HTTPNotFound, HTTPUnauthorized, \
-    int_or_notfound
+    int_or_notfound, HTTPStatus
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import commit, DBSession
+from sqlalchemy import and_, exists
 
 from ..backends import ChatClient
 from ..exceptions import RoomMemberAlreadyExist, ChatRoomNotFound
 from ..models import Issue, Phase, Item, Member, DraftIssue, DraftIssueTag, \
-    Tag, Skill, Resource, IssueTag, RelatedIssue
+    Tag, Skill, Resource, IssueTag, RelatedIssue, DraftIssueIssue
 from ..validators import draft_issue_finalize_validator, \
-    draft_issue_define_validator
+    draft_issue_define_validator, draft_issue_relate_validator
 from .tag import TagController
 
 
@@ -159,23 +160,45 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
                 )
                 DBSession.add(issue_tag)
 
-        if draft_issue.related_issue_id:
-            related_issue_id = draft_issue.related_issue_id
+        if draft_issue.related_issues:
+            for issue in draft_issue.related_issues:
+                draftissue_issue = DraftIssueIssue(
+                    draft_issue_id=draft_issue.id,
+                    related_issue_id=issue.id,
+                )
+                DBSession.add(draftissue_issue)
 
-        elif 'relatedIssueId' in context.form:
-            related_issue_id = context.form.get('relatedIssueId')
+        return draft_issue
 
-        else:
-            related_issue_id = None
+    @authorize
+    @json(prevent_empty_form='708 Empty Form')
+    @draft_issue_relate_validator
+    @commit
+    def relate(self, id):
+        id = int_or_notfound(id)
+        target_id = context.form.get('targetIssueId')
 
-        if related_issue_id:
-            issue.relations.append(relate_issue)
+        draft_issue = DBSession.query(DraftIssue).get(id)
+        if draft_issue is None:
+            raise HTTPNotFound()
 
-        if related_issue_id:
-            related_issue = RelatedIssue(
-                issue_id=issue.id,
-                related_issue_id=related_issue_id,
+        target = DBSession.query(Issue).get(target_id)
+        if target is None:
+            raise HTTPStatus('648 Target Issue Not Found')
+
+        is_related = DBSession.query(exists().where(
+            and_(
+                DraftIssueIssue.draft_issue_id == draft_issue.id,
+                DraftIssueIssue.related_issue_id == target.id
             )
-            DBSession.add(related_issue)
+        )).scalar()
+        if is_related:
+            raise HTTPStatus('645 Already Is Related')
+
+        draftissue_issue = DraftIssueIssue(
+            draft_issue_id=draft_issue.id,
+            related_issue_id=target.id,
+        )
+        DBSession.add(draftissue_issue)
         return draft_issue
 
