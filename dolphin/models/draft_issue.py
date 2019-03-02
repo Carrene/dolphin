@@ -64,7 +64,6 @@ class DraftIssue(ModifiedMixin, DeclarativeBase):
         secondary='draftissue_issue',
         back_populates='draft_issues',
         lazy='selectin',
-        protected=False,
     )
 
     tags = relationship(
