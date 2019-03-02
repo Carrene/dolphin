@@ -221,6 +221,6 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         return project_dict
 
     def get_room_title(self):
-        return f'{self.title}_{self.manager_id}_{self.workflow_id}_' \
-            f'{self.release_id}_{self.group_id}'
+        return f'{self.title.lower()}-{self.manager_id}-{self.workflow_id}_' \
+            f'{self.release_id}-{self.group_id}'
 

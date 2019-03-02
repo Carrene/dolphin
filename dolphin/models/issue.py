@@ -349,5 +349,5 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
         observe(cls, ['modified_at', 'project_id'])
 
     def get_room_title(self):
-        return f'{self.title}_{self.project_id}'
+        return f'{self.title.lower()}-{self.project_id}'
 
