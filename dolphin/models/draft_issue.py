@@ -19,6 +19,22 @@ class DraftIssueTag(DeclarativeBase):
     )
 
 
+class DraftIssueIssue(DeclarativeBase):
+    __tablename__ = 'draftissue_issue'
+
+    draft_issue_id = Field(
+        Integer,
+        ForeignKey('draft_issue.id'),
+        primary_key=True,
+    )
+
+    related_issue_id = Field(
+        Integer,
+        ForeignKey('issue.id'),
+        primary_key=True,
+    )
+
+
 class DraftIssue(ModifiedMixin, DeclarativeBase):
 
     __tablename__ = 'draft_issue'
@@ -43,12 +59,12 @@ class DraftIssue(ModifiedMixin, DeclarativeBase):
         not_none=False
     )
 
-    related_issue_id = Field(
-        Integer,
-        nullable=True,
-        required=False,
-        readonly=False,
-        not_none=False,
+    related_issues = relationship(
+        'Issue',
+        secondary='draftissue_issue',
+        back_populates='draft_issues',
+        lazy='selectin',
+        protected=False,
     )
 
     tags = relationship(
@@ -60,7 +76,7 @@ class DraftIssue(ModifiedMixin, DeclarativeBase):
 
     issue = relationship(
         'Issue',
-        back_populates='draft_issues',
+        back_populates='draft_issue',
         protected=True
     )
 

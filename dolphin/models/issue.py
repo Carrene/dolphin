@@ -181,9 +181,15 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
         protected=True,
     )
 
-    draft_issues = relationship(
+    draft_issue = relationship(
         'DraftIssue',
         back_populates='issue',
+        protected=True,
+    )
+
+    draft_issues = relationship(
+        'DraftIssue',
+        back_populates='related_issues',
         protected=True,
     )
 
