@@ -328,6 +328,13 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
             required=False,
             readonly=True
         )
+        yield MetadataField(
+            name='boardingValue',
+            key='boarding_value',
+            label='boarding value',
+            required=False,
+            readonly=True
+        )
 
     def to_dict(self, include_relations=True):
         issue_dict = super().to_dict()
