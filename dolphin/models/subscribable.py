@@ -75,3 +75,6 @@ class Subscribable(TimestampMixin, DeclarativeBase):
         protected=True
     )
 
+    def get_room_title(self):
+        raise NotImplementedError
+
