@@ -117,6 +117,18 @@ class TestIssue(LocalApplicationTestCase):
         session.add(cls.issue3)
         session.flush()
 
+        cls.issue4 = Issue(
+            project=cls.project,
+            title='Fourth issue',
+            description='This is description of fourth issue',
+            due_date='2020-2-20',
+            kind='feature',
+            days=3,
+            room_id=4,
+            tags=[cls.tag2],
+        )
+        session.add(cls.issue4)
+
         cls.phase1 = Phase(
             workflow=workflow,
             title='phase 1',
@@ -177,7 +189,7 @@ class TestIssue(LocalApplicationTestCase):
             assert status == 200
 
             issues = response.json
-            assert len(issues) == 3
+            assert len(issues) == 4
 
             for issue in issues:
                 items = issue['items']
@@ -208,7 +220,7 @@ class TestIssue(LocalApplicationTestCase):
                 'List issues except one of them',
                 query=dict(title='!Second issue')
             )
-            assert len(response.json) == 2
+            assert len(response.json) == 3
 
             when(
                 'Filter based on a hybrid property',
@@ -223,7 +235,7 @@ class TestIssue(LocalApplicationTestCase):
                 'Manipulate sorting and pagination',
                 query=dict(sort='-title', take=1, skip=2)
             )
-            assert response.json[0]['title'] == 'First issue'
+            assert response.json[0]['title'] == self.issue4.title
 
             when('Filter by phase id', query=dict(phaseId=self.phase2.id))
             assert status == 200
@@ -269,44 +281,48 @@ class TestIssue(LocalApplicationTestCase):
 
             when('Sort by phase id', query=dict(sort='phaseId'))
             assert status == 200
-            assert len(response.json) == 3
+            assert len(response.json) == 4
             assert response.json[0]['id'] == self.issue2.id
             assert response.json[1]['id'] == self.issue1.id
-            assert response.json[2]['id'] == self.issue3.id
+            assert response.json[2]['id'] == self.issue4.id
+            assert response.json[3]['id'] == self.issue3.id
 
             when('Reverse sort by phase id', query=dict(sort='-phaseId'))
             assert status == 200
-            assert len(response.json) == 3
-            assert response.json[0]['id'] == self.issue3.id
-            assert response.json[1]['id'] == self.issue1.id
-            assert response.json[2]['id'] == self.issue2.id
+            assert len(response.json) == 4
+            assert response.json[0]['id'] == self.issue4.id
+            assert response.json[1]['id'] == self.issue3.id
+            assert response.json[2]['id'] == self.issue1.id
+            assert response.json[3]['id'] == self.issue2.id
 
             when('Sort by tag id', query=dict(sort='tagId'))
             assert status == 200
-            assert len(response.json) == 3
+            assert len(response.json) == 4
             assert response.json[0]['id'] == self.issue1.id
             assert response.json[1]['id'] == self.issue2.id
-            assert response.json[2]['id'] == self.issue3.id
+            assert response.json[2]['id'] == self.issue4.id
+            assert response.json[3]['id'] == self.issue3.id
 
             when('Reverse sort by tag id', query=dict(sort='-tagId'))
             assert status == 200
-            assert len(response.json) == 3
+            assert len(response.json) == 4
             assert response.json[0]['id'] == self.issue3.id
             assert response.json[1]['id'] == self.issue2.id
-            assert response.json[2]['id'] == self.issue1.id
+            assert response.json[2]['id'] == self.issue4.id
+            assert response.json[3]['id'] == self.issue1.id
 
             when('Sort by tag id and title', query=dict(sort='tagId,title'))
             assert status == 200
-            assert len(response.json) == 3
+            assert len(response.json) == 4
             assert response.json[0]['id'] == self.issue1.id
-            assert response.json[1]['id'] == self.issue2.id
+            assert response.json[1]['id'] == self.issue4.id
 
             when(
                 'Sort by tag id and reverse title',
                 query=dict(sort='tagId,-title')
             )
             assert status == 200
-            assert len(response.json) == 3
+            assert len(response.json) == 4
             assert response.json[0]['id'] == self.issue1.id
             assert response.json[1]['id'] == self.issue2.id
 
@@ -317,6 +333,15 @@ class TestIssue(LocalApplicationTestCase):
             assert status == 200
             assert len(response.json) == 1
             assert response.json[0]['id'] == self.issue2.id
+
+            when(
+                'Sort and filter by tag id at the same time',
+                query=dict(sort='tagId', tagId=self.tag2.id)
+            )
+            assert status == 200
+            assert len(response.json) == 2
+            assert response.json[0]['id'] == self.issue2.id
+            assert response.json[1]['id'] == self.issue4.id
 
             when('Request is not authorized', authorization=None)
             assert status == 401
