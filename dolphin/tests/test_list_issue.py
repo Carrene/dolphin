@@ -69,6 +69,7 @@ class TestIssue(LocalApplicationTestCase):
             project=cls.project,
             title='First issue',
             description='This is description of first issue',
+            status='in-progress',
             due_date='2020-2-20',
             kind='feature',
             days=1,
@@ -89,6 +90,7 @@ class TestIssue(LocalApplicationTestCase):
             project=cls.project,
             title='Second issue',
             description='This is description of second issue',
+            status='to-do',
             due_date='2016-2-20',
             kind='feature',
             days=2,
@@ -109,6 +111,7 @@ class TestIssue(LocalApplicationTestCase):
             project=cls.project,
             title='Third issue',
             description='This is description of third issue',
+            status='on-hold',
             due_date='2020-2-20',
             kind='feature',
             days=3,
@@ -121,6 +124,7 @@ class TestIssue(LocalApplicationTestCase):
             project=cls.project,
             title='Fourth issue',
             description='This is description of fourth issue',
+            status='complete',
             due_date='2020-2-20',
             kind='feature',
             days=3,
@@ -206,6 +210,12 @@ class TestIssue(LocalApplicationTestCase):
 
             when('Sort issues by title', query=dict(sort='title'))
             assert response.json[0]['title'] == 'First issue'
+
+            when('Sort issues by status', query=dict(sort='status'))
+            assert response.json[0]['status'] == self.issue2.status
+            assert response.json[1]['status'] == self.issue1.status
+            assert response.json[2]['status'] == self.issue4.status
+            assert response.json[3]['status'] == self.issue3.status
 
             when(
                 'Reverse sorting titles by alphabet',
