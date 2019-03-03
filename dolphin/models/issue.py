@@ -330,7 +330,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
         yield MetadataField(
             name='relations',
             key='relations',
-            label='relations',
+            label='Related Nuggets',
             required=False,
             readonly=True
         )
