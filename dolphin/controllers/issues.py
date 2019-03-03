@@ -216,11 +216,12 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             )
 
         if 'tagId' in sorting_expression:
-            query = query.join(
-                IssueTag,
-                IssueTag.issue_id == Issue.id,
-                isouter=True
-            )
+            if 'tagId' not in context.query:
+                query = query.join(
+                    IssueTag,
+                    IssueTag.issue_id == Issue.id,
+                    isouter=True
+                )
             query = Issue._sort_by_key_value(
                 query,
                 column=IssueTag.tag_id,
