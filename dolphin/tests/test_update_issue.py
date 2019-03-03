@@ -1,25 +1,36 @@
+from auditor import MiddleWare
+from auditor.logentry import ChangeAttributeLogEntry
 from auditor.context import Context as AuditLogContext
 from bddrest import status, when, given, response, Update
+from nanohttp import context
+from nanohttp.contexts import Context
 
+from dolphin import Dolphin
 from dolphin.models import Issue, Project, Member, Workflow, Group, Release
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
+def callback(audit_logs):
+    global logs
+    logs = audit_logs
+
+
 class TestIssue(LocalApplicationTestCase):
+    __application__ = MiddleWare(Dolphin(), callback)
 
     @classmethod
     @AuditLogContext(dict())
     def mockup(cls):
         session = cls.create_session()
 
-        member = Member(
+        cls.member = Member(
             title='First Member',
             email='member1@example.com',
             access_token='access token 1',
             phone=123456789,
             reference_id=1
         )
-        session.add(member)
+        session.add(cls.member)
 
         workflow = Workflow(title='Default')
         group = Group(title='default')
@@ -34,7 +45,7 @@ class TestIssue(LocalApplicationTestCase):
             release=release,
             workflow=workflow,
             group=group,
-            manager=member,
+            manager=cls.member,
             title='My first project',
             description='A decription for my project',
             room_id=1
@@ -65,26 +76,43 @@ class TestIssue(LocalApplicationTestCase):
         session.commit()
 
     def test_update(self):
-        self.login('member1@example.com')
+        self.login(self.member.email)
 
+        session = self.create_session()
+        issue2 = session.query(Issue).get(self.issue2.id)
+
+        class Identity:
+            def __init__(self, member):
+                self.id = member.id
+                self.reference_id = member.reference_id
+
+        with Context({}):
+            context.identity = Identity(self.member)
+            old_values = issue2.to_dict()
+
+        form=dict(
+            title='New issue',
+            description='This is a description for new issue',
+            kind='bug',
+            days=4,
+            priority='high',
+        )
         with oauth_mockup_server(), self.given(
             'Update a issue',
             f'/apiv1/issues/id:{self.issue2.id}',
             'UPDATE',
-            form=dict(
-                title='New issue',
-                description='This is a description for new issue',
-                dueDate='2200-12-12',
-                kind='feature',
-                days=4,
-                priority='high',
-                projectId=2
-            )
+            form=form,
         ):
             assert status == 200
             assert response.json['id'] == self.issue2.id
             assert response.json['priority'] == 'high'
             assert response.json['tags'] is not None
+
+            assert len(logs) == 6
+            for log in logs:
+                if isinstance(log, ChangeAttributeLogEntry):
+                    assert log.old_value == getattr(issue2, log.attribute)
+                    assert log.new_value == form[log.attribute]
 
             when(
                 'Intended issue with string type not found',
