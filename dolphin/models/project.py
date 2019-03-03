@@ -6,6 +6,7 @@ from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
     join, case
 from sqlalchemy.orm import column_property
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.sql import exists
 
 from .issue import Issue, Boarding
 from .subscribable import Subscribable, Subscription
@@ -137,10 +138,11 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     )
 
     is_subscribed = column_property(
-        select([func.count(Subscription.member_id)]) \
-        .select_from(
-            join(Subscription, Member, Subscription.member_id == Member.id)
-        ) \
+        select([
+            exists().select_from(
+                join(Subscription, Member, Subscription.member_id == Member.id)
+            )
+        ]) \
         .where(Subscription.subscribable_id == id) \
         .where(Member.reference_id == bindparam(
                 'reference_id',
