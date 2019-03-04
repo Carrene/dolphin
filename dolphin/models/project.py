@@ -57,8 +57,8 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         ForeignKey('release.id'),
         python_type=int,
         nullable=False,
-        watermark='Choose a launch',
-        label='Launch',
+        watermark='Choose a release',
+        label='Release',
         not_none=True,
         required=True,
         example='Lorem Ipsum'
@@ -219,6 +219,17 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             label='boarding value',
             required=False,
             readonly=True
+        )
+        yield MetadataField(
+            name='managerTitle',
+            key='manager_title',
+            label='Manager',
+            required=False,
+            not_none=False,
+            readonly=True,
+            watermark='Lorem Ipsum',
+            example='Lorem Ipsum',
+            message='Lorem Ipsum',
         )
 
     def to_dict(self):
