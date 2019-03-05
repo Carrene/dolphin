@@ -186,17 +186,13 @@ class TestProject(LocalApplicationTestCase):
                     'Sorting project by "isSubscribed" field',
                     query=dict(sort='isSubscribed')
                 )
-                assert response.json[0]['isSubscribed'] == True
+                assert response.json[0]['isSubscribed'] == False
 
                 when(
                     'Revers sorting project by "isSubscribed" field',
-                    query=dict(sort='-isSubscribed')
+                    query=dict(sort='!isSubscribed')
                 )
-                assert status == 200
-                assert len(response.json) == 3
-                assert response.json[0]['isSubscribed'] == False
-                assert response.json[1]['isSubscribed'] == False
-                assert response.json[2]['isSubscribed'] == True
+                assert response.json[0]['isSubscribed'] == True
 
                 when(
                     'Sorting projects by release title',
@@ -300,36 +296,6 @@ class TestProject(LocalApplicationTestCase):
                 assert len(response.json) == 2
                 assert response.json[0]['title'] == self.project1.title
                 assert response.json[1]['title'] == self.project2.title
-
-                when(
-                    'Filter project by isSubscribed',
-                    query=dict(isSubscribed='true')
-                )
-                assert status == 200
-                assert len(response.json) == 1
-                assert response.json[0]['title'] == self.project1.title
-
-                when(
-                    'Filter project by isNotSubscribed',
-                    query=dict(isNotSubscribed='true')
-                )
-                assert status == 200
-                assert len(response.json) == 2
-                assert response.json[0]['title'] == self.project2.title
-                assert response.json[1]['title'] == self.project3.title
-
-                when(
-                    'Filter project by isNotSubscribed and isSubscribed',
-                    query=dict(isNotSubscribed='true', isSubscribed='true')
-                )
-                assert status == '400 Filtering isSubscribed And ' \
-                    'isNotSubscribed Is Invalid At The Same Time'
-
-                when(
-                    'Filter project by isSubscribed with not "true" value',
-                    query=dict(isSubscribed='false')
-                )
-                assert status == '400 Invalid isSubscribed Field Value'
 
             with self.given(
                 'Project pagination',
