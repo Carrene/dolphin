@@ -111,8 +111,8 @@ class TestIssue(LocalApplicationTestCase):
             assert len(logs) == 6
             for log in logs:
                 if isinstance(log, ChangeAttributeLogEntry):
-                    assert log.old_value == getattr(issue2, log.attribute)
-                    assert log.new_value == form[log.attribute]
+                    assert log.old_value == old_values[log.attribute_key]
+                    assert log.new_value == form[log.attribute_key]
 
             when(
                 'Intended issue with string type not found',

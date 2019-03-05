@@ -433,13 +433,15 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         AuditLogContext.append(
             user=context.identity.email,
             object_=issue,
-            attribute='Phase',
+            attribute_key='phase',
+            attribute_label='Phase',
             value=phase.title
         )
         AuditLogContext.append(
             user=context.identity.email,
             object_=issue,
-            attribute='Resource',
+            attribute_key='resource',
+            attribute_label='Resource',
             value=member.title
         )
         return issue
@@ -472,13 +474,15 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         AuditLogContext.remove(
             user=context.identity.email,
             object_=issue,
-            attribute='Phase',
+            attribute_key='phase',
+            attribute_label='Phase',
             value=phase.title
         )
         AuditLogContext.remove(
             user=context.identity.email,
             object_=issue,
-            attribute='Resource',
+            attribute_key='resource',
+            attribute_label='Resource',
             value=member.title
         )
         return issue
@@ -510,7 +514,8 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         AuditLogContext.append_change_attribute(
             user=context.identity.email,
             object_=issue,
-            attribute='project',
+            attribute_key='project',
+            attribute_label='Project',
             old_value=issue.project.title,
             new_value=project.title,
         )

@@ -23,7 +23,7 @@ def callback(audit_log):
             if isinstance(log, ChangeAttributeLogEntry):
                 message = dict(
                     action='Update',
-                    attribute=log.attribute,
+                    attribute=log.attribute_label,
                     old=format_datetime(log.old_value) \
                         if isinstance(log.old_value, datetime) else log.old_value,
                     new=format_datetime(log.new_value) \
@@ -41,7 +41,7 @@ def callback(audit_log):
             elif isinstance(log, AppendLogEntry):
                 message = dict(
                     action='Append',
-                    attribute=log.attribute,
+                    attribute=log.attribute_label,
                     old=None,
                     new=log.value,
                 )
@@ -49,7 +49,7 @@ def callback(audit_log):
             elif isinstance(log, RemoveLogEntry):
                 message = dict(
                     action='Remove',
-                    attribute=log.attribute,
+                    attribute=log.attribute_label,
                     old=log.value,
                     new=None,
                 )
