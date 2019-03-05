@@ -1,5 +1,4 @@
-from nanohttp import HTTPStatus, json, context, HTTPNotFound, int_or_notfound, \
-    HTTPBadRequest
+from nanohttp import HTTPStatus, json, context, HTTPNotFound, int_or_notfound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
@@ -224,23 +223,8 @@ class ProjectController(ModelRestController):
         query = DBSession.query(Project)
         sorting_expression = context.query.get('sort', '').strip()
 
-        if not ({'isSubscribed', 'isNotSubscribed'} - set(context.query.keys())):
-            raise HTTPBadRequest(
-                'Filtering isSubscribed And isNotSubscribed Is Invalid At '
-                'The Same Time'
-            )
-
-        if 'isSubscribed' in context.query and \
-                context.query['isSubscribed'].lower() != 'true':
-            raise HTTPBadRequest(
-                'Invalid isSubscribed Field Value'
-            )
-
-        if 'isNotSubscribed' in context.query:
-            query = query.filter(Project.is_subscribed.isnot(True))
-
         # SORT
-        external_columns = ('releaseTitle', 'managerTitle', 'isSubscribed')
+        external_columns = ('releaseTitle', 'managerTitle')
 
         if not sorting_expression:
             return query
@@ -272,13 +256,6 @@ class ProjectController(ModelRestController):
                 query,
                 column=Member.title,
                 descending=sorting_columns['managerTitle']
-            )
-
-        if 'isSubscribed' in sorting_expression:
-            query = Project._sort_by_key_value(
-                query,
-                column=Project.is_subscribed,
-                descending=sorting_columns['isSubscribed']
             )
 
         return query
