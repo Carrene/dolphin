@@ -53,43 +53,35 @@ def insert(): # pragma: no cover
 
     phase1 = Phase(
         title='Backlog',
-        order=-1,
+        order=0,
         workflow=default_workflow,
         skill=skill
     )
     DBSession.add(phase1)
 
     phase2 = Phase(
-        title='Triage',
-        order=0,
+        title='Design',
+        order=1,
         workflow=default_workflow,
         skill=skill
     )
     DBSession.add(phase2)
 
     phase3 = Phase(
-        title='Design',
-        order=1,
+        title='Development',
+        order=2,
         workflow=default_workflow,
         skill=skill
     )
     DBSession.add(phase3)
 
     phase4 = Phase(
-        title='Development',
-        order=2,
-        workflow=default_workflow,
-        skill=skill
-    )
-    DBSession.add(phase4)
-
-    phase5 = Phase(
         title='Test',
         order=3,
         workflow=default_workflow,
         skill=skill
     )
-    DBSession.add(phase5)
+    DBSession.add(phase4)
     DBSession.commit()
 
     with Context(dict()), StoreManager(DBSession):
@@ -157,7 +149,6 @@ def insert(): # pragma: no cover
         print(phase2)
         print(phase3)
         print(phase4)
-        print(phase5)
 
         print('Following tags have been added:')
         print(code_review_tag)
