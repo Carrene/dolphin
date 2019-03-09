@@ -107,6 +107,7 @@ class TestIssue(LocalApplicationTestCase):
             assert response.json['id'] == self.issue2.id
             assert response.json['priority'] == 'high'
             assert response.json['tags'] is not None
+            assert response.json['modifiedAt'] is not None
 
             assert len(logs) == 6
             for log in logs:

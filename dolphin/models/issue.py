@@ -69,7 +69,7 @@ class Boarding:
 
 
 # FIXME: Remove the '\' from Issue inheritance definition
-class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
+class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedMixin, \
             Subscribable):
 
     __tablename__ = 'issue'
@@ -359,6 +359,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
 
     @classmethod
     def __declare_last__(cls):
+        super().__declare_last__()
         observe(cls, ['modified_at', 'project_id'])
 
     def get_room_title(self):
