@@ -28,10 +28,6 @@ def upgrade():
 
     op.add_column(
         'subscription',
-        sa.Column('created_at', sa.DateTime(), nullable=False)
-    )
-    op.add_column(
-        'subscription',
         sa.Column('one_shot', sa.BOOLEAN(), nullable=True)
     )
     op.drop_constraint(
