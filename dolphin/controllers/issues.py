@@ -10,7 +10,8 @@ from auditor import context as AuditLogContext
 
 from ..backends import ChatClient
 from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound, \
-    ChatRoomNotFound, HTTPNotSubscribedIssue, HTTPRelatedIssueNotFound
+    ChatRoomNotFound, HTTPNotSubscribedIssue, HTTPRelatedIssueNotFound, \
+    HTTPIssueBugMustHaveRelatedIssue
 from ..models import Issue, Subscription, Phase, Item, Member, Project, \
     RelatedIssue, Subscribable, IssueTag, Tag
 from ..validators import update_issue_validator, assign_issue_validator, \
@@ -622,6 +623,9 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         )).scalar()
         if not is_related:
             raise HTTPStatus('646 Already Unrelated')
+
+        if issue.kind == 'bug' and len(issue.relations) < 2 :
+            raise HTTPIssueBugMustHaveRelatedIssue()
 
         issue.relations.remove(target)
         return issue

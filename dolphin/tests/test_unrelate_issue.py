@@ -80,6 +80,24 @@ class TestIssue(LocalApplicationTestCase):
             related_issue_id=cls.issue3.id
         )
         session.add(related_issue)
+
+        cls.issue_bug = Issue(
+            project=project,
+            title='Issue bug',
+            description='This is issue kind of bug',
+            due_date='2020-2-20',
+            kind='bug',
+            days=1,
+            room_id=2
+        )
+        session.add(cls.issue_bug)
+        session.flush()
+
+        related_issue_bug = RelatedIssue(
+            issue_id=cls.issue_bug.id,
+            related_issue_id=cls.issue3.id
+        )
+        session.add(related_issue_bug)
         session.commit()
 
     def test_unrelate(self):
@@ -142,6 +160,12 @@ class TestIssue(LocalApplicationTestCase):
                 json=dict()
             )
             assert status == '708 Empty Form'
+
+            when(
+                'The issue bug have one related issue',
+                url_parameters=dict(id=self.issue_bug.id),
+            )
+            assert status == '649 The Issue Bug Must Have A Related Issue'
 
             when('Request is not authorized', authorization=None)
             assert status == 401
