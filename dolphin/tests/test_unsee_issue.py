@@ -72,6 +72,13 @@ class TestUnseeIssue(LocalApplicationTestCase):
         )
         session.add(cls.subscription_issue1)
 
+        one_shot_subscription = Subscription(
+            member_id=member1.id,
+            subscribable_id=cls.issue1.id,
+            one_shot=True,
+        )
+        session.add(one_shot_subscription)
+
         cls.subscription_issue2 = Subscription(
             subscribable_id=cls.issue1.id,
             member_id=member2.id,
