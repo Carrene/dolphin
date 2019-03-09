@@ -364,6 +364,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         subscription = DBSession.query(Subscription).filter(
             Subscription.subscribable_id == id,
             Subscription.member_id == member.id,
+            Subscription.one_shot.is_(None),
         ).one_or_none()
 
         if not subscription:
