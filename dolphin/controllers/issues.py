@@ -125,12 +125,11 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 and_(
                     Subscription.member_id != context.identity.id,
                     Subscription.subscribable_id == issue.id,
+                    Subscription.one_shot.is_(None),
                 )
             )
 
-        for subscription in subscriptions:
-            subscription.seen_at = None
-
+        self._unsee_subscriptions(subscriptions)
         return issue
 
     @authorize
@@ -536,18 +535,19 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         if issue is None:
             raise HTTPNotFound()
 
-        subscription = DBSession.query(Subscription) \
+        subscriptions = DBSession.query(Subscription) \
             .filter(
                 and_(
                     Subscription.member_id == context.identity.id,
                     Subscription.subscribable_id == issue.id
                 )
-        ).one_or_none()
+        )
 
-        if subscription is None:
+        if subscriptions.count() == 0:
             raise HTTPNotSubscribedIssue()
 
-        subscription.seen_at = datetime.utcnow()
+        for subscription in subscriptions:
+            subscription.seen_at = datetime.utcnow()
         return issue
 
     @authorize
