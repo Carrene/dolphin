@@ -80,7 +80,7 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
         yield MetadataField(
             name='dueDate',
             key='due_date',
-            label='Target',
+            label='Release Date',
             readonly=True,
             example='Lorem Ipsum',
             watermark='Lorem Ipsum',
