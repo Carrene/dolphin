@@ -266,6 +266,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
             subscribed_issues = DBSession.query(Subscription) \
                 .filter(Subscription.member_id == member.id) \
+                .filter(Subscription.one_shot.is_(None)) \
                 .join(
                     Subscribable,
                     Subscribable.id == Subscription.subscribable_id,
@@ -307,7 +308,8 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         if DBSession.query(Subscription).filter(
                 Subscription.subscribable_id == id,
-                Subscription.member_id == member.id
+                Subscription.member_id == member.id,
+                Subscription.one_shot.is_(None),
         ).one_or_none():
             raise HTTPStatus('611 Already Subscribed')
 

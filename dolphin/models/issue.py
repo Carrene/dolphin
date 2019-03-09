@@ -221,6 +221,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
                     None
             )
         ) \
+        .where(Subscription.one_shot.is_(None)) \
         .correlate_except(Subscription),
         deferred=True
     )
@@ -239,6 +240,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
                     None
             )
         ) \
+        .where(Subscription.one_shot.is_(None)) \
         .correlate_except(Subscription),
         deferred=True
     )
