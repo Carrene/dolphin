@@ -190,45 +190,44 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         # SORT
         external_columns = ('phaseId', 'tagId')
 
-        if not sorting_expression:
-            return query
+        if sorting_expression:
 
-        sorting_columns = {
-                c[1:] if c.startswith('-') else c:
-                'desc' if c.startswith('-') else None
-            for c in sorting_expression.split(',')
-            if c.replace('-', '') in external_columns
-        }
+            sorting_columns = {
+                    c[1:] if c.startswith('-') else c:
+                    'desc' if c.startswith('-') else None
+                for c in sorting_expression.split(',')
+                if c.replace('-', '') in external_columns
+            }
 
-        if 'phaseId' in sorting_expression:
-            if 'phaseId' not in context.query:
-                query = query.join(Item, Item.issue_id == Issue.id, isouter=True)
-                query = query.join(
-                    item_cte,
-                    item_cte.c.max_item_id == Item.id,
-                    isouter=True
+            if 'phaseId' in sorting_expression:
+                if 'phaseId' not in context.query:
+                    query = query.join(Item, Item.issue_id == Issue.id, isouter=True)
+                    query = query.join(
+                        item_cte,
+                        item_cte.c.max_item_id == Item.id,
+                        isouter=True
+                    )
+
+                query = Issue._sort_by_key_value(
+                    query,
+                    column=Item.phase_id,
+                    descending=sorting_columns['phaseId']
                 )
 
-            query = Issue._sort_by_key_value(
-                query,
-                column=Item.phase_id,
-                descending=sorting_columns['phaseId']
-            )
-
-        if 'tagId' in sorting_expression:
-            if 'tagId' not in context.query:
-                query = query.join(
-                    IssueTag,
-                    IssueTag.issue_id == Issue.id,
-                    isouter=True
+            if 'tagId' in sorting_expression:
+                if 'tagId' not in context.query:
+                    query = query.join(
+                        IssueTag,
+                        IssueTag.issue_id == Issue.id,
+                        isouter=True
+                    )
+                query = Issue._sort_by_key_value(
+                    query,
+                    column=IssueTag.tag_id,
+                    descending=sorting_columns['tagId']
                 )
-            query = Issue._sort_by_key_value(
-                query,
-                column=IssueTag.tag_id,
-                descending=sorting_columns['tagId']
-            )
 
-        if 'seenAt' in context.query:
+        if 'unread' in context.query:
             query = query \
                 .join(
                     Subscription,
