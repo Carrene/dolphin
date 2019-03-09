@@ -1,7 +1,8 @@
 from datetime import datetime
 
 from nanohttp import HTTPStatus, json, context, HTTPNotFound, \
-    HTTPUnauthorized, int_or_notfound, settings
+    HTTPUnauthorized, int_or_notfound, settings, validate, HTTPNoContent, \
+    action
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import DBSession, commit
@@ -546,7 +547,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         subscription.seen_at = datetime.utcnow()
         return issue
 
-    #FIXME: Add authorize decorator, #519
+    @authorize
     @json(prevent_form='709 Form Not Allowed')
     @Issue.expose
     @commit
@@ -557,17 +558,15 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             raise HTTPNotFound()
 
         subscriptions = DBSession.query(Subscription) \
-            .filter(Subscription.subscribable_id == issue.id)
-
-        if context.identity and context.identity.id:
-            subscriptions = subscriptions \
-                .filter(Subscription.member_id == context.identity.id)
+            .filter(
+                Subscription.subscribable_id == issue.id,
+                Subscription.member_id == context.identity.id,
+            )
 
         if subscriptions.count() == 0:
             raise HTTPNotSubscribedIssue()
 
-        for subscription in subscriptions:
-            subscription.seen_at = None
+        self._unsee_subscriptions(subscriptions)
         return issue
 
     @authorize
@@ -625,4 +624,28 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         issue.relations.remove(target)
         return issue
+
+    @validate(
+        roomId=dict(
+            type_=int,
+            required=True,
+        )
+    )
+    @action
+    @commit
+    def sent(self):
+        issue = DBSession.query(Issue) \
+            .filter(Issue.room_id == context.query['roomId']) \
+            .one_or_none()
+        if issue is None:
+            raise ChatRoomNotFound()
+
+        subscriptions = DBSession.query(Subscription) \
+            .filter(Subscription.subscribable_id == issue.id)
+        self._unsee_subscriptions(subscriptions)
+        raise HTTPNoContent()
+
+    def _unsee_subscriptions(self, subscriptions):
+        for subscription in subscriptions:
+            subscription.seen_at = None
 
