@@ -343,6 +343,13 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
             required=False,
             readonly=True
         )
+        yield MetadataField(
+            name='unread',
+            key='unread',
+            label='unread',
+            required=False,
+            readonly=True
+        )
 
     def to_dict(self, include_relations=True):
         issue_dict = super().to_dict()
