@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from restfulpy.orm.metadata import MetadataField
 from restfulpy.orm import DeclarativeBase, Field, TimestampMixin, relationship
 from sqlalchemy import Integer, String, ForeignKey, DateTime
 
@@ -74,6 +75,17 @@ class Subscribable(TimestampMixin, DeclarativeBase):
         back_populates='subscribables',
         protected=True
     )
+
+    @classmethod
+    def iter_metadata_fields(cls):
+        yield from super().iter_metadata_fields()
+        yield MetadataField(
+            name='createdAt',
+            key='created_at',
+            label='Created',
+            required=False,
+            readonly=True
+        )
 
     def get_room_title(self):
         raise NotImplementedError

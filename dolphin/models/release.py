@@ -48,7 +48,7 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
     cutoff = Field(
         DateTime,
         python_type=datetime,
-        label='Cutoff',
+        label='Release Cutoff',
         pattern=
             r'^(\d{4})-(0[1-9]|1[012]|[1-9])-(0[1-9]|[12]\d{1}|3[01]|[1-9])'
             r'(T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z)?)?$',
@@ -88,6 +88,16 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
             not_none=True,
             required=True,
         )
+        yield MetadataField(
+            name='projects',
+            key='projects',
+            label='Project',
+            readonly=True,
+            example='Lorem Ipsum',
+            watermark='Lorem Ipsum',
+            message='Lorem Ipsum',
+        )
+
 
     def to_dict(self):
         release_dict = super().to_dict()
