@@ -645,6 +645,37 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         self._unsee_subscriptions(subscriptions)
         raise HTTPNoContent()
 
+    @validate(
+        roomId=dict(
+            type_=int,
+            required=True,
+        ),
+        memberId=dict(
+            type_=int,
+            required=True,
+        ),
+    )
+    @action
+    @commit
+    def mentioned(self):
+        issue = DBSession.query(Issue) \
+            .filter(Issue.room_id == context.query['roomId']) \
+            .one_or_none()
+        if issue is None:
+            raise ChatRoomNotFound()
+
+        member = DBSession.query(Member).get(context.query['memberId'])
+        if member is None:
+            raise HTTPStatus('610 Member Not Found')
+
+        subscription = Subscription(
+            member_id=member.reference_id,
+            subscribable_id=issue.id,
+            one_shot=True,
+        )
+        DBSession.add(subscription)
+        raise HTTPNoContent()
+
     def _unsee_subscriptions(self, subscriptions):
         for subscription in subscriptions:
             subscription.seen_at = None
