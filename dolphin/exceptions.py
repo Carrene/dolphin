@@ -86,6 +86,11 @@ class HTTPResourceNotFound(HTTPKnownStatus):
     def __init__(self, resource_id):
         self.status = f'609 Resource not found with id: {resource_id}'
 
+
 class HTTPIssueBugMustHaveRelatedIssue(HTTPKnownStatus):
     status = '649 The Issue Bug Must Have A Related Issue'
+
+
+class HTTPManagerNotFound(HTTPKnownStatus):
+    status = '608 Manager Not Found'
 

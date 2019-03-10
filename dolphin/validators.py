@@ -278,6 +278,11 @@ release_validator = validate(
     ),
     status=dict(
         callback=release_status_value_validator
+    ),
+    managerReferenceId=dict(
+        type_=(int, '608 Manager Not Found'),
+        required='777 Manager Reference Id Not In Form',
+        not_none='778 Manager Reference Id Is Null',
     )
 )
 
@@ -295,6 +300,10 @@ update_release_validator = validate(
     ),
     status=dict(
         callback=release_status_value_validator
+    ),
+    managerReferenceId=dict(
+        type_=(int, '608 Manager Not Found'),
+        not_none='778 Manager Reference Id Is Null',
     )
 )
 

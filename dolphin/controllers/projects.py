@@ -8,7 +8,7 @@ from .files import FileController
 from .issues import IssueController
 from ..backends import ChatClient
 from ..exceptions import ChatRoomNotFound, RoomMemberAlreadyExist, \
-    RoomMemberNotFound
+    RoomMemberNotFound, HTTPManagerNotFound
 from ..models import Project, Member, Subscription, Workflow, Group, Release
 from ..validators import project_validator, update_project_validator
 
@@ -75,7 +75,7 @@ class ProjectController(ModelRestController):
             .filter(Member.reference_id == form['managerReferenceId']) \
             .one_or_none()
         if member is None:
-            raise HTTPStatus('608 Manager Not Found')
+            raise HTTPManagerNotFound()
 
         project = Project()
         project.update_from_request()

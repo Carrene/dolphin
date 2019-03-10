@@ -5,37 +5,59 @@ from restfulpy.orm import DBSession, commit
 from restfulpy.utils import to_camel_case
 
 from ..backends import ChatClient
-from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound
+from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound, \
+    HTTPManagerNotFound
 from ..models import Release, release_statuses, Subscription, Member
 from ..validators import release_validator, update_release_validator
+
+
+FORM_WHITELIST = [
+    'title',
+    'description',
+    'status',
+    'cutoff',
+    'managerReferenceId',
+]
+
+
+FORM_WHITELISTS_STRING = ', '.join(FORM_WHITELIST)
 
 
 class ReleaseController(ModelRestController):
     __model__ = Release
 
     @authorize
-    @json
+    @json(
+        prevent_empty_form='708 No Parameter Exists In The Form',
+        form_whitelist=(
+            FORM_WHITELIST,
+            f'707 Invalid field, only following fields are accepted: '
+            f'{FORM_WHITELISTS_STRING}'
+        )
+    )
     @release_validator
     @Release.expose
     @commit
     def create(self):
-        title = context.form.get('title')
-        release = DBSession.query(Release) \
-            .filter(Release.title == title) \
+        member = DBSession.query(Member) \
+            .filter(Member.reference_id == context.form['managerReferenceId']) \
             .one_or_none()
+        if member is None:
+            raise HTTPManagerNotFound()
 
-        new_release = Release()
-        new_release.update_from_request()
-        DBSession.add(new_release)
-        return new_release
+        release = Release()
+        release.manager = member
+        release.update_from_request()
+        DBSession.add(release)
+        return release
 
     @authorize
     @json(
         prevent_empty_form='708 No Parameter Exists In The Form',
         form_whitelist=(
-            ['title', 'description', 'status', 'cutoff'],
-            '707 Invalid field, only following fields are accepted: ' \
-            'title, description, status, cutoff' \
+            FORM_WHITELIST,
+            f'707 Invalid field, only following fields are accepted: '
+            f'{FORM_WHITELISTS_STRING}'
         )
     )
     @update_release_validator
@@ -57,6 +79,16 @@ class ReleaseController(ModelRestController):
                 f'600 Another release with title: ' \
                 f'"{form["title"]}" is already exists.'
             )
+
+        manager_reference_id = context.form.get('managerReferenceId')
+        if manager_reference_id is not None:
+            member = DBSession.query(Member) \
+                .filter(Member.reference_id == manager_reference_id) \
+                .one_or_none()
+            if member is None:
+                raise HTTPManagerNotFound()
+
+            release.manager_id = member.id
 
         release.update_from_request()
         return release
