@@ -57,7 +57,6 @@ def downgrade():
         type_='primary'
     )
     op.drop_column('subscription', 'id')
-    op.drop_column('subscription', 'created_at')
     op.execute(
         'ALTER TABLE subscription ADD PRIMARY KEY (subscribable_id, member_id)'
     )
