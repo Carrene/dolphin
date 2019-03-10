@@ -11,7 +11,6 @@ with open(join(dirname(__file__), 'dolphin', '__init__.py')) as v_file:
 
 
 dependencies = [
-    'restfulpy >= 2.7.2',
     'sqlalchemy_media >= 0.17.1',
 #    'cas-common',
 
@@ -26,6 +25,9 @@ setup(
     version=package_version,
     packages=find_packages(),
     install_requires=dependencies,
+    dependency_links=[
+           "git+ssh://git@github.com/Carrene/restfulpy@390f2379b979daa96355eb8e22e8af3477ba0e27"
+    ],
     include_package_data=True,
     entry_points={
         'console_scripts': [
