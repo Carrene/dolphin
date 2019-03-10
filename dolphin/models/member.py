@@ -102,6 +102,12 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     projects = relationship('Project', back_populates='manager', protected=True)
 
+    releases = relationship(
+        'Release',
+        back_populates='manager',
+        protected=True
+    )
+
     phases = relationship(
         'Phase',
         back_populates='members',

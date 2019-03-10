@@ -39,6 +39,7 @@ class TestIssue(LocalApplicationTestCase):
             title='My first release',
             description='A decription for my first release',
             cutoff='2030-2-20',
+            manager=cls.member,
         )
 
         project1 = Project(

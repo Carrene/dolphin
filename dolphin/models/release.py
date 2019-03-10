@@ -36,6 +36,17 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
         example=1,
         protected=False,
     )
+    manager_id = Field(
+        Integer,
+        ForeignKey('member.id'),
+        python_type=int,
+        watermark='Choose a member',
+        label='Manager',
+        nullable=False,
+        not_none=True,
+        readonly=True,
+        required=True
+    )
     status = Field(
         Enum(*release_statuses, name='release_status'),
         python_type=str,
@@ -68,6 +79,13 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
         lazy='selectin'
     )
 
+    manager = relationship(
+        'Member',
+        foreign_keys=[manager_id],
+        back_populates='releases',
+        protected=True
+    )
+
     due_date = column_property(
         select([func.max(Project.due_date)]).\
             where(Project.release_id == id).\
@@ -97,7 +115,17 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
             watermark='Lorem Ipsum',
             message='Lorem Ipsum',
         )
-
+        yield MetadataField(
+            name='managerReferenceId',
+            key='manager_reference_id',
+            label='Lorem Ipsum',
+            required=True,
+            not_none=True,
+            readonly=False,
+            watermark='Lorem Ipsum',
+            example='Lorem Ipsum',
+            message='Lorem Ipsum',
+        )
 
     def to_dict(self):
         release_dict = super().to_dict()
