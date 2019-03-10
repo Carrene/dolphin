@@ -221,6 +221,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedMixin, \
                     None
             )
         ) \
+        .where(Subscription.one_shot.is_(None)) \
         .correlate_except(Subscription),
         deferred=True
     )
@@ -239,6 +240,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedMixin, \
                     None
             )
         ) \
+        .where(Subscription.one_shot.is_(None)) \
         .correlate_except(Subscription),
         deferred=True
     )
@@ -338,6 +340,13 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedMixin, \
             name='boardingValue',
             key='boarding_value',
             label='boarding value',
+            required=False,
+            readonly=True
+        )
+        yield MetadataField(
+            name='unread',
+            key='unread',
+            label='unread',
             required=False,
             readonly=True
         )

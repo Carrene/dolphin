@@ -104,6 +104,7 @@ class TestIssue(LocalApplicationTestCase):
             subscribable_id=cls.issue2.id,
             member_id=member.id,
             seen_at=None,
+            one_shot=True,
         )
         session.add(subscription_issue2)
 
@@ -119,6 +120,14 @@ class TestIssue(LocalApplicationTestCase):
         )
         session.add(cls.issue3)
         session.flush()
+
+        subscription_issue3 = Subscription(
+            subscribable_id=cls.issue3.id,
+            member_id=member.id,
+            seen_at=None,
+            one_shot=True,
+        )
+        session.add(subscription_issue3)
 
         cls.issue4 = Issue(
             project=cls.project,
@@ -205,8 +214,8 @@ class TestIssue(LocalApplicationTestCase):
                     assert item['createdAt'] >= privious_item_created_at
                     privious_item_created_at = item['createdAt']
 
-            when('Unread messages', query=dict(seenAt=None))
-            assert len(response.json) == 1
+            when('Unread messages', query=dict(unread=True))
+            assert len(response.json) == 2
 
             when('Sort issues by title', query=dict(sort='title'))
             assert response.json[0]['title'] == 'First issue'
