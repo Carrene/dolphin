@@ -100,7 +100,19 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         back_populates='members',
     )
 
-    projects = relationship('Project', back_populates='manager', protected=True)
+    projects = relationship(
+        'Project',
+        primaryjoin='Project.manager_id == Member.id',
+        back_populates='manager',
+        protected=True
+    )
+
+    secondary_projects = relationship(
+        'Project',
+        primaryjoin='Project.secondary_manager_id == Member.id',
+        back_populates='secondary_manager',
+        protected=True
+    )
 
     releases = relationship(
         'Release',

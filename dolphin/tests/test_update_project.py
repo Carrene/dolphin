@@ -1,4 +1,4 @@
-from bddrest import status, response, Update, when, given
+from bddrest import status, response, Update, when, given, Append
 
 from dolphin.models import Project, Member, Workflow, Group, Release
 from dolphin.tests.helpers import LocalApplicationTestCase, \
@@ -11,23 +11,23 @@ class TestProject(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        member1 = Member(
+        cls.member1 = Member(
             title='First Member',
             email='member1@example.com',
             access_token='access token 1',
             phone=123456789,
             reference_id=2
         )
-        session.add(member1)
+        session.add(cls.member1)
 
-        member2 = Member(
+        cls.member2 = Member(
             title='Second Member',
             email='member2@example.com',
             access_token='access token 2',
             phone=123457689,
             reference_id=3
         )
-        session.add(member2)
+        session.add(cls.member2)
 
         workflow = Workflow(title='Default')
         group = Group(title='default')
@@ -36,21 +36,21 @@ class TestProject(LocalApplicationTestCase):
             title='My first release',
             description='A decription for my first release',
             cutoff='2030-2-20',
-            manager=member1,
+            manager=cls.member1,
         )
 
         cls.release2 = Release(
             title='My second release',
             description='A decription for my second release',
             cutoff='2030-2-20',
-            manager=member1,
+            manager=cls.member1,
         )
 
         cls.project1 = Project(
             release=cls.release1,
             workflow=workflow,
             group=group,
-            manager=member1,
+            manager=cls.member1,
             title='My first project',
             description='A decription for my project',
             room_id=1001
@@ -61,7 +61,7 @@ class TestProject(LocalApplicationTestCase):
             release=cls.release1,
             workflow=workflow,
             group=group,
-            manager=member1,
+            manager=cls.member1,
             title='My second project',
             description='A decription for my project',
             room_id=1002
@@ -72,7 +72,7 @@ class TestProject(LocalApplicationTestCase):
             release=cls.release2,
             workflow=workflow,
             group=group,
-            manager=member1,
+            manager=cls.member1,
             title='My third project',
             description='A decription for my project',
             room_id=1003
@@ -83,7 +83,7 @@ class TestProject(LocalApplicationTestCase):
             release=cls.release2,
             workflow=workflow,
             group=group,
-            manager=member1,
+            manager=cls.member1,
             title='My fourth project',
             description='A decription for my project',
             room_id=1004
@@ -94,7 +94,7 @@ class TestProject(LocalApplicationTestCase):
             release=cls.release1,
             workflow=workflow,
             group=group,
-            manager=member1,
+            manager=cls.member1,
             title='My hidden project',
             description='A decription for my project',
             removed_at='2020-2-20',
@@ -110,7 +110,7 @@ class TestProject(LocalApplicationTestCase):
             'Updating a project',
             f'/apiv1/projects/id:{self.project1.id}',
             'UPDATE',
-            form=dict(
+            json=dict(
                 title='My interesting project',
                 description='A updated project description',
                 status='active',
@@ -122,6 +122,8 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['description'] == 'A updated project ' \
                 'description'
             assert response.json['status'] == 'active'
+            assert response.json['managerId'] == self.member1.id
+            assert response.json['secondaryManagerId'] is None
 
             when(
                 'Intended project with string type not found',
@@ -137,14 +139,14 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Title is repetetive',
-                form=given - 'releaseId' | dict(title='My fourth project')
+                json=given - 'releaseId' | dict(title='My fourth project')
             )
             assert status == '600 Another project with title: "My fourth '\
                 'project" is already exists.'
 
             when(
                 'Title is repetetive in another release',
-                form=given | dict(
+                json=given | dict(
                     title='My second project',
                     releaseId=self.release1.id
                 )
@@ -154,13 +156,13 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Title format is wrong',
-                form=given | dict(title=' Invalid Format ')
+                json=given | dict(title=' Invalid Format ')
             )
             assert status == '747 Invalid Title Format'
 
             when(
                 'Title length is more than limit',
-                form=Update(
+                json=Update(
                     title=((128 + 1) * 'a')
                 )
             )
@@ -168,7 +170,7 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Description length is more than limit',
-                form=given | dict(
+                json=given | dict(
                     description=((8192 + 1) * 'a'),
                 )
             )
@@ -177,7 +179,7 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Status value is invalid',
-                form=given | dict(
+                json=given | dict(
                     status='progressing',
                 )
             )
@@ -186,12 +188,51 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Invalid parameter is in the form',
-                form=given + \
+                json=given + \
                     dict(invalid_param='External parameter')
             )
             assert status == \
-                '707 Invalid field, only following fields are accepted: '\
-                'groupId, title, description, status and releaseId'
+                '707 Invalid field, only following fields are accepted: ' \
+                'title, description, status, releaseId, workflowId, groupId, ' \
+                'managerReferenceId, secondaryManagerReferenceId'
+
+            when(
+                'Trying to update a project with secondary manager',
+                json=Update(
+                    secondaryManagerReferenceId=self.member2.reference_id
+                )
+            )
+            assert response.json['secondaryManagerId'] == self.member2.id
+
+            when(
+                'Secondary manager reference id is null',
+                json=Append(secondaryManagerReferenceId=None)
+            )
+            assert status == '782 Secondary Manager Reference Id Is Null'
+
+            when(
+                'Secondary manager is not found',
+                json=Append(secondaryManagerReferenceId=0)
+            )
+            assert status == '650 Secondary Manager Not Found'
+
+            when(
+                'Trying to change the project manager',
+                json=Append(managerReferenceId=self.member2.reference_id)
+            )
+            assert response.json['managerId'] == self.member2.id
+
+            when(
+                'Manager reference id is null',
+                json=Append(managerReferenceId=None)
+            )
+            assert status == '778 Manager Reference Id Is Null'
+
+            when(
+                'Manager is not found',
+                json=Append(managerReferenceId=0)
+            )
+            assert status == '608 Manager Not Found'
 
             when('Request is not authorized', authorization=None)
             assert status == 401
@@ -206,7 +247,7 @@ class TestProject(LocalApplicationTestCase):
                 'Updating project with empty form',
                 '/apiv1/projects/id:2',
                 'UPDATE',
-                form=dict()
+                json=dict()
             ):
                 assert status == '708 No Parameter Exists In The Form'
 

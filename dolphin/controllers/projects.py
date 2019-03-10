@@ -8,13 +8,28 @@ from .files import FileController
 from .issues import IssueController
 from ..backends import ChatClient
 from ..exceptions import ChatRoomNotFound, RoomMemberAlreadyExist, \
-    RoomMemberNotFound, HTTPManagerNotFound
+    RoomMemberNotFound, HTTPManagerNotFound, HTTPSecondaryManagerNotFound
 from ..models import Project, Member, Subscription, Workflow, Group, Release
 from ..validators import project_validator, update_project_validator
 
 
 # FIXME: create room before creating project and remove PENDING
 PENDING = -1
+
+
+FORM_WHITELIST = [
+    'title',
+    'description',
+    'status',
+    'releaseId',
+    'workflowId',
+    'groupId',
+    'managerReferenceId',
+    'secondaryManagerReferenceId'
+]
+
+
+FORM_WHITELISTS_STRING = ', '.join(FORM_WHITELIST)
 
 
 class ProjectController(ModelRestController):
@@ -60,10 +75,9 @@ class ProjectController(ModelRestController):
 
     @authorize
     @json(form_whitelist=(
-        ['title', 'description', 'status', 'releaseId', 'workflowId', 'groupId',
-         'managerReferenceId'],
-        '707 Invalid field, only following fields are accepted: ' \
-        'title, description, status, releaseId, workflowId and groupId' \
+        FORM_WHITELIST,
+        f'707 Invalid field, only following fields are accepted: '
+        f'{FORM_WHITELISTS_STRING}'
     ))
     @project_validator
     @Project.expose
@@ -79,6 +93,16 @@ class ProjectController(ModelRestController):
 
         project = Project()
         project.update_from_request()
+
+        secondary_manager_reference_id = form.get('secondaryManagerReferenceId')
+        if secondary_manager_reference_id is not None:
+            secondary_manager = DBSession.query(Member) \
+                .filter(Member.reference_id == secondary_manager_reference_id) \
+                .one_or_none()
+            if secondary_manager is None:
+                raise HTTPSecondaryManagerNotFound()
+
+            project.secondary_manager = secondary_manager
 
         if 'groupId' in form:
             project.group_id = form['groupId']
@@ -143,9 +167,9 @@ class ProjectController(ModelRestController):
     @json(
         prevent_empty_form='708 No Parameter Exists In The Form',
         form_whitelist=(
-            ['groupId', 'title', 'description', 'status', 'releaseId'],
-            '707 Invalid field, only following fields are accepted: ' \
-            'groupId, title, description, status and releaseId'
+            FORM_WHITELIST,
+            f'707 Invalid field, only following fields are accepted: '
+            f'{FORM_WHITELISTS_STRING}'
         )
     )
     @update_project_validator
@@ -163,6 +187,26 @@ class ProjectController(ModelRestController):
 
         if project.is_deleted:
             raise HTTPStatus('746 Hidden Project Is Not Editable')
+
+        manager_reference_id = form.get('managerReferenceId')
+        if manager_reference_id is not None:
+            manager = DBSession.query(Member) \
+                .filter(Member.reference_id == manager_reference_id) \
+                .one_or_none()
+            if manager is None:
+                raise HTTPManagerNotFound()
+
+            project.manager = manager
+
+        secondary_manager_reference_id = form.get('secondaryManagerReferenceId')
+        if secondary_manager_reference_id is not None:
+            secondary_manager = DBSession.query(Member) \
+                .filter(Member.reference_id == secondary_manager_reference_id) \
+                .one_or_none()
+            if secondary_manager is None:
+                raise HTTPSecondaryManagerNotFound()
+
+            project.secondary_manager = secondary_manager
 
         if 'title' in form:
             release = project.release

@@ -331,7 +331,11 @@ project_validator = validate(
         type_=(int, '608 Manager Not Found'),
         required='777 Manager Reference Id Not In Form',
         not_none='778 Manager Reference Id Is Null',
-    )
+    ),
+    secondaryManagerReferenceId=dict(
+        type_=(int, '650 Secondary Manager Not Found'),
+        not_none='782 Secondary Manager Reference Id Is Null',
+    ),
 )
 
 
@@ -345,6 +349,14 @@ update_project_validator = validate(
     ),
     status=dict(
         callback=project_status_value_validator
+    ),
+    secondaryManagerReferenceId=dict(
+        type_=(int, '650 Secondary Manager Not Found'),
+        not_none='782 Secondary Manager Reference Id Is Null',
+    ),
+    managerReferenceId=dict(
+        type_=(int, '608 Manager Not Found'),
+        not_none='778 Manager Reference Id Is Null',
     ),
 )
 
