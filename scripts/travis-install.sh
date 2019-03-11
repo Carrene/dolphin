@@ -22,4 +22,5 @@ pip3 install -U pip setuptools wheel
 pip3 install -r requirements-ci.txt
 pip3 install git+git://github.com/Carrene/cas-common.git@master
 pip3 install -e . -U --no-cache
-pip3 install git+https://git@github.com/Carrene/restfulpy@390f2379b979daa96355eb8e22e8af3477ba0e27 -U 
+pip3 install git+https://git@github.com/Carrene/restfulpy@patch/commiton2xx3xx -U
+

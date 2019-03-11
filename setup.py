@@ -26,7 +26,7 @@ setup(
     packages=find_packages(),
     install_requires=dependencies,
     dependency_links=[
-           "git+ssh://git@github.com/Carrene/restfulpy@390f2379b979daa96355eb8e22e8af3477ba0e27"
+        'git+https://git@github.com/Carrene/restfulpy@patch/commiton2xx3xx'
     ],
     include_package_data=True,
     entry_points={
