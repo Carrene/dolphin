@@ -57,11 +57,11 @@ class TestRelease(LocalApplicationTestCase):
             assert fields['cutoff']['pattern'] is not None
             assert fields['cutoff']['example'] is not None
 
-            assert fields['dueDate']['label'] is not None
-            assert fields['dueDate']['watermark'] is not None
-            assert fields['dueDate']['name'] is not None
-            assert fields['dueDate']['notNone'] is not None
-            assert fields['dueDate']['required'] is not None
-            assert fields['dueDate']['example'] is not None
-            assert fields['dueDate']['readonly'] is not None
+            assert fields['launchDate']['label'] is not None
+            assert fields['launchDate']['watermark'] is not None
+            assert fields['launchDate']['name'] is not None
+            assert fields['launchDate']['notNone'] is not None
+            assert fields['launchDate']['required'] is not None
+            assert fields['launchDate']['example'] is not None
+            assert fields['launchDate']['readonly'] is not None
 

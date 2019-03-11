@@ -6,7 +6,7 @@ from restfulpy.utils import to_camel_case
 
 from ..backends import ChatClient
 from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound, \
-    HTTPManagerNotFound
+    HTTPManagerNotFound, HTTPLaunchDateMustGreaterCutoffDate
 from ..models import Release, release_statuses, Subscription, Member
 from ..validators import release_validator, update_release_validator
 
@@ -17,6 +17,7 @@ FORM_WHITELIST = [
     'status',
     'cutoff',
     'managerReferenceId',
+    'launchDate',
 ]
 
 
@@ -48,6 +49,9 @@ class ReleaseController(ModelRestController):
         release = Release()
         release.manager = member
         release.update_from_request()
+        if release.launch_date < release.cutoff:
+            raise HTTPLaunchDateMustGreaterCutoffDate()
+
         DBSession.add(release)
         return release
 
@@ -91,6 +95,9 @@ class ReleaseController(ModelRestController):
             release.manager_id = member.id
 
         release.update_from_request()
+        if release.launch_date < release.cutoff:
+            raise HTTPLaunchDateMustGreaterCutoffDate()
+
         return release
 
     @authorize
