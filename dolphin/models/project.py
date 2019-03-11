@@ -73,6 +73,17 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         readonly=True,
         required=True
     )
+    secondary_manager_id = Field(
+        Integer,
+        ForeignKey('member.id'),
+        python_type=int,
+        watermark='Lorem Ipsum',
+        label='Secondary manager',
+        nullable=True,
+        not_none=False,
+        readonly=False,
+        required=False,
+    )
     group_id = Field(
         Integer,
         ForeignKey('group.id'),
@@ -103,11 +114,16 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         back_populates='projects',
         protected=True
     )
-
     manager = relationship(
         'Member',
         foreign_keys=[manager_id],
         back_populates='projects',
+        protected=True
+    )
+    secondary_manager = relationship(
+        'Member',
+        foreign_keys=[secondary_manager_id],
+        back_populates='secondary_projects',
         protected=True
     )
     release = relationship(
@@ -206,6 +222,17 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             label='Lorem Ipsum',
             required=True,
             not_none=True,
+            readonly=False,
+            watermark='Lorem Ipsum',
+            example='Lorem Ipsum',
+            message='Lorem Ipsum',
+        )
+        yield MetadataField(
+            name='secondaryManagerReferenceId',
+            key='secondary_manager_reference_id',
+            label='Lorem Ipsum',
+            required=False,
+            not_none=False,
             readonly=False,
             watermark='Lorem Ipsum',
             example='Lorem Ipsum',

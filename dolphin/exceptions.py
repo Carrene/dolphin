@@ -94,3 +94,7 @@ class HTTPIssueBugMustHaveRelatedIssue(HTTPKnownStatus):
 class HTTPManagerNotFound(HTTPKnownStatus):
     status = '608 Manager Not Found'
 
+
+class HTTPSecondaryManagerNotFound(HTTPKnownStatus):
+    status = '650 Secondary Manager Not Found'
+

@@ -65,6 +65,34 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['boarding'] == None
             assert response.json['dueDate'] == None
             assert response.json['managerId'] == self.member.id
+            assert response.json['secondaryManagerId'] is None
+
+            when(
+                'Trying to create a project with secondary manager',
+                json=Update(
+                    title='project',
+                    secondaryManagerReferenceId=self.member.reference_id
+                )
+            )
+            assert response.json['secondaryManagerId'] == self.member.id
+
+            when(
+                'Secondary manager reference id is null',
+                json=Update(
+                    title='New Project',
+                    secondaryManagerReferenceId=None
+                )
+            )
+            assert status == '782 Secondary Manager Reference Id Is Null'
+
+            when(
+                'Secondary manager is not found',
+                json=Update(
+                    title='New Project',
+                    secondaryManagerReferenceId=0
+                )
+            )
+            assert status == '650 Secondary Manager Not Found'
 
             when(
                 'Manager reference id is null',
