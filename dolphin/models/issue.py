@@ -64,7 +64,7 @@ issue_priorities = [
 class Boarding:
     ontime =    (1, 'on-time')
     delayed =   (2, 'delayed')
-    frozen =    (3, 'frozedn')
+    frozen =    (3, 'frozen')
     atrisk =    (4, 'at-risk')
 
 

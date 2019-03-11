@@ -175,7 +175,10 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     @hybrid_property
     def boarding(self):
-        if self.boarding_value == 1:
+        if self.status == 'on-hold':
+            return Boarding.frozen[1]
+
+        elif self.boarding_value == 1:
             return Boarding.ontime[1]
 
         elif self.boarding_value == 2:
@@ -186,8 +189,9 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     @boarding.expression
     def boarding(cls):
         return case([
+            (cls.status == 'on-hold', Boarding.frozen[1]),
             (cls.boarding_value == 1, Boarding.ontime[1]),
-            (cls.boarding_value == 2, Boarding.delayed[1])
+            (cls.boarding_value == 2, Boarding.delayed[1]),
         ])
 
     @classmethod
