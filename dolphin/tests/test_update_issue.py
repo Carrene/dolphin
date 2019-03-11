@@ -28,7 +28,7 @@ class TestIssue(LocalApplicationTestCase):
             email='member1@example.com',
             access_token='access token 1',
             phone=123456789,
-            reference_id=1
+            reference_id=2
         )
         session.add(cls.member)
 
@@ -110,6 +110,7 @@ class TestIssue(LocalApplicationTestCase):
             assert response.json['priority'] == 'high'
             assert response.json['tags'] is not None
             assert response.json['modifiedAt'] is not None
+            assert response.json['modifiedBy'] == self.member.reference_id
 
             assert len(logs) == 6
             for log in logs:
