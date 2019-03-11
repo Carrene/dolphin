@@ -125,6 +125,7 @@ class TestIssue(LocalApplicationTestCase):
 
     def test_finalize(self):
         self.login(self.member.email)
+        session = self.create_session()
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
             f'Define an issue',
@@ -145,6 +146,10 @@ class TestIssue(LocalApplicationTestCase):
             assert response.json['id'] == self.draft_issue1.id
             assert response.json['issueId'] is not None
             assert len(response.json['tags']) == 2
+
+            created_issue_id = response.json['issueId']
+            created_issue = session.query(Issue).get(created_issue_id)
+            assert created_issue.modified_by is None
 
             assert len(logs) == 2
             assert isinstance(logs[0], InstantiationLogEntry)

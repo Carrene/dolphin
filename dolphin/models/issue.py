@@ -15,6 +15,7 @@ from .subscribable import Subscribable, Subscription
 from .phase import Phase
 from .tag import Tag
 from .member import Member
+from ..mixins import ModifiedByMixin
 
 
 class IssueTag(DeclarativeBase):
@@ -69,7 +70,7 @@ class Boarding:
 
 
 # FIXME: Remove the '\' from Issue inheritance definition
-class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedMixin, \
+class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin, \
             Subscribable):
 
     __tablename__ = 'issue'
@@ -369,7 +370,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedMixin, \
     @classmethod
     def __declare_last__(cls):
         super().__declare_last__()
-        observe(cls, ['modified_at', 'project_id'])
+        observe(cls, ['modified_at', 'project_id', 'modified_by'])
 
     def get_room_title(self):
         return f'{self.title.lower()}-{self.project_id}'
