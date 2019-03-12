@@ -22,6 +22,7 @@ class TestRelease(LocalApplicationTestCase):
             title='My first release',
             description='A decription for my first release',
             cutoff='2030-2-20',
+            launch_date='2030-2-20',
             manager=cls.member,
         )
         session.add(release1)
@@ -38,6 +39,7 @@ class TestRelease(LocalApplicationTestCase):
                 title='My awesome release',
                 description='Decription for my release',
                 cutoff='2030-2-20',
+                launchDate='2030-2-20',
                 managerReferenceId=self.member.reference_id,
             )
         ):
@@ -45,6 +47,7 @@ class TestRelease(LocalApplicationTestCase):
             assert response.json['title'] == 'My awesome release'
             assert response.json['description'] == 'Decription for my release'
             assert response.json['cutoff'] == '2030-02-20T00:00:00'
+            assert response.json['launchDate'] == '2030-02-20T00:00:00'
             assert response.json['status'] is None
             assert response.json['managerId'] == self.member.reference_id
 
@@ -99,6 +102,39 @@ class TestRelease(LocalApplicationTestCase):
             assert status == '712 Cutoff Not In Form'
 
             when(
+                'Launch date format is wrong',
+                json=Update(
+                    launchDate='30-20-20',
+                    title='Another title'
+                )
+            )
+            assert status == '784 Invalid Launch Date Format'
+
+            when(
+                'Launch Date is not in form',
+                json=given - 'launchDate' | dict(title='Another title')
+            )
+            assert status == '783 Launch Date Not In Form'
+
+            when(
+                'The cutoff date greater than launch date',
+                json=Update(
+                    title='Another title',
+                    cutoff='2030-2-25',
+                )
+            )
+            assert status == '651 The Launch Date Must Greater Than Cutoff Date'
+
+            when(
+                'The launch date less than cutoff date',
+                json=Update(
+                    title='Another title',
+                    launchDate='2030-2-15',
+                )
+            )
+            assert status == '651 The Launch Date Must Greater Than Cutoff Date'
+
+            when(
                 'Invalid status in form',
                 json=given | dict(
                     status='progressing',
@@ -135,7 +171,7 @@ class TestRelease(LocalApplicationTestCase):
             )
             assert status == '707 Invalid field, only following fields are ' \
                 'accepted: title, description, status, cutoff, ' \
-                'managerReferenceId'
+                'managerReferenceId, launchDate'
 
             when('Request is not authorized', authorization=None)
             assert status == 401

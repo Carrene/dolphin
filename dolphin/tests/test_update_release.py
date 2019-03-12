@@ -32,6 +32,7 @@ class TestRelease(LocalApplicationTestCase):
             title='My first release',
             description='A decription for my first release',
             cutoff='2030-2-20',
+            launch_date='2030-2-20',
             manager=member1,
         )
         session.add(release1)
@@ -40,6 +41,7 @@ class TestRelease(LocalApplicationTestCase):
             title='My second release',
             description='A decription for my second release',
             cutoff='2030-2-20',
+            launch_date='2030-2-20',
             manager=member1,
         )
         session.add(release2)
@@ -55,7 +57,8 @@ class TestRelease(LocalApplicationTestCase):
             json=dict(
                 title='My interesting release',
                 description='This is my new awesome release',
-                cutoff='2300-2-2',
+                cutoff='2030-2-21',
+                launchDate='2030-2-21',
                 status='in-progress',
                 managerReferenceId=self.member2.reference_id,
             )
@@ -63,7 +66,8 @@ class TestRelease(LocalApplicationTestCase):
             assert status == 200
             assert response.json['title'] == 'My interesting release'
             assert response.json['description'] == 'This is my new awesome release'
-            assert response.json['cutoff'] == '2300-02-02T00:00:00'
+            assert response.json['cutoff'] == '2030-02-21T00:00:00'
+            assert response.json['launchDate'] == '2030-02-21T00:00:00'
             assert response.json['status'] == 'in-progress'
             assert response.json['managerId'] == self.member2.id
 
@@ -115,6 +119,24 @@ class TestRelease(LocalApplicationTestCase):
                 )
             )
             assert status == '702 Invalid Cutoff Format'
+
+            when(
+                'Launch date format is wrong',
+                json=Update(launchDate='30-20-20')
+            )
+            assert status == '784 Invalid Launch Date Format'
+
+            when(
+                'The cutoff date greater than launch date',
+                json=Update(cutoff='2030-2-25')
+            )
+            assert status == '651 The Launch Date Must Greater Than Cutoff Date'
+
+            when(
+                'The launch date less than cutoff date',
+                json=Update(launchDate='2030-2-15')
+            )
+            assert status == '651 The Launch Date Must Greater Than Cutoff Date'
 
             when(
                 'Invalid status in form',

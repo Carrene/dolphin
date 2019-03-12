@@ -38,6 +38,7 @@ class TestProject(LocalApplicationTestCase):
             title='My first release',
             description='A decription for my first release',
             cutoff='2030-2-20',
+            launch_date='2030-2-20',
             manager=member1,
         )
 
@@ -45,6 +46,7 @@ class TestProject(LocalApplicationTestCase):
             title='My second release',
             description='A decription for my second release',
             cutoff='2030-2-20',
+            launch_date='2030-2-20',
             manager=member1,
         )
 
@@ -52,6 +54,7 @@ class TestProject(LocalApplicationTestCase):
             title='My third release',
             description='A decription for my third release',
             cutoff='2030-2-20',
+            launch_date='2030-2-20',
             manager=member1,
         )
 

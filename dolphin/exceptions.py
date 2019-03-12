@@ -98,3 +98,7 @@ class HTTPManagerNotFound(HTTPKnownStatus):
 class HTTPSecondaryManagerNotFound(HTTPKnownStatus):
     status = '650 Secondary Manager Not Found'
 
+
+class HTTPLaunchDateMustGreaterThanCutoffDate(HTTPKnownStatus):
+    status = '651 The Launch Date Must Greater Than Cutoff Date'
+

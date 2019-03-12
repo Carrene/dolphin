@@ -59,6 +59,7 @@ class TestTag(LocalApplicationTestCase):
             title='My first release',
             description='A decription for my first release',
             cutoff='2030-2-20',
+            launch_date='2030-2-20',
             manager=cls.member1,
         )
 
