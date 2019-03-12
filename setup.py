@@ -26,9 +26,6 @@ setup(
     version=package_version,
     packages=find_packages(),
     install_requires=dependencies,
-    dependency_links=[
-        'git+https://git@github.com/Carrene/restfulpy@patch/commiton2xx3xx'
-    ],
     include_package_data=True,
     entry_points={
         'console_scripts': [
