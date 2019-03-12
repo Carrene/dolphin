@@ -37,7 +37,7 @@ class TestProject(LocalApplicationTestCase):
             description='A decription for my first release',
             cutoff='2030-2-20',
             launch_date='2030-2-20',
-            manager=member1,
+            manager=cls.member1,
         )
 
         cls.release2 = Release(
@@ -45,7 +45,7 @@ class TestProject(LocalApplicationTestCase):
             description='A decription for my second release',
             cutoff='2030-2-20',
             launch_date='2030-2-20',
-            manager=member1,
+            manager=cls.member1,
         )
 
         cls.project1 = Project(
