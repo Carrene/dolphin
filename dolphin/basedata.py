@@ -70,6 +70,7 @@ def insert(): # pragma: no cover
             title='My first release',
             description='This is an awesome product.',
             cutoff='2030-2-20',
+            launch_date='2030-2-20',
             manager_id=god.id,
         )
         DBSession.add(release1)
@@ -78,6 +79,7 @@ def insert(): # pragma: no cover
             title='My second release',
             description='A decription for my release.',
             cutoff='2022-2-20',
+            launch_date='2030-2-20',
             manager_id=god.id,
         )
         DBSession.add(release2)
@@ -86,6 +88,7 @@ def insert(): # pragma: no cover
             title='My third release',
             description='One of the most interesting releases.',
             cutoff='2027-2-20',
+            launch_date='2030-2-20',
             manager_id=god.id,
         )
         DBSession.add(release3)
@@ -94,6 +97,7 @@ def insert(): # pragma: no cover
             title='My fourth release',
             description='A description for fourth release.',
             cutoff='2030-2-20',
+            launch_date='2030-2-20',
             manager_id=god.id,
         )
         DBSession.add(release4)
@@ -102,6 +106,7 @@ def insert(): # pragma: no cover
             title='My fifth release',
             description='This release has awesome projects.',
             cutoff='2034-2-20',
+            launch_date='2030-2-20',
             manager_id=god.id,
         )
         DBSession.add(release5)
