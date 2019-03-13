@@ -178,10 +178,10 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         if self.status == 'on-hold':
             return Boarding.frozen[1]
 
-        elif self.boarding_value == 1:
+        elif self.boarding_value == Boarding.ontime[0]:
             return Boarding.ontime[1]
 
-        elif self.boarding_value == 2:
+        elif self.boarding_value == Boarding.delayed[0]:
             return Boarding.delayed[1]
 
         return None
@@ -190,8 +190,8 @@ class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     def boarding(cls):
         return case([
             (cls.status == 'on-hold', Boarding.frozen[1]),
-            (cls.boarding_value == 1, Boarding.ontime[1]),
-            (cls.boarding_value == 2, Boarding.delayed[1]),
+            (cls.boarding_value == Boarding.ontime[0], Boarding.ontime[1]),
+            (cls.boarding_value == Boarding.delayed[0], Boarding.delayed[1]),
         ])
 
     @classmethod
