@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from auditor.context import Context as AuditLogContext
-from bddrest import status, when
+from bddrest import status, when, Remove, Update
 
 from dolphin.models import Issue, Project, Member, Workflow, Group, \
     Subscription, Release
@@ -15,14 +15,23 @@ class TestSentMessegeWebhook(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        member1 = Member(
+        cls.member1 = Member(
             title='First Member',
             email='member1@example.com',
             access_token='access token 1',
             phone=123456789,
             reference_id=1
         )
-        session.add(member1)
+        session.add(cls.member1)
+
+        cls.member2 = Member(
+            title='Second Member',
+            email='member2@example.com',
+            access_token='access token 2',
+            phone=123456788,
+            reference_id=2
+        )
+        session.add(cls.member2)
 
         workflow = Workflow(title='Default')
         group = Group(title='default')
@@ -32,14 +41,14 @@ class TestSentMessegeWebhook(LocalApplicationTestCase):
             description='A decription for my first release',
             cutoff='2030-2-20',
             launch_date='2030-2-20',
-            manager=member1,
+            manager=cls.member1,
         )
 
         project = Project(
             release=release,
             workflow=workflow,
             group=group,
-            manager=member1,
+            manager=cls.member1,
             title='My first project',
             description='A decription for my project',
             room_id=1
@@ -59,10 +68,17 @@ class TestSentMessegeWebhook(LocalApplicationTestCase):
 
         cls.subscription_issue1 = Subscription(
             subscribable_id=cls.issue1.id,
-            member_id=member1.id,
+            member_id=cls.member1.id,
             seen_at=datetime.utcnow()
         )
         session.add(cls.subscription_issue1)
+
+        cls.subscription_issue2 = Subscription(
+            subscribable_id=cls.issue1.id,
+            member_id=cls.member2.id,
+            seen_at=datetime.utcnow()
+        )
+        session.add(cls.subscription_issue2)
 
         session.commit()
         session.expunge_all()
@@ -73,14 +89,21 @@ class TestSentMessegeWebhook(LocalApplicationTestCase):
             f'SENT message webhook handler',
             f'/apiv1/issues',
             f'SENT',
-            query=dict(roomId=self.issue1.room_id)
+            query=dict(
+                roomId=self.issue1.room_id,
+                memberReferenceId=self.member1.reference_id,
+            )
         ):
             assert status == 204
 
             session = self.create_session()
             session.add(self.subscription_issue1)
             session.expire(self.subscription_issue1)
-            assert self.subscription_issue1.seen_at is None
+            assert self.subscription_issue1.seen_at is not None
+
+            session.add(self.subscription_issue2)
+            session.expire(self.subscription_issue2)
+            assert self.subscription_issue2.seen_at is None
 
             when(
                 'roomId not in query',
@@ -93,6 +116,30 @@ class TestSentMessegeWebhook(LocalApplicationTestCase):
                 query=dict(roomId='a'),
             )
             assert status == 400
+
+            when(
+                'roomId must be integer',
+                query=Update(roomId=0),
+            )
+            assert status == '605 Issue Not Found'
+
+            when(
+                'Member reference id not in query',
+                query=Remove('memberReferenceId'),
+            )
+            assert status == 400
+
+            when(
+                'Member reference id must be integer',
+                query=Update(memberReferenceId='not-integer'),
+            )
+            assert status == 400
+
+            when(
+                'Member not found',
+                query=Update(memberReferenceId=0),
+            )
+            assert status == '611 User Not Found'
 
             # FIXME: Commented due to issue #519
             # self.logout()
