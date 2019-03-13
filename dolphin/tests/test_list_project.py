@@ -114,7 +114,8 @@ class TestProject(LocalApplicationTestCase):
             due_date='2020-2-20',
             kind='feature',
             days=2,
-            room_id=3
+            room_id=3,
+            status='in-progress',
         )
         session.add(issue2)
 
@@ -156,8 +157,7 @@ class TestProject(LocalApplicationTestCase):
                 assert status == 200
                 assert response.json[0]['title'] == 'My first project'
 
-                when(
-                    'Reverse sorting titles by alphabet',
+                when( 'Reverse sorting titles by alphabet',
                     query=dict(sort='-title')
                 )
                 assert response.json[0]['title'] == 'My third project'
@@ -246,9 +246,9 @@ class TestProject(LocalApplicationTestCase):
                 )
                 assert status == 200
                 assert len(response.json) == 3
-                assert response.json[0]['title'] == self.project1.title
-                assert response.json[1]['title'] == self.project3.title
-                assert response.json[2]['title'] == self.project2.title
+                assert response.json[0]['title'] == self.project3.title
+                assert response.json[1]['title'] == self.project2.title
+                assert response.json[2]['title'] == self.project1.title
 
                 when(
                     'Reverse sorting projects by boarding title',
@@ -256,9 +256,9 @@ class TestProject(LocalApplicationTestCase):
                 )
                 assert status == 200
                 assert len(response.json) == 3
-                assert response.json[0]['title'] == self.project2.title
-                assert response.json[1]['title'] == self.project3.title
-                assert response.json[2]['title'] == self.project1.title
+                assert response.json[0]['title'] == self.project1.title
+                assert response.json[1]['title'] == self.project2.title
+                assert response.json[2]['title'] == self.project3.title
 
             with self.given(
                 'Filter projects',
@@ -304,12 +304,12 @@ class TestProject(LocalApplicationTestCase):
 
                 when(
                     'Filter project by boarding using IN clause',
-                    query=dict(boarding='IN(on-time,delayed)')
+                    query=dict(boarding='IN(on-time,frozen)')
                 )
                 assert status == 200
                 assert len(response.json) == 2
-                assert response.json[0]['title'] == self.project1.title
-                assert response.json[1]['title'] == self.project2.title
+                assert response.json[0]['title'] == self.project2.title
+                assert response.json[1]['title'] == self.project3.title
 
             with self.given(
                 'Project pagination',

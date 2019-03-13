@@ -249,6 +249,13 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert len(response.json) == 1
 
+            when(
+                'Filter based on a status',
+                query=dict(status='on-hold')
+            )
+            assert len(response.json) == 1
+            assert response.json[0]['boarding'] == 'frozen'
+
             when('Issues pagination', query=dict(take=1, skip=2))
             assert response.json[0]['title'] == 'Third issue'
 

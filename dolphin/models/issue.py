@@ -248,7 +248,10 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin, \
 
     @hybrid_property
     def boarding_value(self):
-        if self.due_date < datetime.now():
+        if self.status == 'on-hold':
+            return Boarding.frozen[0]
+
+        elif self.due_date < datetime.now():
             return Boarding.delayed[0]
 
         return Boarding.ontime[0]
@@ -256,13 +259,17 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin, \
     @boarding_value.expression
     def boarding_value(cls):
         return case([
+            (cls.status == 'on-hold', Boarding.frozen[0]),
             (cls.due_date < datetime.now(), Boarding.delayed[0]),
             (cls.due_date > datetime.now(), Boarding.ontime[0])
         ])
 
     @hybrid_property
     def boarding(self):
-        if self.due_date < datetime.now():
+        if self.status == 'on-hold':
+            return Boarding.frozen[1]
+
+        elif self.due_date < datetime.now():
             return Boarding.delayed[1]
 
         return Boarding.ontime[1]
@@ -270,6 +277,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin, \
     @boarding.expression
     def boarding(cls):
         return case([
+            (cls.status == 'on-hold', Boarding.frozen[1]),
             (cls.due_date < datetime.now(), Boarding.delayed[1]),
             (cls.due_date > datetime.now(), Boarding.ontime[1])
         ])
