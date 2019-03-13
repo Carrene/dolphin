@@ -99,6 +99,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     @Issue.expose
     @commit
     def update(self, id):
+        import pudb; pudb.set_trace()  # XXX BREAKPOINT
         form = context.form
         id = int_or_notfound(id)
 

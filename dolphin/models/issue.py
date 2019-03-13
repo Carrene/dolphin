@@ -69,9 +69,8 @@ class Boarding:
     atrisk =    (4, 'at-risk')
 
 
-# FIXME: Remove the '\' from Issue inheritance definition
-class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin, \
-            Subscribable):
+class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedMixin,
+            ModifiedByMixin, Subscribable):
 
     __tablename__ = 'issue'
     __mapper_args__ = {'polymorphic_identity': __tablename__}

@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from nanohttp import context
+from nanohttp.contexts import Context
 from auditor.context import Context as AuditLogContext
 from bddrest.authoring import response, when, Update, Remove, status
 
@@ -54,80 +56,83 @@ class TestSubscribeIssues(LocalApplicationTestCase):
         )
         session.add(project)
 
-        cls.issue1 = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            due_date='2020-2-20',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(cls.issue1)
-        session.flush()
+        with Context(dict()):
+            context.identity = cls.member1
 
-        subscription_issue1 = Subscription(
-            subscribable_id=cls.issue1.id,
-            member_id=cls.member2.id,
-            seen_at=datetime.utcnow(),
-        )
-        session.add(subscription_issue1)
+            cls.issue1 = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                due_date='2020-2-20',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(cls.issue1)
+            session.flush()
 
-        cls.issue2 = Issue(
-            project=project,
-            title='Second issue',
-            description='This is description of second issue',
-            due_date='2016-2-20',
-            kind='feature',
-            days=2,
-            room_id=3
-        )
-        session.add(cls.issue2)
+            subscription_issue1 = Subscription(
+                subscribable_id=cls.issue1.id,
+                member_id=cls.member2.id,
+                seen_at=datetime.utcnow(),
+            )
+            session.add(subscription_issue1)
 
-        cls.issue3 = Issue(
-            project=project,
-            title='Third issue',
-            description='This is description of third issue',
-            due_date='2020-2-20',
-            kind='feature',
-            days=3,
-            room_id=4,
-        )
-        session.add(cls.issue3)
+            cls.issue2 = Issue(
+                project=project,
+                title='Second issue',
+                description='This is description of second issue',
+                due_date='2016-2-20',
+                kind='feature',
+                days=2,
+                room_id=3
+            )
+            session.add(cls.issue2)
 
-        cls.issue4 = Issue(
-            project=project,
-            title='Fourth issue',
-            description='This is description of fourth issue',
-            due_date='2020-2-20',
-            kind='feature',
-            days=3,
-            room_id=5,
-        )
-        session.add(cls.issue4)
+            cls.issue3 = Issue(
+                project=project,
+                title='Third issue',
+                description='This is description of third issue',
+                due_date='2020-2-20',
+                kind='feature',
+                days=3,
+                room_id=4,
+            )
+            session.add(cls.issue3)
 
-        cls.issue5 = Issue(
-            project=project,
-            title='Fifth issue',
-            description='This is description of fifth issue',
-            due_date='2020-2-20',
-            kind='feature',
-            days=3,
-            room_id=6,
-        )
-        session.add(cls.issue5)
+            cls.issue4 = Issue(
+                project=project,
+                title='Fourth issue',
+                description='This is description of fourth issue',
+                due_date='2020-2-20',
+                kind='feature',
+                days=3,
+                room_id=5,
+            )
+            session.add(cls.issue4)
 
-        cls.issue6 = Issue(
-            project=project,
-            title='Sixth issue',
-            description='This is description of sixth issue',
-            due_date='2020-2-20',
-            kind='feature',
-            days=3,
-            room_id=7,
-        )
-        session.add(cls.issue6)
-        session.commit()
+            cls.issue5 = Issue(
+                project=project,
+                title='Fifth issue',
+                description='This is description of fifth issue',
+                due_date='2020-2-20',
+                kind='feature',
+                days=3,
+                room_id=6,
+            )
+            session.add(cls.issue5)
+
+            cls.issue6 = Issue(
+                project=project,
+                title='Sixth issue',
+                description='This is description of sixth issue',
+                due_date='2020-2-20',
+                kind='feature',
+                days=3,
+                room_id=7,
+            )
+            session.add(cls.issue6)
+            session.commit()
 
     def test_subscribe_multiple_issues(self):
          self.login('member1@example.com')
