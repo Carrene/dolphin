@@ -16,16 +16,9 @@ class ModifiedByMixin(ModifiedMixin):
         label='Modified By'
     )
 
-    @property
-    def last_modifier_member(self):
-        return self.modified_by
-
     @classmethod
     def before_update(cls, mapper, connection, target):
         super().before_update(mapper, connection, target)
-        if not target.object.__exclude__.issubset(target.unmodified):
-            return
-
         target.object.modified_by = context.identity.reference_id
 
     @classmethod
