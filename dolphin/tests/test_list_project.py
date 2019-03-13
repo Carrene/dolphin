@@ -247,8 +247,8 @@ class TestProject(LocalApplicationTestCase):
                 assert status == 200
                 assert len(response.json) == 3
                 assert response.json[0]['title'] == self.project1.title
-                assert response.json[1]['title'] == self.project2.title
-                assert response.json[2]['title'] == self.project3.title
+                assert response.json[1]['title'] == self.project3.title
+                assert response.json[2]['title'] == self.project2.title
 
                 when(
                     'Reverse sorting projects by boarding title',
@@ -256,8 +256,8 @@ class TestProject(LocalApplicationTestCase):
                 )
                 assert status == 200
                 assert len(response.json) == 3
-                assert response.json[0]['title'] == self.project3.title
-                assert response.json[1]['title'] == self.project2.title
+                assert response.json[0]['title'] == self.project2.title
+                assert response.json[1]['title'] == self.project3.title
                 assert response.json[2]['title'] == self.project1.title
 
             with self.given(
@@ -279,6 +279,14 @@ class TestProject(LocalApplicationTestCase):
                     query=dict(sort='id', status='active')
                 )
                 assert response.json[0]['status'] == 'active'
+
+                when(
+                    'List projects with filtering by on-hold status to check '
+                    'their boarding is frozen',
+                    query=dict(sort='id', status='on-hold')
+                )
+                assert response.json[0]['status'] == 'on-hold'
+                assert response.json[0]['boarding'] == 'frozen'
 
                 when(
                     'List projects excepts one of statuses',
