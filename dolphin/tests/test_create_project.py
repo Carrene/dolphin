@@ -45,6 +45,7 @@ class TestProject(LocalApplicationTestCase):
 
     def test_create(self):
         self.login('member1@example.com')
+        session = self.create_session()
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Createing a project',
@@ -67,6 +68,11 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['dueDate'] == None
             assert response.json['managerId'] == self.member.id
             assert response.json['secondaryManagerId'] is None
+
+            created_project_id = response.json['id']
+            created_project = session.query(Project).get(created_project_id)
+            assert created_project.modified_by is None
+
 
             when(
                 'Trying to create a project with secondary manager',

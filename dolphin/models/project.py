@@ -10,6 +10,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from .issue import Issue, Boarding
 from .subscribable import Subscribable, Subscription
 from .member import Member
+from ..mixins import ModifiedByMixin
 
 
 project_statuses = [
@@ -20,7 +21,7 @@ project_statuses = [
 ]
 
 
-class Project(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
+class Project(ModifiedByMixin, OrderingMixin, FilteringMixin, PaginationMixin,
               SoftDeleteMixin, Subscribable):
 
     __tablename__ = 'project'

@@ -13,10 +13,6 @@ from ..models import Project, Member, Subscription, Workflow, Group, Release
 from ..validators import project_validator, update_project_validator
 
 
-# FIXME: create room before creating project and remove PENDING
-PENDING = -1
-
-
 FORM_WHITELIST = [
     'title',
     'description',
@@ -93,6 +89,7 @@ class ProjectController(ModelRestController):
 
         project = Project()
         project.update_from_request()
+        project.manager_id = member.id
 
         secondary_manager_reference_id = form.get('secondaryManagerReferenceId')
         if secondary_manager_reference_id is not None:
@@ -106,6 +103,7 @@ class ProjectController(ModelRestController):
 
         if 'groupId' in form:
             project.group_id = form['groupId']
+
         else:
             default_group = DBSession.query(Group)\
                 .filter(Group.public == True)\
@@ -114,16 +112,12 @@ class ProjectController(ModelRestController):
 
         if 'workflowId' in form:
             project.workflow_id = form['workflowId']
+
         else:
             default_workflow = DBSession.query(Workflow) \
                 .filter(Workflow.title == 'Default') \
                 .one()
             project.workflow_id = default_workflow.id
-
-        project.manager_id = member.id
-        DBSession.add(project)
-        project.room_id = PENDING
-        DBSession.flush()
 
         room = self._ensure_room(
             project.get_room_title(),
@@ -140,6 +134,7 @@ class ProjectController(ModelRestController):
                 token,
                 member.access_token
             )
+
         except RoomMemberAlreadyExist:
             # Exception is passed because it means `add_member()` is already
             # called and `member` successfully added to room. So there is
@@ -153,6 +148,7 @@ class ProjectController(ModelRestController):
         try:
             project.room_id = room['id']
             DBSession.flush()
+
         except:
             chat_client.delete_room(
                 project.room_id,
@@ -161,6 +157,7 @@ class ProjectController(ModelRestController):
             )
             raise
 
+        DBSession.add(project)
         return project
 
     @authorize
