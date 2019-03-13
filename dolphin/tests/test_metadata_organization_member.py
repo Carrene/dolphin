@@ -33,14 +33,12 @@ class TestMember(LocalApplicationTestCase):
             assert fields['email']['label'] is not None
             assert fields['email']['name'] is not None
             assert fields['email']['example'] is not None
-            assert fields['email']['watermark'] is not None
 
             assert fields['title']['notNone'] is not None
             assert fields['title']['required'] is not None
             assert fields['title']['label'] is not None
             assert fields['title']['name'] is not None
             assert fields['title']['example'] is not None
-            assert fields['title']['watermark'] is not None
             assert fields['title']['minLength'] is not None
             assert fields['title']['maxLength'] is not None
 
@@ -50,7 +48,6 @@ class TestMember(LocalApplicationTestCase):
             assert fields['name']['label'] is not None
             assert fields['name']['name'] is not None
             assert fields['name']['example'] is not None
-            assert fields['name']['watermark'] is not None
             assert fields['name']['minLength'] is not None
             assert fields['name']['maxLength'] is not None
             assert fields['name']['notNone'] is not None
@@ -59,7 +56,6 @@ class TestMember(LocalApplicationTestCase):
             assert fields['phone']['label'] is not None
             assert fields['phone']['name'] is not None
             assert fields['phone']['example'] is not None
-            assert fields['phone']['watermark'] is not None
 
             assert fields['avatar']['notNone'] is not None
             assert fields['avatar']['label'] is not None
