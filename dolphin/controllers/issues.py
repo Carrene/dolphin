@@ -662,6 +662,8 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 Subscription.member_id != member.id
             )
         self._unsee_subscriptions(subscriptions)
+        issue.modified_at = datetime.utcnow()
+        context.identity = member.create_jwt_principal()
         raise HTTPNoContent()
 
     @validate(
