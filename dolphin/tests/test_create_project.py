@@ -73,7 +73,6 @@ class TestProject(LocalApplicationTestCase):
             created_project = session.query(Project).get(created_project_id)
             assert created_project.modified_by is None
 
-
             when(
                 'Trying to create a project with secondary manager',
                 json=Update(
