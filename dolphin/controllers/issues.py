@@ -543,9 +543,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 )
         )
 
-        if subscriptions.count() == 0:
-            raise HTTPNotSubscribedIssue()
-
         for subscription in subscriptions:
             subscription.seen_at = datetime.utcnow()
         return issue
@@ -565,9 +562,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 Subscription.subscribable_id == issue.id,
                 Subscription.member_id == context.identity.id,
             )
-
-        if subscriptions.count() == 0:
-            raise HTTPNotSubscribedIssue()
 
         self._unsee_subscriptions(subscriptions)
         return issue
@@ -662,6 +656,8 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 Subscription.member_id != member.id
             )
         self._unsee_subscriptions(subscriptions)
+        issue.modified_at = datetime.utcnow()
+        context.identity = member.create_jwt_principal()
         raise HTTPNoContent()
 
     @validate(
@@ -693,6 +689,8 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             one_shot=True,
         )
         DBSession.add(subscription)
+        issue.modified_at = datetime.utcnow()
+        context.identity = member.create_jwt_principal()
         raise HTTPNoContent()
 
     def _unsee_subscriptions(self, subscriptions):
