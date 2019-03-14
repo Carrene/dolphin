@@ -693,6 +693,8 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             one_shot=True,
         )
         DBSession.add(subscription)
+        issue.modified_at = datetime.utcnow()
+        context.identity = member.create_jwt_principal()
         raise HTTPNoContent()
 
     def _unsee_subscriptions(self, subscriptions):
