@@ -6,7 +6,7 @@ from sqlalchemy.events import event
 from restfulpy.orm import ModifiedMixin, Field
 
 
-class ModifiedByMixin:
+class ModifiedByMixin(ModifiedMixin):
     modified_by = Field(
         Integer,
         nullable=True,
@@ -18,6 +18,11 @@ class ModifiedByMixin:
 
     @staticmethod
     def before_update(mapper, connection, target):
+        super(ModifiedByMixin, ModifiedByMixin).before_update(
+            mapper,
+            connection,
+            target
+        )
         target.object.modified_by = context.identity.reference_id
 
     @classmethod

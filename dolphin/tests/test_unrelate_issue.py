@@ -1,3 +1,5 @@
+from nanohttp import context
+from nanohttp.contexts import Context
 from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when, Update, given
 
@@ -43,64 +45,67 @@ class TestIssue(LocalApplicationTestCase):
             room_id=1
         )
 
-        cls.issue1 = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            due_date='2020-2-20',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(cls.issue1)
+        with Context(dict()):
+            context.identity = cls.member
 
-        cls.issue2 = Issue(
-            project=project,
-            title='Second issue',
-            description='This is description of first issue',
-            due_date='2020-2-20',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(cls.issue2)
+            cls.issue1 = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                due_date='2020-2-20',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(cls.issue1)
 
-        cls.issue3 = Issue(
-            project=project,
-            title='Third issue',
-            description='This is description of first issue',
-            due_date='2020-2-20',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(cls.issue3)
-        session.flush()
+            cls.issue2 = Issue(
+                project=project,
+                title='Second issue',
+                description='This is description of first issue',
+                due_date='2020-2-20',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(cls.issue2)
 
-        related_issue = RelatedIssue(
-            issue_id=cls.issue1.id,
-            related_issue_id=cls.issue3.id
-        )
-        session.add(related_issue)
+            cls.issue3 = Issue(
+                project=project,
+                title='Third issue',
+                description='This is description of first issue',
+                due_date='2020-2-20',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(cls.issue3)
+            session.flush()
 
-        cls.issue_bug = Issue(
-            project=project,
-            title='Issue bug',
-            description='This is issue kind of bug',
-            due_date='2020-2-20',
-            kind='bug',
-            days=1,
-            room_id=2
-        )
-        session.add(cls.issue_bug)
-        session.flush()
+            related_issue = RelatedIssue(
+                issue_id=cls.issue1.id,
+                related_issue_id=cls.issue3.id
+            )
+            session.add(related_issue)
 
-        related_issue_bug = RelatedIssue(
-            issue_id=cls.issue_bug.id,
-            related_issue_id=cls.issue3.id
-        )
-        session.add(related_issue_bug)
-        session.commit()
+            cls.issue_bug = Issue(
+                project=project,
+                title='Issue bug',
+                description='This is issue kind of bug',
+                due_date='2020-2-20',
+                kind='bug',
+                days=1,
+                room_id=2
+            )
+            session.add(cls.issue_bug)
+            session.flush()
+
+            related_issue_bug = RelatedIssue(
+                issue_id=cls.issue_bug.id,
+                related_issue_id=cls.issue3.id
+            )
+            session.add(related_issue_bug)
+            session.commit()
 
     def test_unrelate(self):
         self.login(self.member.email)
