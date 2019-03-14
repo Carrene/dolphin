@@ -16,9 +16,13 @@ class ModifiedByMixin(ModifiedMixin):
         label='Modified By'
     )
 
-    @classmethod
-    def before_update(cls, mapper, connection, target):
-        super().before_update(mapper, connection, target)
+    @staticmethod
+    def before_update(mapper, connection, target):
+        super(ModifiedByMixin, ModifiedByMixin).before_update(
+            mapper,
+            connection,
+            target
+        )
         target.object.modified_by = context.identity.reference_id
 
     @classmethod

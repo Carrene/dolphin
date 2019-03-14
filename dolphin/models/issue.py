@@ -69,8 +69,7 @@ class Boarding:
     atrisk =    (4, 'at-risk')
 
 
-# FIXME: Remove the '\' from Issue inheritance definition
-class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin, \
+class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             Subscribable):
 
     __tablename__ = 'issue'

@@ -1,5 +1,7 @@
-from auditor.context import Context as AuditLogContext
+from nanohttp import context
+from nanohttp.contexts import Context
 from bddrest import status, response, when
+from auditor.context import Context as AuditLogContext
 
 from dolphin.models import Project, Member, Workflow, Issue, Subscription, \
     Group, Release
@@ -96,46 +98,49 @@ class TestProject(LocalApplicationTestCase):
         )
         session.add(cls.project3)
 
-        issue1 = Issue(
-            project=cls.project1,
-            title='First issue',
-            description='This is description of first issue',
-            due_date='2030-2-20',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(issue1)
+        with Context(dict()):
+            context.identity = member1
 
-        issue2 = Issue(
-            project=cls.project2,
-            title='Second issue',
-            description='This is description of second issue',
-            due_date='2020-2-20',
-            kind='feature',
-            days=2,
-            room_id=3,
-            status='in-progress',
-        )
-        session.add(issue2)
+            issue1 = Issue(
+                project=cls.project1,
+                title='First issue',
+                description='This is description of first issue',
+                due_date='2030-2-20',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(issue1)
 
-        issue3 = Issue(
-            project=cls.project1,
-            title='Third issue',
-            description='This is description of third issue',
-            due_date='2000-2-20',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(issue3)
+            issue2 = Issue(
+                project=cls.project2,
+                title='Second issue',
+                description='This is description of second issue',
+                due_date='2020-2-20',
+                kind='feature',
+                days=2,
+                room_id=3,
+                status='in-progress',
+            )
+            session.add(issue2)
 
-        subscription = Subscription(
-            subscribable_id=cls.project1.id,
-            member_id=member1.id
-        )
-        session.add(subscription)
-        session.commit()
+            issue3 = Issue(
+                project=cls.project1,
+                title='Third issue',
+                description='This is description of third issue',
+                due_date='2000-2-20',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(issue3)
+
+            subscription = Subscription(
+                subscribable_id=cls.project1.id,
+                member_id=member1.id
+            )
+            session.add(subscription)
+            session.commit()
 
     def test_list(self):
         self.login('member1@example.com')

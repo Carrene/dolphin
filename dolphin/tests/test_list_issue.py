@@ -1,7 +1,9 @@
 from datetime import datetime
 
-from auditor.context import Context as AuditLogContext
+from nanohttp import context
+from nanohttp.contexts import Context
 from bddrest import status, response, when
+from auditor.context import Context as AuditLogContext
 
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 from dolphin.models import Issue, Project, Member, Workflow, Item, Phase, \
@@ -65,133 +67,135 @@ class TestIssue(LocalApplicationTestCase):
             description='A decription for my project',
             room_id=1
         )
-        session.add(cls.project)
 
-        cls.issue1 = Issue(
-            project=cls.project,
-            title='First issue',
-            description='This is description of first issue',
-            status='in-progress',
-            due_date='2020-2-20',
-            kind='feature',
-            days=1,
-            room_id=2,
-            tags=[cls.tag1],
-        )
-        session.add(cls.issue1)
-        session.flush()
+        with Context(dict()):
+            context.identity = member
 
-        subscription_issue1 = Subscription(
-            subscribable_id=cls.issue1.id,
-            member_id=member.id,
-            seen_at=datetime.utcnow(),
-        )
-        session.add(subscription_issue1)
+            cls.issue1 = Issue(
+                project=cls.project,
+                title='First issue',
+                description='This is description of first issue',
+                status='in-progress',
+                due_date='2020-2-20',
+                kind='feature',
+                days=1,
+                room_id=2,
+                tags=[cls.tag1],
+            )
+            session.add(cls.issue1)
+            session.flush()
 
-        cls.issue2 = Issue(
-            project=cls.project,
-            title='Second issue',
-            description='This is description of second issue',
-            status='to-do',
-            due_date='2016-2-20',
-            kind='feature',
-            days=2,
-            room_id=3,
-            tags=[cls.tag2],
-        )
-        session.add(cls.issue2)
-        session.flush()
+            subscription_issue1 = Subscription(
+                subscribable_id=cls.issue1.id,
+                member_id=member.id,
+                seen_at=datetime.utcnow(),
+            )
+            session.add(subscription_issue1)
 
-        subscription_issue2 = Subscription(
-            subscribable_id=cls.issue2.id,
-            member_id=member.id,
-            seen_at=None,
-            one_shot=True,
-        )
-        session.add(subscription_issue2)
+            cls.issue2 = Issue(
+                project=cls.project,
+                title='Second issue',
+                description='This is description of second issue',
+                status='to-do',
+                due_date='2016-2-20',
+                kind='feature',
+                days=2,
+                room_id=3,
+                tags=[cls.tag2],
+            )
+            session.add(cls.issue2)
+            session.flush()
 
-        cls.issue3 = Issue(
-            project=cls.project,
-            title='Third issue',
-            description='This is description of third issue',
-            status='on-hold',
-            due_date='2020-2-20',
-            kind='feature',
-            days=3,
-            room_id=4,
-        )
-        session.add(cls.issue3)
-        session.flush()
+            subscription_issue2 = Subscription(
+                subscribable_id=cls.issue2.id,
+                member_id=member.id,
+                seen_at=None,
+                one_shot=True,
+            )
+            session.add(subscription_issue2)
 
-        subscription_issue3 = Subscription(
-            subscribable_id=cls.issue3.id,
-            member_id=member.id,
-            seen_at=None,
-            one_shot=True,
-        )
-        session.add(subscription_issue3)
+            cls.issue3 = Issue(
+                project=cls.project,
+                title='Third issue',
+                description='This is description of third issue',
+                status='on-hold',
+                due_date='2020-2-20',
+                kind='feature',
+                days=3,
+                room_id=4,
+            )
+            session.add(cls.issue3)
+            session.flush()
 
-        cls.issue4 = Issue(
-            project=cls.project,
-            title='Fourth issue',
-            description='This is description of fourth issue',
-            status='complete',
-            due_date='2020-2-20',
-            kind='feature',
-            days=3,
-            room_id=4,
-            tags=[cls.tag2],
-        )
-        session.add(cls.issue4)
+            subscription_issue3 = Subscription(
+                subscribable_id=cls.issue3.id,
+                member_id=member.id,
+                seen_at=None,
+                one_shot=True,
+            )
+            session.add(subscription_issue3)
 
-        cls.phase1 = Phase(
-            workflow=workflow,
-            title='phase 1',
-            order=1,
-            skill=skill,
-        )
-        session.add(cls.phase1)
+            cls.issue4 = Issue(
+                project=cls.project,
+                title='Fourth issue',
+                description='This is description of fourth issue',
+                status='complete',
+                due_date='2020-2-20',
+                kind='feature',
+                days=3,
+                room_id=4,
+                tags=[cls.tag2],
+            )
+            session.add(cls.issue4)
 
-        cls.phase2 = Phase(
-            workflow=workflow,
-            title='phase 2',
-            order=2,
-            skill=skill
-        )
-        session.add(cls.phase1)
-        session.flush()
+            cls.phase1 = Phase(
+                workflow=workflow,
+                title='phase 1',
+                order=1,
+                skill=skill,
+            )
+            session.add(cls.phase1)
 
-        item1 = Item(
-            member_id=member.id,
-            phase_id=cls.phase1.id,
-            issue_id=cls.issue1.id,
-        )
-        session.add(item1)
-        session.flush()
+            cls.phase2 = Phase(
+                workflow=workflow,
+                title='phase 2',
+                order=2,
+                skill=skill
+            )
+            session.add(cls.phase1)
+            session.flush()
 
-        item2 = Item(
-            member_id=member.id,
-            phase_id=cls.phase2.id,
-            issue_id=cls.issue2.id,
-        )
-        session.add(item2)
-        session.flush()
+            item1 = Item(
+                member_id=member.id,
+                phase_id=cls.phase1.id,
+                issue_id=cls.issue1.id,
+            )
+            session.add(item1)
+            session.flush()
 
-        item3 = Item(
-            member_id=member.id,
-            phase_id=cls.phase2.id,
-            issue_id=cls.issue1.id,
-        )
-        session.add(item3)
-        session.flush()
+            item2 = Item(
+                member_id=member.id,
+                phase_id=cls.phase2.id,
+                issue_id=cls.issue2.id,
+            )
+            session.add(item2)
+            session.flush()
 
-        item4 = Item(
-            member_id=member.id,
-            phase_id=cls.phase1.id,
-            issue_id=cls.issue2.id,
-        )
-        session.add(item4)
-        session.commit()
+            item3 = Item(
+                member_id=member.id,
+                phase_id=cls.phase2.id,
+                issue_id=cls.issue1.id,
+            )
+            session.add(item3)
+            session.flush()
+
+            item4 = Item(
+                member_id=member.id,
+                phase_id=cls.phase1.id,
+                issue_id=cls.issue2.id,
+            )
+            session.add(item4)
+            session.commit()
 
     def test_list(self):
         self.login('member1@example.com')
