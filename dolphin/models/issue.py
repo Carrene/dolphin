@@ -70,7 +70,7 @@ class Boarding:
 
 
 class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
-            ModifiedMixin, Subscribable):
+            Subscribable):
 
     __tablename__ = 'issue'
     __mapper_args__ = {'polymorphic_identity': __tablename__}
