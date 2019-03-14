@@ -105,7 +105,7 @@ class TestUnseeIssue(LocalApplicationTestCase):
         self.login('member1@example.com')
 
         with oauth_mockup_server(), self.given(
-            f'Unsee a subscribed issues',
+            f'Unsee a issues',
             f'/apiv1/issues/id: {self.issue1.id}',
             f'UNSEE',
         ):
@@ -115,12 +115,6 @@ class TestUnseeIssue(LocalApplicationTestCase):
             session.add(self.subscription_issue1)
             session.expire(self.subscription_issue1)
             assert self.subscription_issue1.seen_at is None
-
-            when(
-                'Unsee an unsubscribed issue',
-                url_parameters=dict(id=self.issue2.id),
-            )
-            assert status == '637 Not Subscribed Issue'
 
             when(
                 'Issue id is invalid',

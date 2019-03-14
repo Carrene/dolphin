@@ -543,9 +543,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 )
         )
 
-        if subscriptions.count() == 0:
-            raise HTTPNotSubscribedIssue()
-
         for subscription in subscriptions:
             subscription.seen_at = datetime.utcnow()
         return issue
@@ -565,9 +562,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 Subscription.subscribable_id == issue.id,
                 Subscription.member_id == context.identity.id,
             )
-
-        if subscriptions.count() == 0:
-            raise HTTPNotSubscribedIssue()
 
         self._unsee_subscriptions(subscriptions)
         return issue
