@@ -2,7 +2,7 @@ from nanohttp import HTTPKnownStatus
 
 
 class RoomMemberAlreadyExist(HTTPKnownStatus):
-    status = '604 Already Added To Target'
+    statu = '604 Already Added To Target'
 
 
 class RoomMemberNotFound(HTTPKnownStatus):
@@ -101,4 +101,8 @@ class HTTPSecondaryManagerNotFound(HTTPKnownStatus):
 
 class HTTPLaunchDateMustGreaterThanCutoffDate(HTTPKnownStatus):
     status = '651 The Launch Date Must Greater Than Cutoff Date'
+
+
+class HTTPIssueNotFound(HTTPKnownStatus):
+    status = '605 Issue Not Found'
 

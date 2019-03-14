@@ -12,7 +12,7 @@ from auditor import context as AuditLogContext
 from ..backends import ChatClient
 from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound, \
     ChatRoomNotFound, HTTPNotSubscribedIssue, HTTPRelatedIssueNotFound, \
-    HTTPIssueBugMustHaveRelatedIssue
+    HTTPIssueBugMustHaveRelatedIssue, RoomMemberNotFound, HTTPIssueNotFound
 from ..models import Issue, Subscription, Phase, Item, Member, Project, \
     RelatedIssue, Subscribable, IssueTag, Tag
 from ..validators import update_issue_validator, assign_issue_validator, \
@@ -635,6 +635,10 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         roomId=dict(
             type_=int,
             required=True,
+        ),
+        memberReferenceId=dict(
+            type_=int,
+            required=True,
         )
     )
     @action
@@ -644,10 +648,19 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             .filter(Issue.room_id == context.query['roomId']) \
             .one_or_none()
         if issue is None:
-            raise ChatRoomNotFound()
+            raise HTTPIssueNotFound()
+
+        member = DBSession.query(Member) \
+            .filter(Member.reference_id == context.query['memberReferenceId']) \
+            .one_or_none()
+        if member is None:
+            raise RoomMemberNotFound()
 
         subscriptions = DBSession.query(Subscription) \
-            .filter(Subscription.subscribable_id == issue.id)
+            .filter(
+                Subscription.subscribable_id == issue.id,
+                Subscription.member_id != member.id
+            )
         self._unsee_subscriptions(subscriptions)
         raise HTTPNoContent()
 
