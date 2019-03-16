@@ -196,43 +196,43 @@ class TestProject(LocalApplicationTestCase):
             assert status == \
                 '707 Invalid field, only following fields are accepted: ' \
                 'title, description, status, releaseId, workflowId, groupId, ' \
-                'managerReferenceId, secondaryManagerReferenceId'
+                'managerId, secondaryManagerId'
 
             when(
                 'Trying to update a project with secondary manager',
                 json=Update(
-                    secondaryManagerReferenceId=self.member2.reference_id
+                    secondaryManagerId=self.member2.id
                 )
             )
             assert response.json['secondaryManagerId'] == self.member2.id
 
             when(
-                'Secondary manager reference id is null',
-                json=Append(secondaryManagerReferenceId=None)
+                'Secondary manager id is null',
+                json=Append(secondaryManagerId=None)
             )
-            assert status == '782 Secondary Manager Reference Id Is Null'
+            assert status == '782 Secondary Manager Id Is Null'
 
             when(
                 'Secondary manager is not found',
-                json=Append(secondaryManagerReferenceId=0)
+                json=Append(secondaryManagerId=0)
             )
             assert status == '650 Secondary Manager Not Found'
 
             when(
                 'Trying to change the project manager',
-                json=Append(managerReferenceId=self.member2.reference_id)
+                json=Append(managerId=self.member2.id)
             )
             assert response.json['managerId'] == self.member2.id
 
             when(
-                'Manager reference id is null',
-                json=Append(managerReferenceId=None)
+                'Manager id is null',
+                json=Append(managerId=None)
             )
-            assert status == '778 Manager Reference Id Is Null'
+            assert status == '785 Manager Id Is Null'
 
             when(
                 'Manager is not found',
-                json=Append(managerReferenceId=0)
+                json=Append(managerId=0)
             )
             assert status == '608 Manager Not Found'
 
