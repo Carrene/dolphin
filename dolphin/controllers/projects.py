@@ -19,8 +19,8 @@ FORM_WHITELIST = [
     'releaseId',
     'workflowId',
     'groupId',
-    'managerReferenceId',
-    'secondaryManagerReferenceId'
+    'managerId',
+    'secondaryManagerId'
 ]
 
 
@@ -80,9 +80,7 @@ class ProjectController(ModelRestController):
     def create(self):
         form = context.form
         token = context.environ['HTTP_AUTHORIZATION']
-        member = DBSession.query(Member) \
-            .filter(Member.reference_id == form['managerReferenceId']) \
-            .one_or_none()
+        member = DBSession.query(Member).get(form['managerId'])
         if member is None:
             raise HTTPManagerNotFound()
 
@@ -90,14 +88,10 @@ class ProjectController(ModelRestController):
         project.update_from_request()
         project.manager_id = member.id
 
-        secondary_manager_reference_id \
-            = form.get('secondaryManagerReferenceId')
-        if secondary_manager_reference_id is not None:
-            secondary_manager = DBSession.query(Member) \
-                .filter(
-                    Member.reference_id == secondary_manager_reference_id
-                ) \
-                .one_or_none()
+        if form.get('secondaryManagerId') is not None:
+            secondary_manager = DBSession.query(Member).get(
+                form.get('secondaryManagerId')
+            )
             if secondary_manager is None:
                 raise HTTPSecondaryManagerNotFound()
 
@@ -185,24 +179,18 @@ class ProjectController(ModelRestController):
         if project.is_deleted:
             raise HTTPStatus('746 Hidden Project Is Not Editable')
 
-        manager_reference_id = form.get('managerReferenceId')
-        if manager_reference_id is not None:
-            manager = DBSession.query(Member) \
-                .filter(Member.reference_id == manager_reference_id) \
-                .one_or_none()
+        manager_id = form.get('managerId')
+        if manager_id is not None:
+            manager = DBSession.query(Member).get(form.get('managerId'))
             if manager is None:
                 raise HTTPManagerNotFound()
 
             project.manager = manager
 
-        secondary_manager_reference_id \
-            = form.get('secondaryManagerReferenceId')
-        if secondary_manager_reference_id is not None:
-            secondary_manager = DBSession.query(Member) \
-                .filter(
-                    Member.reference_id == secondary_manager_reference_id
-                ) \
-                .one_or_none()
+        if form.get('secondaryManagerId') is not None:
+            secondary_manager = DBSession.query(Member).get(
+                form.get('secondaryManagerId')
+            )
             if secondary_manager is None:
                 raise HTTPSecondaryManagerNotFound()
 

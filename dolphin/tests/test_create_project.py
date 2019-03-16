@@ -57,7 +57,7 @@ class TestProject(LocalApplicationTestCase):
                 title='My awesome project',
                 description='A decription for my project',
                 status='active',
-                managerReferenceId=self.member.reference_id,
+                managerId=self.member.id,
             )
         ):
             assert status == 200
@@ -77,46 +77,46 @@ class TestProject(LocalApplicationTestCase):
                 'Trying to create a project with secondary manager',
                 json=Update(
                     title='project',
-                    secondaryManagerReferenceId=self.member.reference_id
+                    secondaryManagerId=self.member.id
                 )
             )
             assert response.json['secondaryManagerId'] == self.member.id
 
             when(
-                'Secondary manager reference id is null',
+                'Secondary manager id is null',
                 json=Update(
                     title='New Project',
-                    secondaryManagerReferenceId=None
+                    secondaryManagerId=None
                 )
             )
-            assert status == '782 Secondary Manager Reference Id Is Null'
+            assert status == '782 Secondary Manager Id Is Null'
 
             when(
                 'Secondary manager is not found',
                 json=Update(
                     title='New Project',
-                    secondaryManagerReferenceId=0
+                    secondaryManagerId=0
                 )
             )
             assert status == '650 Secondary Manager Not Found'
 
             when(
-                'Manager reference id is null',
-                json=Update(title='New Project', managerReferenceId=None)
+                'Manager id is null',
+                json=Update(title='New Project', managerId=None)
             )
-            assert status == '778 Manager Reference Id Is Null'
+            assert status == '785 Manager Id Is Null'
 
             when(
                 'Manager is not found',
-                json=Update(title='New Project', managerReferenceId=0)
+                json=Update(title='New Project', managerId=0)
             )
             assert status == '608 Manager Not Found'
 
             when(
-                'Maneger reference id is not in form',
-                json=given - 'managerReferenceId' | dict(title='New Project')
+                'Maneger id is not in form',
+                json=given - 'managerId' | dict(title='New Project')
             )
-            assert status == '777 Manager Reference Id Not In Form'
+            assert status == '786 Manager Id Not In Form'
 
             when(
                 'Workflow id is not in form',
