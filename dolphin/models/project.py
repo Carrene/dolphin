@@ -71,7 +71,7 @@ class Project(ModifiedByMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         label='Manager',
         nullable=False,
         not_none=True,
-        readonly=True,
+        readonly=False,
         required=True
     )
     secondary_manager_id = Field(
