@@ -2,7 +2,8 @@ from datetime import datetime
 
 from auditor import observe
 from nanohttp import context
-from restfulpy.orm import Field, DeclarativeBase, relationship, OrderingMixin, FilteringMixin, PaginationMixin
+from restfulpy.orm import Field, DeclarativeBase, relationship, \
+    OrderingMixin, FilteringMixin, PaginationMixin
 from restfulpy.orm.metadata import MetadataField
 from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
     DateTime, case, join
