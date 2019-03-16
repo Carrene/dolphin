@@ -2,15 +2,14 @@ from nanohttp import HTTPStatus, json, context, HTTPNotFound, int_or_notfound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
-from restfulpy.utils import to_camel_case
 
-from .files import FileController
-from .issues import IssueController
 from ..backends import ChatClient
 from ..exceptions import ChatRoomNotFound, RoomMemberAlreadyExist, \
     RoomMemberNotFound, HTTPManagerNotFound, HTTPSecondaryManagerNotFound
 from ..models import Project, Member, Subscription, Workflow, Group, Release
 from ..validators import project_validator, update_project_validator
+from .files import FileController
+from .issues import IssueController
 
 
 FORM_WHITELIST = [
@@ -91,10 +90,13 @@ class ProjectController(ModelRestController):
         project.update_from_request()
         project.manager_id = member.id
 
-        secondary_manager_reference_id = form.get('secondaryManagerReferenceId')
+        secondary_manager_reference_id \
+            = form.get('secondaryManagerReferenceId')
         if secondary_manager_reference_id is not None:
             secondary_manager = DBSession.query(Member) \
-                .filter(Member.reference_id == secondary_manager_reference_id) \
+                .filter(
+                    Member.reference_id == secondary_manager_reference_id
+                ) \
                 .one_or_none()
             if secondary_manager is None:
                 raise HTTPSecondaryManagerNotFound()
@@ -105,8 +107,8 @@ class ProjectController(ModelRestController):
             project.group_id = form['groupId']
 
         else:
-            default_group = DBSession.query(Group)\
-                .filter(Group.public == True)\
+            default_group = DBSession.query(Group) \
+                .filter(Group.public.is_(True)) \
                 .one()
             project.group = default_group
 
@@ -174,8 +176,6 @@ class ProjectController(ModelRestController):
     @commit
     def update(self, id):
         form = context.form
-        token = context.environ['HTTP_AUTHORIZATION']
-
         id = int_or_notfound(id)
 
         project = DBSession.query(Project).get(id)
@@ -195,10 +195,13 @@ class ProjectController(ModelRestController):
 
             project.manager = manager
 
-        secondary_manager_reference_id = form.get('secondaryManagerReferenceId')
+        secondary_manager_reference_id \
+            = form.get('secondaryManagerReferenceId')
         if secondary_manager_reference_id is not None:
             secondary_manager = DBSession.query(Member) \
-                .filter(Member.reference_id == secondary_manager_reference_id) \
+                .filter(
+                    Member.reference_id == secondary_manager_reference_id
+                ) \
                 .one_or_none()
             if secondary_manager is None:
                 raise HTTPSecondaryManagerNotFound()
@@ -214,7 +217,7 @@ class ProjectController(ModelRestController):
             for i in release.projects:
                 if i.title == form['title'] and i.id != id:
                     raise HTTPStatus(
-                        f'600 Another project with title: ' \
+                        f'600 Another project with title: '
                         f'"{form["title"]}" is already exists.'
                     )
 
@@ -226,9 +229,7 @@ class ProjectController(ModelRestController):
     @Project.expose
     @commit
     def hide(self, id):
-        form = context.form
         id = int_or_notfound(id)
-
         project = DBSession.query(Project).get(id)
         if not project:
             raise HTTPNotFound()
@@ -244,9 +245,7 @@ class ProjectController(ModelRestController):
     @Project.expose
     @commit
     def show(self, id):
-        form = context.form
         id = int_or_notfound(id)
-
         project = DBSession.query(Project).get(id)
         if not project:
             raise HTTPNotFound()
@@ -386,6 +385,7 @@ class ProjectController(ModelRestController):
                 token,
                 member.access_token
             )
+
         except RoomMemberNotFound:
             # Exception is passed because it means `kick_member()` is already
             # called and `member` successfully removed from room. So there is
@@ -395,12 +395,13 @@ class ProjectController(ModelRestController):
 
         try:
             DBSession.flush()
+
         except:
             chat_client.add_member(
                 project.room_id,
                 identity.reference_id,
                 token,
-                access_token
+                member.access_token
             )
             raise
 

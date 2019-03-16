@@ -90,7 +90,7 @@ class TestMentionedMemberWebhook(LocalApplicationTestCase):
                 'Room not found',
                 query=given | dict(roomId=0),
             )
-            assert status == '618 Chat Room Not Found'
+            assert status == '605 Issue Not Found'
 
             when(
                 'memberId not in query',

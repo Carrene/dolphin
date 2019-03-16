@@ -5,10 +5,10 @@ Revises: 46062bdf066b
 Create Date: 2019-03-13 17:28:09.858246
 
 """
-from alembic import op
 import sqlalchemy as sa
-from sqlalchemy import Table, Integer, Column, orm
-from sqlalchemy.ext.declarative import declarative_base
+from alembic import op
+from sqlalchemy import orm
+
 from dolphin.models import Release
 
 

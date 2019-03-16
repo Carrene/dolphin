@@ -1,7 +1,5 @@
-from datetime import datetime
-
-from restfulpy.orm.metadata import MetadataField
 from restfulpy.orm import DeclarativeBase, Field, TimestampMixin, relationship
+from restfulpy.orm.metadata import MetadataField
 from sqlalchemy import Integer, String, ForeignKey, DateTime, BOOLEAN
 
 

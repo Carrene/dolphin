@@ -62,7 +62,7 @@ def insert(): # pragma: no cover
 
         class Identity:
             email = god.email
-#            id = god.id
+            id = god.id
 
         context.identity = Identity
 

@@ -2,12 +2,9 @@ from nanohttp import json, context, HTTPNotFound, HTTPStatus, int_or_notfound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
-from restfulpy.utils import to_camel_case
 
-from ..backends import ChatClient
-from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound, \
-    HTTPManagerNotFound, HTTPLaunchDateMustGreaterThanCutoffDate
-from ..models import Release, release_statuses, Subscription, Member
+from ..exceptions import HTTPManagerNotFound, HTTPLaunchDateMustGreaterThanCutoffDate
+from ..models import Release, Subscription, Member
 from ..validators import release_validator, update_release_validator
 
 
@@ -41,7 +38,9 @@ class ReleaseController(ModelRestController):
     @commit
     def create(self):
         member = DBSession.query(Member) \
-            .filter(Member.reference_id == context.form['managerReferenceId']) \
+            .filter(
+                Member.reference_id == context.form['managerReferenceId']
+            ) \
             .one_or_none()
         if member is None:
             raise HTTPManagerNotFound()
@@ -80,7 +79,7 @@ class ReleaseController(ModelRestController):
             Release.title == form['title']
         ).one_or_none():
             raise HTTPStatus(
-                f'600 Another release with title: ' \
+                f'600 Another release with title: '
                 f'"{form["title"]}" is already exists.'
             )
 
@@ -125,9 +124,7 @@ class ReleaseController(ModelRestController):
     @Release.expose
     @commit
     def subscribe(self, id):
-        token = context.environ['HTTP_AUTHORIZATION']
         id = int_or_notfound(id)
-
         release = DBSession.query(Release).get(id)
         if not release:
             raise HTTPNotFound()
@@ -152,9 +149,7 @@ class ReleaseController(ModelRestController):
     @Release.expose
     @commit
     def unsubscribe(self, id):
-        token = context.environ['HTTP_AUTHORIZATION']
         id = int_or_notfound(id)
-
         release = DBSession.query(Release).get(id)
         if not release:
             raise HTTPNotFound()

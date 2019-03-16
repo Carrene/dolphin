@@ -1,21 +1,18 @@
 from datetime import datetime
 
+from auditor import observe
 from nanohttp import context
-from restfulpy.orm import Field, DeclarativeBase, relationship, \
-    ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin
+from restfulpy.orm import Field, DeclarativeBase, relationship, OrderingMixin, FilteringMixin, PaginationMixin
 from restfulpy.orm.metadata import MetadataField
 from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
     DateTime, case, join
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import column_property
-from auditor import observe
 
-from .item import Item
-from .subscribable import Subscribable, Subscription
-from .phase import Phase
-from .tag import Tag
-from .member import Member
 from ..mixins import ModifiedByMixin
+from .item import Item
+from .member import Member
+from .subscribable import Subscribable, Subscription
 
 
 class IssueTag(DeclarativeBase):
@@ -208,39 +205,35 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
     )
 
     is_subscribed = column_property(
-        select([func.count(Subscription.member_id)]) \
+        select([func.count(Subscription.member_id)])
         .select_from(
             join(Subscription, Member, Subscription.member_id == Member.id)
-        ) \
-        .where(Subscription.subscribable_id == id) \
+        )
+        .where(Subscription.subscribable_id == id)
         .where(Member.reference_id == bindparam(
-                'reference_id',
-                callable_=lambda:
-                    context.identity.reference_id
-                    if context.identity else
-                    None
+            'reference_id',
+            callable_=lambda:
+                context.identity.reference_id if context.identity else None
             )
-        ) \
-        .where(Subscription.one_shot.is_(None)) \
+        )
+        .where(Subscription.one_shot.is_(None))
         .correlate_except(Subscription),
         deferred=True
     )
 
     seen_at = column_property(
-        select([Subscription.seen_at]) \
+        select([Subscription.seen_at])
         .select_from(
             join(Subscription, Member, Subscription.member_id == Member.id)
-        ) \
-        .where(Subscription.subscribable_id == id) \
+        )
+        .where(Subscription.subscribable_id == id)
         .where(Member.reference_id == bindparam(
-                'reference_id',
-                callable_=lambda:
-                    context.identity.reference_id
-                    if context.identity else
-                    None
+            'reference_id',
+            callable_=lambda:
+                context.identity.reference_id if context.identity else None
             )
-        ) \
-        .where(Subscription.one_shot.is_(None)) \
+        )
+        .where(Subscription.one_shot.is_(None))
         .correlate_except(Subscription),
         deferred=True
     )
@@ -363,7 +356,8 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         issue_dict = super().to_dict()
         issue_dict['boarding'] = self.boarding
         issue_dict['isSubscribed'] = True if self.is_subscribed else False
-        issue_dict['seenAt'] = self.seen_at.isoformat() if self.seen_at else None
+        issue_dict['seenAt'] \
+            = self.seen_at.isoformat() if self.seen_at else None
 
         if include_relations:
             issue_dict['relations'] = []

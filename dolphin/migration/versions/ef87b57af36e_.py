@@ -60,3 +60,4 @@ def downgrade():
     op.execute(
         'ALTER TABLE subscription ADD PRIMARY KEY (subscribable_id, member_id)'
     )
+

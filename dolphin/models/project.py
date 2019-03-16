@@ -148,29 +148,29 @@ class Project(ModifiedByMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     )
 
     due_date = column_property(
-        select([func.max(Issue.due_date)]) \
-        .where(Issue.project_id == id) \
+        select([func.max(Issue.due_date)])
+        .where(Issue.project_id == id)
         .correlate_except(Issue)
     )
 
     is_subscribed = column_property(
-        select([func.count(Subscription.member_id)]) \
+        select([func.count(Subscription.member_id)])
         .select_from(
             join(Subscription, Member, Subscription.member_id == Member.id)
-        ) \
-        .where(Subscription.subscribable_id == id) \
+        )
+        .where(Subscription.subscribable_id == id)
         .where(Member.reference_id == bindparam(
                 'reference_id',
                 callable_=lambda: context.identity.reference_id
             )
-        ) \
+        )
         .correlate_except(Subscription),
         deferred=True
     )
 
     boarding_value = column_property(
-        select([func.max(Issue.boarding_value)]) \
-        .where(Issue.project_id == id) \
+        select([func.max(Issue.boarding_value)])
+        .where(Issue.project_id == id)
         .where(status == 'active')
     )
 

@@ -2,7 +2,7 @@ from nanohttp import HTTPKnownStatus
 
 
 class RoomMemberAlreadyExist(HTTPKnownStatus):
-    statu = '604 Already Added To Target'
+    status = '604 Already Added To Target'
 
 
 class RoomMemberNotFound(HTTPKnownStatus):
@@ -27,6 +27,7 @@ class ChatInternallError(HTTPKnownStatus):
 
 class OutOfLimitRoomSubscription(HTTPKnownStatus):
     status = '804 Number Of Chat Room Subscription Is Out Of Limit'
+
 
 class CASServerNotFound(HTTPKnownStatus):
     status = '619 CAS Server Not Found'

@@ -3,8 +3,7 @@ from datetime import datetime
 from restfulpy.orm import Field, relationship, ModifiedMixin, FilteringMixin, \
     OrderingMixin, PaginationMixin
 from restfulpy.orm.metadata import MetadataField
-from sqlalchemy import Integer, Enum, DateTime, ForeignKey, select, func
-from sqlalchemy.orm import column_property
+from sqlalchemy import Integer, Enum, DateTime, ForeignKey
 
 from .project import Project
 from .subscribable import Subscribable

@@ -1,9 +1,7 @@
-from datetime import datetime
-
 from nanohttp import context
+from restfulpy.orm import ModifiedMixin, Field
 from sqlalchemy import Integer
 from sqlalchemy.events import event
-from restfulpy.orm import ModifiedMixin, Field
 
 
 class ModifiedByMixin(ModifiedMixin):
