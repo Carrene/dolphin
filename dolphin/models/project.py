@@ -201,7 +201,7 @@ class Project(ModifiedByMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         yield MetadataField(
             name='boarding',
             key='boarding',
-            label='Pace',
+            label='Tempo',
             required=False,
             readonly=True
         )
