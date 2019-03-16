@@ -280,7 +280,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         yield MetadataField(
             name='boarding',
             key='boarding',
-            label='Pace',
+            label='Tempo',
             required=False,
             readonly=True
         )
