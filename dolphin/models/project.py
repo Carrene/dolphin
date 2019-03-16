@@ -224,24 +224,24 @@ class Project(ModifiedByMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         yield MetadataField(
             name='managerReferenceId',
             key='manager_reference_id',
-            label='Lorem Ipsum',
+            label='Manager',
             required=True,
             not_none=True,
             readonly=False,
             watermark='Lorem Ipsum',
             example='Lorem Ipsum',
-            message='Lorem Ipsum',
+            message=None,
         )
         yield MetadataField(
             name='secondaryManagerReferenceId',
             key='secondary_manager_reference_id',
-            label='Lorem Ipsum',
+            label='Secondary Manager (optional)',
             required=False,
             not_none=False,
             readonly=False,
             watermark='Lorem Ipsum',
             example='Lorem Ipsum',
-            message='Lorem Ipsum',
+            message=None,
         )
         yield MetadataField(
             name='boardingValue',
