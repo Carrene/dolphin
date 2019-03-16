@@ -179,11 +179,17 @@ class Project(ModifiedByMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         if self.status == 'on-hold':
             return Boarding.frozen[1]
 
+        elif self.status == 'queued':
+            return None
+
         elif self.boarding_value == Boarding.ontime[0]:
             return Boarding.ontime[1]
 
         elif self.boarding_value == Boarding.delayed[0]:
             return Boarding.delayed[1]
+
+        elif self.boarding_value == Boarding.frozen[0]:
+            return Boarding.frozen[1]
 
         return None
 
@@ -193,6 +199,7 @@ class Project(ModifiedByMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             (cls.status == 'on-hold', Boarding.frozen[1]),
             (cls.boarding_value == Boarding.ontime[0], Boarding.ontime[1]),
             (cls.boarding_value == Boarding.delayed[0], Boarding.delayed[1]),
+            (cls.boarding_value == Boarding.frozen[0], Boarding.frozen[1]),
         ])
 
     @classmethod

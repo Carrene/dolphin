@@ -98,6 +98,19 @@ class TestProject(LocalApplicationTestCase):
         )
         session.add(cls.project3)
 
+        cls.project4 = Project(
+            release=cls.release3,
+            workflow=workflow,
+            group=group,
+            manager=member2,
+            title='My third project',
+            description='A decription for my project',
+            removed_at='2020-2-20',
+            room_id=1000,
+            status='queued',
+        )
+        session.add(cls.project4)
+
         with Context(dict()):
             context.identity = member1
 
@@ -151,7 +164,7 @@ class TestProject(LocalApplicationTestCase):
             'LIST',
         ):
             assert status == 200
-            assert len(response.json) == 3
+            assert len(response.json) == 4
 
             with self.given(
                 'Sort projects by phases title',
@@ -177,7 +190,7 @@ class TestProject(LocalApplicationTestCase):
                     'Reverse sorting titles by alphabet',
                     query=dict(sort='-status')
                 )
-                assert response.json[0]['status'] == 'on-hold'
+                assert response.json[0]['status'] == 'queued'
 
                 when(
                     'Sorting project by due dates',
@@ -210,60 +223,66 @@ class TestProject(LocalApplicationTestCase):
                     query=dict(sort='releaseTitle')
                 )
                 assert status == 200
-                assert len(response.json) == 3
+                assert len(response.json) == 4
                 assert response.json[0]['title'] == self.project1.title
                 assert response.json[1]['title'] == self.project2.title
                 assert response.json[2]['title'] == self.project3.title
+                assert response.json[3]['title'] == self.project4.title
 
                 when(
                     'Reverse sorting projects by release title',
                     query=dict(sort='-releaseTitle')
                 )
                 assert status == 200
-                assert len(response.json) == 3
-                assert response.json[0]['title'] == self.project3.title
-                assert response.json[1]['title'] == self.project2.title
-                assert response.json[2]['title'] == self.project1.title
+                assert len(response.json) == 4
+                assert response.json[0]['title'] == self.project4.title
+                assert response.json[1]['title'] == self.project3.title
+                assert response.json[2]['title'] == self.project2.title
+                assert response.json[3]['title'] == self.project1.title
 
                 when(
                     'Sorting projects by manager title',
                     query=dict(sort='managerTitle')
                 )
                 assert status == 200
-                assert len(response.json) == 3
+                assert len(response.json) == 4
                 assert response.json[0]['title'] == self.project1.title
                 assert response.json[1]['title'] == self.project2.title
                 assert response.json[2]['title'] == self.project3.title
+                assert response.json[3]['title'] == self.project4.title
 
                 when(
                     'Reverse sorting projects by manager title',
                     query=dict(sort='-managerTitle')
                 )
                 assert status == 200
-                assert len(response.json) == 3
+                assert len(response.json) == 4
                 assert response.json[0]['title'] == self.project2.title
-                assert response.json[1]['title'] == self.project3.title
-                assert response.json[2]['title'] == self.project1.title
+                assert response.json[1]['title'] == self.project4.title
+                assert response.json[2]['title'] == self.project3.title
+                assert response.json[3]['title'] == self.project1.title
 
                 when(
                     'Sorting projects by boarding title',
                     query=dict(sort='boarding')
                 )
                 assert status == 200
-                assert len(response.json) == 3
-                assert response.json[0]['title'] == self.project3.title
-                assert response.json[1]['title'] == self.project2.title
-                assert response.json[2]['title'] == self.project1.title
+                assert len(response.json) == 4
+                assert response.json[0]['title'] == self.project1.title
+                assert response.json[1]['title'] == self.project3.title
+                assert response.json[2]['title'] == self.project2.title
+                assert response.json[3]['title'] == self.project4.title
 
                 when(
                     'Reverse sorting projects by boarding title',
                     query=dict(sort='-boarding')
                 )
                 assert status == 200
-                assert len(response.json) == 3
-                assert response.json[0]['title'] == self.project1.title
+                assert len(response.json) == 4
+                assert response.json[0]['title'] == self.project3.title
                 assert response.json[1]['title'] == self.project2.title
-                assert response.json[2]['title'] == self.project3.title
+                assert response.json[2]['title'] == self.project1.title
+                assert response.json[3]['title'] == self.project4.title
 
             with self.given(
                 'Filter projects',
@@ -312,9 +331,10 @@ class TestProject(LocalApplicationTestCase):
                     query=dict(boarding='IN(on-time,frozen)')
                 )
                 assert status == 200
-                assert len(response.json) == 2
-                assert response.json[0]['title'] == self.project2.title
-                assert response.json[1]['title'] == self.project3.title
+                assert len(response.json) == 3
+                assert response.json[0]['title'] == self.project1.title
+                assert response.json[1]['title'] == self.project2.title
+                assert response.json[2]['title'] == self.project4.title
 
             with self.given(
                 'Project pagination',
@@ -328,7 +348,7 @@ class TestProject(LocalApplicationTestCase):
                     'Manipulate sorting and pagination',
                     query=dict(sort='-title', take=1, skip=2)
                 )
-                assert response.json[0]['title'] == 'My first project'
+                assert response.json[0]['title'] == self.project2.title
 
                 when('Request is not authorized', authorization=None)
                 assert status == 401
