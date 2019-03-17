@@ -262,6 +262,14 @@ def tag_exists_validator(title, project, field):
     return title
 
 
+def skill_exists_validator(title, project, field):
+    skill = DBSession.query(Skill).filter(Skill.title == title).one_or_none()
+    if skill is not None:
+        raise HTTPStatus('600 Repetitive Title')
+
+    return title
+
+
 release_validator = validate(
     title=dict(
         required='710 Title Not In Form',
@@ -605,5 +613,21 @@ draft_issue_relate_validator = validate(
         required='780 Target Issue Id Not In Form',
         type_=(int, '781 Invalid Target Issue Id Type'),
     )
+)
+
+
+skill_create_validator = validate(
+    description=dict(
+        max_length=(
+            512,
+            '703 At Most 512 Characters Are Valid For Description'
+        ),
+    ),
+    title = dict(
+        required='710 Title Not In Form',
+        not_none='727 Title Is Null',
+        max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
+        callback=skill_exists_validator,
+    ),
 )
 
