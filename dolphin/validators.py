@@ -750,6 +750,8 @@ phase_validator = validate(
     ),
     order=dict(
         callback=phase_order_exists_validator,
+        type_=(int, '741 Invalid Order Type'),
+        required='742 Order Not In Form',
     ),
 )
 

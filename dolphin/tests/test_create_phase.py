@@ -76,15 +76,22 @@ class TestPhase(LocalApplicationTestCase):
             when('Title is not in form', json=given - 'title')
             assert status == '610 Title Not In Form'
 
-            when('Order type is wrong', json=given | dict(order='order'))
+            when(
+                'Order type is wrong',
+                json=given | dict(order='order', title='new title')
+            )
             assert status == '741 Invalid Order Type'
 
-            when('Order is not in form', json=given | dict(order='order'))
+            when(
+                'Order is not in form',
+                json=given - 'order' | dict(title='new title')
+            )
             assert status == '742 Order Not In Form'
 
             when(
                 'Workflow is not found',
-                url=f'/apiv1/workflows/id: {cls.workflow.id}/phases'
+                url=f'/apiv1/workflows/id: {self.workflow.id}/phases',
+                json=given | dict(title='new title', order=3)
             )
             assert status == 404
 
