@@ -1,3 +1,5 @@
+from nanohttp import context
+from nanohttp.contexts import Context
 from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when
 
@@ -39,6 +41,8 @@ class TestActivity(LocalApplicationTestCase):
             title='My first release',
             description='A decription for my first release',
             cutoff='2030-2-20',
+            launch_date='2030-2-20',
+            manager=cls.member1,
         )
 
         project = Project(
@@ -50,70 +54,72 @@ class TestActivity(LocalApplicationTestCase):
             description='A decription for my project',
             room_id=1
         )
-        session.add(project)
 
-        cls.issue1 = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            due_date='2020-2-20',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(cls.issue1)
-        session.flush()
+        with Context(dict()):
+            context.identity = cls.member1
 
-        issue2 = Issue(
-            project=project,
-            title='Second issue',
-            description='This is description of second issue',
-            due_date='2016-2-20',
-            kind='feature',
-            days=2,
-            room_id=3
-        )
-        session.add(issue2)
-        session.flush()
+            cls.issue1 = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                due_date='2020-2-20',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(cls.issue1)
+            session.flush()
 
-        cls.phase1 = Phase(
-            workflow=workflow,
-            title='phase 1',
-            order=1,
-            skill=skill,
-        )
-        session.add(cls.phase1)
-        session.flush()
+            issue2 = Issue(
+                project=project,
+                title='Second issue',
+                description='This is description of second issue',
+                due_date='2016-2-20',
+                kind='feature',
+                days=2,
+                room_id=3
+            )
+            session.add(issue2)
+            session.flush()
 
-        item1 = Item(
-            member_id=cls.member1.id,
-            phase_id=cls.phase1.id,
-            issue_id=cls.issue1.id,
-        )
-        session.add(item1)
+            cls.phase1 = Phase(
+                workflow=workflow,
+                title='phase 1',
+                order=1,
+                skill=skill,
+            )
+            session.add(cls.phase1)
+            session.flush()
 
-        item2 = Item(
-            member_id=cls.member1.id,
-            phase_id=cls.phase1.id,
-            issue_id=issue2.id,
-        )
-        session.add(item2)
+            item1 = Item(
+                member_id=cls.member1.id,
+                phase_id=cls.phase1.id,
+                issue_id=cls.issue1.id,
+            )
+            session.add(item1)
 
-        activity1 = Activity(
-            item=item1
-        )
-        session.add(activity1)
+            item2 = Item(
+                member_id=cls.member1.id,
+                phase_id=cls.phase1.id,
+                issue_id=issue2.id,
+            )
+            session.add(item2)
 
-        activity2 = Activity(
-            item=item1
-        )
-        session.add(activity2)
+            activity1 = Activity(
+                item=item1
+            )
+            session.add(activity1)
 
-        activity3 = Activity(
-            item=item2
-        )
-        session.add(activity3)
-        session.commit()
+            activity2 = Activity(
+                item=item1
+            )
+            session.add(activity2)
+
+            activity3 = Activity(
+                item=item2
+            )
+            session.add(activity3)
+            session.commit()
 
     def test_list(self):
         self.login(email=self.member1.email)

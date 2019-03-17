@@ -278,7 +278,16 @@ release_validator = validate(
     ),
     status=dict(
         callback=release_status_value_validator
-    )
+    ),
+    managerReferenceId=dict(
+        type_=(int, '608 Manager Not Found'),
+        required='777 Manager Reference Id Not In Form',
+        not_none='778 Manager Reference Id Is Null',
+    ),
+    launchDate=dict(
+        pattern=(DATETIME_PATTERN, '784 Invalid Launch Date Format'),
+        required='783 Launch Date Not In Form'
+    ),
 )
 
 
@@ -295,7 +304,14 @@ update_release_validator = validate(
     ),
     status=dict(
         callback=release_status_value_validator
-    )
+    ),
+    managerReferenceId=dict(
+        type_=(int, '608 Manager Not Found'),
+        not_none='778 Manager Reference Id Is Null',
+    ),
+    launchDate=dict(
+        pattern=(DATETIME_PATTERN, '784 Invalid Launch Date Format'),
+    ),
 )
 
 
@@ -318,11 +334,15 @@ project_validator = validate(
     releaseId=dict(
         callback=release_exists_validator
     ),
-    managerReferenceId=dict(
+    managerId=dict(
         type_=(int, '608 Manager Not Found'),
-        required='777 Manager Reference Id Not In Form',
-        not_none='778 Manager Reference Id Is Null',
-    )
+        required='786 Manager Id Not In Form',
+        not_none='785 Manager Id Is Null',
+    ),
+    secondaryManagerId=dict(
+        type_=(int, '650 Secondary Manager Not Found'),
+        not_none='782 Secondary Manager Id Is Null',
+    ),
 )
 
 
@@ -336,6 +356,14 @@ update_project_validator = validate(
     ),
     status=dict(
         callback=project_status_value_validator
+    ),
+    secondaryManagerId=dict(
+        type_=(int, '650 Secondary Manager Not Found'),
+        not_none='782 Secondary Manager Id Is Null',
+    ),
+    managerId=dict(
+        type_=(int, '608 Manager Not Found'),
+        not_none='785 Manager Id Is Null',
     ),
 )
 

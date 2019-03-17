@@ -11,8 +11,8 @@ with open(join(dirname(__file__), 'dolphin', '__init__.py')) as v_file:
 
 
 dependencies = [
-    'restfulpy >= 2.7.2',
     'sqlalchemy_media >= 0.17.1',
+    'restfulpy >= 2.7.4',
 #    'cas-common',
 
     # Deployment

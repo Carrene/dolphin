@@ -1,7 +1,9 @@
 from datetime import datetime
 
-from auditor.context import Context as AuditLogContext
+from nanohttp import context
 from bddrest import status, when
+from nanohttp.contexts import Context
+from auditor.context import Context as AuditLogContext
 
 from dolphin.models import Issue, Project, Member, Workflow, Group, \
     Subscription, Release
@@ -40,6 +42,8 @@ class TestUnseeIssue(LocalApplicationTestCase):
             title='My first release',
             description='A decription for my first release',
             cutoff='2030-2-20',
+            launch_date='2030-2-20',
+            manager=member1,
         )
 
         project = Project(
@@ -53,50 +57,60 @@ class TestUnseeIssue(LocalApplicationTestCase):
         )
         session.add(project)
 
-        cls.issue1 = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            due_date='2020-2-20',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(cls.issue1)
-        session.flush()
+        with Context(dict()):
+            context.identity = member1
 
-        cls.subscription_issue1 = Subscription(
-            subscribable_id=cls.issue1.id,
-            member_id=member1.id,
-            seen_at=datetime.utcnow()
-        )
-        session.add(cls.subscription_issue1)
+            cls.issue1 = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                due_date='2020-2-20',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(cls.issue1)
+            session.flush()
 
-        cls.subscription_issue2 = Subscription(
-            subscribable_id=cls.issue1.id,
-            member_id=member2.id,
-            seen_at=datetime.utcnow()
-        )
-        session.add(cls.subscription_issue2)
+            cls.subscription_issue1 = Subscription(
+                subscribable_id=cls.issue1.id,
+                member_id=member1.id,
+                seen_at=datetime.utcnow()
+            )
+            session.add(cls.subscription_issue1)
 
-        cls.issue2 = Issue(
-            project=project,
-            title='Second issue',
-            description='This is description of second issue',
-            due_date='2016-2-20',
-            kind='feature',
-            days=2,
-            room_id=3
-        )
-        session.add(cls.issue2)
-        session.commit()
-        session.expunge_all()
+            one_shot_subscription = Subscription(
+                member_id=member1.id,
+                subscribable_id=cls.issue1.id,
+                one_shot=True,
+            )
+            session.add(one_shot_subscription)
+
+            cls.subscription_issue2 = Subscription(
+                subscribable_id=cls.issue1.id,
+                member_id=member2.id,
+                seen_at=datetime.utcnow()
+            )
+            session.add(cls.subscription_issue2)
+
+            cls.issue2 = Issue(
+                project=project,
+                title='Second issue',
+                description='This is description of second issue',
+                due_date='2016-2-20',
+                kind='feature',
+                days=2,
+                room_id=3
+            )
+            session.add(cls.issue2)
+            session.commit()
+            session.expunge_all()
 
     def test_unsee_issue(self):
         self.login('member1@example.com')
 
         with oauth_mockup_server(), self.given(
-            f'Unsee a subscribed issues',
+            f'Unsee a issues',
             f'/apiv1/issues/id: {self.issue1.id}',
             f'UNSEE',
         ):
@@ -106,23 +120,6 @@ class TestUnseeIssue(LocalApplicationTestCase):
             session.add(self.subscription_issue1)
             session.expire(self.subscription_issue1)
             assert self.subscription_issue1.seen_at is None
-
-            # FIXME: Add proper authorization, #519
-            when(
-                'Unsee an issue as jaguar',
-                url_parameters=dict(id=self.issue1.id),
-                authorization=None,
-            )
-            assert status == 200
-            session.add(self.subscription_issue2)
-            session.expire(self.subscription_issue2)
-            assert self.subscription_issue2.seen_at is None
-
-            when(
-                'Unsee an unsubscribed issue',
-                url_parameters=dict(id=self.issue2.id),
-            )
-            assert status == '637 Not Subscribed Issue'
 
             when(
                 'Issue id is invalid',
@@ -136,11 +133,10 @@ class TestUnseeIssue(LocalApplicationTestCase):
             )
             assert status == '709 Form Not Allowed'
 
-            # FIXME: Commented due to issue #519
-            # self.logout()
-            # when(
-            #     'Trying with an unauthorized member',
-            #     authorization=None
-            # )
-            # assert status == 401
+            self.logout()
+            when(
+                'Trying with an unauthorized member',
+                authorization=None
+            )
+            assert status == 401
 

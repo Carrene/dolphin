@@ -28,7 +28,7 @@ class TestIssue(LocalApplicationTestCase):
             email='member1@example.com',
             access_token='access token 1',
             phone=123456789,
-            reference_id=1
+            reference_id=2
         )
         session.add(cls.member)
 
@@ -39,6 +39,8 @@ class TestIssue(LocalApplicationTestCase):
             title='My first release',
             description='A decription for my first release',
             cutoff='2030-2-20',
+            launch_date='2030-2-20',
+            manager=cls.member,
         )
 
         project1 = Project(
@@ -107,6 +109,8 @@ class TestIssue(LocalApplicationTestCase):
             assert response.json['id'] == self.issue2.id
             assert response.json['priority'] == 'high'
             assert response.json['tags'] is not None
+            assert response.json['modifiedAt'] is not None
+            assert response.json['modifiedBy'] == self.member.reference_id
 
             assert len(logs) == 6
             for log in logs:
@@ -184,8 +188,8 @@ class TestIssue(LocalApplicationTestCase):
                 form=given + dict(status='progressing') | \
                     dict(title='Another title')
             )
-            assert status == '705 Invalid status, only one of "to-do, '\
-                'in-progress, complete, done, on-hold" will be accepted'
+            assert status == '705 Invalid status, only one of "to-do, ' \
+                'in-progress, done, complete, on-hold" will be accepted'
             assert status.text.startswith('Invalid status')
 
             when(

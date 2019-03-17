@@ -1,26 +1,27 @@
 from datetime import datetime
 
+from auditor import context as AuditLogContext
 from nanohttp import HTTPStatus, json, context, HTTPNotFound, \
-    HTTPUnauthorized, int_or_notfound, settings
+    HTTPUnauthorized, int_or_notfound, settings, validate, HTTPNoContent, \
+    action
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import DBSession, commit
 from sqlalchemy import and_, exists, select, func
-from auditor import context as AuditLogContext
 
 from ..backends import ChatClient
 from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound, \
-    ChatRoomNotFound, HTTPNotSubscribedIssue, HTTPRelatedIssueNotFound
+    ChatRoomNotFound, HTTPRelatedIssueNotFound, \
+    HTTPIssueBugMustHaveRelatedIssue, HTTPIssueNotFound
 from ..models import Issue, Subscription, Phase, Item, Member, Project, \
     RelatedIssue, Subscribable, IssueTag, Tag
 from ..validators import update_issue_validator, assign_issue_validator, \
     issue_move_validator, unassign_issue_validator, issue_relate_validator, \
     issue_unrelate_validator
+from .activity import ActivityController
 from .files import FileController
 from .phases import PhaseController
 from .tag import TagController
-from .files import FileController
-from .activity import ActivityController
 
 
 PENDING = -1
@@ -89,8 +90,8 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         form_whitelist=(
             ['title', 'days', 'dueDate', 'kind', 'description', 'status',
              'priority', 'projectId'],
-            '707 Invalid field, only following fields are accepted: ' \
-            'title, days, dueDate, kind, description, status, priority' \
+            '707 Invalid field, only following fields are accepted: '
+            'title, days, dueDate, kind, description, status, priority'
         )
     )
     @update_issue_validator
@@ -113,7 +114,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             for i in project.issues:
                 if i.title == form['title'] and i.id != id:
                     raise HTTPStatus(
-                        f'600 Another issue with title: ' \
+                        f'600 Another issue with title: '
                         f'"{form["title"]}" is already exists.'
                     )
 
@@ -124,12 +125,11 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 and_(
                     Subscription.member_id != context.identity.id,
                     Subscription.subscribable_id == issue.id,
+                    Subscription.one_shot.is_(None),
                 )
             )
 
-        for subscription in subscriptions:
-            subscription.seen_at = None
-
+        self._unsee_subscriptions(subscriptions)
         return issue
 
     @authorize
@@ -173,7 +173,11 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         if 'tagId' in context.query:
             query = query.join(IssueTag, IssueTag.issue_id == Issue.id)
             value = context.query['tagId']
-            query = Issue._filter_by_column_value(query, IssueTag.tag_id, value)
+            query = Issue._filter_by_column_value(
+                query,
+                IssueTag.tag_id,
+                value
+            )
 
         if 'tagTitle' in context.query:
             value = context.query['tagTitle']
@@ -190,45 +194,48 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         # SORT
         external_columns = ('phaseId', 'tagId')
 
-        if not sorting_expression:
-            return query
+        if sorting_expression:
 
-        sorting_columns = {
+            sorting_columns = {
                 c[1:] if c.startswith('-') else c:
-                'desc' if c.startswith('-') else None
-            for c in sorting_expression.split(',')
-            if c.replace('-', '') in external_columns
-        }
+                    'desc' if c.startswith('-') else None
+                for c in sorting_expression.split(',')
+                    if c.replace('-', '') in external_columns
+            }
 
-        if 'phaseId' in sorting_expression:
-            if 'phaseId' not in context.query:
-                query = query.join(Item, Item.issue_id == Issue.id, isouter=True)
-                query = query.join(
-                    item_cte,
-                    item_cte.c.max_item_id == Item.id,
-                    isouter=True
+            if 'phaseId' in sorting_expression:
+                if 'phaseId' not in context.query:
+                    query = query.join(
+                        Item,
+                        Item.issue_id == Issue.id,
+                        isouter=True
+                    )
+                    query = query.join(
+                        item_cte,
+                        item_cte.c.max_item_id == Item.id,
+                        isouter=True
+                    )
+
+                query = Issue._sort_by_key_value(
+                    query,
+                    column=Item.phase_id,
+                    descending=sorting_columns['phaseId']
                 )
 
-            query = Issue._sort_by_key_value(
-                query,
-                column=Item.phase_id,
-                descending=sorting_columns['phaseId']
-            )
-
-        if 'tagId' in sorting_expression:
-            if 'tagId' not in context.query:
-                query = query.join(
-                    IssueTag,
-                    IssueTag.issue_id == Issue.id,
-                    isouter=True
+            if 'tagId' in sorting_expression:
+                if 'tagId' not in context.query:
+                    query = query.join(
+                        IssueTag,
+                        IssueTag.issue_id == Issue.id,
+                        isouter=True
+                    )
+                query = Issue._sort_by_key_value(
+                    query,
+                    column=IssueTag.tag_id,
+                    descending=sorting_columns['tagId']
                 )
-            query = Issue._sort_by_key_value(
-                query,
-                column=IssueTag.tag_id,
-                descending=sorting_columns['tagId']
-            )
 
-        if 'seenAt' in context.query:
+        if 'unread' in context.query:
             query = query \
                 .join(
                     Subscription,
@@ -265,6 +272,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
             subscribed_issues = DBSession.query(Subscription) \
                 .filter(Subscription.member_id == member.id) \
+                .filter(Subscription.one_shot.is_(None)) \
                 .join(
                     Subscribable,
                     Subscribable.id == Subscription.subscribable_id,
@@ -305,8 +313,9 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             raise HTTPNotFound()
 
         if DBSession.query(Subscription).filter(
-                Subscription.subscribable_id == id,
-                Subscription.member_id == member.id
+            Subscription.subscribable_id == id,
+            Subscription.member_id == member.id,
+            Subscription.one_shot.is_(None),
         ).one_or_none():
             raise HTTPStatus('611 Already Subscribed')
 
@@ -334,6 +343,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         try:
             DBSession.flush()
+
         except:
             chat_client.kick_member(
                 issue.room_id,
@@ -361,6 +371,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         subscription = DBSession.query(Subscription).filter(
             Subscription.subscribable_id == id,
             Subscription.member_id == member.id,
+            Subscription.one_shot.is_(None),
         ).one_or_none()
 
         if not subscription:
@@ -385,6 +396,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         try:
             DBSession.flush()
+
         except:
             chat_client.add_member(
                 issue.room_id,
@@ -532,21 +544,17 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         if issue is None:
             raise HTTPNotFound()
 
-        subscription = DBSession.query(Subscription) \
-            .filter(
-                and_(
-                    Subscription.member_id == context.identity.id,
-                    Subscription.subscribable_id == issue.id
-                )
-        ).one_or_none()
+        subscriptions = DBSession.query(Subscription) \
+            .filter(and_(
+                Subscription.member_id == context.identity.id,
+                Subscription.subscribable_id == issue.id,
+            ))
 
-        if subscription is None:
-            raise HTTPNotSubscribedIssue()
-
-        subscription.seen_at = datetime.utcnow()
+        for subscription in subscriptions:
+            subscription.seen_at = datetime.utcnow()
         return issue
 
-    #FIXME: Add authorize decorator, #519
+    @authorize
     @json(prevent_form='709 Form Not Allowed')
     @Issue.expose
     @commit
@@ -557,17 +565,12 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             raise HTTPNotFound()
 
         subscriptions = DBSession.query(Subscription) \
-            .filter(Subscription.subscribable_id == issue.id)
+            .filter(
+                Subscription.subscribable_id == issue.id,
+                Subscription.member_id == context.identity.id,
+            )
 
-        if context.identity and context.identity.id:
-            subscriptions = subscriptions \
-                .filter(Subscription.member_id == context.identity.id)
-
-        if subscriptions.count() == 0:
-            raise HTTPNotSubscribedIssue()
-
-        for subscription in subscriptions:
-            subscription.seen_at = None
+        self._unsee_subscriptions(subscriptions)
         return issue
 
     @authorize
@@ -623,6 +626,83 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         if not is_related:
             raise HTTPStatus('646 Already Unrelated')
 
+        if issue.kind == 'bug' and len(issue.relations) < 2:
+            raise HTTPIssueBugMustHaveRelatedIssue()
+
         issue.relations.remove(target)
         return issue
+
+    @validate(
+        roomId=dict(
+            type_=int,
+            required=True,
+        ),
+        memberReferenceId=dict(
+            type_=int,
+            required=True,
+        )
+    )
+    @action
+    @commit
+    def sent(self):
+        issue = DBSession.query(Issue) \
+            .filter(Issue.room_id == context.query['roomId']) \
+            .one_or_none()
+        if issue is None:
+            raise HTTPIssueNotFound()
+
+        member = DBSession.query(Member) \
+            .filter(
+                Member.reference_id == context.query['memberReferenceId']
+            ) \
+            .one_or_none()
+        if member is None:
+            raise RoomMemberNotFound()
+
+        subscriptions = DBSession.query(Subscription) \
+            .filter(
+                Subscription.subscribable_id == issue.id,
+                Subscription.member_id != member.id
+            )
+        self._unsee_subscriptions(subscriptions)
+        issue.modified_at = datetime.utcnow()
+        context.identity = member.create_jwt_principal()
+        raise HTTPNoContent()
+
+    @validate(
+        roomId=dict(
+            type_=int,
+            required=True,
+        ),
+        memberId=dict(
+            type_=int,
+            required=True,
+        ),
+    )
+    @action
+    @commit
+    def mentioned(self):
+        issue = DBSession.query(Issue) \
+            .filter(Issue.room_id == context.query['roomId']) \
+            .one_or_none()
+        if issue is None:
+            raise HTTPIssueNotFound()
+
+        member = DBSession.query(Member).get(context.query['memberId'])
+        if member is None:
+            raise HTTPStatus('610 Member Not Found')
+
+        subscription = Subscription(
+            member_id=member.reference_id,
+            subscribable_id=issue.id,
+            one_shot=True,
+        )
+        DBSession.add(subscription)
+        issue.modified_at = datetime.utcnow()
+        context.identity = member.create_jwt_principal()
+        raise HTTPNoContent()
+
+    def _unsee_subscriptions(self, subscriptions):
+        for subscription in subscriptions:
+            subscription.seen_at = None
 

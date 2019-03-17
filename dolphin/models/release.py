@@ -3,8 +3,7 @@ from datetime import datetime
 from restfulpy.orm import Field, relationship, ModifiedMixin, FilteringMixin, \
     OrderingMixin, PaginationMixin
 from restfulpy.orm.metadata import MetadataField
-from sqlalchemy import Integer, Enum, DateTime, ForeignKey, select, func
-from sqlalchemy.orm import column_property
+from sqlalchemy import Integer, Enum, DateTime, ForeignKey
 
 from .project import Project
 from .subscribable import Subscribable
@@ -36,6 +35,17 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
         example=1,
         protected=False,
     )
+    manager_id = Field(
+        Integer,
+        ForeignKey('member.id'),
+        python_type=int,
+        watermark='Choose a member',
+        label='Manager',
+        nullable=False,
+        not_none=True,
+        readonly=True,
+        required=True
+    )
     status = Field(
         Enum(*release_statuses, name='release_status'),
         python_type=str,
@@ -48,7 +58,7 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
     cutoff = Field(
         DateTime,
         python_type=datetime,
-        label='Cutoff',
+        label='Release Cutoff',
         pattern=
             r'^(\d{4})-(0[1-9]|1[012]|[1-9])-(0[1-9]|[12]\d{1}|3[01]|[1-9])'
             r'(T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z)?)?$',
@@ -59,6 +69,21 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
         not_none=True,
         required=True
     )
+    launch_date= Field(
+        DateTime,
+        python_type=datetime,
+        label='Release Date',
+        pattern=
+            r'^(\d{4})-(0[1-9]|1[012]|[1-9])-(0[1-9]|[12]\d{1}|3[01]|[1-9])'
+            r'(T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z)?)?$',
+        pattern_description='ISO format and format like "yyyy-mm-dd" is valid',
+        example='2018-02-02T1:12:12.000Z',
+        watermark='Enter a launch date',
+        nullable=False,
+        not_none=True,
+        required=True,
+        readonly=False,
+    )
 
     projects = relationship(
         'Project',
@@ -68,32 +93,36 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
         lazy='selectin'
     )
 
-    due_date = column_property(
-        select([func.max(Project.due_date)]).\
-            where(Project.release_id == id).\
-            correlate_except(Project)
+    manager = relationship(
+        'Member',
+        foreign_keys=[manager_id],
+        back_populates='releases',
+        protected=True
     )
 
     @classmethod
     def iter_metadata_fields(cls):
         yield from super().iter_metadata_fields()
         yield MetadataField(
-            name='dueDate',
-            key='due_date',
-            label='Target',
+            name='projects',
+            key='projects',
+            label='Project',
             readonly=True,
             example='Lorem Ipsum',
             watermark='Lorem Ipsum',
             message='Lorem Ipsum',
-            not_none=True,
-            required=True,
         )
-
-    def to_dict(self):
-        release_dict = super().to_dict()
-        release_dict['dueDate'] = self.due_date.isoformat() \
-            if self.due_date else None
-        return release_dict
+        yield MetadataField(
+            name='managerReferenceId',
+            key='manager_reference_id',
+            label='Lorem Ipsum',
+            required=True,
+            not_none=True,
+            readonly=False,
+            watermark='Lorem Ipsum',
+            example='Lorem Ipsum',
+            message='Lorem Ipsum',
+        )
 
     def __repr__(self):
         return f'\tTitle: {self.title}\n'

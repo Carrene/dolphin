@@ -23,6 +23,8 @@ class TestProject(LocalApplicationTestCase):
             title='My first release',
             description='A decription for my first release',
             cutoff='2030-2-20',
+            launch_date='2030-2-20',
+            manager=cls.member,
         )
 
         cls.workflow = Workflow(title='Default')
@@ -43,6 +45,7 @@ class TestProject(LocalApplicationTestCase):
 
     def test_create(self):
         self.login('member1@example.com')
+        session = self.create_session()
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Createing a project',
@@ -54,7 +57,7 @@ class TestProject(LocalApplicationTestCase):
                 title='My awesome project',
                 description='A decription for my project',
                 status='active',
-                managerReferenceId=self.member.reference_id,
+                managerId=self.member.id,
             )
         ):
             assert status == 200
@@ -64,24 +67,56 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['boarding'] == None
             assert response.json['dueDate'] == None
             assert response.json['managerId'] == self.member.id
+            assert response.json['secondaryManagerId'] is None
+
+            created_project_id = response.json['id']
+            created_project = session.query(Project).get(created_project_id)
+            assert created_project.modified_by is None
 
             when(
-                'Manager reference id is null',
-                json=Update(title='New Project', managerReferenceId=None)
+                'Trying to create a project with secondary manager',
+                json=Update(
+                    title='project',
+                    secondaryManagerId=self.member.id
+                )
             )
-            assert status == '778 Manager Reference Id Is Null'
+            assert response.json['secondaryManagerId'] == self.member.id
+
+            when(
+                'Secondary manager id is null',
+                json=Update(
+                    title='New Project',
+                    secondaryManagerId=None
+                )
+            )
+            assert status == '782 Secondary Manager Id Is Null'
+
+            when(
+                'Secondary manager is not found',
+                json=Update(
+                    title='New Project',
+                    secondaryManagerId=0
+                )
+            )
+            assert status == '650 Secondary Manager Not Found'
+
+            when(
+                'Manager id is null',
+                json=Update(title='New Project', managerId=None)
+            )
+            assert status == '785 Manager Id Is Null'
 
             when(
                 'Manager is not found',
-                json=Update(title='New Project', managerReferenceId=0)
+                json=Update(title='New Project', managerId=0)
             )
             assert status == '608 Manager Not Found'
 
             when(
-                'Maneger reference id is not in form',
-                json=given - 'managerReferenceId' | dict(title='New Project')
+                'Maneger id is not in form',
+                json=given - 'managerId' | dict(title='New Project')
             )
-            assert status == '777 Manager Reference Id Not In Form'
+            assert status == '786 Manager Id Not In Form'
 
             when(
                 'Workflow id is not in form',

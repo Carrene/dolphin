@@ -1,5 +1,7 @@
-from auditor.context import Context as AuditLogContext
+from nanohttp import context
+from nanohttp.contexts import Context
 from bddrest import status, response, when
+from auditor.context import Context as AuditLogContext
 
 from dolphin.models import Project, Member, Workflow, Issue, Subscription, \
     Group, Release
@@ -38,18 +40,24 @@ class TestProject(LocalApplicationTestCase):
             title='My first release',
             description='A decription for my first release',
             cutoff='2030-2-20',
+            launch_date='2030-2-20',
+            manager=member1,
         )
 
         cls.release2 = Release(
             title='My second release',
             description='A decription for my second release',
             cutoff='2030-2-20',
+            launch_date='2030-2-20',
+            manager=member1,
         )
 
         cls.release3 = Release(
             title='My third release',
             description='A decription for my third release',
             cutoff='2030-2-20',
+            launch_date='2030-2-20',
+            manager=member1,
         )
 
         cls.project1 = Project(
@@ -90,45 +98,62 @@ class TestProject(LocalApplicationTestCase):
         )
         session.add(cls.project3)
 
-        issue1 = Issue(
-            project=cls.project1,
-            title='First issue',
-            description='This is description of first issue',
-            due_date='2030-2-20',
-            kind='feature',
-            days=1,
-            room_id=2
+        cls.project4 = Project(
+            release=cls.release3,
+            workflow=workflow,
+            group=group,
+            manager=member2,
+            title='My third project',
+            description='A decription for my project',
+            removed_at='2020-2-20',
+            room_id=1000,
+            status='queued',
         )
-        session.add(issue1)
+        session.add(cls.project4)
 
-        issue2 = Issue(
-            project=cls.project2,
-            title='Second issue',
-            description='This is description of second issue',
-            due_date='2020-2-20',
-            kind='feature',
-            days=2,
-            room_id=3
-        )
-        session.add(issue2)
+        with Context(dict()):
+            context.identity = member1
 
-        issue3 = Issue(
-            project=cls.project1,
-            title='Third issue',
-            description='This is description of third issue',
-            due_date='2000-2-20',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(issue3)
+            issue1 = Issue(
+                project=cls.project1,
+                title='First issue',
+                description='This is description of first issue',
+                due_date='2030-2-20',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(issue1)
 
-        subscription = Subscription(
-            subscribable_id=cls.project1.id,
-            member_id=member1.id
-        )
-        session.add(subscription)
-        session.commit()
+            issue2 = Issue(
+                project=cls.project2,
+                title='Second issue',
+                description='This is description of second issue',
+                due_date='2020-2-20',
+                kind='feature',
+                days=2,
+                room_id=3,
+                status='in-progress',
+            )
+            session.add(issue2)
+
+            issue3 = Issue(
+                project=cls.project1,
+                title='Third issue',
+                description='This is description of third issue',
+                due_date='2000-2-20',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(issue3)
+
+            subscription = Subscription(
+                subscribable_id=cls.project1.id,
+                member_id=member1.id
+            )
+            session.add(subscription)
+            session.commit()
 
     def test_list(self):
         self.login('member1@example.com')
@@ -139,7 +164,7 @@ class TestProject(LocalApplicationTestCase):
             'LIST',
         ):
             assert status == 200
-            assert len(response.json) == 3
+            assert len(response.json) == 4
 
             with self.given(
                 'Sort projects by phases title',
@@ -150,8 +175,7 @@ class TestProject(LocalApplicationTestCase):
                 assert status == 200
                 assert response.json[0]['title'] == 'My first project'
 
-                when(
-                    'Reverse sorting titles by alphabet',
+                when( 'Reverse sorting titles by alphabet',
                     query=dict(sort='-title')
                 )
                 assert response.json[0]['title'] == 'My third project'
@@ -166,7 +190,7 @@ class TestProject(LocalApplicationTestCase):
                     'Reverse sorting titles by alphabet',
                     query=dict(sort='-status')
                 )
-                assert response.json[0]['status'] == 'on-hold'
+                assert response.json[0]['status'] == 'queued'
 
                 when(
                     'Sorting project by due dates',
@@ -199,60 +223,66 @@ class TestProject(LocalApplicationTestCase):
                     query=dict(sort='releaseTitle')
                 )
                 assert status == 200
-                assert len(response.json) == 3
+                assert len(response.json) == 4
                 assert response.json[0]['title'] == self.project1.title
                 assert response.json[1]['title'] == self.project2.title
                 assert response.json[2]['title'] == self.project3.title
+                assert response.json[3]['title'] == self.project4.title
 
                 when(
                     'Reverse sorting projects by release title',
                     query=dict(sort='-releaseTitle')
                 )
                 assert status == 200
-                assert len(response.json) == 3
-                assert response.json[0]['title'] == self.project3.title
-                assert response.json[1]['title'] == self.project2.title
-                assert response.json[2]['title'] == self.project1.title
+                assert len(response.json) == 4
+                assert response.json[0]['title'] == self.project4.title
+                assert response.json[1]['title'] == self.project3.title
+                assert response.json[2]['title'] == self.project2.title
+                assert response.json[3]['title'] == self.project1.title
 
                 when(
                     'Sorting projects by manager title',
                     query=dict(sort='managerTitle')
                 )
                 assert status == 200
-                assert len(response.json) == 3
+                assert len(response.json) == 4
                 assert response.json[0]['title'] == self.project1.title
                 assert response.json[1]['title'] == self.project2.title
                 assert response.json[2]['title'] == self.project3.title
+                assert response.json[3]['title'] == self.project4.title
 
                 when(
                     'Reverse sorting projects by manager title',
                     query=dict(sort='-managerTitle')
                 )
                 assert status == 200
-                assert len(response.json) == 3
+                assert len(response.json) == 4
                 assert response.json[0]['title'] == self.project2.title
-                assert response.json[1]['title'] == self.project3.title
-                assert response.json[2]['title'] == self.project1.title
+                assert response.json[1]['title'] == self.project4.title
+                assert response.json[2]['title'] == self.project3.title
+                assert response.json[3]['title'] == self.project1.title
 
                 when(
                     'Sorting projects by boarding title',
                     query=dict(sort='boarding')
                 )
                 assert status == 200
-                assert len(response.json) == 3
+                assert len(response.json) == 4
                 assert response.json[0]['title'] == self.project1.title
-                assert response.json[1]['title'] == self.project2.title
-                assert response.json[2]['title'] == self.project3.title
+                assert response.json[1]['title'] == self.project3.title
+                assert response.json[2]['title'] == self.project2.title
+                assert response.json[3]['title'] == self.project4.title
 
                 when(
                     'Reverse sorting projects by boarding title',
                     query=dict(sort='-boarding')
                 )
                 assert status == 200
-                assert len(response.json) == 3
+                assert len(response.json) == 4
                 assert response.json[0]['title'] == self.project3.title
                 assert response.json[1]['title'] == self.project2.title
                 assert response.json[2]['title'] == self.project1.title
+                assert response.json[3]['title'] == self.project4.title
 
             with self.given(
                 'Filter projects',
@@ -275,6 +305,14 @@ class TestProject(LocalApplicationTestCase):
                 assert response.json[0]['status'] == 'active'
 
                 when(
+                    'List projects with filtering by on-hold status to check '
+                    'their boarding is frozen',
+                    query=dict(sort='id', status='on-hold')
+                )
+                assert response.json[0]['status'] == 'on-hold'
+                assert response.json[0]['boarding'] == 'frozen'
+
+                when(
                     'List projects excepts one of statuses',
                     query=dict(sort='id', status='!active')
                 )
@@ -290,12 +328,13 @@ class TestProject(LocalApplicationTestCase):
 
                 when(
                     'Filter project by boarding using IN clause',
-                    query=dict(boarding='IN(on-time,delayed)')
+                    query=dict(boarding='IN(on-time,frozen)')
                 )
                 assert status == 200
-                assert len(response.json) == 2
+                assert len(response.json) == 3
                 assert response.json[0]['title'] == self.project1.title
                 assert response.json[1]['title'] == self.project2.title
+                assert response.json[2]['title'] == self.project4.title
 
             with self.given(
                 'Project pagination',
@@ -309,7 +348,7 @@ class TestProject(LocalApplicationTestCase):
                     'Manipulate sorting and pagination',
                     query=dict(sort='-title', take=1, skip=2)
                 )
-                assert response.json[0]['title'] == 'My first project'
+                assert response.json[0]['title'] == self.project2.title
 
                 when('Request is not authorized', authorization=None)
                 assert status == 401

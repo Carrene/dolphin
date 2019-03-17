@@ -9,41 +9,6 @@ from .models import Release, Member, Organization, OrganizationMember,\
 
 def insert(): # pragma: no cover
 
-    release1 = Release(
-        title='My first release',
-        description='This is an awesome product.',
-        cutoff='2030-2-20',
-    )
-    DBSession.add(release1)
-
-    release2 = Release(
-        title='My second release',
-        description='A decription for my release.',
-        cutoff='2022-2-20',
-    )
-    DBSession.add(release2)
-
-    release3 = Release(
-        title='My third release',
-        description='One of the most interesting releases.',
-        cutoff='2027-2-20',
-    )
-    DBSession.add(release3)
-
-    release4 = Release(
-        title='My fourth release',
-        description='A description for fourth release.',
-        cutoff='2030-2-20',
-    )
-    DBSession.add(release4)
-
-    release5 = Release(
-        title='My fifth release',
-        description='This release has awesome projects.',
-        cutoff='2034-2-20',
-    )
-    DBSession.add(release5)
-
     default_workflow = Workflow(title='Default')
 
     public_group = Group(title='Public', public=True)
@@ -93,11 +58,58 @@ def insert(): # pragma: no cover
             reference_id=1
         )
         DBSession.add(god)
+        DBSession.flush()
 
         class Identity:
             email = god.email
+            id = god.id
 
         context.identity = Identity
+
+        release1 = Release(
+            title='My first release',
+            description='This is an awesome product.',
+            cutoff='2030-2-20',
+            launch_date='2030-2-20',
+            manager_id=god.id,
+        )
+        DBSession.add(release1)
+
+        release2 = Release(
+            title='My second release',
+            description='A decription for my release.',
+            cutoff='2022-2-20',
+            launch_date='2030-2-20',
+            manager_id=god.id,
+        )
+        DBSession.add(release2)
+
+        release3 = Release(
+            title='My third release',
+            description='One of the most interesting releases.',
+            cutoff='2027-2-20',
+            launch_date='2030-2-20',
+            manager_id=god.id,
+        )
+        DBSession.add(release3)
+
+        release4 = Release(
+            title='My fourth release',
+            description='A description for fourth release.',
+            cutoff='2030-2-20',
+            launch_date='2030-2-20',
+            manager_id=god.id,
+        )
+        DBSession.add(release4)
+
+        release5 = Release(
+            title='My fifth release',
+            description='This release has awesome projects.',
+            cutoff='2034-2-20',
+            launch_date='2030-2-20',
+            manager_id=god.id,
+        )
+        DBSession.add(release5)
 
         organization = Organization(
             title='carrene',

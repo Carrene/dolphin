@@ -1,5 +1,7 @@
-from auditor.context import Context as AuditLogContext
+from nanohttp import context
+from nanohttp.contexts import Context
 from bddrest import status, when, response
+from auditor.context import Context as AuditLogContext
 
 from dolphin.models import Issue, Project, Member, Workflow, Group, \
     Subscription, Release
@@ -29,6 +31,8 @@ class TestSeeIssue(LocalApplicationTestCase):
             title='My first release',
             description='A decription for my first release',
             cutoff='2030-2-20',
+            launch_date='2030-2-20',
+            manager=member,
         )
 
         project = Project(
@@ -42,42 +46,52 @@ class TestSeeIssue(LocalApplicationTestCase):
         )
         session.add(project)
 
-        cls.issue1 = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            due_date='2020-2-20',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(cls.issue1)
-        session.flush()
+        with Context(dict()):
+            context.identity = member
 
-        cls.subscription_issue1 = Subscription(
-            subscribable_id=cls.issue1.id,
-            member_id=member.id,
-        )
-        session.add(cls.subscription_issue1)
+            cls.issue1 = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                due_date='2020-2-20',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(cls.issue1)
+            session.flush()
 
-        cls.issue2 = Issue(
-            project=project,
-            title='Second issue',
-            description='This is description of second issue',
-            due_date='2016-2-20',
-            kind='feature',
-            days=2,
-            room_id=3
-        )
-        session.add(cls.issue2)
-        session.commit()
-        session.expunge(cls.subscription_issue1)
+            cls.subscription_issue1 = Subscription(
+                subscribable_id=cls.issue1.id,
+                member_id=member.id,
+            )
+            session.add(cls.subscription_issue1)
+
+            one_shot_subscription = Subscription(
+                member_id=member.id,
+                subscribable_id=cls.issue1.id,
+                one_shot=True,
+            )
+            session.add(one_shot_subscription)
+
+            cls.issue2 = Issue(
+                project=project,
+                title='Second issue',
+                description='This is description of second issue',
+                due_date='2016-2-20',
+                kind='feature',
+                days=2,
+                room_id=3
+            )
+            session.add(cls.issue2)
+            session.commit()
+            session.expunge(cls.subscription_issue1)
 
     def test_see(self):
         self.login('member1@example.com')
 
         with oauth_mockup_server(), self.given(
-            f'See a subscribed issues',
+            f'See a issues',
             f'/apiv1/issues/id: {self.issue1.id}',
             f'SEE',
         ):
@@ -88,12 +102,6 @@ class TestSeeIssue(LocalApplicationTestCase):
             session.add(self.subscription_issue1)
             session.expire(self.subscription_issue1)
             assert self.subscription_issue1.seen_at is not None
-
-            when(
-                'See an unsubscribed issue',
-                url_parameters=dict(id=self.issue2.id),
-            )
-            assert status == '637 Not Subscribed Issue'
 
             when(
                 'Issue is invalid',

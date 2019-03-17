@@ -58,6 +58,8 @@ class TestIssue(LocalApplicationTestCase):
             title='My first release',
             description='A decription for my first release',
             cutoff='2030-2-20',
+            launch_date='2030-2-20',
+            manager=cls.member,
         )
 
         cls.project = Project(
@@ -81,8 +83,8 @@ class TestIssue(LocalApplicationTestCase):
         )
         session.add(issue1)
 
-        cls.draft_issue = DraftIssue()
-        session.add(cls.draft_issue)
+        cls.draft_issue1 = DraftIssue()
+        session.add(cls.draft_issue1)
 
         organization = Organization(
             title='organization-title',
@@ -115,15 +117,19 @@ class TestIssue(LocalApplicationTestCase):
         )
         session.add(cls.tag3)
 
-        cls.draft_issue.tags = [cls.tag1, cls.tag2]
+        cls.draft_issue1.tags = [cls.tag1, cls.tag2]
+
+        cls.draft_issue2 = DraftIssue()
+        session.add(cls.draft_issue2)
         session.commit()
 
     def test_finalize(self):
         self.login(self.member.email)
+        session = self.create_session()
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
             f'Define an issue',
-            f'/apiv1/draftissues/id: {self.draft_issue.id}',
+            f'/apiv1/draftissues/id: {self.draft_issue1.id}',
             f'FINALIZE',
             form=dict(
                 title='Defined issue',
@@ -137,9 +143,13 @@ class TestIssue(LocalApplicationTestCase):
             )
         ):
             assert status == 200
-            assert response.json['id'] == self.draft_issue.id
+            assert response.json['id'] == self.draft_issue1.id
             assert response.json['issueId'] is not None
             assert len(response.json['tags']) == 2
+
+            created_issue_id = response.json['issueId']
+            created_issue = session.query(Issue).get(created_issue_id)
+            assert created_issue.modified_by is None
 
             assert len(logs) == 2
             assert isinstance(logs[0], InstantiationLogEntry)
@@ -266,8 +276,8 @@ class TestIssue(LocalApplicationTestCase):
                 form=given | dict(status='progressing') | \
                     dict(title='Another title')
             )
-            assert status == '705 Invalid status, only one of "to-do, '\
-                'in-progress, complete, done, on-hold" will be accepted'
+            assert status == '705 Invalid status, only one of "to-do, ' \
+                'in-progress, done, complete, on-hold" will be accepted'
 
             when(
                 'Trying to pass with invalid form parameters',
@@ -279,6 +289,16 @@ class TestIssue(LocalApplicationTestCase):
 
             when('Request is not authorized', authorization=None)
             assert status == 401
+
+            when(
+                'Trying to pass draft issue bug without related issue',
+                url_parameters=dict(id=self.draft_issue2.id),
+                form=Update(
+                    title='Another title',
+                    kind='bug'
+                )
+            )
+            assert status == '649 The Issue Bug Must Have A Related Issue'
 
             with chat_server_status('404 Not Found'):
                 when(

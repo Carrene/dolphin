@@ -1,7 +1,8 @@
 from auditor.context import Context as AuditLogContext
 from bddrest import status, when, response
 
-from dolphin.models import Issue, Project, Member, Workflow, Group, Release
+from dolphin.models import Issue, Project, Member, Workflow, Group, Release, \
+    Subscription
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
@@ -28,6 +29,8 @@ class TestIssue(LocalApplicationTestCase):
             title='My first release',
             description='A decription for my first release',
             cutoff='2030-2-20',
+            launch_date='2030-2-20',
+            manager=member,
         )
 
         project = Project(
@@ -62,6 +65,15 @@ class TestIssue(LocalApplicationTestCase):
             room_id=3
         )
         session.add(issue2)
+
+        session.flush()
+        subscription = Subscription(
+            member_id=member.id,
+            subscribable_id=cls.issue1.id,
+            one_shot=True,
+        )
+        session.add(subscription)
+
         session.commit()
 
     def test_subscribe(self):

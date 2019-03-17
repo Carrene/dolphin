@@ -1,4 +1,4 @@
-from bddrest import status, response, when, given
+from bddrest import status, response, when, given, Update
 
 from dolphin.models import Release, Member
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
@@ -10,19 +10,30 @@ class TestRelease(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        member = Member(
+        member1 = Member(
             title='First Member',
             email='member1@example.com',
             access_token='access token 1',
             phone=123456789,
             reference_id=1
         )
-        session.add(member)
+        session.add(member1)
+
+        cls.member2 = Member(
+            title='Second Member',
+            email='member2@example.com',
+            access_token='access token 2',
+            phone=123456788,
+            reference_id=2
+        )
+        session.add(cls.member2)
 
         release1 = Release(
             title='My first release',
             description='A decription for my first release',
             cutoff='2030-2-20',
+            launch_date='2030-2-20',
+            manager=member1,
         )
         session.add(release1)
 
@@ -30,6 +41,8 @@ class TestRelease(LocalApplicationTestCase):
             title='My second release',
             description='A decription for my second release',
             cutoff='2030-2-20',
+            launch_date='2030-2-20',
+            manager=member1,
         )
         session.add(release2)
         session.commit()
@@ -41,18 +54,22 @@ class TestRelease(LocalApplicationTestCase):
             'Updating a release',
             '/apiv1/releases/id:1',
             'UPDATE',
-            form=dict(
+            json=dict(
                 title='My interesting release',
                 description='This is my new awesome release',
-                cutoff='2300-2-2',
-                status='in-progress'
+                cutoff='2030-2-21',
+                launchDate='2030-2-21',
+                status='in-progress',
+                managerReferenceId=self.member2.reference_id,
             )
         ):
             assert status == 200
             assert response.json['title'] == 'My interesting release'
             assert response.json['description'] == 'This is my new awesome release'
-            assert response.json['cutoff'] == '2300-02-02T00:00:00'
+            assert response.json['cutoff'] == '2030-02-21T00:00:00'
+            assert response.json['launchDate'] == '2030-02-21T00:00:00'
             assert response.json['status'] == 'in-progress'
+            assert response.json['managerId'] == self.member2.id
 
             when(
                 'Intended release with string type not found',
@@ -62,33 +79,33 @@ class TestRelease(LocalApplicationTestCase):
 
             when(
                 'Intended release with integer type not found',
-                form=given | dict(title='Another title'),
+                json=given | dict(title='Another title'),
                 url_parameters=dict(id=100)
             )
             assert status == 404
 
             when(
                 'Title length is more than limit',
-                form=given | dict(title=((128 + 1) * 'a'))
+                json=given | dict(title=((128 + 1) * 'a'))
             )
             assert status == '704 At Most 128 Characters Are Valid For Title'
 
             when(
                 'Title is repetitive',
-                form=given | dict(title='My second release')
+                json=given | dict(title='My second release')
             )
             assert status == '600 Another release with title: "My second '\
                 'release" is already exists.'
 
             when(
                 'Title format is wrong',
-                form=given | dict(title=' Invalid Format ')
+                json=given | dict(title=' Invalid Format ')
             )
             assert status == '747 Invalid Title Format'
 
             when(
                 'Description length is less than limit',
-                form=given | dict(
+                json=given | dict(
                     description=((8192 + 1) * 'a'),
                 )
             )
@@ -97,20 +114,53 @@ class TestRelease(LocalApplicationTestCase):
 
             when(
                 'Cutoff format is wrong',
-                form=given | dict(
+                json=given | dict(
                     cutoff='30-20-20',
                 )
             )
             assert status == '702 Invalid Cutoff Format'
 
             when(
+                'Launch date format is wrong',
+                json=Update(launchDate='30-20-20')
+            )
+            assert status == '784 Invalid Launch Date Format'
+
+            when(
+                'The cutoff date greater than launch date',
+                json=Update(cutoff='2030-2-25')
+            )
+            assert status == '651 The Launch Date Must Greater Than Cutoff Date'
+
+            when(
+                'The launch date less than cutoff date',
+                json=Update(launchDate='2030-2-15')
+            )
+            assert status == '651 The Launch Date Must Greater Than Cutoff Date'
+
+            when(
                 'Invalid status in form',
-                form=given | dict(
+                json=given | dict(
                     status='progressing',
                 )
             )
             assert status == '705 Invalid status value, only one of '\
                 '"in-progress, on-hold, delayed, complete" will be accepted'
+
+            when(
+                'Manager reference id is null',
+                json=Update(title='New Release', managerReferenceId=None)
+            )
+            assert status == '778 Manager Reference Id Is Null'
+
+            when(
+                'Manager is not found',
+                json=Update(title='New Release', managerReferenceId=0)
+            )
+            assert status == '608 Manager Not Found'
+
+            when('Trying to pass without form', json={})
+            assert status == '708 No Parameter Exists In The Form'
 
             when('Request is not authorized', authorization=None)
             assert status == 401
@@ -119,7 +169,7 @@ class TestRelease(LocalApplicationTestCase):
             'Send HTTP request with empty form parameter',
             '/apiv1/releases/id:1',
             'UPDATE',
-            form=dict()
+            json=dict()
         ):
             assert status == '708 No Parameter Exists In The Form'
 

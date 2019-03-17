@@ -27,6 +27,8 @@ class TestRelease(LocalApplicationTestCase):
             title='My first release',
             description='A decription for my first release',
             cutoff='2030-2-20',
+            launch_date='2030-2-20',
+            manager=member,
         )
         session.add(cls.release1)
 
@@ -34,6 +36,8 @@ class TestRelease(LocalApplicationTestCase):
             title='My second release',
             description='A decription for my second release',
             cutoff='2030-2-20',
+            launch_date='2030-2-20',
+            manager=member,
         )
         session.add(release2)
         session.commit()

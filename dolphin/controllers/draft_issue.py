@@ -6,7 +6,8 @@ from restfulpy.orm import commit, DBSession
 from sqlalchemy import and_, exists
 
 from ..backends import ChatClient
-from ..exceptions import RoomMemberAlreadyExist, ChatRoomNotFound
+from ..exceptions import RoomMemberAlreadyExist, ChatRoomNotFound, \
+    HTTPIssueBugMustHaveRelatedIssue
 from ..models import Issue, Phase, Item, Member, DraftIssue, DraftIssueTag, \
     Tag, Skill, Resource, IssueTag, RelatedIssue, DraftIssueIssue
 from ..validators import draft_issue_finalize_validator, \
@@ -105,6 +106,9 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
 
         issue = Issue()
         issue.update_from_request()
+
+        if issue.kind == 'bug' and not draft_issue.related_issues:
+            raise HTTPIssueBugMustHaveRelatedIssue()
 
         current_member = Member.current()
         room = self._ensure_room(

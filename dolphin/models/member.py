@@ -45,15 +45,12 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             'valid',
         example='John Doe',
         label='Full Name',
-        watermark='John Doe',
-        message='Enter your full name',
     )
     title = Field(
         String,
         max_length=50,
         min_length=1,
         label='Title',
-        watermark='Enter the title',
         nullable=False,
         not_none=False,
         required=True,
@@ -69,16 +66,13 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         python_type=str,
         pattern=r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)',
         pattern_description='Invalid email format, example: user@example.com',
-        watermark='user@example.com',
         example='user@example.com',
         label='Email Address',
-        message='Enter your email address',
     )
     access_token = Field(Unicode(512), protected=True)
     phone = Field(
         BigInteger,
         label='Phone',
-        watermark='Enter your phone number',
         nullable=True,
         required=False,
         unique=True,
@@ -100,7 +94,25 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         back_populates='members',
     )
 
-    projects = relationship('Project', back_populates='manager', protected=True)
+    projects = relationship(
+        'Project',
+        primaryjoin='Project.manager_id == Member.id',
+        back_populates='manager',
+        protected=True
+    )
+
+    secondary_projects = relationship(
+        'Project',
+        primaryjoin='Project.secondary_manager_id == Member.id',
+        back_populates='secondary_manager',
+        protected=True
+    )
+
+    releases = relationship(
+        'Release',
+        back_populates='manager',
+        protected=True
+    )
 
     phases = relationship(
         'Phase',
@@ -159,3 +171,4 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     def __repr__(self):
         return f'\tTitle: {self.title}, Email: {self.email}\n'
+

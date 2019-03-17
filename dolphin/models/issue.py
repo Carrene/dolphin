@@ -1,20 +1,19 @@
 from datetime import datetime
 
+from auditor import observe
 from nanohttp import context
 from restfulpy.orm import Field, DeclarativeBase, relationship, \
-    ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin
+    OrderingMixin, FilteringMixin, PaginationMixin
 from restfulpy.orm.metadata import MetadataField
 from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
     DateTime, case, join
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import column_property
-from auditor import observe
 
+from ..mixins import ModifiedByMixin
 from .item import Item
-from .subscribable import Subscribable, Subscription
-from .phase import Phase
-from .tag import Tag
 from .member import Member
+from .subscribable import Subscribable, Subscription
 
 
 class IssueTag(DeclarativeBase):
@@ -42,8 +41,8 @@ class RelatedIssue(DeclarativeBase):
 issue_statuses = [
     'to-do',
     'in-progress',
-    'complete',
     'done',
+    'complete',
     'on-hold',
 ]
 
@@ -64,12 +63,11 @@ issue_priorities = [
 class Boarding:
     ontime =    (1, 'on-time')
     delayed =   (2, 'delayed')
-    frozen =    (3, 'frozedn')
+    frozen =    (3, 'frozen')
     atrisk =    (4, 'at-risk')
 
 
-# FIXME: Remove the '\' from Issue inheritance definition
-class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
+class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             Subscribable):
 
     __tablename__ = 'issue'
@@ -208,44 +206,45 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
     )
 
     is_subscribed = column_property(
-        select([func.count(Subscription.member_id)]) \
+        select([func.count(Subscription.member_id)])
         .select_from(
             join(Subscription, Member, Subscription.member_id == Member.id)
-        ) \
-        .where(Subscription.subscribable_id == id) \
+        )
+        .where(Subscription.subscribable_id == id)
         .where(Member.reference_id == bindparam(
-                'reference_id',
-                callable_=lambda:
-                    context.identity.reference_id
-                    if context.identity else
-                    None
+            'reference_id',
+            callable_=lambda:
+                context.identity.reference_id if context.identity else None
             )
-        ) \
+        )
+        .where(Subscription.one_shot.is_(None))
         .correlate_except(Subscription),
         deferred=True
     )
 
     seen_at = column_property(
-        select([Subscription.seen_at]) \
+        select([Subscription.seen_at])
         .select_from(
             join(Subscription, Member, Subscription.member_id == Member.id)
-        ) \
-        .where(Subscription.subscribable_id == id) \
+        )
+        .where(Subscription.subscribable_id == id)
         .where(Member.reference_id == bindparam(
-                'reference_id',
-                callable_=lambda:
-                    context.identity.reference_id
-                    if context.identity else
-                    None
+            'reference_id',
+            callable_=lambda:
+                context.identity.reference_id if context.identity else None
             )
-        ) \
+        )
+        .where(Subscription.one_shot.is_(None))
         .correlate_except(Subscription),
         deferred=True
     )
 
     @hybrid_property
     def boarding_value(self):
-        if self.due_date < datetime.now():
+        if self.status == 'on-hold':
+            return Boarding.frozen[0]
+
+        elif self.due_date < datetime.now():
             return Boarding.delayed[0]
 
         return Boarding.ontime[0]
@@ -253,13 +252,17 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
     @boarding_value.expression
     def boarding_value(cls):
         return case([
+            (cls.status == 'on-hold', Boarding.frozen[0]),
             (cls.due_date < datetime.now(), Boarding.delayed[0]),
             (cls.due_date > datetime.now(), Boarding.ontime[0])
         ])
 
     @hybrid_property
     def boarding(self):
-        if self.due_date < datetime.now():
+        if self.status == 'on-hold':
+            return Boarding.frozen[1]
+
+        elif self.due_date < datetime.now():
             return Boarding.delayed[1]
 
         return Boarding.ontime[1]
@@ -267,6 +270,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
     @boarding.expression
     def boarding(cls):
         return case([
+            (cls.status == 'on-hold', Boarding.frozen[1]),
             (cls.due_date < datetime.now(), Boarding.delayed[1]),
             (cls.due_date > datetime.now(), Boarding.ontime[1])
         ])
@@ -277,7 +281,7 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
         yield MetadataField(
             name='boarding',
             key='boarding',
-            label='Pace',
+            label='Tempo',
             required=False,
             readonly=True
         )
@@ -341,12 +345,20 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
             required=False,
             readonly=True
         )
+        yield MetadataField(
+            name='unread',
+            key='unread',
+            label='unread',
+            required=False,
+            readonly=True
+        )
 
     def to_dict(self, include_relations=True):
         issue_dict = super().to_dict()
         issue_dict['boarding'] = self.boarding
         issue_dict['isSubscribed'] = True if self.is_subscribed else False
-        issue_dict['seenAt'] = self.seen_at.isoformat() if self.seen_at else None
+        issue_dict['seenAt'] \
+            = self.seen_at.isoformat() if self.seen_at else None
 
         if include_relations:
             issue_dict['relations'] = []
@@ -359,7 +371,8 @@ class Issue(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
 
     @classmethod
     def __declare_last__(cls):
-        observe(cls, ['modified_at', 'project_id'])
+        super().__declare_last__()
+        observe(cls, ['modified_at', 'project_id', 'modified_by'])
 
     def get_room_title(self):
         return f'{self.title.lower()}-{self.project_id}'
