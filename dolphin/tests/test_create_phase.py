@@ -1,6 +1,6 @@
 from bddrest import status, response, when
 
-from dolphin.models import Member, Phase
+from dolphin.models import Member, Phase, Skill
 from dolphin.tests.helpers import create_workflow, LocalApplicationTestCase, \
     oauth_mockup_server
 
@@ -20,10 +20,18 @@ class TestPhase(LocalApplicationTestCase):
         )
         session.add(cls.member)
 
+        skill = Skill(title='skill 1')
+        session.add(skill)
+
         cls.workflow = create_workflow()
         session.add(cls.workflow)
 
-        cls.phase = Phase(title='phase1', order=1)
+        cls.phase = Phase(
+            title='phase 1',
+            order=1,
+            skill=skill,
+            workflow=cls.workflow,
+        )
         session.add(cls.phase)
         session.commit()
 
@@ -32,9 +40,9 @@ class TestPhase(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             'Creating a phase',
-            f'/apiv1/workflows/id: {cls.workflow.id}/phases',
+            f'/apiv1/workflows/id: {self.workflow.id}/phases',
             'CREATE',
-            json=dict(title=title),
+            json=dict(title='new phase'),
         ):
             assert status == 200
             assert response.json['title'] == title
