@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from nanohttp import context, json, HTTPForbidden, settings
 from restfulpy.authorization import authorize
-from restfulpy.controllers import ModelRestController
+from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import commit, DBSession
 from sqlalchemy import exists, and_
 from sqlalchemy_media import store_manager
@@ -14,7 +14,7 @@ from ..tokens import OrganizationInvitationToken
 from ..validators import organization_invite_validator
 
 
-class InvitationController(ModelRestController):
+class InvitationController(ModelRestController, JsonPatchControllerMixin):
     __model__ = Invitation
 
     def __init__(self, organization=None):
