@@ -20,8 +20,8 @@ class TestPhase(LocalApplicationTestCase):
         )
         session.add(cls.member)
 
-        skill = Skill(title='skill 1')
-        session.add(skill)
+        cls.skill = Skill(title='skill 1')
+        session.add(cls.skill)
 
         cls.workflow = create_workflow()
         session.add(cls.workflow)
@@ -29,7 +29,7 @@ class TestPhase(LocalApplicationTestCase):
         cls.phase = Phase(
             title='phase 1',
             order=1,
-            skill=skill,
+            skill=cls.skill,
             workflow=cls.workflow,
         )
         session.add(cls.phase)
@@ -42,11 +42,17 @@ class TestPhase(LocalApplicationTestCase):
             'Creating a phase',
             f'/apiv1/workflows/id: {self.workflow.id}/phases',
             'CREATE',
-            json=dict(title='new phase'),
+            json=dict(
+                title='new phase',
+                skill_id=self.skill.id,
+                order=self.phase.order + 1
+            ),
         ):
             assert status == 200
-            assert response.json['title'] == title
             assert response.json['id'] is not None
+            assert response.json['title'] == title
+            assert response.json['order'] == self.phase.order
+            assert response.json['skillId'] == self.skill.id
 
             when(
                 'Title is repetitive',
