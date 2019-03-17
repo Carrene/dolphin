@@ -1,16 +1,10 @@
 from bddrest import status, when
-from restfulpy.messaging import create_messenger
 
 from dolphin.models import Member, Organization, OrganizationMember
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
-class TestIssue(LocalApplicationTestCase):
-
-    __configuration__ = '''
-      messaging:
-        default_messenger: restfulpy.mockup.MockupMessenger
-    '''
+class TestInvitation(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
@@ -57,13 +51,12 @@ class TestIssue(LocalApplicationTestCase):
         session.commit()
 
     def test_invite(self):
-        messenger = create_messenger()
         self.login(email=self.member1.email)
 
         with oauth_mockup_server(), self.given(
             f'Inviting to the organization has successfully created',
-            url=f'/apiv1/organizations/id: {self.organization.id}/invitations',
-            verb=f'PATCH',
+            f'/apiv1/organizations/id: {self.organization.id}/invitations',
+            f'PATCH',
             json=[
                 dict(
                     op='CREATE',
