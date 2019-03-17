@@ -1,10 +1,10 @@
-from nanohttp import json
+from nanohttp import json, int_or_notfound , HTTPNotFound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 
 from ..models import Skill
-from ..validators import skill_create_validator
+from ..validators import skill_create_validator, skill_update_validator
 
 
 FORM_WHITELIST = [
@@ -32,6 +32,27 @@ class SkillController(ModelRestController):
     @commit
     def create(self):
         skill = Skill()
+        skill.update_from_request()
+        DBSession.add(skill)
+        return skill
+
+    @authorize
+    @json(
+        prevent_empty_form='708 Empty Form',
+        form_whitelist=(
+            FORM_WHITELIST,
+            f'707 Invalid field, only following fields are accepted: '
+            f'{FORM_WHITELISTS_STRING}'
+        )
+    )
+    @skill_update_validator
+    @commit
+    def update(self, id):
+        id = int_or_notfound(id)
+        skill = DBSession.query(Skill).get(id)
+        if skill is None:
+            raise HTTPNotFound()
+
         skill.update_from_request()
         DBSession.add(skill)
         return skill

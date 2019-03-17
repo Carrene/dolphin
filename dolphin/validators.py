@@ -631,3 +631,18 @@ skill_create_validator = validate(
     ),
 )
 
+
+skill_update_validator = validate(
+    description=dict(
+        max_length=(
+            512,
+            '703 At Most 512 Characters Are Valid For Description'
+        ),
+    ),
+    title = dict(
+        not_none='727 Title Is Null',
+        max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
+        callback=skill_exists_validator,
+    ),
+)
+
