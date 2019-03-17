@@ -1,10 +1,11 @@
 from nanohttp import json, HTTPNotFound, HTTPUnauthorized, context, \
-    int_or_notfound
+    int_or_notfound, HTTPStatus
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 
-from ..models import Phase, Skill
+from ..validators  import phase_validator
+from ..models import Phase, Member
 from .resource import ResourceController
 from ..validators import phase_update_validator
 from ..exceptions import HTTPRepetitiveTitle, HTTPSkillNotFound, \
@@ -72,6 +73,7 @@ class PhaseController(ModelRestController):
         return phase
 
     @authorize
+<<<<<<< HEAD
     @json(form_whitelist=(
         FORM_WHITELIST,
         f'707 Invalid field, only following fields are accepted: '
@@ -120,5 +122,23 @@ class PhaseController(ModelRestController):
         if phase is None:
             raise HTTPNotFound()
 
+        return phase
+
+    @phase_validator
+    @json
+    @commit
+    def create(self):
+        form = context.form
+        token = context.identity
+        member = DBSession.query(Member).get(token.id)
+        if member is None:
+            raise HTTPSecondaryManagerNotFound
+
+        phase = Phase()
+        phase.update_from_request()
+        phase.workflow = self.workflow
+        phase.skill_id = form['skill_id']
+
+        DBSession.add(phase)
         return phase
 

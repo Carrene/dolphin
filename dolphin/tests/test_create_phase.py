@@ -1,4 +1,4 @@
-from bddrest import status, response, when
+from bddrest import status, response, when, given
 
 from dolphin.models import Member, Phase, Skill
 from dolphin.tests.helpers import create_workflow, LocalApplicationTestCase, \
@@ -37,13 +37,14 @@ class TestPhase(LocalApplicationTestCase):
 
     def test_create(self):
         self.login(self.member.email)
+        title = 'new phase'
 
         with oauth_mockup_server(), self.given(
             'Creating a phase',
             f'/apiv1/workflows/id: {self.workflow.id}/phases',
             'CREATE',
             json=dict(
-                title='new phase',
+                title=title,
                 skill_id=self.skill.id,
                 order=self.phase.order + 1
             ),
@@ -51,32 +52,26 @@ class TestPhase(LocalApplicationTestCase):
             assert status == 200
             assert response.json['id'] is not None
             assert response.json['title'] == title
-            assert response.json['order'] == self.phase.order
+            assert response.json['order'] == self.phase.order + 1
             assert response.json['skillId'] == self.skill.id
 
             when(
                 'Title is repetitive',
-                json=given | dict(title=cls.phase.title)
+                json=given | dict(title=self.phase.title)
             )
             assert status == '600 Repetitive Title'
 
             when(
                 'Order is repetitive',
-                json=given | dict(title=cls.phase.order)
-            )
-            assert status == '615 Repetitive Order'
-
-            when(
-                'Order is repetitive',
-                json=given | dict(title=cls.phase.order)
+                json=given | dict(order=self.phase.order, title='new title')
             )
             assert status == '615 Repetitive Order'
 
             when(
                 'Title length is more than limit',
-                json=given | dict(title=('a' * 50) + 1)
+                json=given | dict(title=(50 + 1) * 'a')
             )
-            assert status == '615 Repetitive Order'
+            assert status == '704 At Most 50 Characters Valid For Title'
 
             when('Title is not in form', json=given - 'title')
             assert status == '610 Title Not In Form'
