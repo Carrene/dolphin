@@ -4,7 +4,7 @@ from dolphin.models import Member, Skill
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
-class TestGroup(LocalApplicationTestCase):
+class TestSkill(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
