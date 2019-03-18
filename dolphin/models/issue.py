@@ -41,9 +41,9 @@ class RelatedIssue(DeclarativeBase):
 issue_statuses = [
     'to-do',
     'in-progress',
-    'done',
-    'complete',
     'on-hold',
+    'complete',
+    'done',
 ]
 
 
