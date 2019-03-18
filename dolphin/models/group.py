@@ -1,5 +1,12 @@
 from restfulpy.orm import DeclarativeBase, Field, relationship
-from sqlalchemy import Integer, String, BOOLEAN
+from sqlalchemy import Integer, String, BOOLEAN, ForeignKey
+
+
+class GroupMember(DeclarativeBase):
+    __tablename__ = 'group_member'
+
+    group_id = Field(Integer, ForeignKey('group.id'), primary_key=True)
+    member_id= Field(Integer, ForeignKey('member.id'), primary_key=True)
 
 
 class Group(DeclarativeBase):
@@ -39,6 +46,14 @@ class Group(DeclarativeBase):
     )
 
     projects = relationship('Project', back_populates='group', protected=True)
+
+    members = relationship(
+        'Member',
+        secondary='group_member',
+        lazy='selectin',
+        back_populates='groups',
+        protected=True,
+    )
 
     def __repr__(self):
         return f'\tTitle: {self.title}, Public: {self.public}'

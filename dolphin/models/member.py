@@ -138,6 +138,13 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         protected=True
     )
     attachments = relationship('Attachment', lazy='selectin')
+    groups = relationship(
+        'Group',
+        secondary='group_member',
+        lazy='selectin',
+        back_populates='members',
+        protected=True,
+    )
 
     @property
     def roles(self):
