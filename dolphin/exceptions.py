@@ -109,7 +109,7 @@ class HTTPIssueNotFound(HTTPKnownStatus):
 
 
 class HTTPMemberNotFound(HTTPKnownStatus):
-    status = '110 Member Not Found'
+    status = '610 Member Not Found'
 
 
 class HTTPAlreadyAddedToGroup(HTTPKnownStatus):

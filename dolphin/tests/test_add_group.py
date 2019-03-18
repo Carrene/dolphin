@@ -68,7 +68,7 @@ class TestGroup(LocalApplicationTestCase):
                 'Member is not found',
                 json=dict(memberId=0),
             )
-            assert status == '110 Member Not Found'
+            assert status == '610 Member Not Found'
 
             when(
                 'Trying to pass with invalid member id type',
