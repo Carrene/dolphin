@@ -89,7 +89,7 @@ class TestGroup(LocalApplicationTestCase):
             assert status == '774 Member Id Is Null'
 
             when(
-                'The member addready added to group',
+                'The member already added to group',
                 json=dict(memberId=self.member2.id)
             )
             assert status == '652 Already Added To Group'
