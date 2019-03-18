@@ -577,6 +577,15 @@ group_add_validator = validate(
 )
 
 
+group_remove_validator = validate(
+    memberId=dict(
+        not_none='774 Member Id Is Null',
+        required='735 Member Id Not In Form',
+        type_=(int , '736 Invalid Member Id Type'),
+    ),
+)
+
+
 workflow_create_validator = validate(
     title=dict(
         not_none='727 Title Is None',
