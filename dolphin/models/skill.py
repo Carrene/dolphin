@@ -28,6 +28,17 @@ class Skill(DeclarativeBase):
         required=True,
         python_type=str
     )
+    description = Field(
+        String(512),
+        max_length=512,
+        label='Description',
+        watermark='Lorem Ipusm',
+        not_none=False,
+        nullable=True,
+        required=False,
+        python_type=str,
+        example='Lorem Ipsum'
+    )
 
     phases = relationship(
         'Phase',
