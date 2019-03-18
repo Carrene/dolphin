@@ -28,7 +28,6 @@ class TestGroup(LocalApplicationTestCase):
         )
         session.add(cls.member2)
 
-
         cls.group = Group(
             title='first group',
         )
@@ -46,13 +45,14 @@ class TestGroup(LocalApplicationTestCase):
         self.login(self.member1.email)
 
         with oauth_mockup_server(), self.given(
-            'Adding a member to a group',
+            f'Adding a member to a group',
             f'/apiv1/groups/id: {self.group.id}',
-            'ADD',
+            f'ADD',
             json=dict(memberId=self.member1.id),
         ):
             assert status == 200
             assert response.json['id'] == self.group.id
+
             session = self.create_session()
             assert session.query(GroupMember) \
                 .filter(
