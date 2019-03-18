@@ -1,4 +1,4 @@
-from bddrest import status, response, when, Remove, Update
+from bddrest import status, response, when, Update
 
 from dolphin.models import Member, Skill
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
