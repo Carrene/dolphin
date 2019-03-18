@@ -9,7 +9,7 @@ from .resource import Resource
 from .guest import Guest
 from .team import Team
 from .item import Item
-from .group import Group
+from .group import Group, GroupMember
 from .workflow import Workflow
 from .organization import OrganizationMember, Organization
 from .messaging import OrganizationInvitationEmail

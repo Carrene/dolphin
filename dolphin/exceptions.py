@@ -107,3 +107,11 @@ class HTTPLaunchDateMustGreaterThanCutoffDate(HTTPKnownStatus):
 class HTTPIssueNotFound(HTTPKnownStatus):
     status = '605 Issue Not Found'
 
+
+class HTTPMemberNotFound(HTTPKnownStatus):
+    status = '610 Member Not Found'
+
+
+class HTTPAlreadyAddedToGroup(HTTPKnownStatus):
+    status = '652 Already Added To Group'
+
