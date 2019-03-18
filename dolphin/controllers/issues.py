@@ -674,7 +674,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             type_=int,
             required=True,
         ),
-        memberId=dict(
+        memberReferenceId=dict(
             type_=int,
             required=True,
         ),
@@ -688,12 +688,16 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         if issue is None:
             raise HTTPIssueNotFound()
 
-        member = DBSession.query(Member).get(context.query['memberId'])
+        member = DBSession.query(Member) \
+            .filter(
+                Member.reference_id == context.query['memberReferenceId']
+            ) \
+            .one_or_none()
         if member is None:
             raise HTTPStatus('610 Member Not Found')
 
         subscription = Subscription(
-            member_id=member.reference_id,
+            member_id=member.id,
             subscribable_id=issue.id,
             one_shot=True,
         )
