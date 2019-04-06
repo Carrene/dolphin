@@ -189,7 +189,7 @@ class TestIssue(LocalApplicationTestCase):
                     dict(title='Another title')
             )
             assert status == '705 Invalid status, only one of "to-do, ' \
-                'in-progress, done, complete, on-hold" will be accepted'
+                'in-progress, on-hold, complete, done" will be accepted'
             assert status.text.startswith('Invalid status')
 
             when(
