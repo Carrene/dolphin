@@ -34,6 +34,18 @@ class Workflow(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         required=True,
         python_type=str
     )
+    description = Field(
+        String,
+        min_length=1,
+        max_length=8192,
+        label='Description',
+        watermark='Lorem Ipsum',
+        not_none=False,
+        nullable=True,
+        required=False,
+        python_type=str,
+        example='Lorem Ipsum'
+    )
 
     phases = relationship(
         'Phase',

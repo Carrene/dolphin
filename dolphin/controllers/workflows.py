@@ -40,7 +40,8 @@ class WorkflowController(ModelRestController):
     @commit
     def create(self):
         workflow = Workflow(
-            title=context.form.get('title')
+            title=context.form.get('title'),
+            description=context.form.get('description'),
         )
         DBSession.add(workflow)
         return workflow
