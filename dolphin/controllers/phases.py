@@ -55,6 +55,7 @@ class PhaseController(ModelRestController):
     def list(self):
         query = DBSession.query(Phase) \
             .filter(Phase.workflow_id == self.workflow.id)
+
         return query
 
     @authorize
@@ -70,6 +71,7 @@ class PhaseController(ModelRestController):
 
         phase.issues.append(self.issue)
         DBSession.add(phase)
+
         return phase
 
     @authorize
@@ -131,6 +133,7 @@ class PhaseController(ModelRestController):
         form = context.form
         token = context.identity
         member = DBSession.query(Member).get(token.id)
+
         if member is None:
             raise HTTPSecondaryManagerNotFound
 
@@ -138,7 +141,7 @@ class PhaseController(ModelRestController):
         phase.update_from_request()
         phase.workflow = self.workflow
         phase.skill_id = form['skill_id']
-
         DBSession.add(phase)
+
         return phase
 

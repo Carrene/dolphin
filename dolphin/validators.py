@@ -266,6 +266,7 @@ def phase_not_exists_validator(title, project, field):
     phase = DBSession.query(Phase).filter(Phase.title == title).one_or_none()
     if phase is not None:
         raise HTTPStatus('600 Repetitive Title')
+
     return title
 
 def phase_order_exists_validator(order, project, field):
@@ -273,6 +274,7 @@ def phase_order_exists_validator(order, project, field):
     phase = DBSession.query(Phase).filter(Phase.order == order).one_or_none()
     if phase is not None:
         raise HTTPStatus('615 Repetitive Order')
+
     return order
 
 
