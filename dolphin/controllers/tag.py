@@ -120,9 +120,10 @@ class TagController(ModelRestController, JsonPatchControllerMixin):
     @commit
     def create(self):
         tag = Tag(
+            title=context.form.get('title'),
             organization_id=context.identity.payload['organizationId'],
+            description=context.form.get('description'),
         )
-        tag.update_from_request()
         DBSession.add(tag)
         return tag
 
