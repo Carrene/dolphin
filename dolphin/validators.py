@@ -589,6 +589,12 @@ workflow_create_validator = validate(
 
 
 tag_create_validator = validate(
+    description=dict(
+        max_length=(
+            8192,
+            '703 At Most 8192 Characters Are Valid For Description'
+        )
+    ),
     title=dict(
         not_none='727 Title Is None',
         required='710 Title Not In Form',
