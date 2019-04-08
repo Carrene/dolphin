@@ -1,5 +1,5 @@
 from restfulpy.orm import DeclarativeBase, Field, relationship
-from sqlalchemy import Integer, String, BOOLEAN, ForeignKey
+from sqlalchemy import Integer, String, BOOLEAN, ForeignKey, Unicode
 
 
 class GroupMember(DeclarativeBase):
@@ -45,7 +45,7 @@ class Group(DeclarativeBase):
         label='Public',
     )
     description = Field(
-        String,
+        Unicode,
         min_length=1,
         max_length=8192,
         label='Description',
