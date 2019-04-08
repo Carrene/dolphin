@@ -74,7 +74,7 @@ class TestGroup(LocalApplicationTestCase):
                 'Description length is less than limit',
                 json=Update(description=((8192 + 1) * 'a')),
             )
-            assert status == '703 At Most 8192 Characters Are Valid For '\
+            assert status == '703 At Most 8192 Characters Are Valid For ' \
                 'Description'
 
             when('Request is not authorized', authorization=None)
