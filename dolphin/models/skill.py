@@ -1,8 +1,9 @@
-from restfulpy.orm import DeclarativeBase, Field, relationship
+from restfulpy.orm import DeclarativeBase, Field, relationship, \
+    OrderingMixin, FilteringMixin, PaginationMixin
 from sqlalchemy import Integer, ForeignKey, String
 
 
-class Skill(DeclarativeBase):
+class Skill(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
     __tablename__ = 'skill'
 
     id = Field(
