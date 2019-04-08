@@ -269,6 +269,7 @@ def phase_not_exists_validator(title, project, field):
 
     return title
 
+
 def phase_order_exists_validator(order, project, field):
 
     phase = DBSession.query(Phase).filter(Phase.order == order).one_or_none()
@@ -745,15 +746,14 @@ phase_update_validator = validate(
 
 phase_validator = validate(
     title=dict(
-        callback=phase_not_exists_validator,
         required='610 Title Not In Form',
         max_length=(50, '704 At Most 50 Characters Valid For Title'),
-
+        callback=phase_not_exists_validator,
     ),
     order=dict(
-        callback=phase_order_exists_validator,
-        type_=(int, '741 Invalid Order Type'),
         required='742 Order Not In Form',
+        type_=(int, '741 Invalid Order Type'),
+        callback=phase_order_exists_validator,
     ),
 )
 
