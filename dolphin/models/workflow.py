@@ -1,7 +1,7 @@
 from restfulpy.orm import Field, relationship, SoftDeleteMixin, \
     ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
     DeclarativeBase
-from sqlalchemy import Integer, String
+from sqlalchemy import Integer, String, Unicode
 
 
 class Workflow(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
@@ -33,6 +33,18 @@ class Workflow(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         not_none=True,
         required=True,
         python_type=str
+    )
+    description = Field(
+        Unicode,
+        min_length=1,
+        max_length=8192,
+        label='Description',
+        watermark='Lorem Ipsum',
+        not_none=False,
+        nullable=True,
+        required=False,
+        python_type=str,
+        example='Lorem Ipsum'
     )
 
     phases = relationship(

@@ -1,4 +1,4 @@
-from bddrest import status, response, when
+from bddrest import status, response, when, Update
 
 from dolphin.models import Member
 from dolphin.tests.helpers import create_workflow, LocalApplicationTestCase, \
@@ -27,15 +27,20 @@ class TestWorkflow(LocalApplicationTestCase):
     def test_create(self):
         self.login(self.member.email)
         title = 'first workflow'
+        description = 'a description for a workflow'
 
         with oauth_mockup_server(), self.given(
             'Creating a workflow',
             '/apiv1/workflows',
             'CREATE',
-            json=dict(title=title),
+            json=dict(
+                title=title,
+                description=description,
+            ),
         ):
             assert status == 200
             assert response.json['title'] == title
+            assert response.json['description'] == description
             assert response.json['id'] is not None
 
             when('Trying to pass without form parameters', json={})
@@ -67,6 +72,13 @@ class TestWorkflow(LocalApplicationTestCase):
                 json=dict(title=None)
             )
             assert status == '727 Title Is None'
+
+            when(
+                'Description length is less than limit',
+                json=Update(description=((8192 + 1) * 'a')),
+            )
+            assert status == '703 At Most 8192 Characters Are Valid For ' \
+                'Description'
 
             when('Request is not authorized', authorization=None)
             assert status == 401
