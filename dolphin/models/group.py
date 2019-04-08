@@ -44,6 +44,18 @@ class Group(DeclarativeBase):
         not_none=False,
         label='Public',
     )
+    description = Field(
+        String,
+        min_length=1,
+        max_length=8192,
+        label='Description',
+        watermark='Lorem Ipsum',
+        not_none=False,
+        nullable=True,
+        required=False,
+        python_type=str,
+        example='Lorem Ipsum'
+    )
 
     projects = relationship('Project', back_populates='group', protected=True)
 
