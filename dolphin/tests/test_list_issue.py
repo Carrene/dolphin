@@ -229,8 +229,8 @@ class TestIssue(LocalApplicationTestCase):
             when('Sort issues by status', query=dict(sort='status'))
             assert response.json[0]['status'] == self.issue2.status
             assert response.json[1]['status'] == self.issue1.status
-            assert response.json[2]['status'] == self.issue4.status
-            assert response.json[3]['status'] == self.issue3.status
+            assert response.json[2]['status'] == self.issue3.status
+            assert response.json[3]['status'] == self.issue4.status
 
             when(
                 'Reverse sorting titles by alphabet',
