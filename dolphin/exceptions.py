@@ -119,3 +119,7 @@ class HTTPAlreadyAddedToGroup(HTTPKnownStatus):
 class HTTPMemberNotExistsInGroup(HTTPKnownStatus):
     status = '653 Member Not Exists In Group'
 
+
+class HTTPAlreadyGrantedSkill(HTTPKnownStatus):
+    status = '655 Skill Already Granted'
+

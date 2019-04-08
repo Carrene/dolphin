@@ -145,6 +145,12 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         back_populates='members',
         protected=True,
     )
+    skills = relationship(
+        'Skill',
+        secondary='skill_member',
+        back_populates='members',
+        protected=True,
+    )
 
     @property
     def roles(self):
