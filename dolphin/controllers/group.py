@@ -4,8 +4,10 @@ from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 
 from ..models import Group, GroupMember, Member
-from ..validators import group_create_validator, group_add_validator
-from ..exceptions import HTTPMemberNotFound, HTTPAlreadyAddedToGroup
+from ..validators import group_create_validator, group_add_validator, \
+    group_remove_validator
+from ..exceptions import HTTPMemberNotFound, HTTPAlreadyAddedToGroup, \
+    HTTPMemberNotExistsInGroup
 
 
 class GroupController(ModelRestController):
@@ -65,5 +67,31 @@ class GroupController(ModelRestController):
             raise HTTPAlreadyAddedToGroup()
 
         group.members.append(member)
+        return group
+
+    @authorize
+    @json(prevent_empty_form='708 Empty Form')
+    @group_remove_validator
+    @commit
+    def remove(self, id):
+        id = int_or_notfound(id)
+        group = DBSession.query(Group).get(id)
+        if group is None:
+            raise HTTPNotFound()
+
+        member = DBSession.query(Member).get(context.form.get('memberId'))
+        if member is None:
+            raise HTTPMemberNotFound()
+
+        group_member = DBSession.query(GroupMember) \
+            .filter(
+                GroupMember.group_id == id,
+                GroupMember.member_id == member.id
+            ) \
+            .one_or_none()
+        if group_member is None:
+            raise HTTPMemberNotExistsInGroup()
+
+        group.members.remove(member)
         return group
 

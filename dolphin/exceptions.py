@@ -115,3 +115,7 @@ class HTTPMemberNotFound(HTTPKnownStatus):
 class HTTPAlreadyAddedToGroup(HTTPKnownStatus):
     status = '652 Already Added To Group'
 
+
+class HTTPMemberNotExistsInGroup(HTTPKnownStatus):
+    status = '653 Member Not Exists In Group'
+
