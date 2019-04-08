@@ -1,6 +1,6 @@
 from restfulpy.orm import Field, DeclarativeBase, relationship, OrderingMixin, \
     FilteringMixin, PaginationMixin
-from sqlalchemy import Integer, ForeignKey, String
+from sqlalchemy import Integer, ForeignKey, String, Unicode
 
 
 class Tag(DeclarativeBase, OrderingMixin, FilteringMixin, PaginationMixin):
@@ -38,7 +38,7 @@ class Tag(DeclarativeBase, OrderingMixin, FilteringMixin, PaginationMixin):
     )
 
     description = Field(
-        String,
+        Unicode,
         min_length=1,
         max_length=8192,
         label='Description',
