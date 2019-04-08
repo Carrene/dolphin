@@ -62,14 +62,17 @@ class TestMentionedMemberWebhook(LocalApplicationTestCase):
             f'MENTIONED member webhook handler',
             f'/apiv1/issues',
             f'MENTIONED',
-            query=dict(roomId=self.issue1.room_id, memberId=self.member1.id)
+            query=dict(
+                roomId=self.issue1.room_id,
+                memberReferenceId=self.member1.reference_id,
+            )
         ):
             assert status == 204
 
             session = self.create_session()
             one_shot_subscription = session.query(Subscription) \
                 .filter(Subscription.subscribable_id == self.issue1.id) \
-                .filter(Subscription.member_id == self.member1.reference_id) \
+                .filter(Subscription.member_id == self.member1.id) \
                 .filter(Subscription.one_shot.is_(True)) \
                 .one()
             assert one_shot_subscription.seen_at is None
@@ -93,20 +96,20 @@ class TestMentionedMemberWebhook(LocalApplicationTestCase):
             assert status == '605 Issue Not Found'
 
             when(
-                'memberId not in query',
-                query=given - 'memberId',
+                'memberReferenceId not in query',
+                query=given - 'memberReferenceId',
             )
             assert status == 400
 
             when(
-                'memberId must be integer',
-                query=given | dict(memberId='not-integer'),
+                'memberReferenceId must be integer',
+                query=given | dict(memberReferenceId='not-integer'),
             )
             assert status == 400
 
             when(
                 'Member not found',
-                query=given | dict(memberId=0),
+                query=given | dict(memberReferenceId=0),
             )
             assert status == '610 Member Not Found'
 
