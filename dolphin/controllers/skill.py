@@ -1,4 +1,4 @@
-from nanohttp import json, int_or_notfound , HTTPNotFound, context
+from nanohttp import json, int_or_notfound , HTTPNotFound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
