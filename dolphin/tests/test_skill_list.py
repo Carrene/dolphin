@@ -63,7 +63,6 @@ class TestSkill(LocalApplicationTestCase):
             assert response.json[0]['id'] == 1
             assert len(response.json) == 1
 
-            self.logout()
             when('Request is not authorized', authorization=None)
             assert status == 401
 
