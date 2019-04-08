@@ -1,4 +1,4 @@
-from bddrest import status, response, when
+from bddrest import status, response, when, Update
 
 from dolphin.models import Member, Group
 from dolphin.tests.helpers import create_group, LocalApplicationTestCase, \
@@ -27,15 +27,20 @@ class TestGroup(LocalApplicationTestCase):
     def test_create(self):
         self.login(self.member.email)
         title = 'first group'
+        description = 'A description for a group'
 
         with oauth_mockup_server(), self.given(
             'Creating a group',
             '/apiv1/groups',
             'CREATE',
-            json=dict(title=title),
+            json=dict(
+                title=title,
+                description=description,
+            ),
         ):
             assert status == 200
             assert response.json['title'] == title
+            assert response.json['description'] == description
             assert response.json['id'] is not None
 
             when('Trying to pass without form parameters', json={})
@@ -64,6 +69,13 @@ class TestGroup(LocalApplicationTestCase):
                 json=dict(title=None)
             )
             assert status == '727 Title Is None'
+
+            when(
+                'Description length is less than limit',
+                json=Update(description=((8192 + 1) * 'a')),
+            )
+            assert status == '703 At Most 8192 Characters Are Valid For ' \
+                'Description'
 
             when('Request is not authorized', authorization=None)
             assert status == 401

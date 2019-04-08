@@ -35,7 +35,8 @@ class GroupController(ModelRestController):
     @commit
     def create(self):
         group = Group(
-            title=context.form.get('title')
+            title=context.form.get('title'),
+            description=context.form.get('description'),
         )
         DBSession.add(group)
         return group
