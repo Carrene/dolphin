@@ -90,7 +90,7 @@ class TestPhase(LocalApplicationTestCase):
 
             when(
                 'Workflow is not found',
-                url=f'/apiv1/workflows/id: {self.workflow.id}/phases',
+                url=f'/apiv1/workflows/0/phases',
                 json=given | dict(title='new title', order=3)
             )
             assert status == 404
