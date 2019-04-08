@@ -57,3 +57,14 @@ class SkillController(ModelRestController):
         DBSession.add(skill)
         return skill
 
+    @authorize
+    @json(prevent_form='709 Form Not Allowed')
+    def get(self, id):
+        id = int_or_notfound(id)
+        issue = DBSession.query(Skill).get(id)
+        if issue is None:
+            raise HTTPNotFound()
+
+        return issue
+
+
