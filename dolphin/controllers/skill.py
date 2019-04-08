@@ -67,4 +67,3 @@ class SkillController(ModelRestController):
 
         return issue
 
-
