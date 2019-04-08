@@ -67,3 +67,9 @@ class SkillController(ModelRestController):
 
         return skill
 
+    @authorize
+    @json(prevent_form='709 Form Not Allowed')
+    @Skill.expose
+    def list(self):
+        return DBSession.query(Skill)
+
