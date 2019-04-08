@@ -3,6 +3,21 @@ from restfulpy.orm import DeclarativeBase, Field, relationship, \
 from sqlalchemy import Integer, ForeignKey, String
 
 
+class SkillMember(DeclarativeBase):
+    __tablename__ = 'skill_member'
+
+    skill_id = Field(
+        Integer,
+        ForeignKey('skill.id'),
+        primary_key=True
+    )
+    member_id = Field(
+        Integer,
+        ForeignKey('member.id'),
+        primary_key=True
+    )
+
+
 class Skill(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
     __tablename__ = 'skill'
 
@@ -50,5 +65,11 @@ class Skill(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
         'Resource',
         back_populates='skill',
         protected=True
+    )
+    members = relationship(
+        'Member',
+        secondary='skill_member',
+        back_populates='skills',
+        protected=True,
     )
 

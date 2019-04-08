@@ -6,6 +6,7 @@ from restfulpy.orm import DBSession
 
 from ..models import Member
 from .organization import OrganizationController
+from .skill import SkillController
 
 
 class MemberController(ModelRestController):
@@ -24,6 +25,15 @@ class MemberController(ModelRestController):
                 raise HTTPNotFound()
 
             return OrganizationController(member=member)(*remaining_paths[2:])
+
+        if len(remaining_paths) > 1 and remaining_paths[1] == 'skills':
+
+            id = int_or_notfound(remaining_paths[0])
+            member = DBSession.query(Member).get(id)
+            if member is None:
+                raise HTTPNotFound()
+
+            return SkillController(member=member)(*remaining_paths[2:])
 
         return super().__call__(*remaining_paths)
 
