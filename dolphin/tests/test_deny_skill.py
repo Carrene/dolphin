@@ -1,8 +1,7 @@
 from bddrest import status, response, when, given
 
 from dolphin.models import Member, Skill, SkillMember
-from dolphin.tests.helpers import LocalApplicationTestCase, \
-    oauth_mockup_server, chat_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
 class TestSkill(LocalApplicationTestCase):
@@ -32,7 +31,7 @@ class TestSkill(LocalApplicationTestCase):
         self.login(self.member.email)
         session = self.create_session()
 
-        with oauth_mockup_server(), chat_mockup_server(), self.given(
+        with oauth_mockup_server(), self.given(
             f'Denying a skill',
             f'/apiv1/members/member_id: {self.member.id}/' \
             f'skills/skill_id: {self.skill.id}',
