@@ -1,4 +1,5 @@
-from nanohttp import json, context, HTTPNotFound, HTTPForbidden
+from nanohttp import json, context, HTTPNotFound, HTTPForbidden, \
+    int_or_notfound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import DBSession, commit
@@ -125,5 +126,18 @@ class TagController(ModelRestController, JsonPatchControllerMixin):
             description=context.form.get('description'),
         )
         DBSession.add(tag)
+        return tag
+
+    @authorize
+    @json(prevent_form='709 Form Not Allowed')
+    def get(self, id):
+        id = int_or_notfound(id)
+        tag = DBSession.query(Tag).get(id)
+        if tag is None:
+            raise HTTPNotFound()
+
+        if tag.organization_id != context.identity.payload['organizationId']:
+            raise HTTPForbidden()
+
         return tag
 
