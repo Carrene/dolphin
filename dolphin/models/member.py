@@ -6,6 +6,7 @@ from restfulpy.orm import DeclarativeBase, Field, relationship, DBSession, \
     SoftDeleteMixin, ModifiedMixin, FilteringMixin, PaginationMixin, \
     OrderingMixin
 from restfulpy.principal import JwtRefreshToken
+from restfulpy.orm.metadata import MetadataField
 from sqlalchemy import Integer, String, Unicode, BigInteger
 
 
@@ -50,7 +51,7 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         String,
         max_length=50,
         min_length=1,
-        label='Title',
+        label='User Name',
         nullable=False,
         not_none=False,
         required=True,
@@ -67,7 +68,7 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         pattern=r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)',
         pattern_description='Invalid email format, example: user@example.com',
         example='user@example.com',
-        label='Email Address',
+        label='Email',
     )
     access_token = Field(Unicode(512), protected=True)
     phone = Field(
@@ -184,4 +185,15 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     def __repr__(self):
         return f'\tTitle: {self.title}, Email: {self.email}\n'
+
+    @classmethod
+    def iter_metadata_fields(cls):
+        yield from super().iter_metadata_fields()
+        yield MetadataField(
+            name='groups',
+            key='groups',
+            label='Groups',
+            required=False,
+            readonly=True
+        )
 

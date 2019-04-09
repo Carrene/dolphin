@@ -18,7 +18,7 @@ class Resource(Member):
     skill_id = Field(
         Integer,
         ForeignKey('skill.id'),
-        label='Skill ID',
+        label='Skills',
         required=True,
         nullable=True,
         not_none=False,

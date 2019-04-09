@@ -27,7 +27,7 @@ class Group(DeclarativeBase):
     title = Field(
         String,
         max_length=50,
-        label='Title',
+        label='Group Name',
         not_none=False,
         required=True,
         unique=True,
