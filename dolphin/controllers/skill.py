@@ -1,10 +1,10 @@
-from nanohttp import json, int_or_notfound , HTTPNotFound
+from nanohttp import json, int_or_notfound , HTTPNotFound, context
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 
 from ..models import Skill, SkillMember
-from ..exceptions import HTTPAlreadyGrantedSkill
+from ..exceptions import HTTPAlreadyGrantedSkill, HTTPSkillNotGrantedYet
 from ..validators import skill_create_validator, skill_update_validator
 
 
@@ -100,5 +100,26 @@ class SkillController(ModelRestController):
             member_id=self.member.id
         )
         DBSession.add(skill_member)
+        return skill
+
+    @authorize
+    @json
+    @commit
+    def deny(self, id):
+        id = int_or_notfound(id)
+        skill = DBSession.query(Skill).get(id)
+
+        if skill is None:
+            raise HTTPNotFound()
+
+        if not DBSession.query(SkillMember) \
+                .filter(
+                    SkillMember.skill_id == id,
+                    SkillMember.member_id == self.member.id
+                ) \
+                .one_or_none():
+            raise HTTPSkillNotGrantedYet()
+
+        skill.members.remove(self.member)
         return skill
 

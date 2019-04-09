@@ -123,3 +123,7 @@ class HTTPMemberNotExistsInGroup(HTTPKnownStatus):
 class HTTPAlreadyGrantedSkill(HTTPKnownStatus):
     status = '655 Skill Already Granted'
 
+
+class HTTPSkillNotGrantedYet(HTTPKnownStatus):
+    status = '656 Skill Not Granted Yet'
+
