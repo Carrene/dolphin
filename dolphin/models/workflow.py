@@ -2,6 +2,8 @@ from restfulpy.orm import Field, relationship, SoftDeleteMixin, \
     ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
     DeclarativeBase
 from sqlalchemy import Integer, String, Unicode
+from restfulpy.orm.metadata import MetadataField
+from sqlalchemy import Integer, String
 
 
 class Workflow(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
@@ -24,7 +26,7 @@ class Workflow(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         String,
         max_length=50,
         min_length=1,
-        label='Name',
+        label='Workflow Name',
         watermark='Enter the name',
         pattern=r'^[^\s].+[^\s]$',
         pattern_description='Spaces at the first and end of title is not valid',
@@ -58,6 +60,15 @@ class Workflow(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         back_populates='workflow',
         protected=True
     )
+
+    @classmethod
+    def iter_metadata_fields(cls):
+        yield from super().iter_metadata_fields()
+        yield MetadataField(
+            name='phases',
+            key='phases',
+            label='Phases',
+        )
 
     def __repr__(self):
         return f'\tTitle: {self.title}\n'

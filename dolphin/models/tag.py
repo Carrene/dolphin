@@ -28,7 +28,7 @@ class Tag(DeclarativeBase, OrderingMixin, FilteringMixin, PaginationMixin):
         String,
         max_length=50,
         min_length=1,
-        label='Title',
+        label='Tag Name',
         watermark='Enter the title',
         example='lorem ipsum',
         nullable=False,
