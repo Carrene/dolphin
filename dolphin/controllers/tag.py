@@ -7,7 +7,7 @@ from sqlalchemy import and_, exists
 
 from ..exceptions import HTTPAlreadyTagAdded, HTTPAlreadyTagRemoved
 from ..models import Tag, DraftIssueTag, IssueTag
-from ..validators import tag_create_validator
+from ..validators import tag_create_validator, tag_update_validator
 
 
 class TagController(ModelRestController, JsonPatchControllerMixin):
@@ -139,5 +139,21 @@ class TagController(ModelRestController, JsonPatchControllerMixin):
         if tag.organization_id != context.identity.payload['organizationId']:
             raise HTTPForbidden()
 
+        return tag
+
+    @authorize
+    @json(prevent_empty_form='708 Empty Form')
+    @tag_update_validator
+    @commit
+    def update(self, id):
+        id = int_or_notfound(id)
+        tag = DBSession.query(Tag).get(id)
+        if tag is None:
+            raise HTTPNotFound()
+
+        if tag.organization_id != context.identity.payload['organizationId']:
+            raise HTTPForbidden()
+
+        tag.update_from_request()
         return tag
 

@@ -625,6 +625,21 @@ tag_create_validator = validate(
 )
 
 
+tag_update_validator = validate(
+    description=dict(
+        max_length=(
+            8192,
+            '703 At Most 8192 Characters Are Valid For Description'
+        )
+    ),
+    title=dict(
+        not_none='727 Title Is None',
+        max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
+        callback=tag_exists_validator,
+    )
+)
+
+
 issue_relate_validator = validate(
     targetIssueId=dict(
         not_none='779 Target Issue Id Is None',
