@@ -48,7 +48,7 @@ class Group(DeclarativeBase):
         Unicode,
         min_length=1,
         max_length=8192,
-        label='Description',
+        label='Group Description',
         watermark='Lorem Ipsum',
         not_none=False,
         nullable=True,
