@@ -38,7 +38,7 @@ class TestWorkflow(LocalApplicationTestCase):
         description = 'Another description'
 
         with oauth_mockup_server(), self.given(
-            'Creating a workflow',
+            'Updating a workflow',
             f'/apiv1/workflows/id: {self.workflow1.id}',
             'UPDATE',
             json=dict(
