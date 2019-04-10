@@ -6,7 +6,7 @@ from restfulpy.orm import DBSession
 from .models import *
 from .models.organization import roles
 from .exceptions import HTTPResourceNotFound, HTTPRepetitiveTitle, \
-    HTTPRelatedIssueNotFound, HTTPRepetitiveOrder
+    HTTPRelatedIssueNotFound
 
 
 TITLE_PATTERN = re.compile(r'^(?!\s).*[^\s]$')
