@@ -100,7 +100,7 @@ class TestTag(LocalApplicationTestCase):
                 'Trying to pass with none title',
                 json=dict(title=None)
             )
-            assert status == '727 Title Is None'
+            assert status == '727 Title Is Null'
 
             when(
                 'Description length is less than limit',
@@ -118,6 +118,13 @@ class TestTag(LocalApplicationTestCase):
                 authorization=self._authentication_token
             )
             assert status == 403
+
+            when(
+                'Invalid parameter is in the form',
+                json=dict(invalid_param='External parameter'),
+            )
+            assert status == '707 Invalid field, only following fields are ' \
+                'accepted: title, description'
 
             when('Request is not authorized', authorization=None)
             assert status == 401

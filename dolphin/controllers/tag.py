@@ -10,6 +10,15 @@ from ..models import Tag, DraftIssueTag, IssueTag
 from ..validators import tag_create_validator, tag_update_validator
 
 
+FORM_WHITELIST = [
+    'title',
+    'description',
+]
+
+
+FORM_WHITELISTS_STRING = ', '.join(FORM_WHITELIST)
+
+
 class TagController(ModelRestController, JsonPatchControllerMixin):
     __model__ = Tag
 
@@ -142,7 +151,14 @@ class TagController(ModelRestController, JsonPatchControllerMixin):
         return tag
 
     @authorize
-    @json(prevent_empty_form='708 Empty Form')
+    @json(
+        prevent_empty_form='708 Empty Form',
+        form_whitelist=(
+            FORM_WHITELIST,
+            f'707 Invalid field, only following fields are accepted: '
+            f'{FORM_WHITELISTS_STRING}'
+        )
+    )
     @tag_update_validator
     @commit
     def update(self, id):
