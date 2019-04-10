@@ -711,3 +711,17 @@ workflow_update_validator = validate(
     ),
 )
 
+
+phase_update_validator = validate(
+    skillId=dict(
+        type_=(int, '788 Invalid Skill Id Type'),
+    ),
+    order=dict(
+        type_=(int, '741 Invalid Order Type'),
+    ),
+    title=dict(
+        not_none='727 Title Is Null',
+        max_length=(50, '704 At Most 50 Characters Valid For Title'),
+    ),
+)
+

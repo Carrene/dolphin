@@ -127,3 +127,11 @@ class HTTPAlreadyGrantedSkill(HTTPKnownStatus):
 class HTTPSkillNotGrantedYet(HTTPKnownStatus):
     status = '656 Skill Not Granted Yet'
 
+
+class HTTPRepetitiveOrder(HTTPKnownStatus):
+    status = '615 Repetitive Order'
+
+
+class HTTPSkillNotFound(HTTPKnownStatus):
+    status = '645 Skill Not Found'
+
