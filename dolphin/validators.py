@@ -6,7 +6,7 @@ from restfulpy.orm import DBSession
 from .models import *
 from .models.organization import roles
 from .exceptions import HTTPResourceNotFound, HTTPRepetitiveTitle, \
-    HTTPRelatedIssueNotFound
+    HTTPRelatedIssueNotFound, HTTPRepetitiveOrder
 
 
 TITLE_PATTERN = re.compile(r'^(?!\s).*[^\s]$')
@@ -693,6 +693,20 @@ workflow_update_validator = validate(
     title = dict(
         not_none='727 Title Is Null',
         max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
+    ),
+)
+
+
+phase_update_validator = validate(
+    skillId=dict(
+        type_=(int, '788 Invalid Skill Id Type'),
+    ),
+    order=dict(
+        type_=(int, '741 Invalid Order Type'),
+    ),
+    title=dict(
+        not_none='727 Title Is Null',
+        max_length=(50, '704 At Most 50 Characters Valid For Title'),
     ),
 )
 
