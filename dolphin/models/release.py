@@ -46,6 +46,12 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
         readonly=True,
         required=True
     )
+    room_id = Field(
+        Integer,
+        readonly=True,
+        nullable=False,
+        python_type=int,
+    )
     status = Field(
         Enum(*release_statuses, name='release_status'),
         python_type=str,
@@ -126,4 +132,7 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
 
     def __repr__(self):
         return f'\tTitle: {self.title}\n'
+
+    def get_room_title(self):
+        return f'{self.title.lower()}-{self.manager_id}'
 
