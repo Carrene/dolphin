@@ -45,6 +45,7 @@ class TestProject(LocalApplicationTestCase):
                 cutoff='2030-2-20',
                 launch_date='2030-2-20',
                 manager=member1,
+                room_id=0,
             )
 
             cls.project1 = Project(
