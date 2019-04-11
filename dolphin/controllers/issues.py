@@ -235,6 +235,30 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                     descending=sorting_columns['tagId']
                 )
 
+            if 'tagTitle' in sorting_expression:
+                if 'tagId' not in context.query or \
+                        'tagId' not in sorting_expression or \
+                        'tagTitle' not in context.query:
+
+                    query = query.join(
+                        IssueTag,
+                        IssueTag.issue_id == Issue.id,
+                        isouter=True
+                    )
+
+                if 'tagTitle' not in context.query:
+                    query = query.join(
+                        Tag,
+                        Tag.id == IssueTag.tag_id,
+                        isouter=True
+                    )
+
+                query = Issue._sort_by_key_value(
+                    query,
+                    column=Tag.title,
+                    descending=sorting_columns['tagTitle']
+                )
+
         if 'unread' in context.query:
             query = query \
                 .join(
