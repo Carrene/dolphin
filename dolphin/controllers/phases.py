@@ -112,3 +112,13 @@ class PhaseController(ModelRestController):
         phase.update_from_request()
         return phase
 
+    @authorize
+    @json(prevent_form='709 Form Not Allowed')
+    def get(self, id):
+        id = int_or_notfound(id)
+        phase = DBSession.query(Phase).get(id)
+        if phase is None:
+            raise HTTPNotFound()
+
+        return phase
+
