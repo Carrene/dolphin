@@ -1,6 +1,6 @@
 from bddrest import status, response, when, given
 
-from dolphin.models import Member, Phase, Skill
+from dolphin.models import Member, Phase, Skill, Workflow
 from dolphin.tests.helpers import create_workflow, LocalApplicationTestCase, \
     oauth_mockup_server
 
@@ -23,16 +23,28 @@ class TestPhase(LocalApplicationTestCase):
         cls.skill = Skill(title='skill 1')
         session.add(cls.skill)
 
-        cls.workflow = create_workflow()
-        session.add(cls.workflow)
+        cls.workflow1 = Workflow(title='Workflow 1')
+        session.add(cls.workflow1)
 
-        cls.phase = Phase(
+
+        cls.workflow2 = Workflow(title='Workflow 2')
+        session.add(cls.workflow2)
+
+        cls.phase1 = Phase(
             title='phase 1',
             order=1,
             skill=cls.skill,
-            workflow=cls.workflow,
+            workflow=cls.workflow1,
         )
-        session.add(cls.phase)
+        session.add(cls.phase1)
+
+        cls.phase2 = Phase(
+            title='phase 1',
+            order=2,
+            skill=cls.skill,
+            workflow=cls.workflow2,
+        )
+        session.add(cls.phase2)
         session.commit()
 
     def test_create(self):
@@ -41,29 +53,35 @@ class TestPhase(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             'Creating a phase',
-            f'/apiv1/workflows/id: {self.workflow.id}/phases',
+            f'/apiv1/workflows/id: {self.workflow1.id}/phases',
             'CREATE',
             json=dict(
                 title=title,
                 skill_id=self.skill.id,
-                order=self.phase.order + 1
+                order=self.phase1.order + 1
             ),
         ):
             assert status == 200
             assert response.json['id'] is not None
             assert response.json['title'] == title
-            assert response.json['order'] == self.phase.order + 1
+            assert response.json['order'] == self.phase1.order + 1
             assert response.json['skillId'] == self.skill.id
 
             when(
+                'Title is same as title of a phase in another workflow',
+                title=given | self.phase2.title
+            )
+            assert status == 200
+
+            when(
                 'Title is repetitive',
-                json=given | dict(title=self.phase.title)
+                json=given | dict(title=self.phase1.title)
             )
             assert status == '600 Repetitive Title'
 
             when(
                 'Order is repetitive',
-                json=given | dict(order=self.phase.order, title='new title')
+                json=given | dict(order=self.phase1.order, title='new title')
             )
             assert status == '615 Repetitive Order'
 
