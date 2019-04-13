@@ -199,14 +199,14 @@ class TestRelease(LocalApplicationTestCase):
 
             with chat_server_status('615 Room Already Exists'):
                 when(
-                    'Chat server faces with internal error',
+                    'Intended room is already exists',
                     json=given | dict(title='Another title')
                 )
                 assert status == 200
 
             with chat_server_status('604 Already Added To Target'):
                 when(
-                    'Chat server faces with internal error',
+                    'Intended member is already added to room',
                     json=given | dict(title='Awesome release')
                 )
                 assert status == 200
