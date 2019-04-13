@@ -66,51 +66,6 @@ def insert(): # pragma: no cover
 
         context.identity = Identity
 
-        release1 = Release(
-            title='My first release',
-            description='This is an awesome product.',
-            cutoff='2030-2-20',
-            launch_date='2030-2-20',
-            manager_id=god.id,
-        )
-        DBSession.add(release1)
-
-        release2 = Release(
-            title='My second release',
-            description='A decription for my release.',
-            cutoff='2022-2-20',
-            launch_date='2030-2-20',
-            manager_id=god.id,
-        )
-        DBSession.add(release2)
-
-        release3 = Release(
-            title='My third release',
-            description='One of the most interesting releases.',
-            cutoff='2027-2-20',
-            launch_date='2030-2-20',
-            manager_id=god.id,
-        )
-        DBSession.add(release3)
-
-        release4 = Release(
-            title='My fourth release',
-            description='A description for fourth release.',
-            cutoff='2030-2-20',
-            launch_date='2030-2-20',
-            manager_id=god.id,
-        )
-        DBSession.add(release4)
-
-        release5 = Release(
-            title='My fifth release',
-            description='This release has awesome projects.',
-            cutoff='2034-2-20',
-            launch_date='2030-2-20',
-            manager_id=god.id,
-        )
-        DBSession.add(release5)
-
         organization = Organization(
             title='carrene',
         )
@@ -139,13 +94,6 @@ def insert(): # pragma: no cover
         )
         organization.tags.append(documentation_tag)
         DBSession.commit()
-
-        print('Following releases have been added:')
-        print(release1)
-        print(release2)
-        print(release3)
-        print(release4)
-        print(release5)
 
         print('Following user has been added:')
         print(god)
