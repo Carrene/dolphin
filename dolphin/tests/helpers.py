@@ -184,8 +184,12 @@ def chat_mockup_server():
                 return [dict(id=1, title='First chat room')]
 
             if _chat_server_status == '604 Already Added To Target' and \
-                    context.method in ('create', 'add'):
+                    context.method in ('create'):
                 return dict(id=10, title='New Room')
+
+            if _chat_server_status == '604 Already Added To Target' and \
+                    context.method in ('add'):
+                raise HTTPStatus(_chat_server_status)
 
             if _chat_server_status == '615 Room Already Exists' and \
                     context.method == 'add':
