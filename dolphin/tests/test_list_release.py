@@ -25,6 +25,7 @@ class TestRelease(LocalApplicationTestCase):
             cutoff='2030-2-20',
             launch_date='2030-2-20',
             manager=member,
+            room_id=0,
         )
         session.add(release1)
 
@@ -34,6 +35,7 @@ class TestRelease(LocalApplicationTestCase):
             cutoff='2030-2-20',
             launch_date='2030-2-20',
             manager=member,
+            room_id=0,
         )
         session.add(release2)
 
@@ -43,6 +45,7 @@ class TestRelease(LocalApplicationTestCase):
             cutoff='2030-2-20',
             launch_date='2030-2-20',
             manager=member,
+            room_id=0,
         )
         session.add(release3)
         session.commit()

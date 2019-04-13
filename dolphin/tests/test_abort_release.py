@@ -24,7 +24,8 @@ class TestRelease(LocalApplicationTestCase):
             description='A decription for my first release',
             cutoff='2030-2-20',
             launch_date='2030-2-20',
-            manager=member
+            manager=member,
+            room_id=0,
         )
         session.add(cls.release)
         session.commit()

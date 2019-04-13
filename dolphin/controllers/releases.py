@@ -3,9 +3,12 @@ from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 
-from ..exceptions import HTTPManagerNotFound, HTTPLaunchDateMustGreaterThanCutoffDate
+from ..exceptions import HTTPManagerNotFound, \
+    HTTPLaunchDateMustGreaterThanCutoffDate, ChatRoomNotFound, \
+    RoomMemberAlreadyExist, RoomMemberNotFound
 from ..models import Release, Subscription, Member
 from ..validators import release_validator, update_release_validator
+from ..backends import ChatClient
 
 
 FORM_WHITELIST = [
@@ -37,6 +40,7 @@ class ReleaseController(ModelRestController):
     @Release.expose
     @commit
     def create(self):
+        token = context.environ['HTTP_AUTHORIZATION']
         member = DBSession.query(Member) \
             .filter(
                 Member.reference_id == context.form['managerReferenceId']
@@ -50,6 +54,29 @@ class ReleaseController(ModelRestController):
         release.update_from_request()
         if release.launch_date < release.cutoff:
             raise HTTPLaunchDateMustGreaterThanCutoffDate()
+
+        chat_client = ChatClient()
+        room = chat_client.create_room(
+            release.get_room_title(),
+            token,
+            member.access_token,
+            context.identity.reference_id
+        )
+        release.room_id = room['id']
+        try:
+            chat_client.add_member(
+                release.room_id,
+                member.reference_id,
+                token,
+                member.access_token
+            )
+
+        except RoomMemberAlreadyExist:
+            # Exception is passed because it means `add_member()` is already
+            # called and `member` successfully added to room. So there is
+            # no need to call `add_member()` API again and re-add the member to
+            # room.
+            pass
 
         DBSession.add(release)
         return release

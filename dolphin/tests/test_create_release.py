@@ -1,7 +1,8 @@
 from bddrest import status, response, when, Remove, given, Update
 
 from dolphin.models import Member, Release
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase, \
+    oauth_mockup_server, chat_mockup_server, chat_server_status
 
 
 class TestRelease(LocalApplicationTestCase):
@@ -24,6 +25,7 @@ class TestRelease(LocalApplicationTestCase):
             cutoff='2030-2-20',
             launch_date='2030-2-20',
             manager=cls.member,
+            room_id=0,
         )
         session.add(release1)
         session.commit()
@@ -31,7 +33,7 @@ class TestRelease(LocalApplicationTestCase):
     def test_create(self):
         self.login('member1@example.com')
 
-        with oauth_mockup_server(), self.given(
+        with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Createing a release',
             '/apiv1/releases',
             'CREATE',
@@ -50,6 +52,7 @@ class TestRelease(LocalApplicationTestCase):
             assert response.json['launchDate'] == '2030-02-20T00:00:00'
             assert response.json['status'] is None
             assert response.json['managerId'] == self.member.reference_id
+            assert response.json['roomId'] is not None
 
             when(
                 'Title is not in form',
@@ -172,6 +175,41 @@ class TestRelease(LocalApplicationTestCase):
             assert status == '707 Invalid field, only following fields are ' \
                 'accepted: title, description, status, cutoff, ' \
                 'managerReferenceId, launchDate'
+
+            with chat_server_status('404 Not Found'):
+                when(
+                    'Chat server is not found',
+                    json=given | dict(title='Another title')
+                )
+                assert status == '617 Chat Server Not Found'
+
+            with chat_server_status('503 Service Not Available'):
+                when(
+                    'Chat server is not available',
+                    json=given | dict(title='Another title')
+                )
+                assert status == '800 Chat Server Not Available'
+
+            with chat_server_status('500 Internal Service Error'):
+                when(
+                    'Chat server faces with internal error',
+                    json=given | dict(title='Another title')
+                )
+                assert status == '801 Chat Server Internal Error'
+
+            with chat_server_status('615 Room Already Exists'):
+                when(
+                    'Intended room is already exists',
+                    json=given | dict(title='Another title')
+                )
+                assert status == 200
+
+            with chat_server_status('604 Already Added To Target'):
+                when(
+                    'Intended member is already added to room',
+                    json=given | dict(title='Awesome release')
+                )
+                assert status == 200
 
             when('Request is not authorized', authorization=None)
             assert status == 401
