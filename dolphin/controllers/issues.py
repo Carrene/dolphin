@@ -138,6 +138,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     def list(self):
         query = DBSession.query(Issue)
         sorting_expression = context.query.get('sort', '').strip()
+        is_issue_tag_joined = False
 
         if 'phaseId' in sorting_expression or 'phaseId' in context.query:
             item_cte = select([
@@ -178,16 +179,18 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 IssueTag.tag_id,
                 value
             )
+            is_issue_tag_joined = True
 
         if 'tagTitle' in context.query:
             value = context.query['tagTitle']
-            if 'tagId' in context.query:
+            if is_issue_tag_joined:
                 query = query.join(Tag, Tag.id == IssueTag.tag_id)
 
             else:
                 query = query \
                     .join(IssueTag, IssueTag.issue_id == Issue.id) \
                     .join(Tag, Tag.id == IssueTag.tag_id)
+                is_issue_tag_joined = True
 
             query = Issue._filter_by_column_value(query, Tag.title, value)
 
@@ -223,12 +226,14 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 )
 
             if 'tagId' in sorting_expression:
-                if 'tagId' not in context.query:
+                if not is_issue_tag_joined:
                     query = query.join(
                         IssueTag,
                         IssueTag.issue_id == Issue.id,
                         isouter=True
                     )
+                    is_issue_tag_joined = True
+
                 query = Issue._sort_by_key_value(
                     query,
                     column=IssueTag.tag_id,
@@ -236,15 +241,13 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 )
 
             if 'tagTitle' in sorting_expression:
-                if 'tagId' not in context.query or \
-                        'tagId' not in sorting_expression or \
-                        'tagTitle' not in context.query:
-
+                if not is_issue_tag_joined:
                     query = query.join(
                         IssueTag,
                         IssueTag.issue_id == Issue.id,
                         isouter=True
                     )
+                    is_issue_tag_joined = True
 
                 if 'tagTitle' not in context.query:
                     query = query.join(
