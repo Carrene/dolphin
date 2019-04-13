@@ -140,8 +140,14 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         sorting_expression = context.query.get('sort', '').strip()
         is_issue_tag_joined = False
         is_issue_item_joined = False
+        needed_cte = bool(
+            'phaseId' in sorting_expression or \
+            'phaseTitle' in sorting_expression or \
+            'phaseId' in context.query or \
+            'phaseTitle' in context.query
+        )
 
-        if 'phaseId' in sorting_expression or 'phaseId' in context.query:
+        if needed_cte:
             item_cte = select([
                 Item.issue_id,
                 func.max(Item.id).label('max_item_id')
@@ -198,7 +204,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             query = Issue._filter_by_column_value(query, Tag.title, value)
 
         # SORT
-        external_columns = ('phaseId', 'tagId', 'tagTitle')
+        external_columns = ('phaseId', 'tagId', 'tagTitle', 'phaseTitle')
 
         if sorting_expression:
 
@@ -227,6 +233,34 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                     query,
                     column=Item.phase_id,
                     descending=sorting_columns['phaseId']
+                )
+
+            if 'phaseTitle' in sorting_expression:
+
+                if 'phaseId' not in context.query or \
+                    'phaseTitle' not in context.query or \
+                    'phaseId' not in sorting_expression:
+
+                    query = query.join(
+                        Item,
+                        Item.issue_id == Issue.id,
+                        isouter=True
+                    )
+                    query = query.join(
+                        item_cte,
+                        item_cte.c.max_item_id == Item.id,
+                        isouter=True
+                    )
+                    query = query.join(
+                        Phase,
+                        Phase.id == Item.phase_id,
+                        isouter=True
+                    )
+
+                query = Issue._sort_by_key_value(
+                    query,
+                    column=Phase.title,
+                    descending=sorting_columns['phaseTitle']
                 )
 
             if 'tagId' in sorting_expression:
