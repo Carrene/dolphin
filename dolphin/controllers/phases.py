@@ -5,7 +5,7 @@ from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 
 from ..validators  import phase_validator
-from ..models import Phase, Member
+from ..models import Phase, Member, Workflow, Skill
 from .resource import ResourceController
 from ..validators import phase_update_validator
 from ..exceptions import HTTPRepetitiveTitle, HTTPSkillNotFound, \
@@ -73,7 +73,6 @@ class PhaseController(ModelRestController):
         return phase
 
     @authorize
-<<<<<<< HEAD
     @json(form_whitelist=(
         FORM_WHITELIST,
         f'707 Invalid field, only following fields are accepted: '
@@ -124,6 +123,7 @@ class PhaseController(ModelRestController):
 
         return phase
 
+    @authorize
     @phase_validator
     @json
     @commit
@@ -134,10 +134,40 @@ class PhaseController(ModelRestController):
         if member is None:
             raise HTTPSecondaryManagerNotFound()
 
-        phase = Phase()
+        self._check_title_repetition(
+            workflow=self.workflow,
+            title=form['title']
+        )
+        phase = self._check_order_repetition(
+            workflow=self.workflow,
+            order=form['order'],
+            instance_creation=True
+        )
         phase.update_from_request()
         phase.workflow = self.workflow
         phase.skill_id = form['skill_id']
         DBSession.add(phase)
         return phase
+
+    def _check_title_repetition(self, workflow, title, instance_creation=False):
+        phase = DBSession.query(Phase) \
+            .filter(Phase.title == title, Phase.workflow_id == workflow.id) \
+            .one_or_none()
+        if phase is not None:
+            raise HTTPStatus('600 Repetitive Title')
+
+        if instance_creation:
+            phase = Phase()
+            return phase
+
+    def _check_order_repetition(self, workflow, order, instance_creation=False):
+        phase = DBSession.query(Phase) \
+            .filter(Phase.order == order, Phase.workflow_id == workflow.id) \
+            .one_or_none()
+        if phase is not None:
+            raise HTTPStatus('615 Repetitive Order')
+
+        if instance_creation:
+            phase = Phase()
+            return phase
 

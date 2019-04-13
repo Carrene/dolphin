@@ -261,23 +261,6 @@ def tag_exists_validator(title, project, field):
 
     return title
 
-def phase_not_exists_validator(title, project, field):
-
-    phase = DBSession.query(Phase).filter(Phase.title == title).one_or_none()
-    if phase is not None:
-        raise HTTPStatus('600 Repetitive Title')
-
-    return title
-
-
-def phase_order_exists_validator(order, project, field):
-
-    phase = DBSession.query(Phase).filter(Phase.order == order).one_or_none()
-    if phase is not None:
-        raise HTTPStatus('615 Repetitive Order')
-
-    return order
-
 
 def skill_exists_validator(title, project, field):
     skill = DBSession.query(Skill).filter(Skill.title == title).one_or_none()
@@ -684,7 +667,6 @@ draft_issue_relate_validator = validate(
 )
 
 
-<<<<<<< HEAD
 skill_create_validator = validate(
     description=dict(
         max_length=(
@@ -748,12 +730,10 @@ phase_validator = validate(
     title=dict(
         required='610 Title Not In Form',
         max_length=(50, '704 At Most 50 Characters Valid For Title'),
-        callback=phase_not_exists_validator,
     ),
     order=dict(
         required='742 Order Not In Form',
         type_=(int, '741 Invalid Order Type'),
-        callback=phase_order_exists_validator,
     ),
 )
 

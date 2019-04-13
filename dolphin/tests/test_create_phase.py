@@ -26,7 +26,6 @@ class TestPhase(LocalApplicationTestCase):
         cls.workflow1 = Workflow(title='Workflow 1')
         session.add(cls.workflow1)
 
-
         cls.workflow2 = Workflow(title='Workflow 2')
         session.add(cls.workflow2)
 
@@ -39,7 +38,7 @@ class TestPhase(LocalApplicationTestCase):
         session.add(cls.phase1)
 
         cls.phase2 = Phase(
-            title='phase 1',
+            title='phase 2',
             order=2,
             skill=cls.skill,
             workflow=cls.workflow2,
@@ -58,18 +57,27 @@ class TestPhase(LocalApplicationTestCase):
             json=dict(
                 title=title,
                 skill_id=self.skill.id,
-                order=self.phase1.order + 1
+                order=self.phase1.order + 2
             ),
         ):
             assert status == 200
             assert response.json['id'] is not None
             assert response.json['title'] == title
-            assert response.json['order'] == self.phase1.order + 1
+            assert response.json['order'] == self.phase1.order + 2
             assert response.json['skillId'] == self.skill.id
 
             when(
                 'Title is same as title of a phase in another workflow',
-                title=given | self.phase2.title
+                json=given | dict(title=self.phase2.title, order=0),
+            )
+            assert status == 200
+
+            when(
+                'Order is same as order of a phase in another workflow',
+                json=given | dict(
+                    order=self.phase2.order,
+                    title='another title'
+                ),
             )
             assert status == 200
 
