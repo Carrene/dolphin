@@ -138,6 +138,8 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     def list(self):
         query = DBSession.query(Issue)
         sorting_expression = context.query.get('sort', '').strip()
+        is_issue_tag_joined = False
+        is_issue_item_joined = False
 
         if 'phaseId' in sorting_expression or 'phaseId' in context.query:
             item_cte = select([
@@ -157,16 +159,18 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 Item.phase_id,
                 value
             )
+            is_issue_item_joined = True
 
         if 'phaseTitle' in context.query:
             value = context.query['phaseTitle']
-            if 'phaseId' in context.query:
+            if is_issue_item_joined:
                 query = query.join(Phase, Item.phase_id == Phase.id)
 
             else:
                 query = query \
                     .join(Item, Item.issue_id == Issue.id) \
                     .join(Phase, Item.phase_id == Phase.id)
+                is_issue_item_joined = True
 
             query = Issue._filter_by_column_value(query, Phase.title, value)
 
@@ -178,21 +182,23 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 IssueTag.tag_id,
                 value
             )
+            is_issue_tag_joined = True
 
         if 'tagTitle' in context.query:
             value = context.query['tagTitle']
-            if 'tagId' in context.query:
+            if is_issue_tag_joined:
                 query = query.join(Tag, Tag.id == IssueTag.tag_id)
 
             else:
                 query = query \
                     .join(IssueTag, IssueTag.issue_id == Issue.id) \
                     .join(Tag, Tag.id == IssueTag.tag_id)
+                is_issue_tag_joined = True
 
             query = Issue._filter_by_column_value(query, Tag.title, value)
 
         # SORT
-        external_columns = ('phaseId', 'tagId')
+        external_columns = ('phaseId', 'tagId', 'tagTitle')
 
         if sorting_expression:
 
@@ -204,7 +210,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             }
 
             if 'phaseId' in sorting_expression:
-                if 'phaseId' not in context.query:
+                if not is_issue_item_joined:
                     query = query.join(
                         Item,
                         Item.issue_id == Issue.id,
@@ -215,6 +221,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                         item_cte.c.max_item_id == Item.id,
                         isouter=True
                     )
+                    is_issue_item_joined = True
 
                 query = Issue._sort_by_key_value(
                     query,
@@ -223,16 +230,40 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 )
 
             if 'tagId' in sorting_expression:
-                if 'tagId' not in context.query:
+                if not is_issue_tag_joined:
                     query = query.join(
                         IssueTag,
                         IssueTag.issue_id == Issue.id,
                         isouter=True
                     )
+                    is_issue_tag_joined = True
+
                 query = Issue._sort_by_key_value(
                     query,
                     column=IssueTag.tag_id,
                     descending=sorting_columns['tagId']
+                )
+
+            if 'tagTitle' in sorting_expression:
+                if not is_issue_tag_joined:
+                    query = query.join(
+                        IssueTag,
+                        IssueTag.issue_id == Issue.id,
+                        isouter=True
+                    )
+                    is_issue_tag_joined = True
+
+                if 'tagTitle' not in context.query:
+                    query = query.join(
+                        Tag,
+                        Tag.id == IssueTag.tag_id,
+                        isouter=True
+                    )
+
+                query = Issue._sort_by_key_value(
+                    query,
+                    column=Tag.title,
+                    descending=sorting_columns['tagTitle']
                 )
 
         if 'unread' in context.query:

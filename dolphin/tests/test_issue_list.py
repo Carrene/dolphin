@@ -287,6 +287,22 @@ class TestIssue(LocalApplicationTestCase):
             assert len(response.json) == 2
 
             when(
+                'Filtering and sorting the issues by phase title',
+                query=dict(phaseTitle=self.phase1.title, sort='phaseId')
+            )
+            assert len(response.json) == 2
+
+            when(
+                'Filtering the issues by phase title and phase id',
+                query=dict(
+                    phaseTitle=self.phase1.title,
+                    phaseId=self.phase1.id
+                )
+            )
+            assert len(response.json) == 1
+            assert response.json[0]['id'] == self.issue2.id
+
+            when(
                 'Filtering the issues by tag id',
                 query=dict(tagId=self.tag1.id)
             )
@@ -297,6 +313,17 @@ class TestIssue(LocalApplicationTestCase):
             when(
                 'Filtering the issues by tag title',
                 query=dict(tagTitle=self.tag1.title)
+            )
+            assert len(response.json) == 1
+            assert response.json[0]['id'] == self.issue1.id
+            assert response.json[0]['title'] == self.issue1.title
+
+            when(
+                'Filtering the issues by tag title and tag id',
+                query=dict(
+                    tagTitle=self.tag1.title,
+                    tagId=self.tag1.id
+                )
             )
             assert len(response.json) == 1
             assert response.json[0]['id'] == self.issue1.id
@@ -375,6 +402,28 @@ class TestIssue(LocalApplicationTestCase):
             assert len(response.json) == 2
             assert response.json[0]['id'] == self.issue2.id
             assert response.json[1]['id'] == self.issue4.id
+
+            when(
+                'Sort issues by tag title',
+                query=dict(sort='tagTitle')
+            )
+            assert status == 200
+            assert len(response.json) == 4
+            assert response.json[0]['id'] == self.issue1.id
+            assert response.json[1]['id'] == self.issue2.id
+            assert response.json[2]['id'] == self.issue4.id
+            assert response.json[3]['id'] == self.issue3.id
+
+            when(
+                'Reverse sort issues by tag title',
+                query=dict(sort='-tagTitle')
+            )
+            assert status == 200
+            assert len(response.json) == 4
+            assert response.json[0]['id'] == self.issue3.id
+            assert response.json[1]['id'] == self.issue2.id
+            assert response.json[2]['id'] == self.issue4.id
+            assert response.json[3]['id'] == self.issue1.id
 
             when('Request is not authorized', authorization=None)
             assert status == 401
