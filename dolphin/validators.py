@@ -725,3 +725,15 @@ phase_update_validator = validate(
     ),
 )
 
+
+phase_validator = validate(
+    title=dict(
+        required='610 Title Not In Form',
+        max_length=(50, '704 At Most 50 Characters Valid For Title'),
+    ),
+    order=dict(
+        required='742 Order Not In Form',
+        type_=(int, '741 Invalid Order Type'),
+    ),
+)
+

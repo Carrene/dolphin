@@ -1,10 +1,11 @@
 from nanohttp import json, HTTPNotFound, HTTPUnauthorized, context, \
-    int_or_notfound
+    int_or_notfound, HTTPStatus
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 
-from ..models import Phase, Skill
+from ..validators  import phase_validator
+from ..models import Phase, Member, Workflow, Skill
 from .resource import ResourceController
 from ..validators import phase_update_validator
 from ..exceptions import HTTPRepetitiveTitle, HTTPSkillNotFound, \
@@ -121,4 +122,39 @@ class PhaseController(ModelRestController):
             raise HTTPNotFound()
 
         return phase
+
+    @authorize
+    @phase_validator
+    @json
+    @commit
+    def create(self):
+        form = context.form
+        self._check_title_repetition(
+            workflow=self.workflow,
+            title=form['title']
+        )
+        self._check_order_repetition(
+            workflow=self.workflow,
+            order=form['order'],
+        )
+        phase = Phase()
+        phase.update_from_request()
+        phase.workflow = self.workflow
+        phase.skill_id = form['skill_id']
+        DBSession.add(phase)
+        return phase
+
+    def _check_title_repetition(self, workflow, title):
+        phase = DBSession.query(Phase) \
+            .filter(Phase.title == title, Phase.workflow_id == workflow.id) \
+            .one_or_none()
+        if phase is not None:
+            raise HTTPStatus('600 Repetitive Title')
+
+    def _check_order_repetition(self, workflow, order):
+        phase = DBSession.query(Phase) \
+            .filter(Phase.order == order, Phase.workflow_id == workflow.id) \
+            .one_or_none()
+        if phase is not None:
+            raise HTTPStatus('615 Repetitive Order')
 

@@ -55,7 +55,6 @@ class Phase(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
     )
     order = Field(
         Integer,
-        unique=True,
         minimum=-1,
         label='order',
         watermark='Enter the order',
