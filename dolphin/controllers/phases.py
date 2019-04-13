@@ -129,45 +129,32 @@ class PhaseController(ModelRestController):
     @commit
     def create(self):
         form = context.form
-        identity = context.identity
-        member = DBSession.query(Member).get(identity.id)
-        if member is None:
-            raise HTTPSecondaryManagerNotFound()
-
         self._check_title_repetition(
             workflow=self.workflow,
             title=form['title']
         )
-        phase = self._check_order_repetition(
+        self._check_order_repetition(
             workflow=self.workflow,
             order=form['order'],
-            instance_creation=True
         )
+        phase = Phase()
         phase.update_from_request()
         phase.workflow = self.workflow
         phase.skill_id = form['skill_id']
         DBSession.add(phase)
         return phase
 
-    def _check_title_repetition(self, workflow, title, instance_creation=False):
+    def _check_title_repetition(self, workflow, title):
         phase = DBSession.query(Phase) \
             .filter(Phase.title == title, Phase.workflow_id == workflow.id) \
             .one_or_none()
         if phase is not None:
             raise HTTPStatus('600 Repetitive Title')
 
-        if instance_creation:
-            phase = Phase()
-            return phase
-
-    def _check_order_repetition(self, workflow, order, instance_creation=False):
+    def _check_order_repetition(self, workflow, order):
         phase = DBSession.query(Phase) \
             .filter(Phase.order == order, Phase.workflow_id == workflow.id) \
             .one_or_none()
         if phase is not None:
             raise HTTPStatus('615 Repetitive Order')
-
-        if instance_creation:
-            phase = Phase()
-            return phase
 
