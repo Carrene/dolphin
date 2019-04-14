@@ -49,6 +49,7 @@ class TestPhase(LocalApplicationTestCase):
     def test_create(self):
         self.login(self.member.email)
         title = 'new phase'
+        description = 'new description'
 
         with oauth_mockup_server(), self.given(
             'Creating a phase',
@@ -56,8 +57,9 @@ class TestPhase(LocalApplicationTestCase):
             'CREATE',
             json=dict(
                 title=title,
-                skill_id=self.skill.id,
-                order=self.phase1.order + 2
+                skillId=self.skill.id,
+                order=self.phase1.order + 2,
+                description=description
             ),
         ):
             assert status == 200
@@ -65,6 +67,7 @@ class TestPhase(LocalApplicationTestCase):
             assert response.json['title'] == title
             assert response.json['order'] == self.phase1.order + 2
             assert response.json['skillId'] == self.skill.id
+            assert response.json['description'] == description
 
             when(
                 'Title is same as title of a phase in another workflow',
@@ -99,6 +102,12 @@ class TestPhase(LocalApplicationTestCase):
             )
             assert status == '704 At Most 50 Characters Valid For Title'
 
+            when(
+                'Title length is more than limit',
+                json=given | dict(description=(512 + 1) * 'a')
+            )
+            assert status == '703 At Most 512 Characters Are Valid For Description'
+
             when('Title is not in form', json=given - 'title')
             assert status == '610 Title Not In Form'
 
@@ -116,7 +125,7 @@ class TestPhase(LocalApplicationTestCase):
 
             when(
                 'Workflow is not found',
-                url=f'/apiv1/workflows/0/phases',
+                url_parameters=given | dict(id=0),
                 json=given | dict(title='new title', order=3)
             )
             assert status == 404

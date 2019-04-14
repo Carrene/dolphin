@@ -16,6 +16,7 @@ FORM_WHITELIST = [
     'title',
     'order',
     'skillId',
+    'description',
 ]
 
 
@@ -140,7 +141,7 @@ class PhaseController(ModelRestController):
         phase = Phase()
         phase.update_from_request()
         phase.workflow = self.workflow
-        phase.skill_id = form['skill_id']
+        phase.skill_id = form['skillId']
         DBSession.add(phase)
         return phase
 

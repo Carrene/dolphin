@@ -721,6 +721,12 @@ phase_update_validator = validate(
         not_none='727 Title Is Null',
         max_length=(50, '704 At Most 50 Characters Valid For Title'),
     ),
+    description=dict(
+        max_length=(
+            512,
+            '703 At Most 512 Characters Are Valid For Description'
+        ),
+    )
 )
 
 
@@ -733,5 +739,11 @@ phase_validator = validate(
         required='742 Order Not In Form',
         type_=(int, '741 Invalid Order Type'),
     ),
+    description=dict(
+        max_length=(
+            512,
+            '703 At Most 512 Characters Are Valid For Description'
+        ),
+    )
 )
 
