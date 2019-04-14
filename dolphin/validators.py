@@ -693,7 +693,6 @@ skill_update_validator = validate(
     title = dict(
         not_none='727 Title Is Null',
         max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
-        callback=skill_exists_validator,
     ),
 )
 

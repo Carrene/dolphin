@@ -19,11 +19,17 @@ class TestSkill(LocalApplicationTestCase):
         )
         session.add(cls.member)
 
-        cls.skill = Skill(
+        cls.skill1 = Skill(
             title='Already-added',
             description='A description for skill',
         )
-        session.add(cls.skill)
+        session.add(cls.skill1)
+
+        cls.skill2 = Skill(
+            title='Second skill',
+            description='A description for second skill',
+        )
+        session.add(cls.skill2)
         session.commit()
 
     def test_update(self):
@@ -32,7 +38,7 @@ class TestSkill(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             'Creating a skill',
-            f'/apiv1/skills/id: {self.skill.id}',
+            f'/apiv1/skills/id: {self.skill1.id}',
             'UPDATE',
             json=dict(
                 title=title,
@@ -44,6 +50,18 @@ class TestSkill(LocalApplicationTestCase):
             assert response.json['id'] is not None
             assert response.json['description'] is not None
 
+            when(
+                'Trying to send title which intended skill already has',
+                json=dict(title=title),
+            )
+            assert status == 200
+
+            when(
+                'Title is same as title of another skill',
+                json=dict(title=self.skill2.title),
+            )
+            assert status == '600 Repetitive Title'
+
             when('Trying to pass without form parameters', json={})
             assert status == '708 Empty Form'
 
@@ -53,12 +71,6 @@ class TestSkill(LocalApplicationTestCase):
             )
             assert status == '707 Invalid field, only following fields are ' \
                 'accepted: title, description'
-
-            when(
-                'Trying to pass with repetitive title',
-                json=dict(title=title),
-            )
-            assert status == '600 Repetitive Title'
 
             when(
                 'Title length is more than limit',

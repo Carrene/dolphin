@@ -1,9 +1,11 @@
-from nanohttp import json, int_or_notfound , HTTPNotFound
+from nanohttp import json, int_or_notfound , HTTPNotFound, context, HTTPStatus
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 
-from ..models import Skill
+from ..models import Skill, SkillMember
+from ..exceptions import HTTPAlreadyGrantedSkill, HTTPSkillNotGrantedYet, \
+    HTTPRepetitiveTitle
 from ..validators import skill_create_validator, skill_update_validator
 
 
@@ -50,6 +52,15 @@ class SkillController(ModelRestController):
     def update(self, id):
         id = int_or_notfound(id)
         skill = DBSession.query(Skill).get(id)
+
+        if DBSession.query(Skill) \
+                .filter(
+                    Skill.title == context.form['title'],
+                    Skill.id != id
+                ) \
+                .one_or_none():
+            raise HTTPRepetitiveTitle()
+
         if skill is None:
             raise HTTPNotFound()
 
