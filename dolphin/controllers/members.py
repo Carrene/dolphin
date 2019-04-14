@@ -60,7 +60,7 @@ class MemberController(ModelRestController):
 class MemberSkillController(ModelRestController):
     __model__ = Skill
 
-    def __init__(self, member=None):
+    def __init__(self, member):
         self.member = member
 
     @authorize
