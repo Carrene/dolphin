@@ -53,11 +53,17 @@ class TestTag(LocalApplicationTestCase):
         )
         session.add(organization_member2)
 
-        cls.tag = Tag(
+        cls.tag1 = Tag(
             title='already exist',
             organization_id=cls.organization1.id,
         )
-        session.add(cls.tag)
+        session.add(cls.tag1)
+
+        cls.tag2 = Tag(
+            title='second tag',
+            organization_id=cls.organization1.id,
+        )
+        session.add(cls.tag2)
         session.commit()
 
     def test_update(self):
@@ -70,7 +76,7 @@ class TestTag(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             f'Updating a tag',
-            f'/apiv1/tags/id: {self.tag.id}',
+            f'/apiv1/tags/id: {self.tag1.id}',
             f'UPDATE',
             json=dict(
                 title=title,
@@ -80,15 +86,22 @@ class TestTag(LocalApplicationTestCase):
             assert status == 200
             assert response.json['title'] == title
             assert response.json['description'] == description
-            assert response.json['id'] == self.tag.id
+            assert response.json['id'] == self.tag1.id
+
+            when(
+                'Title is repetitive',
+                json=dict(title=self.tag2.title)
+            )
+            assert status == '600 Repetitive Title'
+
+            when(
+                'Title is as the same it is',
+                json=dict(title=title)
+            )
+            assert status == 200
 
             when('Trying to pass without form parameters', json={})
             assert status == '708 Empty Form'
-
-            when(
-                'Trying to pass with repetitive title',
-            )
-            assert status == '600 Repetitive Title'
 
             when(
                 'Title length is more than limit',

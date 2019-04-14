@@ -165,13 +165,14 @@ class TagController(ModelRestController, JsonPatchControllerMixin):
     def update(self, id):
         id = int_or_notfound(id)
         tag = DBSession.query(Tag).get(id)
+        form = context.form
         identity = context.identity
         if tag is None:
             raise HTTPNotFound()
 
         if DBSession.query(Tag) \
                 .filter(
-                    Tag.title == title,
+                    Tag.title == form['title'],
                     Tag.organization_id == identity.payload['organizationId'],
                     Tag.id != id
                 ) \
