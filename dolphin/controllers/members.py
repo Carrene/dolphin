@@ -129,3 +129,11 @@ class MemberOrganizationController(ModelRestController):
                 OrganizationMember.member_id == self.member.id
             )
 
+    @authorize
+    @json(prevent_form='709 Form Not Allowed')
+    @Skill.expose
+    def list(self):
+        return DBSession.query(Skill) \
+            .join(SkillMember, Skill.id == SkillMember.skill_id) \
+            .filter(SkillMember.member_id == self.member.id)
+
