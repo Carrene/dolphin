@@ -5,7 +5,8 @@ from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import DBSession, commit
 from sqlalchemy import and_, exists
 
-from ..exceptions import HTTPAlreadyTagAdded, HTTPAlreadyTagRemoved
+from ..exceptions import HTTPAlreadyTagAdded, HTTPAlreadyTagRemoved, \
+    HTTPRepetitiveTitle
 from ..models import Tag, DraftIssueTag, IssueTag
 from ..validators import tag_create_validator, tag_update_validator
 
@@ -164,10 +165,20 @@ class TagController(ModelRestController, JsonPatchControllerMixin):
     def update(self, id):
         id = int_or_notfound(id)
         tag = DBSession.query(Tag).get(id)
+        identity = context.identity
         if tag is None:
             raise HTTPNotFound()
 
-        if tag.organization_id != context.identity.payload['organizationId']:
+        if DBSession.query(Tag) \
+                .filter(
+                    Tag.title == title,
+                    Tag.organization_id == identity.payload['organizationId'],
+                    Tag.id != id
+                ) \
+                .one_or_none():
+            raise HTTPRepetitiveTitle()
+
+        if tag.organization_id != identity.payload['organizationId']:
             raise HTTPForbidden()
 
         tag.update_from_request()
