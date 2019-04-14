@@ -34,6 +34,7 @@ class TestPhase(LocalApplicationTestCase):
             order=1,
             skill=cls.skill1,
             workflow=cls.workflow,
+            description='Description for phase 1',
         )
         session.add(cls.phase1)
 
@@ -42,6 +43,7 @@ class TestPhase(LocalApplicationTestCase):
             order=2,
             skill=cls.skill1,
             workflow=cls.workflow,
+            description='Description for phase 2',
         )
         session.add(cls.phase2)
         session.commit()
@@ -50,6 +52,7 @@ class TestPhase(LocalApplicationTestCase):
         self.login(self.member.email)
         new_title = 'new title'
         new_order = self.phase1.order + 2
+        new_description = 'new description'
 
         with oauth_mockup_server(), self.given(
             f'Updating a phase',
@@ -60,6 +63,7 @@ class TestPhase(LocalApplicationTestCase):
                 title=new_title,
                 skillId=self.skill2.id,
                 order=new_order,
+                description=new_description,
             ),
         ):
             assert status == 200
@@ -67,6 +71,7 @@ class TestPhase(LocalApplicationTestCase):
             assert response.json['title'] == new_title
             assert response.json['order'] == new_order
             assert response.json['skillId'] == self.skill2.id
+            assert response.json['description'] == new_description
 
             when(
                 'Title is repetitive',
@@ -85,6 +90,12 @@ class TestPhase(LocalApplicationTestCase):
                 json=given | dict(title=(50 + 1) * 'a')
             )
             assert status == '704 At Most 50 Characters Valid For Title'
+
+            when(
+                'Title length is more than limit',
+                json=given | dict(description=(512 + 1) * 'a')
+            )
+            assert status == '703 At Most 512 Characters Are Valid For Description'
 
             when(
                 'Order type is wrong',
