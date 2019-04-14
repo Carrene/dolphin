@@ -7,7 +7,10 @@ from restfulpy.orm import DeclarativeBase, Field, relationship, DBSession, \
     OrderingMixin
 from restfulpy.principal import JwtRefreshToken
 from restfulpy.orm.metadata import MetadataField
-from sqlalchemy import Integer, String, Unicode, BigInteger
+from sqlalchemy import Integer, String, Unicode, BigInteger, select, bindparam
+from sqlalchemy.orm import column_property
+
+from .organization import OrganizationMember
 
 
 class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
@@ -153,6 +156,18 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         protected=True,
     )
 
+    organization_role = column_property(
+        select([OrganizationMember.role]) \
+        .select_from(OrganizationMember) \
+        .where(OrganizationMember.organization_id == bindparam(
+            'organization_id',
+            callable_=lambda: context.identity.payload['organizationId']
+        )) \
+        .where(OrganizationMember.member_id == id) \
+        .correlate_except(OrganizationMember),
+        deferred=True
+    )
+
     @property
     def roles(self):
         return [self.role]
@@ -195,5 +210,16 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             label='Groups',
             required=False,
             readonly=True
+        )
+        yield MetadataField(
+            name='organizationRole',
+            key='organization_role',
+            label='Organization Role',
+            example='lorem ipsum',
+            readonly=True,
+            watermark='lorem ipsum',
+            type_=str,
+            required=True,
+            not_none=True,
         )
 

@@ -13,7 +13,6 @@ from .group import Group, GroupMember
 from .workflow import Workflow
 from .organization import OrganizationMember, Organization
 from .messaging import OrganizationInvitationEmail
-from .organization_member import AbstractOrganizationMemberView
 from .invitation import Invitation
 from .draft_issue import DraftIssue, DraftIssueTag, DraftIssueIssue
 from .tag import Tag
