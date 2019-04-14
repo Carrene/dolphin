@@ -3,8 +3,7 @@ from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 
-from ..models import Skill, SkillMember
-from ..exceptions import HTTPAlreadyGrantedSkill, HTTPSkillNotGrantedYet
+from ..models import Skill
 from ..validators import skill_create_validator, skill_update_validator
 
 
@@ -19,9 +18,6 @@ FORM_WHITELISTS_STRING = ', '.join(FORM_WHITELIST)
 
 class SkillController(ModelRestController):
     __model__ = Skill
-
-    def __init__(self, member=None):
-        self.member = member
 
     @authorize
     @json(
@@ -76,50 +72,4 @@ class SkillController(ModelRestController):
     @Skill.expose
     def list(self):
         return DBSession.query(Skill)
-
-    @authorize
-    @json
-    @commit
-    def grant(self, id):
-        id = int_or_notfound(id)
-        skill = DBSession.query(Skill).get(id)
-
-        if skill is None:
-            raise HTTPNotFound()
-
-        if DBSession.query(SkillMember) \
-                .filter(
-                    SkillMember.skill_id == id,
-                    SkillMember.member_id == self.member.id
-                ) \
-                .one_or_none():
-            raise HTTPAlreadyGrantedSkill()
-
-        skill_member = SkillMember(
-            skill_id=id,
-            member_id=self.member.id
-        )
-        DBSession.add(skill_member)
-        return skill
-
-    @authorize
-    @json
-    @commit
-    def deny(self, id):
-        id = int_or_notfound(id)
-        skill = DBSession.query(Skill).get(id)
-
-        if skill is None:
-            raise HTTPNotFound()
-
-        if not DBSession.query(SkillMember) \
-                .filter(
-                    SkillMember.skill_id == id,
-                    SkillMember.member_id == self.member.id
-                ) \
-                .one_or_none():
-            raise HTTPSkillNotGrantedYet()
-
-        skill.members.remove(self.member)
-        return skill
 
