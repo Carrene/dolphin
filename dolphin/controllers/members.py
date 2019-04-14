@@ -3,13 +3,13 @@ from nanohttp import json, HTTPNotFound, context, HTTPUnauthorized, \
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
-
-from ..models import Member, Skill, SkillMember
-from ..exceptions import HTTPAlreadyGrantedSkill, HTTPSkillNotGrantedYet
-from .organization import OrganizationController
 from sqlalchemy_media import store_manager
 
-from ..models import Member, Organization, OrganizationMember
+from ..models import Member, Skill, SkillMember, Organization, \
+    OrganizationMember
+from ..exceptions import HTTPAlreadyGrantedSkill, HTTPSkillNotGrantedYet
+from .organization import OrganizationController
+
 from .skill import SkillController
 
 
