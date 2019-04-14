@@ -7,6 +7,10 @@ from restfulpy.orm import DBSession, commit
 from ..models import Member, Skill, SkillMember
 from ..exceptions import HTTPAlreadyGrantedSkill, HTTPSkillNotGrantedYet
 from .organization import OrganizationController
+from sqlalchemy_media import store_manager
+
+from ..models import Member, Organization, OrganizationMember
+from .skill import SkillController
 
 
 class MemberController(ModelRestController):
@@ -24,7 +28,8 @@ class MemberController(ModelRestController):
                     or member.reference_id != context.identity.reference_id:
                 raise HTTPNotFound()
 
-            return OrganizationController(member=member)(*remaining_paths[2:])
+            return MemberOrganizationController(member=member) \
+                (*remaining_paths[2:])
 
         if len(remaining_paths) > 1 and remaining_paths[1] == 'skills':
 
@@ -106,4 +111,21 @@ class MemberSkillController(ModelRestController):
 
         skill.members.remove(self.member)
         return skill
+
+
+class MemberOrganizationController(ModelRestController):
+    __model__ = Organization
+
+    def __init__(self, member):
+        self.member = member
+
+    @store_manager(DBSession)
+    @json(prevent_form=True)
+    @Organization.expose
+    def list(self):
+        return DBSession.query(Organization) \
+            .join(
+                OrganizationMember,
+                OrganizationMember.member_id == self.member.id
+            )
 

@@ -8,21 +8,15 @@ from sqlalchemy_media import store_manager
 
 from ..exceptions import HTTPRepetitiveTitle, HTTPAlreadyInThisOrganization
 from ..models import Member, Organization, OrganizationMember, \
-    OrganizationInvitationEmail, AbstractOrganizationMemberView
+    OrganizationInvitationEmail
 from ..tokens import OrganizationInvitationToken
 from ..validators import organization_create_validator, \
     organization_invite_validator
 from .invitation import InvitationController
 
 
-OrganizationMemberView = AbstractOrganizationMemberView.create_mapped_class()
-
-
 class OrganizationController(ModelRestController):
     __model__ = Organization
-
-    def __init__(self, member=None):
-        self.member = member
 
     def __call__(self, *remaining_paths):
         if len(remaining_paths) > 1:
@@ -42,9 +36,10 @@ class OrganizationController(ModelRestController):
             if organization is None:
                 raise HTTPNotFound()
 
-            if remaining_paths[1] == 'organizationmembers':
-                return OrganizationMemberController(organization=organization) \
+            if remaining_paths[1] == 'members':
+                return OrganizationMemberController(organization) \
                     (*remaining_paths[2:])
+
             elif remaining_paths[1] == 'invitations':
                 return InvitationController(organization=organization) \
                     (*remaining_paths[2:])
@@ -84,13 +79,6 @@ class OrganizationController(ModelRestController):
     @Organization.expose
     @commit
     def list(self):
-
-        if self.member is not None:
-            return DBSession.query(Organization).join(
-                OrganizationMember,
-                OrganizationMember.organization_id == Organization.id
-            ).filter(OrganizationMember.member_id == self.member.id)
-
         if 'email' in context.form.keys():
             return DBSession.query(Organization) \
                 .join(
@@ -132,19 +120,20 @@ class OrganizationController(ModelRestController):
 
 
 class OrganizationMemberController(ModelRestController):
-    __model__ = OrganizationMemberView
+    __model__ = Member
 
-    def __init__(self, organization=None):
+    def __init__(self, organization):
         self.organization = organization
 
     @authorize
     @store_manager(DBSession)
     @json(prevent_form=True)
-    @OrganizationMemberView.expose
+    @Member.expose
     @commit
     def list(self):
-        query = DBSession.query(OrganizationMemberView).filter(
-            OrganizationMemberView.organization_id == self.organization.id
-        )
-        return query
+        return DBSession.query(Member) \
+            .join(
+                OrganizationMember,
+                OrganizationMember.organization_id == self.organization.id
+            )
 

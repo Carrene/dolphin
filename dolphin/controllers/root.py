@@ -11,7 +11,7 @@ from .oauth2 import OAUTHController
 from .projects import ProjectController
 from .releases import ReleaseController
 from .tokens import TokenController
-from .organization import OrganizationController, OrganizationMemberController
+from .organization import OrganizationController
 from .invitation import InvitationController
 from .tag import TagController
 from .workflows import WorkflowController
@@ -38,7 +38,6 @@ class Apiv1(Controller):
     tokens = TokenController()
     oauth2 = OAUTHController()
     organizations = OrganizationController()
-    organizationmembers = OrganizationMemberController()
     invitations = InvitationController()
     tags = TagController()
     workflows = WorkflowController()

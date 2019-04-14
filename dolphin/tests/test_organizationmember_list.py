@@ -49,21 +49,37 @@ class TestOrganizationMembers(LocalApplicationTestCase):
         session.commit()
 
     def test_list(self):
-        self.login(email=self.owner.email)
+        self.login(
+            email=self.owner.email,
+            organization_id=self.organization1.id
+        )
 
         with oauth_mockup_server(), self.given(
-            f'List of organization',
-            f'/apiv1/organizations/id: {self.organization1.id}/'
-                'organizationmembers',
+            f'List of organizationi',
+            f'/apiv1/organizations/id: {self.organization1.id}/members',
             f'LIST',
         ):
             assert status == 200
             assert len(response.json) == 2
 
+            owner = response.json[0] \
+                if response.json[0]['id'] == self.owner.id \
+                else response.json[1]
+
+            member = response.json[0] \
+                if response.json[0]['id'] == self.member.id \
+                else response.json[1]
+
+            assert member['organizationRole'] == 'member'
+            assert owner['organizationRole'] == 'owner'
+
             when('Trying to pass with wrong id', url_parameters=dict(id=0))
             assert status == 404
 
-            when('Type of id is invalid', url_parameters=dict(id='not-integer'))
+            when(
+                'Type of id is invalid',
+                url_parameters=dict(id='not-integer')
+            )
             assert status == 404
 
             when('The request with form parameter', form=dict(param='param'))
@@ -78,11 +94,9 @@ class TestOrganizationMembers(LocalApplicationTestCase):
             assert response.json[1]['id'] == 1
 
             when('Trying pagination response', query=dict(take=1))
-            assert response.json[0]['id'] == 1
             assert len(response.json) == 1
 
             when('Trying pagination with skip', query=dict(take=1, skip=1))
-            assert response.json[0]['id'] == 2
             assert len(response.json) == 1
 
             when('Trying filtering response', query=dict(id=1))
