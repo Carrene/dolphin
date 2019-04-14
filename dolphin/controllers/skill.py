@@ -3,7 +3,9 @@ from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 
-from ..models import Skill
+from ..models import Skill, SkillMember
+from ..exceptions import HTTPAlreadyGrantedSkill, HTTPSkillNotGrantedYet, \
+    HTTPRepetitiveTitle
 from ..validators import skill_create_validator, skill_update_validator
 
 
@@ -57,7 +59,7 @@ class SkillController(ModelRestController):
                     Skill.id != id
                 ) \
                 .one_or_none():
-            raise HTTPStatus('600 Repetitive Title')
+            raise HTTPRepetitiveTitle()
 
         if skill is None:
             raise HTTPNotFound()
