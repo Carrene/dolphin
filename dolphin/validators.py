@@ -574,6 +574,20 @@ group_create_validator = validate(
 )
 
 
+group_update_validator = validate(
+    description=dict(
+        max_length=(
+            8192,
+            '703 At Most 8192 Characters Are Valid For Description'
+        )
+    ),
+    title=dict(
+        not_none='727 Title Is None',
+        max_length=(50, '704 At Most 50 Characters Valid For Title'),
+    )
+)
+
+
 group_add_validator = validate(
     memberId=dict(
         not_none='774 Member Id Is Null',

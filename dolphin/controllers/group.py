@@ -5,9 +5,19 @@ from restfulpy.orm import DBSession, commit
 
 from ..models import Group, GroupMember, Member
 from ..validators import group_create_validator, group_add_validator, \
-    group_remove_validator
+    group_remove_validator, group_update_validator
 from ..exceptions import HTTPMemberNotFound, HTTPAlreadyAddedToGroup, \
-    HTTPMemberNotExistsInGroup
+    HTTPMemberNotExistsInGroup, HTTPRepetitiveTitle
+
+
+FORM_WHITELIST = [
+    'title',
+    'description',
+    'public',
+]
+
+
+FORM_WHITELISTS_STRING = ', '.join(FORM_WHITELIST)
 
 
 class GroupController(ModelRestController):
@@ -41,6 +51,33 @@ class GroupController(ModelRestController):
             description=context.form.get('description'),
         )
         DBSession.add(group)
+        return group
+
+    @authorize
+    @json(
+        prevent_empty_form='708 Empty Form',
+        form_whitelist=(
+            FORM_WHITELIST,
+            f'707 Invalid field, only following fields are accepted: '
+            f'{FORM_WHITELISTS_STRING}'
+        )
+    )
+    @group_update_validator
+    @commit
+    def update(self, id):
+        id = int_or_notfound(id)
+        title = context.form.get('title')
+        group = DBSession.query(Group).get(id)
+        if group is None:
+            raise HTTPNotFound()
+
+        is_exist_group = DBSession.query(Group) \
+            .filter(Group.title == title) \
+            .one_or_none()
+        if group.title != title and is_exist_group is not None:
+            raise HTTPRepetitiveTitle()
+
+        group.update_from_request()
         return group
 
     @authorize
