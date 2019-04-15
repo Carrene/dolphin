@@ -54,6 +54,7 @@ class TestRelease(LocalApplicationTestCase):
         ):
             assert status == 200
             assert response.json['id'] == self.release1.id
+            assert response.json['isSubscribed'] == True
 
             when(
                 'Intended release with string type not found',
