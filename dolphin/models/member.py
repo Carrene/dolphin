@@ -209,7 +209,20 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             key='groups',
             label='Groups',
             required=False,
-            readonly=True
+            readonly=True,
+            example='lorem ipsum',
+            message='lorem ipsum',
+            watermark='lorem ipsum',
+        )
+        yield MetadataField(
+            name='skills',
+            key='skills',
+            label='Skills',
+            required=False,
+            readonly=True,
+            example='lorem ipsum',
+            message='lorem ipsum',
+            watermark='lorem ipsum',
         )
         yield MetadataField(
             name='organizationRole',
