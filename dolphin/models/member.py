@@ -147,13 +147,13 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         secondary='group_member',
         lazy='selectin',
         back_populates='members',
-        protected=True,
+        protected=False,
     )
     skills = relationship(
         'Skill',
         secondary='skill_member',
         back_populates='members',
-        protected=True,
+        protected=False,
     )
 
     organization_role = column_property(
