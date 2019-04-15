@@ -1,4 +1,4 @@
-from bddrest import status, response, when
+from bddrest import status, response, when, given
 
 from dolphin.models import Member, Group
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
@@ -59,6 +59,12 @@ class TestListGroup(LocalApplicationTestCase):
 
             when('The request with form parameter', form=dict(param='param'))
             assert status == '709 Form Not Allowed'
+
+            when(
+                'Member not found',
+                url_parameters=given | dict(id=0),
+            )
+            assert status == 404
 
             when('Trying to sorting response', query=dict(sort='id'))
             assert response.json[0]['id'] < response.json[1]['id']
