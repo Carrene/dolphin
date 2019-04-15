@@ -1,6 +1,7 @@
 from bddrest.authoring import when, status, response
 
-from dolphin.models import Member, Organization, OrganizationMember
+from dolphin.models import Member, Organization, OrganizationMember, Group, \
+    Skill
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -46,6 +47,18 @@ class TestOrganizationMembers(LocalApplicationTestCase):
             role='member',
         )
         session.add(organization_member2)
+
+        skill = Skill(
+            title='first skill',
+            members=[cls.member],
+        )
+        session.add(skill)
+
+        group = Group(
+            title='group1',
+            members=[cls.member],
+        )
+        session.add(group)
         session.commit()
 
     def test_list(self):
@@ -72,6 +85,9 @@ class TestOrganizationMembers(LocalApplicationTestCase):
 
             assert member['organizationRole'] == 'member'
             assert owner['organizationRole'] == 'owner'
+
+            assert member['skills'] is not None
+            assert member['groups'] is not None
 
             when('Trying to pass with wrong id', url_parameters=dict(id=0))
             assert status == 404
