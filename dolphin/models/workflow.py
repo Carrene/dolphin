@@ -52,7 +52,7 @@ class Workflow(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     phases = relationship(
         'Phase',
         back_populates='workflow',
-        protected=True
+        protected=False,
     )
 
     projects = relationship(
@@ -68,6 +68,9 @@ class Workflow(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             name='phases',
             key='phases',
             label='Phases',
+            watermark='Lorem Ipsum',
+            example='Lorem Ipsum',
+            readonly=True,
         )
 
     def __repr__(self):

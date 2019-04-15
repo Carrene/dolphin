@@ -35,3 +35,9 @@ class TestWorkflow(LocalApplicationTestCase):
             assert fields['title']['notNone'] is not None
             assert fields['title']['required'] is not None
 
+            assert fields['phases']['label'] is not None
+            assert fields['phases']['watermark'] is not None
+            assert fields['phases']['example'] is not None
+            assert fields['phases']['name'] is not None
+            assert fields['phases']['readonly'] is not None
+
