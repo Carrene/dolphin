@@ -441,6 +441,13 @@ class TestIssue(LocalApplicationTestCase):
             assert response.json[2]['id'] == self.issue1.id
             assert response.json[3]['id'] == self.issue2.id
 
+            when(
+                'Filter by phase id and sort by phase title',
+                query=dict(sort='phaseTitle', phaseId=1)
+            )
+            assert status == 200
+            assert len(response.json) == 1
+
             when('Request is not authorized', authorization=None)
             assert status == 401
 
