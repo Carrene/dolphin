@@ -112,6 +112,14 @@ class MemberSkillController(ModelRestController):
         skill.members.remove(self.member)
         return skill
 
+    @authorize
+    @json(prevent_form='709 Form Not Allowed')
+    @Skill.expose
+    def list(self):
+        return DBSession.query(Skill) \
+            .join(SkillMember, Skill.id == SkillMember.skill_id) \
+            .filter(SkillMember.member_id == self.member.id)
+
 
 class MemberOrganizationController(ModelRestController):
     __model__ = Organization
