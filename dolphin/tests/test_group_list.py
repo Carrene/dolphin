@@ -47,10 +47,10 @@ class TestListGroup(LocalApplicationTestCase):
             assert len(response.json) == 3
 
     def test_list_groups_of_member(self):
-        self.login('member1@example.com')
+        self.login(self.member.email)
 
         with oauth_mockup_server(), self.given(
-            f'List of member\'s groups',
+            f'List groups of member\'s',
             f'/apiv1/members/id: {self.member.id}/groups',
             f'LIST',
         ):
