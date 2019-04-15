@@ -29,8 +29,7 @@ here = abspath(dirname(__file__))
 attachment_storage = abspath(join(here, '../..', 'data/assets'))
 
 
-class ApiV1(RestController, JsonPatchControllerMixin):
-
+class Apiv1(RestController, JsonPatchControllerMixin):
 
     releases = ReleaseController()
     projects = ProjectController()
