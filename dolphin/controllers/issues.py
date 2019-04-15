@@ -237,10 +237,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
             if 'phaseTitle' in sorting_expression:
 
-                if 'phaseId' not in context.query or \
-                    'phaseTitle' not in context.query or \
-                    'phaseId' not in sorting_expression:
-
+                if not is_issue_item_joined:
                     query = query.join(
                         Item,
                         Item.issue_id == Issue.id,
@@ -251,6 +248,8 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                         item_cte.c.max_item_id == Item.id,
                         isouter=True
                     )
+
+                if not 'phaseTitle' in context.query:
                     query = query.join(
                         Phase,
                         Phase.id == Item.phase_id,
