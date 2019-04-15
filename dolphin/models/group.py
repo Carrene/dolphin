@@ -1,4 +1,5 @@
-from restfulpy.orm import DeclarativeBase, Field, relationship
+from restfulpy.orm import DeclarativeBase, Field, relationship, \
+    OrderingMixin, FilteringMixin, PaginationMixin
 from sqlalchemy import Integer, String, BOOLEAN, ForeignKey, Unicode
 
 
@@ -9,7 +10,7 @@ class GroupMember(DeclarativeBase):
     member_id= Field(Integer, ForeignKey('member.id'), primary_key=True)
 
 
-class Group(DeclarativeBase):
+class Group(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
     __tablename__ = 'group'
 
     id = Field(

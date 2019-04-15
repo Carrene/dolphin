@@ -6,7 +6,7 @@ from restfulpy.orm import DBSession, commit
 from sqlalchemy_media import store_manager
 
 from ..models import Member, Skill, SkillMember, Organization, \
-    OrganizationMember
+    OrganizationMember, Group, GroupMember
 from ..exceptions import HTTPAlreadyGrantedSkill, HTTPSkillNotGrantedYet
 from .organization import OrganizationController
 
@@ -39,6 +39,14 @@ class MemberController(ModelRestController):
                 raise HTTPNotFound()
 
             return MemberSkillController(member=member)(*remaining_paths[2:])
+
+        if len(remaining_paths) > 1 and remaining_paths[1] == 'groups':
+            id = int_or_notfound(remaining_paths[0])
+            member = DBSession.query(Member).get(id)
+            if member is None:
+                raise HTTPNotFound()
+
+            return MemberGroupController(member=member)(*remaining_paths[2:])
 
         return super().__call__(*remaining_paths)
 
@@ -136,4 +144,19 @@ class MemberOrganizationController(ModelRestController):
                 OrganizationMember,
                 OrganizationMember.member_id == self.member.id
             )
+
+
+class MemberGroupController(ModelRestController):
+    __model__ = Group
+
+    def __init__(self, member):
+        self.member = member
+
+    @authorize
+    @json(prevent_form='709 Form Not Allowed')
+    @Group.expose
+    def list(self):
+        return DBSession.query(Group) \
+            .join(GroupMember, GroupMember.group_id == Group.id) \
+            .filter(GroupMember.member_id == self.member.id)
 
