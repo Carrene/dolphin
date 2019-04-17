@@ -83,6 +83,7 @@ class PhaseController(ModelRestController):
     @commit
     def update(self, id):
         id = int_or_notfound(id)
+        form = context.form
         phase = DBSession.query(Phase).get(id)
         if phase is None:
             raise HTTPNotFound()
@@ -107,8 +108,9 @@ class PhaseController(ModelRestController):
                 and is_repetitive_order is not None:
             raise HTTPRepetitiveOrder()
 
-        skill = DBSession.query(Skill).get(context.form.get('skillId'))
-        if skill is None:
+        if 'skillId' in form and not DBSession.query(Skill) \
+                .filter(Skill.id == form.get('skillId')) \
+                .one_or_none():
             raise HTTPSkillNotFound()
 
         phase.update_from_request()
