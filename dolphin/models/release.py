@@ -1,12 +1,16 @@
 from datetime import datetime
 
+from nanohttp import context
 from restfulpy.orm import Field, relationship, ModifiedMixin, FilteringMixin, \
     OrderingMixin, PaginationMixin
 from restfulpy.orm.metadata import MetadataField
-from sqlalchemy import Integer, Enum, DateTime, ForeignKey
+from sqlalchemy import Integer, Enum, DateTime, ForeignKey, select, func, \
+    join, bindparam
+from sqlalchemy.orm import column_property
 
 from .project import Project
-from .subscribable import Subscribable
+from .subscribable import Subscribable, Subscription
+from .member import Member
 
 
 release_statuses = [
@@ -106,6 +110,21 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
         protected=True
     )
 
+    is_subscribed = column_property(
+        select([func.count(Subscription.member_id)])
+        .select_from(
+            join(Subscription, Member, Subscription.member_id == Member.id)
+        )
+        .where(Subscription.subscribable_id == id)
+        .where(Member.reference_id == bindparam(
+                'reference_id',
+                callable_=lambda: context.identity.reference_id
+            )
+        )
+        .correlate_except(Subscription),
+        deferred=True
+    )
+
     @classmethod
     def iter_metadata_fields(cls):
         yield from super().iter_metadata_fields()
@@ -135,4 +154,9 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
 
     def get_room_title(self):
         return f'{self.title.lower()}-{self.manager_id}'
+
+    def to_dict(self):
+        release_dict = super().to_dict()
+        release_dict['isSubscribed'] = True if self.is_subscribed else False
+        return release_dict
 
