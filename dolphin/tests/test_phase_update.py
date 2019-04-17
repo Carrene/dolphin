@@ -73,6 +73,9 @@ class TestPhase(LocalApplicationTestCase):
             assert response.json['skillId'] == self.skill2.id
             assert response.json['description'] == new_description
 
+            when('Skill id not in form', json=given - 'skillId')
+            assert status == 200
+
             when(
                 'Title is repetitive',
                 json=given | dict(title=self.phase2.title)
