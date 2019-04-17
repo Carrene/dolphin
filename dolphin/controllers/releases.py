@@ -138,7 +138,11 @@ class ReleaseController(ModelRestController):
             raise HTTPNotFound()
 
         DBSession.delete(release)
-        return release
+        release_dict = release.to_dict()
+
+        # The returning value type is `dict` because the `to_dict` function
+        # value after `@commit` is not accessible
+        return release_dict
 
     @authorize
     @json
