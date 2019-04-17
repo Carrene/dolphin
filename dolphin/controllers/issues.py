@@ -760,12 +760,21 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         if member is None:
             raise HTTPStatus('610 Member Not Found')
 
-        subscription = Subscription(
-            member_id=member.id,
-            subscribable_id=issue.id,
-            one_shot=True,
-        )
-        DBSession.add(subscription)
+        subscription = DBSession.query(Subscription) \
+                .filter(
+                    Subscription.member_id == member.id,
+                    Subscription.subscribable_id == issue.id,
+                    Subscription.one_shot == True
+                ) \
+                .one_or_none()
+        if subscription is None:
+            subscription = Subscription(
+                member_id=member.id,
+                subscribable_id=issue.id,
+                one_shot=True,
+            )
+            DBSession.add(subscription)
+
         issue.modified_at = datetime.utcnow()
         context.identity = member.create_jwt_principal()
         raise HTTPNoContent()

@@ -55,6 +55,24 @@ class TestMentionedMemberWebhook(LocalApplicationTestCase):
         )
         session.add(cls.issue1)
 
+        cls.issue2 = Issue(
+            project=project,
+            title='Second issue',
+            description='This is description of second issue',
+            due_date='2020-2-20',
+            kind='feature',
+            days=2,
+            room_id=3
+        )
+        session.add(cls.issue2)
+        session.flush()
+
+        subscription = Subscription(
+            member_id=cls.member1.id,
+            subscribable_id=cls.issue2.id,
+            one_shot=True
+        )
+        session.add(subscription)
         session.commit()
 
     def test_mentioned_member_webhook(self):
@@ -77,6 +95,12 @@ class TestMentionedMemberWebhook(LocalApplicationTestCase):
                 .filter(Subscription.one_shot.is_(True)) \
                 .one()
             assert one_shot_subscription.seen_at is None
+
+            when(
+                'There is a subcription with one_shot',
+                query=given | dict(roomId=self.issue2.room_id)
+            )
+            assert status == 204
 
             when(
                 'roomId not in query',
