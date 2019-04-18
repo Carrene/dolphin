@@ -376,19 +376,25 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         if not issue:
             raise HTTPNotFound()
 
-        if DBSession.query(Subscription).filter(
+        subscription = DBSession.query(Subscription).filter(
             Subscription.subscribable_id == id,
             Subscription.member_id == member.id,
-            Subscription.one_shot.is_(None),
-        ).one_or_none():
-            raise HTTPStatus('611 Already Subscribed')
+        ).one_or_none()
+        if subscription is not None:
+            if subscription.one_shot != True:
+                raise HTTPStatus('611 Already Subscribed')
 
-        subscription = Subscription(
-            subscribable_id=issue.id,
-            member_id=member.id,
-            seen_at=datetime.utcnow()
-        )
-        DBSession.add(subscription)
+            if subscription.one_shot == True:
+                subscription.one_shot = None
+                subscription.seent_at = datetime.utcnow()
+
+        else:
+            subscription = Subscription(
+                subscribable_id=issue.id,
+                member_id=member.id,
+                seen_at=datetime.utcnow()
+            )
+            DBSession.add(subscription)
 
         try:
             chat_client.add_member(
@@ -760,12 +766,21 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         if member is None:
             raise HTTPStatus('610 Member Not Found')
 
-        subscription = Subscription(
-            member_id=member.id,
-            subscribable_id=issue.id,
-            one_shot=True,
-        )
-        DBSession.add(subscription)
+        subscription = DBSession.query(Subscription) \
+                .filter(
+                    Subscription.member_id == member.id,
+                    Subscription.subscribable_id == issue.id,
+                ) \
+                .one_or_none()
+        if subscription is None:
+            subscription = Subscription(
+                member_id=member.id,
+                subscribable_id=issue.id,
+                one_shot=True,
+            )
+            DBSession.add(subscription)
+
+        subscription.seen_at = None
         issue.modified_at = datetime.utcnow()
         context.identity = member.create_jwt_principal()
         raise HTTPNoContent()
