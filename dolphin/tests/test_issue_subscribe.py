@@ -135,28 +135,28 @@ class TestIssue(LocalApplicationTestCase):
             with chat_server_status('404 Not Found'):
                 when(
                     'Chat server is not found',
-                    url_parameters=dict(id=5)
+                    url_parameters=dict(id=self.issue3.id)
                 )
                 assert status == '617 Chat Server Not Found'
 
             with chat_server_status('503 Service Not Available'):
                 when(
                     'Chat server is not available',
-                    url_parameters=dict(id=5)
+                    url_parameters=dict(id=self.issue3.id)
                 )
                 assert status == '800 Chat Server Not Available'
 
             with chat_server_status('500 Internal Service Error'):
                 when(
                     'Chat server faces with internal error',
-                    url_parameters=dict(id=5)
+                    url_parameters=dict(id=self.issue3.id)
                 )
                 assert status == '801 Chat Server Internal Error'
 
             with chat_server_status('604 Already Added To Target'):
                 when(
                     'Member is already added to room',
-                    url_parameters=dict(id=5)
+                    url_parameters=dict(id=self.issue3.id)
                 )
                 assert status == 200
 
