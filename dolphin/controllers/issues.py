@@ -321,56 +321,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         member = Member.current()
         chat_client = ChatClient()
 
-        if context.query:
-            query = DBSession.query(Issue)
-            requested_issues = Issue.filter_by_request(query)
-
-            if requested_issues.count() \
-                    >= settings.issue.subscription.max_length:
-                raise HTTPStatus(
-                    f'776 Maximum {settings.issue.subscription.max_length} '
-                    f'Issues To Subscribe At A Time'
-                )
-
-            requested_issues_id = {i.id for i in requested_issues}
-
-            subscribed_issues = DBSession.query(Subscription) \
-                .filter(Subscription.member_id == member.id) \
-                .filter(Subscription.one_shot.is_(None)) \
-                .join(
-                    Subscribable,
-                    Subscribable.id == Subscription.subscribable_id,
-                ) \
-                .filter(
-                    Subscribable.type_ == 'issue',
-                )
-            subscribed_issues_id = {
-                i.subscribable_id for i in subscribed_issues
-            }
-
-            not_subscribed_issues_id = \
-                requested_issues_id - subscribed_issues_id
-
-            flush_counter = 0
-            for each_issue_id in not_subscribed_issues_id:
-                flush_counter += 1
-                subscription = Subscription(
-                    subscribable_id=each_issue_id,
-                    member_id=member.id
-                )
-                DBSession.add(subscription)
-                if flush_counter % 10 == 0:
-                    DBSession.flush()
-
-            not_subscribed_issues = DBSession.query(Issue) \
-                .filter(Issue.id.in_(not_subscribed_issues_id))
-
-            requested_rooms_id = [i.room_id for i in requested_issues]
-            if requested_issues_id:
-                chat_client.subscribe_rooms(requested_rooms_id, member)
-
-            return not_subscribed_issues
-
         id = int_or_notfound(id)
         issue = DBSession.query(Issue).filter(Issue.id == id).one_or_none()
         if not issue:
