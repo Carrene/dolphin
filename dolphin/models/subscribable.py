@@ -20,6 +20,9 @@ class Subscription(DeclarativeBase):
         nullable=True,
     )
 
+    # The `one_shot` field fills with `True` value just if the member should be
+    # notified about the subscribable whereas member hasn't subscribed the
+    # subscribed yet.
     one_shot = Field(BOOLEAN, nullable=True)
 
 

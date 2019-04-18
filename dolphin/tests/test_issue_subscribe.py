@@ -56,7 +56,7 @@ class TestIssue(LocalApplicationTestCase):
         )
         session.add(cls.issue1)
 
-        issue2 = Issue(
+        cls.issue2 = Issue(
             project=project,
             title='Second issue',
             description='This is description of second issue',
@@ -65,16 +65,26 @@ class TestIssue(LocalApplicationTestCase):
             days=2,
             room_id=3
         )
-        session.add(issue2)
+        session.add(cls.issue2)
+
+        cls.issue3 = Issue(
+            project=project,
+            title='Third issue',
+            description='This is description of third issue',
+            due_date='2020-2-20',
+            kind='feature',
+            days=3,
+            room_id=4
+        )
+        session.add(cls.issue2)
 
         session.flush()
-        subscription = Subscription(
+        subscription1 = Subscription(
             member_id=member.id,
-            subscribable_id=cls.issue1.id,
+            subscribable_id=cls.issue2.id,
             one_shot=True,
         )
-        session.add(subscription)
-
+        session.add(subscription1)
         session.commit()
 
     def test_subscribe(self):
@@ -82,11 +92,18 @@ class TestIssue(LocalApplicationTestCase):
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Subscribe an issue',
-            f'/apiv1/issues/id:{self.issue1.id}',
+            f'/apiv1/issues/id: {self.issue1.id}',
             'SUBSCRIBE',
         ):
             assert status == 200
             assert response.json['id'] == self.issue1.id
+
+            when(
+                'There is a subscription between member and issue '
+                'but not subscribed yet',
+                url_parameters=dict(id=self.issue2.id),
+            )
+            assert status == 200
 
             when(
                 'Intended issue with string type not found',
@@ -118,28 +135,28 @@ class TestIssue(LocalApplicationTestCase):
             with chat_server_status('404 Not Found'):
                 when(
                     'Chat server is not found',
-                    url_parameters=dict(id=4)
+                    url_parameters=dict(id=5)
                 )
                 assert status == '617 Chat Server Not Found'
 
             with chat_server_status('503 Service Not Available'):
                 when(
                     'Chat server is not available',
-                    url_parameters=dict(id=4)
+                    url_parameters=dict(id=5)
                 )
                 assert status == '800 Chat Server Not Available'
 
             with chat_server_status('500 Internal Service Error'):
                 when(
                     'Chat server faces with internal error',
-                    url_parameters=dict(id=4)
+                    url_parameters=dict(id=5)
                 )
                 assert status == '801 Chat Server Internal Error'
 
             with chat_server_status('604 Already Added To Target'):
                 when(
                     'Member is already added to room',
-                    url_parameters=dict(id=4)
+                    url_parameters=dict(id=5)
                 )
                 assert status == 200
 
