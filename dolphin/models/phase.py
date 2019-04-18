@@ -22,7 +22,7 @@ class Phase(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
     skill_id = Field(
         Integer,
         ForeignKey('skill.id'),
-        label='Skill ID',
+        label='Associated skills',
         required=True,
         nullable=False,
         not_none=True,
