@@ -287,4 +287,3 @@ class Project(ModifiedByMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         super().__declare_last__()
         observe(cls, ['modified_at', 'modified_by'])
 
-

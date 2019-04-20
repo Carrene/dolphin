@@ -144,12 +144,7 @@ class TestProject(LocalApplicationTestCase):
             'Updating a project',
             f'/apiv1/projects/id:{self.project1.id}',
             'UPDATE',
-            json=dict(
-                title='My interesting project',
-                description='A updated project description',
-                status='active',
-                releaseId=self.release2.id
-            )
+            json=form
         ):
             assert status == 200
             assert response.json['title'] == 'My interesting project'
