@@ -237,7 +237,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
                 query = Issue._sort_by_key_value(
                     query,
-                    column=Item.phase_id,
+                    column=item_cte.c.max_item_phase_id,
                     descending=sorting_columns['phaseId']
                 )
 
@@ -258,7 +258,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 if not 'phaseTitle' in context.query:
                     query = query.join(
                         Phase,
-                        Phase.id == Item.phase_id,
+                        Phase.id == item_cte.c.max_item_phase_id,
                         isouter=True
                     )
 
