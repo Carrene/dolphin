@@ -151,16 +151,26 @@ class TestIssue(LocalApplicationTestCase):
 
             cls.phase1 = Phase(
                 workflow=workflow,
-                title='phase 1',
+                title='Backlog',
                 order=1,
                 skill=skill,
             )
             session.add(cls.phase1)
+            session.flush()
 
             cls.phase2 = Phase(
                 workflow=workflow,
-                title='phase 2',
+                title='Test',
                 order=2,
+                skill=skill
+            )
+            session.add(cls.phase1)
+            session.flush()
+
+            cls.phase3 = Phase(
+                workflow=workflow,
+                title='Development',
+                order=3,
                 skill=skill
             )
             session.add(cls.phase1)
@@ -196,6 +206,22 @@ class TestIssue(LocalApplicationTestCase):
                 issue_id=cls.issue2.id,
             )
             session.add(item4)
+            session.flush()
+
+            item5 = Item(
+                member_id=member.id,
+                phase_id=cls.phase3.id,
+                issue_id=cls.issue2.id,
+            )
+            session.add(item5)
+            session.flush()
+
+            item6 = Item(
+                member_id=member.id,
+                phase_id=cls.phase1.id,
+                issue_id=cls.issue3.id,
+            )
+            session.add(item6)
             session.commit()
 
     def test_list(self):
@@ -284,19 +310,19 @@ class TestIssue(LocalApplicationTestCase):
                 'Filtering the issues by phase title',
                 query=dict(phaseTitle=self.phase1.title)
             )
-            assert len(response.json) == 2
+            assert len(response.json) == 3
 
             when(
                 'Filtering and sorting the issues by phase title',
                 query=dict(phaseTitle=self.phase1.title, sort='phaseId')
             )
-            assert len(response.json) == 2
+            assert len(response.json) == 1
 
             when(
                 'Filtering the issues by phase title and phase id',
                 query=dict(
-                    phaseTitle=self.phase1.title,
-                    phaseId=self.phase1.id
+                    phaseTitle=self.phase3.title,
+                    phaseId=self.phase3.id
                 )
             )
             assert len(response.json) == 1
@@ -342,18 +368,18 @@ class TestIssue(LocalApplicationTestCase):
             when('Sort by phase id', query=dict(sort='phaseId'))
             assert status == 200
             assert len(response.json) == 4
-            assert response.json[0]['id'] == self.issue2.id
+            assert response.json[0]['id'] == self.issue3.id
             assert response.json[1]['id'] == self.issue1.id
-            assert response.json[2]['id'] == self.issue4.id
-            assert response.json[3]['id'] == self.issue3.id
+            assert response.json[2]['id'] == self.issue2.id
+            assert response.json[3]['id'] == self.issue4.id
 
             when('Reverse sort by phase id', query=dict(sort='-phaseId'))
             assert status == 200
             assert len(response.json) == 4
             assert response.json[0]['id'] == self.issue4.id
-            assert response.json[1]['id'] == self.issue3.id
+            assert response.json[1]['id'] == self.issue2.id
             assert response.json[2]['id'] == self.issue1.id
-            assert response.json[3]['id'] == self.issue2.id
+            assert response.json[3]['id'] == self.issue3.id
 
             when('Sort by tag id', query=dict(sort='tagId'))
             assert status == 200
@@ -392,7 +418,7 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert status == 200
             assert len(response.json) == 1
-            assert response.json[0]['id'] == self.issue2.id
+            assert response.json[0]['id'] == self.issue3.id
 
             when(
                 'Sort and filter by tag id at the same time',
@@ -428,18 +454,18 @@ class TestIssue(LocalApplicationTestCase):
             when('Sort by phase title', query=dict(sort='phaseTitle'))
             assert status == 200
             assert len(response.json) == 4
-            assert response.json[0]['id'] == self.issue2.id
-            assert response.json[1]['id'] == self.issue1.id
-            assert response.json[2]['id'] == self.issue4.id
-            assert response.json[3]['id'] == self.issue3.id
+            assert response.json[0]['id'] == self.issue3.id
+            assert response.json[1]['id'] == self.issue2.id
+            assert response.json[2]['id'] == self.issue1.id
+            assert response.json[3]['id'] == self.issue4.id
 
             when('Reverse sort by phase title', query=dict(sort='-phaseTitle'))
             assert status == 200
             assert len(response.json) == 4
             assert response.json[0]['id'] == self.issue4.id
-            assert response.json[1]['id'] == self.issue3.id
-            assert response.json[2]['id'] == self.issue1.id
-            assert response.json[3]['id'] == self.issue2.id
+            assert response.json[1]['id'] == self.issue1.id
+            assert response.json[2]['id'] == self.issue2.id
+            assert response.json[3]['id'] == self.issue3.id
 
             when(
                 'Filter by phase id and sort by phase title',

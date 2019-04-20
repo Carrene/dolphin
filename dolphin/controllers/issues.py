@@ -7,7 +7,7 @@ from nanohttp import HTTPStatus, json, context, HTTPNotFound, \
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import DBSession, commit
-from sqlalchemy import and_, exists, select, func
+from sqlalchemy import and_, exists, select, func, join
 
 from ..backends import ChatClient
 from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound, \
@@ -149,9 +149,18 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         if needed_cte:
             item_cte = select([
-                Item.issue_id,
-                func.max(Item.id).label('max_item_id')
+                Item.issue_id.label('item_issue_id'),
+                func.max(Item.id).label('max_item_id'),
+                func.max(Item.phase_id).label('max_item_phase_id')
             ]) \
+                .select_from(
+                    join(Issue, Item, Issue.id == Item.issue_id, isouter=True)
+                ) \
+                .where(
+                    Item.phase_id.in_(
+                        select([Phase.id]).where(Phase.id == Item.phase_id)
+                    )
+                ) \
                 .group_by(Item.issue_id) \
                 .cte()
 
@@ -218,20 +227,15 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             if 'phaseId' in sorting_expression:
                 if not is_issue_item_joined:
                     query = query.join(
-                        Item,
-                        Item.issue_id == Issue.id,
-                        isouter=True
-                    )
-                    query = query.join(
                         item_cte,
-                        item_cte.c.max_item_id == Item.id,
+                        item_cte.c.item_issue_id == Issue.id,
                         isouter=True
                     )
                     is_issue_item_joined = True
 
                 query = Issue._sort_by_key_value(
                     query,
-                    column=Item.phase_id,
+                    column=item_cte.c.max_item_phase_id,
                     descending=sorting_columns['phaseId']
                 )
 
@@ -239,23 +243,28 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
                 if not is_issue_item_joined:
                     query = query.join(
-                        Item,
-                        Item.issue_id == Issue.id,
-                        isouter=True
-                    )
-                    query = query.join(
                         item_cte,
-                        item_cte.c.max_item_id == Item.id,
+                        item_cte.c.item_issue_id == Issue.id,
                         isouter=True
                     )
 
                 if not 'phaseTitle' in context.query:
                     query = query.join(
                         Phase,
-                        Phase.id == Item.phase_id,
+                        Phase.id == item_cte.c.max_item_phase_id,
                         isouter=True
                     )
 
+                # THE RESULT QUERY:
+                # with cte(issue_id, last_item_id, phase_id) as
+                # (SELECT issue.id, max(item.id), max(item.phase_id) FROM issue
+                # LEFT OUTER JOIN item ON issue.id = item.issue_id WHERE
+                # item.phase_id IN
+                # (SELECT id FROM phase WHERE phase.id = item.phase_id)
+                # GROUP BY issue.id)
+                # SELECT ii.id, c.last_item_id, c.phase_id, phase.title FROM
+                # issue ii LEFT OUTER JOIN cte c ON ii.id = c.issue_id LEFT
+                # OUTER JOIN phase ON phase.id = c.phase_id ORDER BY phase.title;
                 query = Issue._sort_by_key_value(
                     query,
                     column=Phase.title,
