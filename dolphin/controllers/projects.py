@@ -95,7 +95,7 @@ class ProjectController(ModelRestController):
             if secondary_manager is None:
                 raise HTTPSecondaryManagerNotFound()
 
-            project.secondary_manager = secondary_manager
+            project.secondary_manager_id = secondary_manager.id
 
         if 'groupId' in form:
             project.group_id = form['groupId']
@@ -104,7 +104,7 @@ class ProjectController(ModelRestController):
             default_group = DBSession.query(Group) \
                 .filter(Group.public.is_(True)) \
                 .one()
-            project.group = default_group
+            project.group_id = default_group.id
 
         if 'workflowId' in form:
             project.workflow_id = form['workflowId']

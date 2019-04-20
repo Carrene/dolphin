@@ -1,6 +1,7 @@
 import io
 from os.path import join, dirname, abspath
 
+from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when, Update, Remove
 
 from dolphin.models import Project, Member, Workflow, Group, Release
@@ -15,6 +16,7 @@ maximum_image_path = join(this_dir, 'stuff', 'maximum-length.jpg')
 class TestProject(LocalApplicationTestCase):
 
     @classmethod
+    @AuditLogContext(dict())
     def mockup(cls):
         session = cls.create_session()
 
