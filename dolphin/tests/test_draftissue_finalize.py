@@ -152,7 +152,7 @@ class TestIssue(LocalApplicationTestCase):
             created_issue = session.query(Issue).get(created_issue_id)
             assert created_issue.modified_by is None
 
-
+            assert len(logs) == 2
             assert isinstance(logs[0], InstantiationLogEntry)
             assert isinstance(logs[1], RequestLogEntry)
 
