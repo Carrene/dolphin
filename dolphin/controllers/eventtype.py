@@ -1,13 +1,10 @@
-from nanohttp import json, context, HTTPNotFound, HTTPForbidden
+from nanohttp import json, context
 from restfulpy.authorization import authorize
-from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
+from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
-from sqlalchemy import and_, exists
 
-from ..exceptions import HTTPAlreadyTagAdded, HTTPAlreadyTagRemoved
 from ..models import EventType
 from ..validators import event_type_create_validator
-
 
 
 class EventTypeController(ModelRestController):
