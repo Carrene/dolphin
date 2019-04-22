@@ -18,7 +18,7 @@ class EventType(OrderingMixin, FilteringMixin, PaginationMixin,
         example=1,
     )
     title = Field(
-        String,
+        Unicode,
         max_length=50,
         min_length=1,
         label='lorem ipsum',

@@ -274,7 +274,7 @@ def event_type_exists_validator(title, project, field):
     event_type = DBSession.query(EventType).filter(EventType.title == title). \
         one_or_none()
     if event_type is not None:
-        raise HTTPStatus('600 Repetitive Title')
+        raise HTTPRepetitiveTitle()
 
     return title
 

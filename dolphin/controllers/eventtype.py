@@ -1,4 +1,3 @@
-from nanohttp import json, context
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
@@ -15,11 +14,10 @@ class EventTypeController(ModelRestController):
     @event_type_create_validator
     @commit
     def create(self):
-        event_type  = EventType(
+        event_type = EventType(
             title=context.form.get('title'),
             description=context.form.get('description'),
         )
         DBSession.add(event_type)
         return event_type
-
 
