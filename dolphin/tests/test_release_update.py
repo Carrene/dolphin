@@ -70,15 +70,6 @@ class TestRelease(LocalApplicationTestCase):
     def test_update(self):
         self.login('member1@example.com')
 
-        form = dict(
-            title='My interesting release',
-            description='This is my new awesome release',
-            cutoff='2030-2-21',
-            launchDate='2030-2-21',
-            status='in-progress',
-            managerReferenceId=self.member2.reference_id,
-        )
-
         with oauth_mockup_server(), self.given(
             'Updating a release',
             '/apiv1/releases/id:1',
