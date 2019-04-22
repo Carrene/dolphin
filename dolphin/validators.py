@@ -270,6 +270,15 @@ def skill_exists_validator(title, project, field):
     return title
 
 
+def event_type_exists_validator(title, project, field):
+    event_type = DBSession.query(EventType).filter(EventType.title == title). \
+        one_or_none()
+    if event_type is not None:
+        raise HTTPStatus('600 Repetitive Title')
+
+    return title
+
+
 release_validator = validate(
     title=dict(
         required='710 Title Not In Form',
@@ -759,5 +768,21 @@ phase_validator = validate(
             '703 At Most 512 Characters Are Valid For Description'
         ),
     )
+)
+
+
+event_type_create_validator = validate(
+   description=dict(
+        max_length=(
+            512,
+            '703 At Most 512 Characters Are Valid For Description'
+        ),
+    ),
+    title=dict(
+        required='710 Title Not In Form',
+        not_none='727 Title Is None',
+        max_length=(50, '704 At Most 50 Characters Valid For Title'),
+        callback=event_type_exists_validator
+    ),
 )
 
