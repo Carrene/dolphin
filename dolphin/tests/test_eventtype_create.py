@@ -1,5 +1,4 @@
-from bddrest import status, response, when, Update
-
+from bddrest import status, response, when, Given
 from dolphin.models import Member
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
@@ -15,18 +14,18 @@ class TestEventType(LocalApplicationTestCase):
             email='member1@example.com',
             access_token='access token 1',
             phone=123456789,
-            reference_id=1
+            reference_id=1,
         )
         session.add(cls.member)
         session.commit()
 
     def test_create(self):
         self.login(self.member.email)
-        title = 'type1'
+        title = 'Type1'
         description = 'A description for a type1'
 
         with oauth_mockup_server(), self.given(
-            'Creating a event type',
+            'Creating an event type',
             '/apiv1/eventtypes',
             'CREATE',
             json=dict(
@@ -68,8 +67,11 @@ class TestEventType(LocalApplicationTestCase):
 
             when(
                 'Description length is less than limit',
-                json=Update(description=((512 + 1) * 'a')),
+                json=given | dict(description=(512 + 1) * 'a')),
             )
             assert status == '703 At Most 512 Characters Are Valid For ' \
                 'Description'
+
+            when('Request is not authorized', authorization=None)
+            assert status == 401
 
