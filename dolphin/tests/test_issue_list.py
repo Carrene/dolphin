@@ -310,7 +310,7 @@ class TestIssue(LocalApplicationTestCase):
                 'Filtering the issues by phase title',
                 query=dict(phaseTitle=self.phase1.title)
             )
-            assert len(response.json) == 3
+            assert len(response.json) == 1
 
             when(
                 'Filtering and sorting the issues by phase title',

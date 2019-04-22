@@ -156,11 +156,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 .select_from(
                     join(Issue, Item, Issue.id == Item.issue_id, isouter=True)
                 ) \
-                .where(
-                    Item.phase_id.in_(
-                        select([Phase.id]).where(Phase.id == Item.phase_id)
-                    )
-                ) \
                 .group_by(Item.issue_id) \
                 .cte()
 
@@ -178,15 +173,18 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         if 'phaseTitle' in context.query:
             value = context.query['phaseTitle']
-            if is_issue_item_joined:
-                query = query.join(Phase, Item.phase_id == Phase.id)
-
-            else:
-                query = query \
-                    .join(Item, Item.issue_id == Issue.id) \
-                    .join(Phase, Item.phase_id == Phase.id)
+            if not is_issue_item_joined:
+                query = query.join(
+                    item_cte,
+                    item_cte.c.item_issue_id == Issue.id,
+                )
+                query = query.join(
+                    Item,
+                    Item.id == item_cte.c.max_item_id,
+                )
                 is_issue_item_joined = True
 
+            query = query.join(Phase, Phase.id == Item.phase_id)
             query = Issue._filter_by_column_value(query, Phase.title, value)
 
         if 'tagId' in context.query:
@@ -231,6 +229,11 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                         item_cte.c.item_issue_id == Issue.id,
                         isouter=True
                     )
+                    query = query.join(
+                        Item,
+                        Item.id == item_cte.c.max_item_id,
+                        isouter=True
+                    )
                     is_issue_item_joined = True
 
                 query = Issue._sort_by_key_value(
@@ -247,6 +250,11 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                         item_cte.c.item_issue_id == Issue.id,
                         isouter=True
                     )
+                    query = query.join(
+                        Item,
+                        Item.id == item_cte.c.max_item_id,
+                        isouter=True
+                    )
 
                 if not 'phaseTitle' in context.query:
                     query = query.join(
@@ -256,15 +264,28 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                     )
 
                 # THE RESULT QUERY:
-                # with cte(issue_id, last_item_id, phase_id) as
-                # (SELECT issue.id, max(item.id), max(item.phase_id) FROM issue
-                # LEFT OUTER JOIN item ON issue.id = item.issue_id WHERE
-                # item.phase_id IN
-                # (SELECT id FROM phase WHERE phase.id = item.phase_id)
-                # GROUP BY issue.id)
-                # SELECT ii.id, c.last_item_id, c.phase_id, phase.title FROM
-                # issue ii LEFT OUTER JOIN cte c ON ii.id = c.issue_id LEFT
-                # OUTER JOIN phase ON phase.id = c.phase_id ORDER BY phase.title;
+                # WITH anon_1 AS
+                # (SELECT item.issue_id AS item_issue_id, max(item.id)
+                # AS max_item_id
+                # FROM subscribable JOIN issue ON subscribable.id = issue.id
+                # LEFT OUTER JOIN item ON issue.id = item.issue_id
+                # GROUP BY item.issue_id)
+                # SELECT subscribable.created_at AS subscribable_created_at,
+                # subscribable.type_ AS subscribable_type_,
+                # issue.id AS issue_id, subscribable.id AS subscribable_id,
+                # subscribable.title AS subscribable_title,
+                # subscribable.description AS subscribable_description,
+                # issue.modified_at AS issue_modified_at, issue."modifiedBy"
+                # AS "issue_modifiedBy", issue.project_id AS issue_project_id,
+                # issue.room_id AS issue_room_id,
+                # issue.due_date AS issue_due_date, issue.kind AS issue_kind,
+                # issue.days AS issue_days, issue.status AS issue_status,
+                # issue.priority AS issue_priority
+                # FROM subscribable JOIN issue ON subscribable.id = issue.id
+                # LEFT OUTER JOIN anon_1 ON anon_1.item_issue_id = issue.id
+                # LEFT OUTER JOIN item ON item.id = anon_1.max_item_id
+                # LEFT OUTER JOIN phase ON phase.id = item.phase_id
+
                 query = Issue._sort_by_key_value(
                     query,
                     column=Phase.title,
