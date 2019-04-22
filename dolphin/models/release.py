@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from auditor import observe
 from nanohttp import context
 from restfulpy.orm import Field, relationship, ModifiedMixin, FilteringMixin, \
     OrderingMixin, PaginationMixin
@@ -159,4 +160,9 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
         release_dict = super().to_dict()
         release_dict['isSubscribed'] = True if self.is_subscribed else False
         return release_dict
+
+    @classmethod
+    def __declare_last__(cls):
+        super().__declare_last__()
+        observe(cls, ['modified_at'])
 

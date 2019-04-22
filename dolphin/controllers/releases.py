@@ -50,7 +50,7 @@ class ReleaseController(ModelRestController):
             raise HTTPManagerNotFound()
 
         release = Release()
-        release.manager = member
+        release.manager_id = member.id
         release.update_from_request()
         if release.launch_date < release.cutoff:
             raise HTTPLaunchDateMustGreaterThanCutoffDate()
