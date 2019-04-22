@@ -76,6 +76,10 @@ class TestRelease(LocalApplicationTestCase):
             assert isinstance(logs[1], RequestLogEntry)
             assert response.json['groupId'] == self.group.id
 
+            assert len(logs) == 2
+            assert isinstance(logs[0], InstantiationLogEntry)
+            assert isinstance(logs[1], RequestLogEntry)
+
             when(
                 'Title is not in form',
                 json=Remove('title')
