@@ -1,7 +1,5 @@
 from auditor import MiddleWare
-from auditor.logentry import ChangeAttributeLogEntry
 from auditor.context import Context as AuditLogContext
-from auditor.logentry import RequestLogEntry, InstantiationLogEntry
 from bddrest import status, response, when, given, Update
 from nanohttp.contexts import Context
 from nanohttp import context
@@ -24,14 +22,14 @@ class TestRelease(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        cls.member1 = Member(
+        member1 = Member(
             title='First Member',
             email='member1@example.com',
             access_token='access token 1',
             phone=123456789,
             reference_id=1
         )
-        session.add(cls.member1)
+        session.add(member1)
 
         cls.member2 = Member(
             title='Second Member',
@@ -42,22 +40,22 @@ class TestRelease(LocalApplicationTestCase):
         )
         session.add(cls.member2)
 
-        cls.release1 = Release(
+        release1 = Release(
             title='My first release',
             description='A decription for my first release',
             cutoff='2030-2-20',
             launch_date='2030-2-20',
-            manager=cls.member1,
+            manager=member1,
             room_id=0,
         )
-        session.add(cls.release1)
+        session.add(release1)
 
         release2 = Release(
             title='My second release',
             description='A decription for my second release',
             cutoff='2030-2-20',
             launch_date='2030-2-20',
-            manager=cls.member1,
+            manager=member1,
             room_id=0,
         )
         session.add(release2)
@@ -65,15 +63,6 @@ class TestRelease(LocalApplicationTestCase):
 
     def test_update(self):
         self.login('member1@example.com')
-
-        class Identity:
-            def __init__(self, member):
-                self.id = member.id
-                self.reference_id = member.reference_id
-
-        with Context({}):
-            context.identity = Identity(self.member1)
-            old_values = self.release1.to_dict()
 
         form = dict(
             title='My interesting release',
@@ -86,9 +75,16 @@ class TestRelease(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             'Updating a release',
-            f'/apiv1/releases/id: {self.release1.id}',
+            '/apiv1/releases/id:1',
             'UPDATE',
-            json=form,
+            json=dict(
+                title='My interesting release',
+                description='This is my new awesome release',
+                cutoff='2030-2-21',
+                launchDate='2030-2-21',
+                status='in-progress',
+                managerReferenceId=self.member2.reference_id,
+            )
         ):
             assert status == 200
             assert response.json['title'] == 'My interesting release'
