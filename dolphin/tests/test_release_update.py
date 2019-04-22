@@ -1,12 +1,24 @@
+from auditor import MiddleWare
+from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when, given, Update
+from nanohttp.contexts import Context
+from nanohttp import context
 
+from dolphin import Dolphin
 from dolphin.models import Release, Member
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
+def callback(audit_logs):
+    global logs
+    logs = audit_logs
+
+
 class TestRelease(LocalApplicationTestCase):
+    __application__ = MiddleWare(Dolphin(), callback)
 
     @classmethod
+    @AuditLogContext(dict())
     def mockup(cls):
         session = cls.create_session()
 
@@ -72,6 +84,8 @@ class TestRelease(LocalApplicationTestCase):
             assert response.json['launchDate'] == '2030-02-21T00:00:00'
             assert response.json['status'] == 'in-progress'
             assert response.json['managerId'] == self.member2.id
+
+            assert len(logs) == 7
 
             when(
                 'Intended release with string type not found',
