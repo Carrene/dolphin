@@ -1,3 +1,4 @@
+from auditor import observe
 from nanohttp import context
 from restfulpy.orm import Field, relationship, SoftDeleteMixin, \
     ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin
@@ -280,4 +281,9 @@ class Project(ModifiedByMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     def get_room_title(self):
         return f'{self.title.lower()}-{self.manager_id}-{self.workflow_id}_' \
             f'{self.release_id}-{self.group_id}'
+
+    @classmethod
+    def __declare_last__(cls):
+        super().__declare_last__()
+        observe(cls, ['modified_at', 'modified_by'])
 

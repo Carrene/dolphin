@@ -1,13 +1,24 @@
+from auditor import MiddleWare
+from auditor.context import Context as AuditLogContext
+from auditor.logentry import RequestLogEntry, InstantiationLogEntry
 from bddrest import status, response, when, Remove, given, Update
 
+from dolphin import Dolphin
 from dolphin.models import Project, Member, Workflow, Release, Group
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
 
+def callback(audit_logs):
+    global logs
+    logs = audit_logs
+
+
 class TestProject(LocalApplicationTestCase):
+    __application__ = MiddleWare(Dolphin(), callback)
 
     @classmethod
+    @AuditLogContext(dict())
     def mockup(cls):
         session = cls.create_session()
 
@@ -73,6 +84,10 @@ class TestProject(LocalApplicationTestCase):
             created_project_id = response.json['id']
             created_project = session.query(Project).get(created_project_id)
             assert created_project.modified_by is None
+
+            assert len(logs) == 2
+            assert isinstance(logs[0], InstantiationLogEntry)
+            assert isinstance(logs[1], RequestLogEntry)
 
             when(
                 'Trying to create a project with secondary manager',

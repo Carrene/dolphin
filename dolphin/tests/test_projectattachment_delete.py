@@ -1,5 +1,6 @@
 from os.path import join, dirname, abspath
 
+from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when, Update
 from sqlalchemy_media import StoreManager
 
@@ -15,6 +16,7 @@ maximum_image_path = join(this_dir, 'stuff', 'maximum-length.jpg')
 class TestProject(LocalApplicationTestCase):
 
     @classmethod
+    @AuditLogContext(dict())
     def mockup(cls):
         cls.session = cls.create_session(expire_on_commit=True)
         with StoreManager(cls.session):

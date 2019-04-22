@@ -1,13 +1,27 @@
+from auditor import MiddleWare
+from auditor.logentry import ChangeAttributeLogEntry
+from auditor.context import Context as AuditLogContext
+from auditor.logentry import RequestLogEntry, InstantiationLogEntry
 from bddrest import status, response, Update, when, given, Append
+from nanohttp.contexts import Context
+from nanohttp import context
 
+from dolphin import Dolphin
 from dolphin.models import Project, Member, Workflow, Group, Release
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server
 
 
+def callback(audit_logs):
+    global logs
+    logs = audit_logs
+
+
 class TestProject(LocalApplicationTestCase):
+    __application__ = MiddleWare(Dolphin(), callback)
 
     @classmethod
+    @AuditLogContext(dict())
     def mockup(cls):
         session = cls.create_session()
 
@@ -110,16 +124,27 @@ class TestProject(LocalApplicationTestCase):
     def test_update(self):
         self.login('member1@example.com')
 
+        class Identity:
+            def __init__(self, member):
+                self.id = member.id
+                self.reference_id = member.reference_id
+
+        with Context({}):
+            context.identity = Identity(self.member1)
+            old_values = self.project1.to_dict()
+
+        form = dict(
+            title='My interesting project',
+            description='A updated project description',
+            status='active',
+            releaseId=self.release2.id,
+        )
+
         with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Updating a project',
             f'/apiv1/projects/id:{self.project1.id}',
             'UPDATE',
-            json=dict(
-                title='My interesting project',
-                description='A updated project description',
-                status='active',
-                releaseId=self.release2.id
-            )
+            json=form
         ):
             assert status == 200
             assert response.json['title'] == 'My interesting project'
@@ -128,6 +153,12 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['status'] == 'active'
             assert response.json['managerId'] == self.member1.id
             assert response.json['secondaryManagerId'] is None
+
+            assert len(logs) == 5
+            for log in logs:
+                if isinstance(log, ChangeAttributeLogEntry):
+                    assert log.old_value == old_values[log.attribute_key]
+                    assert log.new_value == form[log.attribute_key]
 
             when(
                 'Intended project with string type not found',
