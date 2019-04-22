@@ -151,7 +151,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             item_cte = select([
                 Item.issue_id.label('item_issue_id'),
                 func.max(Item.id).label('max_item_id'),
-                func.max(Item.phase_id).label('max_item_phase_id')
             ]) \
                 .select_from(
                     join(Issue, Item, Issue.id == Item.issue_id, isouter=True)
@@ -238,7 +237,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
                 query = Issue._sort_by_key_value(
                     query,
-                    column=item_cte.c.max_item_phase_id,
+                    column=Item.phase_id,
                     descending=sorting_columns['phaseId']
                 )
 
@@ -259,7 +258,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 if not 'phaseTitle' in context.query:
                     query = query.join(
                         Phase,
-                        Phase.id == item_cte.c.max_item_phase_id,
+                        Phase.id == Item.phase_id,
                         isouter=True
                     )
 
