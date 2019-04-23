@@ -3,7 +3,7 @@ from dolphin.models import Member
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
-class TestCreateEventType(LocalApplicationTestCase):
+class TestEventType(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
