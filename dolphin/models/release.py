@@ -100,7 +100,7 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
         'Project',
         primaryjoin=id == Project.release_id,
         back_populates='release',
-        protected=True,
+        protected=False,
         lazy='selectin'
     )
 

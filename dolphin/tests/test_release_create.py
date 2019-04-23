@@ -64,6 +64,7 @@ class TestRelease(LocalApplicationTestCase):
             assert response.json['status'] is None
             assert response.json['managerId'] == self.member.reference_id
             assert response.json['roomId'] is not None
+            assert len(response.json['projects']) == 0
 
             assert len(logs) == 2
             assert isinstance(logs[0], InstantiationLogEntry)
