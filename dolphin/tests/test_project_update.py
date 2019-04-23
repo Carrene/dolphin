@@ -43,8 +43,13 @@ class TestProject(LocalApplicationTestCase):
         )
         session.add(cls.member2)
 
-        workflow = Workflow(title='Default')
-        group = Group(title='default')
+        cls.workflow1 = Workflow(title='Workflow1')
+        cls.workflow2 = Workflow(title='Workflow2')
+        session.add(cls.workflow2)
+
+        cls.group1 = Group(title='Group1')
+        cls.group2 = Group(title='Group2')
+        session.add(cls.group2)
 
         cls.release1 = Release(
             title='My first release',
@@ -68,8 +73,8 @@ class TestProject(LocalApplicationTestCase):
 
         cls.project1 = Project(
             release=cls.release1,
-            workflow=workflow,
-            group=group,
+            workflow=cls.workflow1,
+            group=cls.group1,
             manager=cls.member1,
             title='My first project',
             description='A decription for my project',
@@ -79,8 +84,8 @@ class TestProject(LocalApplicationTestCase):
 
         project2 = Project(
             release=cls.release1,
-            workflow=workflow,
-            group=group,
+            workflow=cls.workflow1,
+            group=cls.group1,
             manager=cls.member1,
             title='My second project',
             description='A decription for my project',
@@ -90,8 +95,8 @@ class TestProject(LocalApplicationTestCase):
 
         project3 = Project(
             release=cls.release2,
-            workflow=workflow,
-            group=group,
+            workflow=cls.workflow1,
+            group=cls.group1,
             manager=cls.member1,
             title='My third project',
             description='A decription for my project',
@@ -101,8 +106,8 @@ class TestProject(LocalApplicationTestCase):
 
         project4 = Project(
             release=cls.release2,
-            workflow=workflow,
-            group=group,
+            workflow=cls.workflow1,
+            group=cls.group1,
             manager=cls.member1,
             title='My fourth project',
             description='A decription for my project',
@@ -112,8 +117,8 @@ class TestProject(LocalApplicationTestCase):
 
         cls.hidden_project = Project(
             release=cls.release1,
-            workflow=workflow,
-            group=group,
+            workflow=cls.workflow1,
+            group=cls.group1,
             manager=cls.member1,
             title='My hidden project',
             description='A decription for my project',
@@ -134,12 +139,17 @@ class TestProject(LocalApplicationTestCase):
         with Context({}):
             context.identity = Identity(self.member1)
             old_values = self.project1.to_dict()
+            old_values['release'] = self.release1.title
+            old_values['workflow'] = self.workflow1.title
+            old_values['group'] = self.group1.title
 
         form = dict(
             title='My interesting project',
             description='A updated project description',
             status='active',
             releaseId=self.release2.id,
+            workflowId=self.workflow2.id,
+            groupId=self.group2.id,
         )
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
@@ -156,11 +166,18 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['managerId'] == self.member1.id
             assert response.json['secondaryManagerId'] is None
 
-            assert len(logs) == 5
+            assert len(logs) == 7
+            form['release'] = self.release2.title
+            form['workflow'] = self.workflow2.title
+            form['group'] = self.group2.title
             for log in logs:
                 if isinstance(log, ChangeAttributeLogEntry):
                     assert log.old_value == old_values[log.attribute_key]
                     assert log.new_value == form[log.attribute_key]
+
+            del form['release']
+            del form['workflow']
+            del form['group']
 
             when(
                 'Intended project with string type not found',

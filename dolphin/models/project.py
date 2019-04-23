@@ -285,5 +285,14 @@ class Project(ModifiedByMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     @classmethod
     def __declare_last__(cls):
         super().__declare_last__()
-        observe(cls, ['modified_at', 'modified_by'])
+        observe(
+            cls,
+            [
+                'modified_at',
+                'modified_by',
+                'release_id',
+                'workflow_id',
+                'group_id',
+            ]
+        )
 
