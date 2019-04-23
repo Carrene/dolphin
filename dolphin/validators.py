@@ -770,7 +770,7 @@ phase_validator = validate(
 )
 
 
-event_type_create_validator = validate(
+eventtype_create_validator = validate(
    description=dict(
         max_length=(
             512,

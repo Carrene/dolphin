@@ -27,7 +27,7 @@ class EventType(OrderingMixin, FilteringMixin, PaginationMixin,
         nullable=False,
         not_none=True,
         required=True,
-        python_type=str
+        python_type=str,
     )
     description = Field(
         Unicode,
@@ -39,6 +39,6 @@ class EventType(OrderingMixin, FilteringMixin, PaginationMixin,
         nullable=True,
         required=False,
         python_type=str,
-        example='Lorem Ipsum'
+        example='Lorem Ipsum',
     )
 
