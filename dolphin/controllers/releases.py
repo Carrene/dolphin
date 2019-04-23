@@ -18,6 +18,7 @@ FORM_WHITELIST = [
     'cutoff',
     'managerReferenceId',
     'launchDate',
+    'groupId',
 ]
 
 

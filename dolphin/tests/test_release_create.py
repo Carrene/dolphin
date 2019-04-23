@@ -4,7 +4,7 @@ from auditor.logentry import RequestLogEntry, InstantiationLogEntry
 from bddrest import status, response, when, Remove, given, Update
 
 from dolphin import Dolphin
-from dolphin.models import Member, Release
+from dolphin.models import Member, Release, Group
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
@@ -30,6 +30,9 @@ class TestRelease(LocalApplicationTestCase):
             reference_id=1
         )
         session.add(cls.member)
+
+        cls.group = Group(title='default')
+
         release1 = Release(
             title='My first release',
             description='A decription for my first release',
@@ -37,6 +40,7 @@ class TestRelease(LocalApplicationTestCase):
             launch_date='2030-2-20',
             manager=cls.member,
             room_id=0,
+            group=cls.group,
         )
         session.add(release1)
         session.commit()
@@ -54,6 +58,7 @@ class TestRelease(LocalApplicationTestCase):
                 cutoff='2030-2-20',
                 launchDate='2030-2-20',
                 managerReferenceId=self.member.reference_id,
+                groupId=self.group.id,
             )
         ):
             assert status == 200
@@ -190,7 +195,7 @@ class TestRelease(LocalApplicationTestCase):
             )
             assert status == '707 Invalid field, only following fields are ' \
                 'accepted: title, description, status, cutoff, ' \
-                'managerReferenceId, launchDate'
+                'managerReferenceId, launchDate, groupId'
 
             with chat_server_status('404 Not Found'):
                 when(

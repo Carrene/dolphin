@@ -30,6 +30,10 @@ class TestProject(LocalApplicationTestCase):
             reference_id=2
         )
 
+        cls.workflow = Workflow(title='Default')
+
+        cls.group = Group(title='Public', public=True)
+
         release1 = Release(
             title='My first release',
             description='A decription for my first release',
@@ -37,10 +41,8 @@ class TestProject(LocalApplicationTestCase):
             launch_date='2030-2-20',
             manager=cls.member,
             room_id=0,
+            group=cls.group,
         )
-
-        cls.workflow = Workflow(title='Default')
-        cls.group = Group(title='Public', public=True)
 
         project1 = Project(
             workflow=cls.workflow,
@@ -70,6 +72,7 @@ class TestProject(LocalApplicationTestCase):
                 description='A decription for my project',
                 status='active',
                 managerId=self.member.id,
+                groupId=self.group.id,
             )
         ):
             assert status == 200

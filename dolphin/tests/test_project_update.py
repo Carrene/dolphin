@@ -53,6 +53,7 @@ class TestProject(LocalApplicationTestCase):
             launch_date='2030-2-20',
             manager=cls.member1,
             room_id=0,
+            group=group,
         )
 
         cls.release2 = Release(
@@ -62,6 +63,7 @@ class TestProject(LocalApplicationTestCase):
             launch_date='2030-2-20',
             manager=cls.member1,
             room_id=0,
+            group=group,
         )
 
         cls.project1 = Project(

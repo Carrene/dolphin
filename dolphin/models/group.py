@@ -60,7 +60,11 @@ class Group(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
     )
 
     projects = relationship('Project', back_populates='group', protected=True)
-
+    releases = relationship(
+        'Release',
+        back_populates='group',
+        protected=True,
+    )
     members = relationship(
         'Member',
         secondary='group_member',

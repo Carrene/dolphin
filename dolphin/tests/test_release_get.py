@@ -1,7 +1,7 @@
 from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when
 
-from dolphin.models import Release, Member, Workflow
+from dolphin.models import Release, Member, Workflow, Group
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -21,6 +21,8 @@ class TestRelease(LocalApplicationTestCase):
         )
         session.add(member)
 
+        group = Group(title='default')
+
         cls.release = Release(
             title='My first release',
             description='A decription for my first release',
@@ -28,6 +30,7 @@ class TestRelease(LocalApplicationTestCase):
             launch_date='2030-2-20',
             manager=member,
             room_id=0,
+            group=group,
         )
         session.add(cls.release)
         session.commit()

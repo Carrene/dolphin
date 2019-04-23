@@ -5,7 +5,7 @@ from nanohttp.contexts import Context
 from nanohttp import context
 
 from dolphin import Dolphin
-from dolphin.models import Release, Member
+from dolphin.models import Release, Member, Group
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -31,6 +31,8 @@ class TestRelease(LocalApplicationTestCase):
         )
         session.add(member1)
 
+        group = Group(title='default')
+
         cls.member2 = Member(
             title='Second Member',
             email='member2@example.com',
@@ -47,6 +49,7 @@ class TestRelease(LocalApplicationTestCase):
             launch_date='2030-2-20',
             manager=member1,
             room_id=0,
+            group=group,
         )
         session.add(release1)
 
@@ -57,6 +60,7 @@ class TestRelease(LocalApplicationTestCase):
             launch_date='2030-2-20',
             manager=member1,
             room_id=0,
+            group=group,
         )
         session.add(release2)
         session.commit()

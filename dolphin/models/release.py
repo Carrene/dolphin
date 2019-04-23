@@ -57,6 +57,17 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
         nullable=False,
         python_type=int,
     )
+    group_id = Field(
+        Integer,
+        ForeignKey('group.id'),
+        python_type=int,
+        watermark='Lorem Ipsum',
+        label='Group',
+        nullable=False,
+        not_none=True,
+        required=False,
+        message='Lorem Ipsum',
+    )
     status = Field(
         Enum(*release_statuses, name='release_status'),
         python_type=str,
@@ -110,7 +121,11 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
         back_populates='releases',
         protected=True
     )
-
+    group = relationship(
+        'Group',
+        back_populates='releases',
+        protected=True,
+    )
     is_subscribed = column_property(
         select([func.count(Subscription.member_id)])
         .select_from(
