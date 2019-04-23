@@ -270,7 +270,7 @@ def skill_exists_validator(title, project, field):
     return title
 
 
-def event_type_exists_validator(title, project, field):
+def eventtype_exists_validator(title, project, field):
     event_type = DBSession.query(EventType) \
         .filter(EventType.title == title) \
         .one_or_none()
@@ -783,7 +783,7 @@ eventtype_create_validator = validate(
         required='710 Title Not In Form',
         not_none='727 Title Is None',
         max_length=(50, '704 At Most 50 Characters Valid For Title'),
-        callback=event_type_exists_validator
+        callback=eventtype_exists_validator
     ),
 )
 
