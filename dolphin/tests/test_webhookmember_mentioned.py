@@ -32,6 +32,7 @@ class TestMentionedMemberWebhook(LocalApplicationTestCase):
             launch_date='2030-2-20',
             manager=cls.member1,
             room_id=0,
+            group=group,
         )
 
         project = Project(
