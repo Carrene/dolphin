@@ -4,7 +4,7 @@ from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 
 from ..models import EventType
-from ..validators import event_type_create_validator
+from ..validators import eventtype_create_validator
 
 
 class EventTypeController(ModelRestController):
@@ -12,7 +12,7 @@ class EventTypeController(ModelRestController):
 
     @authorize
     @json(prevent_empty_form='708 Empty Form')
-    @event_type_create_validator
+    @eventtype_create_validator
     @commit
     def create(self):
         event_type = EventType(
