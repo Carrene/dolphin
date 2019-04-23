@@ -1,3 +1,4 @@
+from auditor import context as AuditLogContext
 from nanohttp import HTTPStatus, json, context, HTTPNotFound, int_or_notfound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
@@ -67,6 +68,56 @@ class ProjectController(ModelRestController):
                 create_room_error = 1
 
         return room
+
+    def _create_auditlog(self, project):
+        workflow_id = context.form.get('workflowId')
+        group_id = context.form.get('groupId')
+        release_id = context.form.get('releaseId')
+        manager_id = context.form.get('managerId')
+        if workflow_id is not None and workflow_id != project.workflow_id:
+            workflow = DBSession.query(Workflow).get(workflow_id)
+            AuditLogContext.append_change_attribute(
+                user=context.identity.email,
+                object_=project,
+                attribute_key='workflow',
+                attribute_label='Workflow',
+                old_value=project.workflow.title,
+                new_value=workflow.title,
+            )
+
+        if group_id is not None and group_id != project.group_id:
+            group = DBSession.query(Group).get(group_id)
+            AuditLogContext.append_change_attribute(
+                user=context.identity.email,
+                object_=project,
+                attribute_key='group',
+                attribute_label='Group',
+                old_value=project.group.title,
+                new_value=group.title,
+            )
+
+        if release_id is not None and release_id != project.release_id:
+            release = DBSession.query(Release).get(release_id)
+            AuditLogContext.append_change_attribute(
+                user=context.identity.email,
+                object_=project,
+                attribute_key='release',
+                attribute_label='Release',
+                old_value=project.release.title,
+                new_value=release.title,
+            )
+
+        if manager_id is not None and manager_id != project.manager_id:
+            manager = DBSession.query(Member).get(manager_id)
+            AuditLogContext.append_change_attribute(
+                user=context.identity.email,
+                object_=project,
+                attribute_key='manager',
+                attribute_label='Manager',
+                old_value=project.manager.title,
+                new_value=manager.title,
+            )
+
 
     @authorize
     @json(form_whitelist=(
@@ -210,6 +261,7 @@ class ProjectController(ModelRestController):
                         f'"{form["title"]}" is already exists.'
                     )
 
+        self._create_auditlog(project)
         project.update_from_request()
         return project
 
