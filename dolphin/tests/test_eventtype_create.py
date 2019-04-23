@@ -1,4 +1,4 @@
-from bddrest import status, response, when, Given
+from bddrest import status, response, when, given
 from dolphin.models import Member
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
@@ -67,7 +67,7 @@ class TestEventType(LocalApplicationTestCase):
 
             when(
                 'Description length is less than limit',
-                json=given | dict(description=(512 + 1) * 'a')),
+                json=given | dict(description=(512 + 1) * 'a'),
             )
             assert status == '703 At Most 512 Characters Are Valid For ' \
                 'Description'
