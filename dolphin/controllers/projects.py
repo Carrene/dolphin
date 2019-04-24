@@ -118,7 +118,6 @@ class ProjectController(ModelRestController):
                 new_value=manager.title,
             )
 
-
     @authorize
     @json(form_whitelist=(
         FORM_WHITELIST,
