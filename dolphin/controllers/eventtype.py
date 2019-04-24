@@ -22,7 +22,6 @@ class EventTypeController(ModelRestController):
         DBSession.add(event_type)
         return event_type
 
-
     @authorize
     @json(prevent_form='709 Form Not Allowed')
     def get(self, id):
