@@ -15,7 +15,6 @@ class EventType(OrderingMixin, FilteringMixin, PaginationMixin,
         required=False,
         label='ID',
         minimum=1,
-        example=1,
     )
     title = Field(
         Unicode,
