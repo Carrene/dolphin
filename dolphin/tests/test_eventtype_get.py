@@ -25,7 +25,6 @@ class TestEventType(LocalApplicationTestCase):
         session.add(cls.event_type)
         session.commit()
 
-
     def test_get(self):
         self.login(email=self.member.email)
 
