@@ -74,7 +74,7 @@ class ProjectController(ModelRestController):
         group_id = context.form.get('groupId')
         release_id = context.form.get('releaseId')
         manager_id = context.form.get('managerId')
-        secondary_manager_id= context.form.get('secondaryManagerId')
+        secondary_manager_id = context.form.get('secondaryManagerId')
         if workflow_id is not None and workflow_id != project.workflow_id:
             workflow = DBSession.query(Workflow).get(workflow_id)
             AuditLogContext.append_change_attribute(
