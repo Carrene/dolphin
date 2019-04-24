@@ -31,7 +31,9 @@ class TestRelease(LocalApplicationTestCase):
         )
         session.add(member1)
 
-        group = Group(title='default')
+        group1 = Group(title='group1')
+        cls.group2 = Group(title='group2')
+        session.add(cls.group2)
 
         cls.member2 = Member(
             title='Second Member',
@@ -49,7 +51,7 @@ class TestRelease(LocalApplicationTestCase):
             launch_date='2030-2-20',
             manager=member1,
             room_id=0,
-            group=group,
+            group=group1,
         )
         session.add(release1)
 
@@ -60,7 +62,7 @@ class TestRelease(LocalApplicationTestCase):
             launch_date='2030-2-20',
             manager=member1,
             room_id=0,
-            group=group,
+            group=group1,
         )
         session.add(release2)
         session.commit()
@@ -79,6 +81,7 @@ class TestRelease(LocalApplicationTestCase):
                 launchDate='2030-2-21',
                 status='in-progress',
                 managerReferenceId=self.member2.reference_id,
+                groupId=self.group2.id,
             )
         ):
             assert status == 200
@@ -88,6 +91,7 @@ class TestRelease(LocalApplicationTestCase):
             assert response.json['launchDate'] == '2030-02-21T00:00:00'
             assert response.json['status'] == 'in-progress'
             assert response.json['managerId'] == self.member2.id
+            assert response.json['groupId'] == self.group2.id
 
             assert len(logs) == 7
 
@@ -181,6 +185,18 @@ class TestRelease(LocalApplicationTestCase):
 
             when('Trying to pass without form', json={})
             assert status == '708 No Parameter Exists In The Form'
+
+            when(
+                'Group id is null',
+                json=given | dict(title='New Release', groupId=None)
+            )
+            assert status == '796 Group Id Is Null'
+
+            when(
+                'Group is not found',
+                json=Update(title='New Release', groupId=0)
+            )
+            assert status == '659 Group Not Found'
 
             when('Request is not authorized', authorization=None)
             assert status == 401

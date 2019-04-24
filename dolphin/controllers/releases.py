@@ -5,8 +5,8 @@ from restfulpy.orm import DBSession, commit
 
 from ..exceptions import HTTPManagerNotFound, \
     HTTPLaunchDateMustGreaterThanCutoffDate, ChatRoomNotFound, \
-    RoomMemberAlreadyExist, RoomMemberNotFound
-from ..models import Release, Subscription, Member
+    RoomMemberAlreadyExist, RoomMemberNotFound, HTTPGroupNotFound
+from ..models import Release, Subscription, Member, Group
 from ..validators import release_validator, update_release_validator
 from ..backends import ChatClient
 
@@ -49,6 +49,10 @@ class ReleaseController(ModelRestController):
             .one_or_none()
         if member is None:
             raise HTTPManagerNotFound()
+
+        group = DBSession.query(Group).get(context.form.get('groupId'))
+        if group is None:
+            raise HTTPGroupNotFound()
 
         release = Release()
         release.manager_id = member.id
@@ -120,6 +124,11 @@ class ReleaseController(ModelRestController):
                 raise HTTPManagerNotFound()
 
             release.manager_id = member.id
+
+        if 'groupId' in context.form:
+            group = DBSession.query(Group).get(context.form.get('groupId'))
+            if group is None:
+                raise HTTPGroupNotFound()
 
         release.update_from_request()
         if release.launch_date < release.cutoff:
