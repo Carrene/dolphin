@@ -74,6 +74,7 @@ class ProjectController(ModelRestController):
         group_id = context.form.get('groupId')
         release_id = context.form.get('releaseId')
         manager_id = context.form.get('managerId')
+        secondary_manager_id= context.form.get('secondaryManagerId')
         if workflow_id is not None and workflow_id != project.workflow_id:
             workflow = DBSession.query(Workflow).get(workflow_id)
             AuditLogContext.append_change_attribute(
@@ -116,6 +117,22 @@ class ProjectController(ModelRestController):
                 attribute_label='Manager',
                 old_value=project.manager.title,
                 new_value=manager.title,
+            )
+
+        if secondary_manager_id != project.secondary_manager_id:
+            new_value = None if secondary_manager_id is None \
+                else DBSession.query(Member).get(secondary_manager_id).email
+
+            old_value = None if project.secondary_manager_id is None \
+                else project.secondary_manager.email
+
+            AuditLogContext.append_change_attribute(
+                user=context.identity.email,
+                object_=project,
+                attribute_key='secondaryManager',
+                attribute_label='Secondary Manager',
+                old_value=old_value,
+                new_value=new_value,
             )
 
     @authorize
@@ -236,16 +253,12 @@ class ProjectController(ModelRestController):
             if manager is None:
                 raise HTTPManagerNotFound()
 
-            project.manager = manager
-
         if form.get('secondaryManagerId') is not None:
             secondary_manager = DBSession.query(Member).get(
                 form.get('secondaryManagerId')
             )
             if secondary_manager is None:
                 raise HTTPSecondaryManagerNotFound()
-
-            project.secondary_manager = secondary_manager
 
         if 'title' in form:
             release = project.release
