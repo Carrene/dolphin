@@ -121,10 +121,10 @@ class ProjectController(ModelRestController):
 
         if secondary_manager_id != project.secondary_manager_id:
             new_value = None if secondary_manager_id is None \
-                else DBSession.query(Member).get(secondary_manager_id).email
+                else DBSession.query(Member).get(secondary_manager_id).title
 
             old_value = None if project.secondary_manager_id is None \
-                else project.secondary_manager.email
+                else project.secondary_manager.title
 
             AuditLogContext.append_change_attribute(
                 user=context.identity.email,
