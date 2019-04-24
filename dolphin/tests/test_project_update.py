@@ -142,6 +142,7 @@ class TestProject(LocalApplicationTestCase):
             old_values['release'] = self.release1.title
             old_values['workflow'] = self.workflow1.title
             old_values['group'] = self.group1.title
+            old_values['secondaryManager'] = None
 
         form = dict(
             title='My interesting project',
@@ -150,6 +151,7 @@ class TestProject(LocalApplicationTestCase):
             releaseId=self.release2.id,
             workflowId=self.workflow2.id,
             groupId=self.group2.id,
+            secondaryManagerId=self.member1.id,
         )
 
         with oauth_mockup_server(), chat_mockup_server(), self.given(
@@ -164,12 +166,13 @@ class TestProject(LocalApplicationTestCase):
                 'description'
             assert response.json['status'] == 'active'
             assert response.json['managerId'] == self.member1.id
-            assert response.json['secondaryManagerId'] is None
+            assert response.json['secondaryManagerId'] == self.member1.id
 
-            assert len(logs) == 7
+            assert len(logs) == 8
             form['release'] = self.release2.title
             form['workflow'] = self.workflow2.title
             form['group'] = self.group2.title
+            form['secondaryManager'] = self.member1.email
             for log in logs:
                 if isinstance(log, ChangeAttributeLogEntry):
                     assert log.old_value == old_values[log.attribute_key]
@@ -178,6 +181,7 @@ class TestProject(LocalApplicationTestCase):
             del form['release']
             del form['workflow']
             del form['group']
+            del form['secondaryManager']
 
             when(
                 'Intended project with string type not found',
@@ -260,7 +264,7 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Secondary manager is not found',
-                json=Append(secondaryManagerId=0)
+                json=Update(secondaryManagerId=0)
             )
             assert status == '650 Secondary Manager Not Found'
 

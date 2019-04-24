@@ -293,6 +293,8 @@ class Project(ModifiedByMixin, OrderingMixin, FilteringMixin, PaginationMixin,
                 'release_id',
                 'workflow_id',
                 'group_id',
+                'manager_id',
+                'secondary_manager_id',
             ]
         )
 
