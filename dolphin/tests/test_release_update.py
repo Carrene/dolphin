@@ -93,7 +93,7 @@ class TestRelease(LocalApplicationTestCase):
             assert response.json['managerId'] == self.member2.id
             assert response.json['groupId'] == self.group2.id
 
-            assert len(logs) == 7
+            assert len(logs) == 8
 
             when(
                 'Intended release with string type not found',
