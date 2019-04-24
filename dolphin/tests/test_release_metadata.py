@@ -65,3 +65,10 @@ class TestRelease(LocalApplicationTestCase):
             assert fields['launchDate']['example'] is not None
             assert fields['launchDate']['readonly'] is not None
 
+            assert fields['projects']['label'] is not None
+            assert fields['projects']['example'] is not None
+            assert fields['projects']['name'] is not None
+            assert fields['projects']['key'] is not None
+            assert fields['projects']['readonly'] is not None
+            assert fields['projects']['protected'] is not None
+
