@@ -80,13 +80,14 @@ class ProjectController(ModelRestController):
     def create(self):
         form = context.form
         token = context.environ['HTTP_AUTHORIZATION']
-        member = DBSession.query(Member).get(form['managerId'])
-        if member is None:
+        manager = DBSession.query(Member).get(form['managerId'])
+        creator = Member.current()
+        if manager is None:
             raise HTTPManagerNotFound()
 
         project = Project()
         project.update_from_request()
-        project.manager_id = member.id
+        project.manager_id = manager.id
 
         if form.get('secondaryManagerId') is not None:
             secondary_manager = DBSession.query(Member).get(
@@ -118,7 +119,7 @@ class ProjectController(ModelRestController):
         room = self._ensure_room(
             project.get_room_title(),
             token,
-            member.access_token
+            creator.access_token
         )
 
         chat_client = ChatClient()
@@ -126,15 +127,15 @@ class ProjectController(ModelRestController):
         try:
             chat_client.add_member(
                 project.room_id,
-                member.reference_id,
+                manager.reference_id,
                 token,
-                member.access_token
+                creator.access_token
             )
 
         except RoomMemberAlreadyExist:
             # Exception is passed because it means `add_member()` is already
-            # called and `member` successfully added to room. So there is
-            # no need to call `add_member()` API again and re-add the member to
+            # called and `manager` successfully added to room. So there is
+            # no need to call `add_member()` API again and re-add the manager to
             # room.
             pass
 
@@ -149,7 +150,7 @@ class ProjectController(ModelRestController):
             chat_client.delete_room(
                 project.room_id,
                 token,
-                member.access_token
+                creator.access_token
             )
             raise
 

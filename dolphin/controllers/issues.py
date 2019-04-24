@@ -7,7 +7,7 @@ from nanohttp import HTTPStatus, json, context, HTTPNotFound, \
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import DBSession, commit
-from sqlalchemy import and_, exists, select, func
+from sqlalchemy import and_, exists, select, func, join
 
 from ..backends import ChatClient
 from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound, \
@@ -149,9 +149,12 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         if needed_cte:
             item_cte = select([
-                Item.issue_id,
-                func.max(Item.id).label('max_item_id')
+                Item.issue_id.label('item_issue_id'),
+                func.max(Item.id).label('max_item_id'),
             ]) \
+                .select_from(
+                    join(Issue, Item, Issue.id == Item.issue_id, isouter=True)
+                ) \
                 .group_by(Item.issue_id) \
                 .cte()
 
@@ -169,15 +172,18 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         if 'phaseTitle' in context.query:
             value = context.query['phaseTitle']
-            if is_issue_item_joined:
-                query = query.join(Phase, Item.phase_id == Phase.id)
-
-            else:
-                query = query \
-                    .join(Item, Item.issue_id == Issue.id) \
-                    .join(Phase, Item.phase_id == Phase.id)
+            if not is_issue_item_joined:
+                query = query.join(
+                    item_cte,
+                    item_cte.c.item_issue_id == Issue.id,
+                )
+                query = query.join(
+                    Item,
+                    Item.id == item_cte.c.max_item_id,
+                )
                 is_issue_item_joined = True
 
+            query = query.join(Phase, Phase.id == Item.phase_id)
             query = Issue._filter_by_column_value(query, Phase.title, value)
 
         if 'tagId' in context.query:
@@ -218,13 +224,13 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             if 'phaseId' in sorting_expression:
                 if not is_issue_item_joined:
                     query = query.join(
-                        Item,
-                        Item.issue_id == Issue.id,
+                        item_cte,
+                        item_cte.c.item_issue_id == Issue.id,
                         isouter=True
                     )
                     query = query.join(
-                        item_cte,
-                        item_cte.c.max_item_id == Item.id,
+                        Item,
+                        Item.id == item_cte.c.max_item_id,
                         isouter=True
                     )
                     is_issue_item_joined = True
@@ -239,13 +245,13 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
                 if not is_issue_item_joined:
                     query = query.join(
-                        Item,
-                        Item.issue_id == Issue.id,
+                        item_cte,
+                        item_cte.c.item_issue_id == Issue.id,
                         isouter=True
                     )
                     query = query.join(
-                        item_cte,
-                        item_cte.c.max_item_id == Item.id,
+                        Item,
+                        Item.id == item_cte.c.max_item_id,
                         isouter=True
                     )
 
@@ -255,6 +261,29 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                         Phase.id == Item.phase_id,
                         isouter=True
                     )
+
+                # THE RESULT QUERY:
+                # WITH anon_1 AS
+                # (SELECT item.issue_id AS item_issue_id, max(item.id)
+                # AS max_item_id
+                # FROM subscribable JOIN issue ON subscribable.id = issue.id
+                # LEFT OUTER JOIN item ON issue.id = item.issue_id
+                # GROUP BY item.issue_id)
+                # SELECT subscribable.created_at AS subscribable_created_at,
+                # subscribable.type_ AS subscribable_type_,
+                # issue.id AS issue_id, subscribable.id AS subscribable_id,
+                # subscribable.title AS subscribable_title,
+                # subscribable.description AS subscribable_description,
+                # issue.modified_at AS issue_modified_at, issue."modifiedBy"
+                # AS "issue_modifiedBy", issue.project_id AS issue_project_id,
+                # issue.room_id AS issue_room_id,
+                # issue.due_date AS issue_due_date, issue.kind AS issue_kind,
+                # issue.days AS issue_days, issue.status AS issue_status,
+                # issue.priority AS issue_priority
+                # FROM subscribable JOIN issue ON subscribable.id = issue.id
+                # LEFT OUTER JOIN anon_1 ON anon_1.item_issue_id = issue.id
+                # LEFT OUTER JOIN item ON item.id = anon_1.max_item_id
+                # LEFT OUTER JOIN phase ON phase.id = item.phase_id
 
                 query = Issue._sort_by_key_value(
                     query,
