@@ -30,7 +30,7 @@ class TestProject(LocalApplicationTestCase):
             email='member1@example.com',
             access_token='access token 1',
             phone=123456789,
-            reference_id=2
+            reference_id=1
         )
         session.add(cls.member1)
 
@@ -39,7 +39,7 @@ class TestProject(LocalApplicationTestCase):
             email='member2@example.com',
             access_token='access token 2',
             phone=123457689,
-            reference_id=3
+            reference_id=2
         )
         session.add(cls.member2)
 
@@ -168,11 +168,13 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['managerId'] == self.member1.id
             assert response.json['secondaryManagerId'] == self.member1.id
 
+            session = self.create_session()
+            member1 = session.query(Member).get(self.member1.id)
             assert len(logs) == 8
             form['release'] = self.release2.title
             form['workflow'] = self.workflow2.title
             form['group'] = self.group2.title
-            form['secondaryManager'] = self.member1.email
+            form['secondaryManager'] = member1.title
             for log in logs:
                 if isinstance(log, ChangeAttributeLogEntry):
                     assert log.old_value == old_values[log.attribute_key]
