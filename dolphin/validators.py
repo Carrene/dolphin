@@ -296,6 +296,11 @@ release_validator = validate(
         pattern=(DATETIME_PATTERN, '784 Invalid Launch Date Format'),
         required='783 Launch Date Not In Form'
     ),
+    groupId=dict(
+        type_=(int, '797 Invalid Group Id Type'),
+        required='795 Group Id Not In Form',
+        not_none='796 Group Id Is Null',
+    ),
 )
 
 
@@ -319,6 +324,10 @@ update_release_validator = validate(
     ),
     launchDate=dict(
         pattern=(DATETIME_PATTERN, '784 Invalid Launch Date Format'),
+    ),
+    groupId=dict(
+        type_=(int, '797 Invalid Group Id Type'),
+        not_none='796 Group Id Is Null',
     ),
 )
 

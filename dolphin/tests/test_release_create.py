@@ -74,6 +74,7 @@ class TestRelease(LocalApplicationTestCase):
             assert len(logs) == 2
             assert isinstance(logs[0], InstantiationLogEntry)
             assert isinstance(logs[1], RequestLogEntry)
+            assert response.json['groupId'] == self.group.id
 
             when(
                 'Title is not in form',
@@ -185,6 +186,24 @@ class TestRelease(LocalApplicationTestCase):
                 json=given - 'managerReferenceId' | dict(title='New Release')
             )
             assert status == '777 Manager Reference Id Not In Form'
+
+            when(
+                'Group id is null',
+                json=given | dict(title='New Release', groupId=None)
+            )
+            assert status == '796 Group Id Is Null'
+
+            when(
+                'Group is not found',
+                json=Update(title='New Release', groupId=0)
+            )
+            assert status == '659 Group Not Found'
+
+            when(
+                'Group id is not in form',
+                json=given - 'groupId' | dict(title='New Release')
+            )
+            assert status == '795 Group Id Not In Form'
 
             when('Trying to pass without form', json={})
             assert status == '708 No Parameter Exists In The Form'

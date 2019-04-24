@@ -135,3 +135,7 @@ class HTTPRepetitiveOrder(HTTPKnownStatus):
 class HTTPSkillNotFound(HTTPKnownStatus):
     status = '645 Skill Not Found'
 
+
+class HTTPGroupNotFound(HTTPKnownStatus):
+    status = '659 Group Not Found'
+
