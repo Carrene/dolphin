@@ -349,7 +349,6 @@ project_validator = validate(
     ),
     secondaryManagerId=dict(
         type_=(int, '650 Secondary Manager Not Found'),
-        not_none='782 Secondary Manager Id Is Null',
     ),
 )
 
@@ -367,7 +366,6 @@ update_project_validator = validate(
     ),
     secondaryManagerId=dict(
         type_=(int, '650 Secondary Manager Not Found'),
-        not_none='782 Secondary Manager Id Is Null',
     ),
     managerId=dict(
         type_=(int, '608 Manager Not Found'),
