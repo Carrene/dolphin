@@ -1,13 +1,24 @@
+from auditor import MiddleWare
+from auditor.context import Context as AuditLogContext
+from auditor.logentry import RequestLogEntry, InstantiationLogEntry
 from bddrest import status, response, when, Remove, given, Update
 
+from dolphin import Dolphin
 from dolphin.models import Member, Release
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
 
+def callback(audit_logs):
+    global logs
+    logs = audit_logs
+
+
 class TestRelease(LocalApplicationTestCase):
+    __application__ = MiddleWare(Dolphin(), callback)
 
     @classmethod
+    @AuditLogContext(dict())
     def mockup(cls):
         session = cls.create_session()
 
@@ -53,6 +64,10 @@ class TestRelease(LocalApplicationTestCase):
             assert response.json['status'] is None
             assert response.json['managerId'] == self.member.reference_id
             assert response.json['roomId'] is not None
+
+            assert len(logs) == 2
+            assert isinstance(logs[0], InstantiationLogEntry)
+            assert isinstance(logs[1], RequestLogEntry)
 
             when(
                 'Title is not in form',
