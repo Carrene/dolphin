@@ -30,7 +30,6 @@ class TestEventType(LocalApplicationTestCase):
         session.add(event_type2)
         session.commit()
 
-
     def test_list(self):
         self.login(self.member.email)
 
