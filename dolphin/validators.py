@@ -134,7 +134,9 @@ def kind_value_validator(kind, project, field):
 
 def issue_status_value_validator(status, project, field):
     form = context.form
-    if 'status' in form and form['status'] not in issue_statuses:
+    if 'status' in form  \
+            and form['status'] is not None and \
+            form['status'] not in issue_statuses:
         raise HTTPStatus(
             f'705 Invalid status, only one of ' \
             f'"{", ".join(issue_statuses)}" will be accepted'
