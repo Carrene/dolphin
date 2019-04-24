@@ -240,12 +240,6 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['secondaryManagerId'] == self.member2.id
 
             when(
-                'Secondary manager id is null',
-                json=Append(secondaryManagerId=None)
-            )
-            assert status == '782 Secondary Manager Id Is Null'
-
-            when(
                 'Secondary manager is not found',
                 json=Append(secondaryManagerId=0)
             )
