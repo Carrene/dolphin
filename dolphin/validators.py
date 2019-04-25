@@ -794,6 +794,7 @@ eventtype_create_validator = validate(
     ),
 )
 
+
 eventtype_update_validator = validate(
     description=dict(
         max_length=(

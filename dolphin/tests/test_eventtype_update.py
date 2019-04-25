@@ -16,7 +16,7 @@ class TestEventType(LocalApplicationTestCase):
             email='member1@example.com',
             access_token='access token 1',
             phone=123456789,
-            reference_id=1
+            reference_id=1,
         )
         session.add(cls.member)
 
@@ -35,10 +35,9 @@ class TestEventType(LocalApplicationTestCase):
         self.login(self.member.email)
         new_title = 'New title'
         new_description = 'A description for event type'
-        new_public = False
 
         with oauth_mockup_server(), self.given(
-            f'Updating a event type',
+            f'Updating an event type',
             f'/apiv1/eventtypes/id: {self.event_type1.id}',
             f'UPDATE',
             json=dict(
