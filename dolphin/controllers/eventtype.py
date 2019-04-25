@@ -8,13 +8,10 @@ from ..validators import eventtype_create_validator, eventtype_update_validator
 from ..exceptions import HTTPRepetitiveTitle
 
 
-
 FORM_WHITELIST = [
     'title',
     'description',
 ]
-
-
 FORM_WHITELISTS_STRING = ', '.join(FORM_WHITELIST)
 
 
@@ -50,7 +47,6 @@ class EventTypeController(ModelRestController):
     def update(self, id):
         id = int_or_notfound(id)
         title = context.form.get('title')
-        description = context.form.get('discription')
         event_type = DBSession.query(EventType).get(id)
         if event_type is None:
             raise HTTPNotFound()
