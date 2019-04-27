@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-from nanohttp import json, HTTPNotFound, int_or_notfound
-=======
 from nanohttp import json, HTTPNotFound, int_or_notfound, context
->>>>>>> Implemented the update method on the event controller, closes #724
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
