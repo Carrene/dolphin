@@ -48,7 +48,6 @@ class TestEvent(LocalApplicationTestCase):
         session.add(cls.event2)
         session.commit()
 
-
     def test_add(self):
         self.login(self.member.email)
         title = 'New event'
