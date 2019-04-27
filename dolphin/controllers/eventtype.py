@@ -12,6 +12,8 @@ FORM_WHITELIST = [
     'title',
     'description',
 ]
+
+
 FORM_WHITELISTS_STRING = ', '.join(FORM_WHITELIST)
 
 
