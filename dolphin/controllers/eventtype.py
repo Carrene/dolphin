@@ -36,6 +36,13 @@ class EventTypeController(ModelRestController):
     @json(prevent_form='709 Form Not Allowed')
     def get(self, id):
         id = int_or_notfound(id)
+        event_type = DBSession.query(EventType).get(id)
+        if event_type is None:
+            raise HTTPNotFound()
+
+        return event_type
+
+    @authorize
     @json(
         prevent_empty_form='708 Empty Form',
         form_whitelist=(
