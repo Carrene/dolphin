@@ -34,7 +34,7 @@ class TestEventType(LocalApplicationTestCase):
         self.login(self.member.email)
 
         with oauth_mockup_server(), self.given(
-            'List event type',
+            'List event types',
             '/apiv1/eventtypes',
             'LIST',
         ):
