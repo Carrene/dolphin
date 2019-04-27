@@ -839,7 +839,6 @@ event_add_validator = validate(
         not_none='727 Title Is None',
         max_length=(50, '704 At Most 50 Characters Valid For Title'),
         callback=event_exists_validator,
-    ),
 )
 
 
