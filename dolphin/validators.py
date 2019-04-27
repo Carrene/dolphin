@@ -1,5 +1,4 @@
 import re
-import datetime
 
 from nanohttp import validate, HTTPStatus, context
 from restfulpy.orm import DBSession
