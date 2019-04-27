@@ -2,7 +2,7 @@ from auditor import MiddleWare
 from auditor.logentry import ChangeAttributeLogEntry
 from auditor.context import Context as AuditLogContext
 from auditor.logentry import RequestLogEntry, InstantiationLogEntry
-from bddrest import status, response, Update, when, given, Append
+from bddrest import status, response, when, given
 from nanohttp.contexts import Context
 from nanohttp import context
 
@@ -58,7 +58,7 @@ class TestProject(LocalApplicationTestCase):
             launch_date='2030-2-20',
             manager=cls.member1,
             room_id=0,
-            group=group,
+            group=cls.group1,
         )
 
         cls.release2 = Release(
@@ -68,7 +68,7 @@ class TestProject(LocalApplicationTestCase):
             launch_date='2030-2-20',
             manager=cls.member1,
             room_id=0,
-            group=group,
+            group=cls.group1,
         )
 
         cls.project1 = Project(
@@ -222,9 +222,7 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Title length is more than limit',
-                json=Update(
-                    title=((128 + 1) * 'a')
-                )
+                json=given | dict(title=((128 + 1) * 'a'))
             )
             assert status == '704 At Most 128 Characters Are Valid For Title'
 
@@ -258,9 +256,7 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Trying to update a project with secondary manager',
-                json=Update(
-                    secondaryManagerId=self.member2.id
-                )
+                json=given | dict(secondaryManagerId=self.member2.id)
             )
             assert response.json['secondaryManagerId'] == self.member2.id
 
@@ -272,19 +268,19 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Trying to change the project manager',
-                json=Append(managerId=self.member2.id)
+                json=given | dict(managerId=self.member2.id)
             )
             assert response.json['managerId'] == self.member2.id
 
             when(
                 'Manager id is null',
-                json=Append(managerId=None)
+                json=given | dict(managerId=None)
             )
             assert status == '785 Manager Id Is Null'
 
             when(
                 'Manager is not found',
-                json=Append(managerId=0)
+                json=given | dict(managerId=0)
             )
             assert status == '608 Manager Not Found'
 
