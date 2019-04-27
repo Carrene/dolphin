@@ -24,6 +24,7 @@ from .skill import SkillController
 from .group import GroupController
 from .activity import ActivityController
 from .eventtype import EventTypeController
+from .event import EventController
 
 
 here = abspath(dirname(__file__))
@@ -51,6 +52,7 @@ class Apiv1(RestController, JsonPatchControllerMixin):
     groups = GroupController()
     activities = ActivityController()
     eventtypes = EventTypeController()
+    events = EventController()
 
     @json
     def version(self):

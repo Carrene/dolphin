@@ -20,4 +20,5 @@ from .attachment import Attachment
 from .skill import Skill, SkillMember
 from .activity import Activity
 from .eventtype import EventType
+from .event import Event
 
