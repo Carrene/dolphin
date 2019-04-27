@@ -1,8 +1,14 @@
 import datetime
+<<<<<<< HEAD
 
 from restfulpy.orm import Field, DeclarativeBase, OrderingMixin, \
     FilteringMixin, PaginationMixin, relationship
 from sqlalchemy import Integer, Unicode, DateTime, ForeignKey
+=======
+from restfulpy.orm import Field, DeclarativeBase, OrderingMixin, \
+    FilteringMixin, PaginationMixin, relationship
+from sqlalchemy import Integer, String, Unicode, DateTime, ForeignKey
+>>>>>>> Added the add method to event controller, closes #721
 
 
 class Event(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):

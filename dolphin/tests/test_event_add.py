@@ -2,7 +2,7 @@ import datetime
 
 from bddrest import status, response, when, given
 
-from dolphin.models import Member, EventType
+from dolphin.models import Member, EventType, Event
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -111,6 +111,7 @@ class TestEvent(LocalApplicationTestCase):
             )
             assert status == '790 Invalid End Date Format'
 
+<<<<<<< HEAD
             when(
                 'End date must be greater than start date',
                 json=given | dict(
@@ -130,6 +131,8 @@ class TestEvent(LocalApplicationTestCase):
             )
             assert status == '794 Type Id Not In Form'
 
+=======
+>>>>>>> Added the add method to event controller, closes #721
             when('Request is not authorized', authorization=None)
             assert status == 401
 
