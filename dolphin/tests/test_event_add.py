@@ -1,7 +1,8 @@
 import datetime
 
 from bddrest import status, response, when, given
-from dolphin.models import Member, EventType, Event
+
+from dolphin.models import Member, EventType
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -109,6 +110,15 @@ class TestEvent(LocalApplicationTestCase):
                 json=given | dict(endDate='30-20-20')
             )
             assert status == '790 Invalid End Date Format'
+
+            when('The event-type not found', json=given | dict(eventTypeId=0))
+            assert status == '658 Event Type Not Found'
+
+            when(
+                'Trying to pass without event-type id',
+                json=given - 'eventTypeId'
+            )
+            assert status == '794 Type Id Not In Form'
 
             when('Request is not authorized', authorization=None)
             assert status == 401
