@@ -1,4 +1,4 @@
-from nanohttp import json
+from nanohttp import json, HTTPNotFound, int_or_notfound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
@@ -22,5 +22,15 @@ class EventController(ModelRestController):
             raise HTTPEndDateMustBeGreaterThanStartDate()
 
         DBSession.add(event)
+        return event
+
+    @authorize
+    @json(prevent_form='709 Form Not Allowed')
+    def get(self, id):
+        id = int_or_notfound(id)
+        event = DBSession.query(Event).get(id)
+        if event is None:
+            raise HTTPNotFound()
+
         return event
 
