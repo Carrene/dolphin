@@ -1,4 +1,4 @@
-from bddrest import status, response, when, given, Update
+from bddrest import status, response, when, given
 
 from dolphin.models import Member, EventType
 from dolphin.tests.helpers import create_group, LocalApplicationTestCase, \
@@ -92,7 +92,7 @@ class TestEventType(LocalApplicationTestCase):
 
             when(
                 'Description length is less than limit',
-                json=Update(description=((512 + 1) * 'a')),
+                json=given | dict(description=(512 + 1) * 'a'),
             )
             assert status == '703 At Most 512 Characters Are Valid For ' \
                 'Description'
