@@ -112,7 +112,7 @@ class TestEvent(LocalApplicationTestCase):
             assert status == '790 Invalid End Date Format'
 
             when(
-                '',
+                'End date must be greater than start date',
                 json=given | dict(
                     startDate=end_date,
                     endDate=start_date,
