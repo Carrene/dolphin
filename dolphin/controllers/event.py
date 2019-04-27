@@ -34,3 +34,7 @@ class EventController(ModelRestController):
 
         return event
 
+    @Event.expose
+    def list(self):
+        return DBSession.query(Event)
+
