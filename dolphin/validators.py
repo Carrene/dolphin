@@ -855,3 +855,27 @@ eventtype_update_validator = validate(
     )
 )
 
+
+event_update_validator = validate(
+   description=dict(
+        max_length=(
+            512,
+            '703 At Most 512 Characters Are Valid For Description'
+        ),
+    ),
+    eventTypeId=dict(
+        not_none='798 Event Type Id Is Null',
+        callback=eventtype_exists_validator_by_id,
+    ),
+    startDate=dict(
+        pattern=(DATETIME_PATTERN, HTTPInvalidStartDateFormat),
+    ),
+    endDate=dict(
+        pattern=(DATETIME_PATTERN, HTTPInvalidEndDateFormat),
+    ),
+    title=dict(
+        not_none='727 Title Is None',
+        max_length=(50, '704 At Most 50 Characters Valid For Title'),
+    ),
+)
+
