@@ -268,19 +268,19 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Trying to change the project manager',
-                json=given | dict(managerId=self.member2.id)
+                json=given + dict(managerId=self.member2.id)
             )
             assert response.json['managerId'] == self.member2.id
 
             when(
                 'Manager id is null',
-                json=given | dict(managerId=None)
+                json=given + dict(managerId=None)
             )
             assert status == '785 Manager Id Is Null'
 
             when(
                 'Manager is not found',
-                json=given | dict(managerId=0)
+                json=given + dict(managerId=0)
             )
             assert status == '608 Manager Not Found'
 
