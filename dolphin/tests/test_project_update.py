@@ -266,7 +266,7 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'Secondary manager is not found',
-                json=Update(secondaryManagerId=0)
+                json=given | dict(secondaryManagerId=0)
             )
             assert status == '650 Secondary Manager Not Found'
 
