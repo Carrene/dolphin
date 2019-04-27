@@ -1,4 +1,5 @@
 import re
+import datetime
 
 from nanohttp import validate, HTTPStatus, context
 from restfulpy.orm import DBSession
@@ -6,7 +7,8 @@ from restfulpy.orm import DBSession
 from .models import *
 from .models.organization import roles
 from .exceptions import HTTPResourceNotFound, HTTPRepetitiveTitle, \
-    HTTPRelatedIssueNotFound
+    HTTPRelatedIssueNotFound, HTTPEventTypeNotFound, \
+    HTTPInvalidStartDateFormat, HTTPInvalidEndDateFormat
 
 
 TITLE_PATTERN = re.compile(r'^(?!\s).*[^\s]$')
@@ -270,11 +272,29 @@ def skill_exists_validator(title, project, field):
     return title
 
 
-def eventtype_exists_validator(title, project, field):
+def eventtype_exists_validator_by_title(title, project, field):
     event_type = DBSession.query(EventType) \
         .filter(EventType.title == title) \
         .one_or_none()
     if event_type is not None:
+        raise HTTPRepetitiveTitle()
+
+    return title
+
+
+def eventtype_exists_validator_by_id(event_type_id, project, field):
+    event_type = DBSession.query(EventType).get(event_type_id)
+    if event_type is None:
+        raise HTTPEventTypeNotFound()
+
+    return event_type_id
+
+
+def event_exists_validator(title, project, field):
+    event = DBSession.query(Event) \
+        .filter(Event.title == title) \
+        .one_or_none()
+    if event is not None:
         raise HTTPRepetitiveTitle()
 
     return title
@@ -790,7 +810,36 @@ eventtype_create_validator = validate(
         required='710 Title Not In Form',
         not_none='727 Title Is None',
         max_length=(50, '704 At Most 50 Characters Valid For Title'),
-        callback=eventtype_exists_validator
+        callback=eventtype_exists_validator_by_title
+    ),
+)
+
+
+event_add_validator = validate(
+   description=dict(
+        max_length=(
+            512,
+            '703 At Most 512 Characters Are Valid For Description'
+        ),
+    ),
+    eventTypeId=dict(
+        required='794 Type Id Not In Form',
+        not_none='798 Event Type Id Is Null',
+        callback=eventtype_exists_validator_by_id,
+    ),
+    startDate=dict(
+        required='792 Start Date Not In Form',
+        pattern=(DATETIME_PATTERN, HTTPInvalidStartDateFormat),
+    ),
+    endDate=dict(
+        required='793 End Date Not In Form',
+        pattern=(DATETIME_PATTERN, HTTPInvalidEndDateFormat),
+    ),
+    title=dict(
+        required='710 Title Not In Form',
+        not_none='727 Title Is None',
+        max_length=(50, '704 At Most 50 Characters Valid For Title'),
+        callback=event_exists_validator,
     ),
 )
 

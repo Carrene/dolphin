@@ -1,5 +1,5 @@
 from restfulpy.orm import Field, DeclarativeBase, OrderingMixin, \
-    FilteringMixin, PaginationMixin
+    FilteringMixin, PaginationMixin, relationship
 from sqlalchemy import Integer, String, Unicode
 
 
@@ -39,5 +39,10 @@ class EventType(OrderingMixin, FilteringMixin, PaginationMixin,
         required=False,
         python_type=str,
         example='Lorem Ipsum',
+    )
+    events = relationship(
+        'Event',
+        back_populates='event_type',
+        protected=True,
     )
 

@@ -139,3 +139,19 @@ class HTTPSkillNotFound(HTTPKnownStatus):
 class HTTPGroupNotFound(HTTPKnownStatus):
     status = '659 Group Not Found'
 
+
+class HTTPEventTypeNotFound(HTTPKnownStatus):
+    status = '658 Event Type Not Found'
+
+
+class HTTPEndDateMustBeGreaterThanStartDate(HTTPKnownStatus):
+    status = '657 End Date Must Be Greater Than Start Date'
+
+
+class HTTPInvalidStartDateFormat(HTTPKnownStatus):
+    status = '791 Invalid Start Date Format'
+
+
+class HTTPInvalidEndDateFormat(HTTPKnownStatus):
+    status = '790 Invalid End Date Format'
+
