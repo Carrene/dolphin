@@ -84,9 +84,6 @@ class TestEventType(LocalApplicationTestCase):
             when('Trying to pass without form parameters', json={})
             assert status == '708 Empty Form'
 
-            when('Request is not authorized', authorization=None)
-            assert status == 401
-
             when(
                 'Trying to pass with none title',
                 json=dict(title=None)
@@ -99,4 +96,7 @@ class TestEventType(LocalApplicationTestCase):
             )
             assert status == '703 At Most 512 Characters Are Valid For ' \
                 'Description'
+
+            when('Request is not authorized', authorization=None)
+            assert status == 401
 
