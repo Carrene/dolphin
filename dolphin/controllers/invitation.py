@@ -7,7 +7,7 @@ from restfulpy.orm import commit, DBSession
 from sqlalchemy import exists, and_
 from sqlalchemy_media import store_manager
 
-from ..exceptions import HTTPAlreadyInThisOrganization
+from ..exceptions import StatusAlreadyInThisOrganization
 from ..models import Member, Organization, OrganizationMember, \
     OrganizationInvitationEmail, Invitation
 from ..tokens import OrganizationInvitationToken
@@ -53,7 +53,7 @@ class InvitationController(ModelRestController, JsonPatchControllerMixin):
                 OrganizationMember.member_id == invited_member.id
             ))).scalar()
             if is_member_in_organization:
-                raise HTTPAlreadyInThisOrganization()
+                raise StatusAlreadyInThisOrganization()
 
         invitation = DBSession.query(Invitation) \
             .filter(Invitation.email == email) \

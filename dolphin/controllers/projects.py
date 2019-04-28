@@ -5,8 +5,9 @@ from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 
 from ..backends import ChatClient
-from ..exceptions import ChatRoomNotFound, RoomMemberAlreadyExist, \
-    RoomMemberNotFound, HTTPManagerNotFound, HTTPSecondaryManagerNotFound
+from ..exceptions import StatusChatRoomNotFound, \
+    StatusRoomMemberAlreadyExist, StatusRoomMemberNotFound, \
+    StatusManagerNotFound, StatusSecondaryManagerNotFound
 from ..models import Project, Member, Subscription, Workflow, Group, Release
 from ..validators import project_validator, update_project_validator
 from .files import FileController
@@ -63,7 +64,7 @@ class ProjectController(ModelRestController):
                     context.identity.reference_id
                 )
                 create_room_error = None
-            except ChatRoomNotFound:
+            except StatusChatRoomNotFound:
                 # FIXME: Cover here
                 create_room_error = 1
 
@@ -150,7 +151,7 @@ class ProjectController(ModelRestController):
         manager = DBSession.query(Member).get(form['managerId'])
         creator = Member.current()
         if manager is None:
-            raise HTTPManagerNotFound()
+            raise StatusManagerNotFound()
 
         project = Project()
         project.update_from_request()
@@ -161,7 +162,7 @@ class ProjectController(ModelRestController):
                 form.get('secondaryManagerId')
             )
             if secondary_manager is None:
-                raise HTTPSecondaryManagerNotFound()
+                raise StatusSecondaryManagerNotFound()
 
             project.secondary_manager_id = secondary_manager.id
 
@@ -199,7 +200,7 @@ class ProjectController(ModelRestController):
                 creator.access_token
             )
 
-        except RoomMemberAlreadyExist:
+        except StatusRoomMemberAlreadyExist:
             # Exception is passed because it means `add_member()` is already
             # called and `manager` successfully added to room. So there is
             # no need to call `add_member()` API again and re-add the manager to
@@ -251,14 +252,14 @@ class ProjectController(ModelRestController):
         if manager_id is not None:
             manager = DBSession.query(Member).get(form.get('managerId'))
             if manager is None:
-                raise HTTPManagerNotFound()
+                raise StatusManagerNotFound()
 
         if form.get('secondaryManagerId') is not None:
             secondary_manager = DBSession.query(Member).get(
                 form.get('secondaryManagerId')
             )
             if secondary_manager is None:
-                raise HTTPSecondaryManagerNotFound()
+                raise StatusSecondaryManagerNotFound()
 
         if 'title' in form:
             release = project.release
@@ -387,7 +388,7 @@ class ProjectController(ModelRestController):
                 token,
                 member.access_token
             )
-        except RoomMemberAlreadyExist:
+        except StatusRoomMemberAlreadyExist:
             # Exception is passed because it means `add_member()` is already
             # called and `member` successfully added to room. So there is
             # no need to call `add_member()` API again and re-add the member to
@@ -439,7 +440,7 @@ class ProjectController(ModelRestController):
                 member.access_token
             )
 
-        except RoomMemberNotFound:
+        except StatusRoomMemberNotFound:
             # Exception is passed because it means `kick_member()` is already
             # called and `member` successfully removed from room. So there is
             # no need to call `kick_member()` API again and re-add the member

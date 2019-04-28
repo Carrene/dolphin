@@ -8,8 +8,8 @@ from ..validators  import phase_validator
 from ..models import Phase, Member, Workflow, Skill
 from .resource import ResourceController
 from ..validators import phase_update_validator
-from ..exceptions import HTTPRepetitiveTitle, HTTPSkillNotFound, \
-    HTTPRepetitiveOrder
+from ..exceptions import StatusRepetitiveTitle, StatusSkillNotFound, \
+    StatusRepetitiveOrder
 
 
 FORM_WHITELIST = [
@@ -96,7 +96,7 @@ class PhaseController(ModelRestController):
             .one_or_none()
         if phase.title != context.form.get('title') \
                 and is_repetitive_title is not None:
-            raise HTTPRepetitiveTitle()
+            raise StatusRepetitiveTitle()
 
         is_repetitive_order = DBSession.query(Phase) \
             .filter(
@@ -106,12 +106,12 @@ class PhaseController(ModelRestController):
             .one_or_none()
         if phase.order != context.form.get('order') \
                 and is_repetitive_order is not None:
-            raise HTTPRepetitiveOrder()
+            raise StatusRepetitiveOrder()
 
         if 'skillId' in form and not DBSession.query(Skill) \
                 .filter(Skill.id == form.get('skillId')) \
                 .one_or_none():
-            raise HTTPSkillNotFound()
+            raise StatusSkillNotFound()
 
         phase.update_from_request()
         return phase

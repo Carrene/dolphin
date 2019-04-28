@@ -39,23 +39,23 @@ class CASClient:
             f'target-application={self._server_name}'
         )
         if response.status_code == 404:
-            raise CASServerNotFound()
+            raise StatusCASServerNotFound()
 
         if response.status_code == 503:
-            raise CASServerNotAvailable()
+            raise StatusCASServerNotAvailable()
 
         if response.status_code == 605:
-            raise InvalidApplicationID()
+            raise StatusInvalidApplicationID()
 
         if response.status_code == 608:
-            raise InvalidSecret()
+            raise StatusInvalidSecret()
 
         if response.status_code in (609, 610):
             raise HTTPUnauthorized
 
         if response.status_code != 200:
             logger.exception(response.content.decode())
-            raise CASServerInternalError()
+            raise StatusCASServerInternalError()
 
         result = json.loads(response.text)
         return result['accessToken'], result['memberId']
@@ -101,10 +101,10 @@ class ChatClient:
                 f'target-application={self._server_name}'
             )
             if response.status_code == 404:
-                raise ChatServerNotFound()
+                raise StatusChatServerNotFound()
 
             if response.status_code == 503:
-                raise ChatServerNotAvailable()
+                raise StatusChatServerNotAvailable()
 
             if response.status_code == 615:
                 response = requests.request(
@@ -124,20 +124,20 @@ class ChatClient:
                 try:
                     rooms = json.loads(response.text)
                 except ValueError:
-                    raise ChatInternallError()
+                    raise StatusChatInternallError()
 
                 if len(rooms) == 1:
                     return rooms[0]
 
-                raise ChatRoomNotFound()
+                raise StatusChatRoomNotFound()
 
             if response.status_code != 200:
                 logger.exception(response.content.decode())
-                raise ChatInternallError()
+                raise StatusChatInternallError()
 
         except requests.RequestException as e: # pragma: no cover
             logger.exception(e)
-            raise ChatInternallError()
+            raise StatusChatInternallError()
 
         else:
             room = json.loads(response.text)
@@ -178,25 +178,25 @@ class ChatClient:
                 f'target-application={self._server_name}'
             )
             if response.status_code == 404:
-                raise ChatServerNotFound()
+                raise StatusChatServerNotFound()
 
             # 502: Bad Gateway
             # 503: Service Unavailbale
             if response.status_code in (502, 503):
-                raise ChatServerNotAvailable()
+                raise StatusChatServerNotAvailable()
 
             # 604: Already Added To Target
             # Carrene/jaguar#3
             if response.status_code == 604:
-                raise RoomMemberAlreadyExist()
+                raise StatusRoomMemberAlreadyExist()
 
             if response.status_code != 200:
                 logger.exception(response.content.decode())
-                raise ChatInternallError()
+                raise StatusChatInternallError()
 
         except requests.RequestException as e: # pragma: no cover
             logger.exception(e)
-            raise ChatInternallError()
+            raise StatusChatInternallError()
 
         else:
             room = json.loads(response.text)
@@ -222,30 +222,30 @@ class ChatClient:
                 f'target-application={self._server_name}'
             )
             if response.status_code == 404:
-                raise ChatServerNotFound()
+                raise StatusChatServerNotFound()
 
             # 502: Bad Gateway
             # 503: Service Unavailbale
             if response.status_code in (502, 503):
-                raise ChatServerNotAvailable()
+                raise StatusChatServerNotAvailable()
 
             # 611: User Not Found
             # Carrene/jaguar#13
             if response.status_code == 611:
-                raise RoomMemberNotFound()
+                raise StatusRoomMemberNotFound()
 
             # 604: Already Added To Target
             # Carrene/jaguar#3
             if response.status_code == 604:
-                raise RoomMemberAlreadyExist()
+                raise StatusRoomMemberAlreadyExist()
 
             if response.status_code != 200:
                 logger.exception(response.content.decode())
-                raise ChatInternallError()
+                raise StatusChatInternallError()
 
         except requests.RequestException as e: # pragma: no cover
             logger.exception(e)
-            raise ChatInternallError()
+            raise StatusChatInternallError()
 
         else:
             room = json.loads(response.text)
@@ -268,20 +268,20 @@ class ChatClient:
                 f'target-application={self._server_name}'
             )
             if response.status_code == 404:
-                raise ChatServerNotFound()
+                raise StatusChatServerNotFound()
 
             # 502: Bad Gateway
             # 503: Service Unavailbale
             if response.status_code in (502, 503):
-                raise ChatServerNotAvailable()
+                raise StatusChatServerNotAvailable()
 
             if response.status_code != 200:
                 logger.exception(response.content.decode())
-                raise ChatInternallError()
+                raise StatusChatInternallError()
 
         except requests.RequestException as e: # pragma: no cover
             logger.exception(e)
-            raise ChatInternallError()
+            raise StatusChatInternallError()
 
         else:
             member = json.loads(response.text)
@@ -308,21 +308,21 @@ class ChatClient:
                 f'target-application={self._server_name}'
             )
             if response.status_code == 404:
-                raise ChatServerNotFound()
+                raise StatusChatServerNotFound()
 
             # 502: Bad Gateway
             # 503: Service Unavailbale
             if response.status_code in (502, 503):
-                raise ChatServerNotAvailable()
+                raise StatusChatServerNotAvailable()
 
             if response.status_code != 200:
                 logger.exception(response.content.decode())
-                raise ChatInternallError()
+                raise StatusChatInternallError()
 
             member = json.loads(response.text)
             return member
 
         except requests.RequestException as e: # pragma: no cover
             logger.exception(e)
-            raise ChatInternallError()
+            raise StatusChatInternallError()
 

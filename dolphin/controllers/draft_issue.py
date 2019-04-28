@@ -6,8 +6,8 @@ from restfulpy.orm import commit, DBSession
 from sqlalchemy import and_, exists
 
 from ..backends import ChatClient
-from ..exceptions import RoomMemberAlreadyExist, ChatRoomNotFound, \
-    HTTPIssueBugMustHaveRelatedIssue
+from ..exceptions import StatusRoomMemberAlreadyExist, StatusChatRoomNotFound, \
+    StatusIssueBugMustHaveRelatedIssue
 from ..models import Issue, Phase, Item, Member, DraftIssue, DraftIssueTag, \
     Tag, Skill, Resource, IssueTag, RelatedIssue, DraftIssueIssue
 from ..validators import draft_issue_finalize_validator, \
@@ -47,7 +47,7 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
                 )
                 create_room_error = None
 
-            except ChatRoomNotFound:
+            except StatusChatRoomNotFound:
                 create_room_error = 1
 
         return room
@@ -108,7 +108,7 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
         issue.update_from_request()
 
         if issue.kind == 'bug' and not draft_issue.related_issues:
-            raise HTTPIssueBugMustHaveRelatedIssue()
+            raise StatusIssueBugMustHaveRelatedIssue()
 
         current_member = Member.current()
         room = self._ensure_room(
@@ -127,7 +127,7 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
                 current_member.access_token
             )
 
-        except RoomMemberAlreadyExist:
+        except StatusRoomMemberAlreadyExist:
             # Exception is passed because it means `add_member()` is already
             # called and `member` successfully added to room. So there is
             # no need to call `add_member()` API again and re-add the member to

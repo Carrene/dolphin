@@ -10,9 +10,9 @@ from restfulpy.orm import DBSession, commit
 from sqlalchemy import and_, exists, select, func, join
 
 from ..backends import ChatClient
-from ..exceptions import RoomMemberAlreadyExist, RoomMemberNotFound, \
-    ChatRoomNotFound, HTTPRelatedIssueNotFound, \
-    HTTPIssueBugMustHaveRelatedIssue, HTTPIssueNotFound
+from ..exceptions import StatusRoomMemberAlreadyExist, \
+    StatusRoomMemberNotFound, StatusChatRoomNotFound, StatusRelatedIssueNotFound, \
+    StatusIssueBugMustHaveRelatedIssue, StatusIssueNotFound
 from ..models import Issue, Subscription, Phase, Item, Member, Project, \
     RelatedIssue, Subscribable, IssueTag, Tag
 from ..validators import update_issue_validator, assign_issue_validator, \
@@ -78,7 +78,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                     context.identity.reference_id
                 )
                 create_room_error = None
-            except ChatRoomNotFound:
+            except StatusChatRoomNotFound:
                 # FIXME: Cover here
                 create_room_error = 1
 
@@ -383,7 +383,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 member.access_token
             )
 
-        except RoomMemberAlreadyExist:
+        except StatusRoomMemberAlreadyExist:
             # Exception is passed because it means `add_member()` is already
             # called and `member` successfully added to room. So there is
             # no need to call `add_member()` API again and re-add the member to
@@ -436,7 +436,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 token,
                 member.access_token
             )
-        except RoomMemberNotFound:
+        except StatusRoomMemberNotFound:
             # Exception is passed because it means `kick_member()` is already
             # called and `member` successfully removed from room. So there is
             # no need to call `kick_member()` API again and re-add the member
@@ -664,7 +664,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         target = DBSession.query(Issue).get(target_id)
         if target is None:
-            raise HTTPRelatedIssueNotFound(target_id)
+            raise StatusRelatedIssueNotFound(target_id)
 
         is_related = DBSession.query(exists().where(
             and_(
@@ -676,7 +676,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             raise HTTPStatus('646 Already Unrelated')
 
         if issue.kind == 'bug' and len(issue.relations) < 2:
-            raise HTTPIssueBugMustHaveRelatedIssue()
+            raise StatusIssueBugMustHaveRelatedIssue()
 
         issue.relations.remove(target)
         return issue
@@ -698,7 +698,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             .filter(Issue.room_id == context.query['roomId']) \
             .one_or_none()
         if issue is None:
-            raise HTTPIssueNotFound()
+            raise StatusIssueNotFound()
 
         member = DBSession.query(Member) \
             .filter(
@@ -706,7 +706,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             ) \
             .one_or_none()
         if member is None:
-            raise RoomMemberNotFound()
+            raise StatusRoomMemberNotFound()
 
         subscriptions = DBSession.query(Subscription) \
             .filter(
@@ -735,7 +735,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             .filter(Issue.room_id == context.query['roomId']) \
             .one_or_none()
         if issue is None:
-            raise HTTPIssueNotFound()
+            raise StatusIssueNotFound()
 
         member = DBSession.query(Member) \
             .filter(

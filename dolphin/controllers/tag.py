@@ -5,8 +5,8 @@ from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import DBSession, commit
 from sqlalchemy import and_, exists
 
-from ..exceptions import HTTPAlreadyTagAdded, HTTPAlreadyTagRemoved, \
-    HTTPRepetitiveTitle
+from ..exceptions import StatusAlreadyTagAdded, StatusAlreadyTagRemoved, \
+    StatusRepetitiveTitle
 from ..models import Tag, DraftIssueTag, IssueTag
 from ..validators import tag_create_validator, tag_update_validator
 
@@ -56,7 +56,7 @@ class TagController(ModelRestController, JsonPatchControllerMixin):
                 DraftIssueTag.tag_id == tag.id
             ))).scalar()
             if is_exist_tag:
-                raise HTTPAlreadyTagAdded()
+                raise StatusAlreadyTagAdded()
 
             draft_issue_tag = DraftIssueTag(
                 tag_id=tag.id,
@@ -70,7 +70,7 @@ class TagController(ModelRestController, JsonPatchControllerMixin):
                 IssueTag.tag_id == tag.id
             ))).scalar()
             if is_exist_tag:
-                raise HTTPAlreadyTagAdded()
+                raise StatusAlreadyTagAdded()
 
             self.issue.tags.append(tag)
 
@@ -102,7 +102,7 @@ class TagController(ModelRestController, JsonPatchControllerMixin):
                 ) \
                 .one_or_none()
             if draft_issue_tag is None:
-                raise HTTPAlreadyTagRemoved()
+                raise StatusAlreadyTagRemoved()
 
             else:
                 DBSession.delete(draft_issue_tag)
@@ -115,7 +115,7 @@ class TagController(ModelRestController, JsonPatchControllerMixin):
                 ) \
                 .one_or_none()
             if issue_tag is None:
-                raise HTTPAlreadyTagRemoved()
+                raise StatusAlreadyTagRemoved()
 
             else:
                 self.issue.tags.remove(tag)
@@ -177,7 +177,7 @@ class TagController(ModelRestController, JsonPatchControllerMixin):
                     Tag.id != id
                 ) \
                 .one_or_none():
-            raise HTTPRepetitiveTitle()
+            raise StatusRepetitiveTitle()
 
         if tag.organization_id != identity.payload['organizationId']:
             raise HTTPForbidden()
