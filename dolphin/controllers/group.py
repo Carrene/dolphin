@@ -6,8 +6,8 @@ from restfulpy.orm import DBSession, commit
 from ..models import Group, GroupMember, Member
 from ..validators import group_create_validator, group_add_validator, \
     group_remove_validator, group_update_validator
-from ..exceptions import HTTPMemberNotFound, HTTPAlreadyAddedToGroup, \
-    HTTPMemberNotExistsInGroup, HTTPRepetitiveTitle
+from ..exceptions import StatusMemberNotFound, StatusAlreadyAddedToGroup, \
+    StatusMemberNotExistsInGroup, StatusRepetitiveTitle
 
 
 FORM_WHITELIST = [
@@ -75,7 +75,7 @@ class GroupController(ModelRestController):
             .filter(Group.title == title) \
             .one_or_none()
         if group.title != title and is_exist_group is not None:
-            raise HTTPRepetitiveTitle()
+            raise StatusRepetitiveTitle()
 
         group.update_from_request()
         return group
@@ -92,7 +92,7 @@ class GroupController(ModelRestController):
 
         member = DBSession.query(Member).get(context.form.get('memberId'))
         if member is None:
-            raise HTTPMemberNotFound()
+            raise StatusMemberNotFound()
 
         group_member = DBSession.query(GroupMember) \
             .filter(
@@ -101,7 +101,7 @@ class GroupController(ModelRestController):
             ) \
             .one_or_none()
         if group_member is not None:
-            raise HTTPAlreadyAddedToGroup()
+            raise StatusAlreadyAddedToGroup()
 
         group.members.append(member)
         return group
@@ -118,7 +118,7 @@ class GroupController(ModelRestController):
 
         member = DBSession.query(Member).get(context.form.get('memberId'))
         if member is None:
-            raise HTTPMemberNotFound()
+            raise StatusMemberNotFound()
 
         group_member = DBSession.query(GroupMember) \
             .filter(
@@ -127,7 +127,7 @@ class GroupController(ModelRestController):
             ) \
             .one_or_none()
         if group_member is None:
-            raise HTTPMemberNotExistsInGroup()
+            raise StatusMemberNotExistsInGroup()
 
         group.members.remove(member)
         return group

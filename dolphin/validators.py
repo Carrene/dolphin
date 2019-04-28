@@ -5,9 +5,9 @@ from restfulpy.orm import DBSession
 
 from .models import *
 from .models.organization import roles
-from .exceptions import HTTPResourceNotFound, HTTPRepetitiveTitle, \
-    HTTPRelatedIssueNotFound, HTTPEventTypeNotFound, \
-    HTTPInvalidStartDateFormat, HTTPInvalidEndDateFormat
+from .exceptions import StatusResourceNotFound, StatusRepetitiveTitle, \
+    StatusRelatedIssueNotFound, StatusEventTypeNotFound, \
+    StatusInvalidStartDateFormat, StatusInvalidEndDateFormat
 
 
 TITLE_PATTERN = re.compile(r'^(?!\s).*[^\s]$')
@@ -118,7 +118,7 @@ def relate_to_issue_exists_validator(relatedIssueId, container, field):
         issue = DBSession.query(Issue).get(related_issue_id)
 
         if issue is None:
-            raise HTTPRelatedIssueNotFound(related_issue_id)
+            raise StatusRelatedIssueNotFound(related_issue_id)
 
     return relatedIssueId
 
@@ -200,12 +200,12 @@ def member_exists_validator(memberId, project, field):
         memberId = int(memberId)
 
     except (TypeError, ValueError):
-        raise HTTPResourceNotFound(resource_id=context.form['memberId'])
+        raise StatusResourceNotFound(resource_id=context.form['memberId'])
 
     if 'memberId' in form and not DBSession.query(Member) \
             .filter(Member.id == memberId) \
             .one_or_none():
-        raise HTTPResourceNotFound(resource_id=context.form['memberId'])
+        raise StatusResourceNotFound(resource_id=context.form['memberId'])
 
     return memberId
 
@@ -258,7 +258,7 @@ def tag_exists_validator(title, project, field):
         ) \
         .one_or_none()
     if tag is not None:
-        raise HTTPRepetitiveTitle()
+        raise StatusRepetitiveTitle()
 
     return title
 
@@ -276,7 +276,7 @@ def eventtype_exists_validator_by_title(title, project, field):
         .filter(EventType.title == title) \
         .one_or_none()
     if event_type is not None:
-        raise HTTPRepetitiveTitle()
+        raise StatusRepetitiveTitle()
 
     return title
 
@@ -284,7 +284,7 @@ def eventtype_exists_validator_by_title(title, project, field):
 def eventtype_exists_validator_by_id(event_type_id, project, field):
     event_type = DBSession.query(EventType).get(event_type_id)
     if event_type is None:
-        raise HTTPEventTypeNotFound()
+        raise StatusEventTypeNotFound()
 
     return event_type_id
 
@@ -294,7 +294,7 @@ def event_exists_validator(title, project, field):
         .filter(Event.title == title) \
         .one_or_none()
     if event is not None:
-        raise HTTPRepetitiveTitle()
+        raise StatusRepetitiveTitle()
 
     return title
 
@@ -828,11 +828,11 @@ event_add_validator = validate(
     ),
     startDate=dict(
         required='792 Start Date Not In Form',
-        pattern=(DATETIME_PATTERN, HTTPInvalidStartDateFormat),
+        pattern=(DATETIME_PATTERN, StatusInvalidStartDateFormat),
     ),
     endDate=dict(
         required='793 End Date Not In Form',
-        pattern=(DATETIME_PATTERN, HTTPInvalidEndDateFormat),
+        pattern=(DATETIME_PATTERN, StatusInvalidEndDateFormat),
     ),
     title=dict(
         required='710 Title Not In Form',
@@ -869,10 +869,10 @@ event_update_validator = validate(
         callback=eventtype_exists_validator_by_id,
     ),
     startDate=dict(
-        pattern=(DATETIME_PATTERN, HTTPInvalidStartDateFormat),
+        pattern=(DATETIME_PATTERN, StatusInvalidStartDateFormat),
     ),
     endDate=dict(
-        pattern=(DATETIME_PATTERN, HTTPInvalidEndDateFormat),
+        pattern=(DATETIME_PATTERN, StatusInvalidEndDateFormat),
     ),
     title=dict(
         not_none='727 Title Is None',

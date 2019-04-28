@@ -7,7 +7,7 @@ from sqlalchemy_media import store_manager
 
 from ..models import Member, Skill, SkillMember, Organization, \
     OrganizationMember, Group, GroupMember
-from ..exceptions import HTTPAlreadyGrantedSkill, HTTPSkillNotGrantedYet
+from ..exceptions import StatusAlreadyGrantedSkill, StatusSkillNotGrantedYet
 from .organization import OrganizationController
 
 from .skill import SkillController
@@ -91,7 +91,7 @@ class MemberSkillController(ModelRestController):
                     SkillMember.member_id == self.member.id
                 ) \
                 .one_or_none():
-            raise HTTPAlreadyGrantedSkill()
+            raise StatusAlreadyGrantedSkill()
 
         skill_member = SkillMember(
             skill_id=id,
@@ -115,7 +115,7 @@ class MemberSkillController(ModelRestController):
                     SkillMember.member_id == self.member.id
                 ) \
                 .one_or_none():
-            raise HTTPSkillNotGrantedYet()
+            raise StatusSkillNotGrantedYet()
 
         skill.members.remove(self.member)
         return skill

@@ -6,7 +6,7 @@ from restfulpy.orm import commit, DBSession
 from sqlalchemy import exists, and_
 from sqlalchemy_media import store_manager
 
-from ..exceptions import HTTPRepetitiveTitle, HTTPAlreadyInThisOrganization
+from ..exceptions import StatusRepetitiveTitle, StatusAlreadyInThisOrganization
 from ..models import Member, Organization, OrganizationMember, \
     OrganizationInvitationEmail
 from ..tokens import OrganizationInvitationToken
@@ -56,7 +56,7 @@ class OrganizationController(ModelRestController):
             .filter(Organization.title == context.form.get('title')) \
             .one_or_none()
         if organization is not None:
-            raise HTTPRepetitiveTitle()
+            raise StatusRepetitiveTitle()
 
         member = Member.current()
         organization = Organization(

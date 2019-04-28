@@ -5,7 +5,7 @@ from restfulpy.orm import DBSession, commit
 
 from ..models import EventType
 from ..validators import eventtype_create_validator, eventtype_update_validator
-from ..exceptions import HTTPRepetitiveTitle
+from ..exceptions import StatusRepetitiveTitle
 
 
 FORM_WHITELIST = [
@@ -67,7 +67,7 @@ class EventTypeController(ModelRestController):
             ) \
             .one_or_none()
         if is_exist_event_type:
-            raise HTTPRepetitiveTitle()
+            raise StatusRepetitiveTitle()
 
         event_type.update_from_request()
         return event_type

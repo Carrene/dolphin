@@ -4,8 +4,8 @@ from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 from sqlalchemy import exists
 
-from ..exceptions import HTTPEndDateMustBeGreaterThanStartDate, \
-    HTTPRepetitiveTitle
+from ..exceptions import StatusEndDateMustBeGreaterThanStartDate, \
+    StatusRepetitiveTitle
 from ..models import Event
 from ..validators import event_add_validator, event_update_validator
 
@@ -33,7 +33,7 @@ class EventController(ModelRestController):
         event = Event()
         event.update_from_request()
         if event.start_date > event.end_date:
-            raise HTTPEndDateMustBeGreaterThanStartDate()
+            raise StatusEndDateMustBeGreaterThanStartDate()
 
         DBSession.add(event)
         return event
@@ -76,11 +76,11 @@ class EventController(ModelRestController):
                 exists().where(Event.title == context.form.get('title'))
             ).scalar()
             if is_title_already_exist:
-                raise HTTPRepetitiveTitle()
+                raise StatusRepetitiveTitle()
 
         event.update_from_request()
         if event.start_date > event.end_date:
-            raise HTTPEndDateMustBeGreaterThanStartDate()
+            raise StatusEndDateMustBeGreaterThanStartDate()
 
         return event
 

@@ -3,9 +3,10 @@ from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 
-from ..exceptions import HTTPManagerNotFound, \
-    HTTPLaunchDateMustGreaterThanCutoffDate, ChatRoomNotFound, \
-    RoomMemberAlreadyExist, RoomMemberNotFound, HTTPGroupNotFound
+from ..exceptions import StatusManagerNotFound, \
+    StatusLaunchDateMustGreaterThanCutoffDate, StatusChatRoomNotFound, \
+    StatusRoomMemberAlreadyExist, StatusRoomMemberNotFound, \
+    StatusGroupNotFound
 from ..models import Release, Subscription, Member, Group
 from ..validators import release_validator, update_release_validator
 from ..backends import ChatClient
@@ -48,17 +49,17 @@ class ReleaseController(ModelRestController):
             ) \
             .one_or_none()
         if member is None:
-            raise HTTPManagerNotFound()
+            raise StatusManagerNotFound()
 
         group = DBSession.query(Group).get(context.form.get('groupId'))
         if group is None:
-            raise HTTPGroupNotFound()
+            raise StatusGroupNotFound()
 
         release = Release()
         release.manager_id = member.id
         release.update_from_request()
         if release.launch_date < release.cutoff:
-            raise HTTPLaunchDateMustGreaterThanCutoffDate()
+            raise StatusLaunchDateMustGreaterThanCutoffDate()
 
         chat_client = ChatClient()
         room = chat_client.create_room(
@@ -76,7 +77,7 @@ class ReleaseController(ModelRestController):
                 member.access_token
             )
 
-        except RoomMemberAlreadyExist:
+        except StatusRoomMemberAlreadyExist:
             # Exception is passed because it means `add_member()` is already
             # called and `member` successfully added to room. So there is
             # no need to call `add_member()` API again and re-add the member to
@@ -121,18 +122,18 @@ class ReleaseController(ModelRestController):
                 .filter(Member.reference_id == manager_reference_id) \
                 .one_or_none()
             if member is None:
-                raise HTTPManagerNotFound()
+                raise StatusManagerNotFound()
 
             release.manager_id = member.id
 
         if 'groupId' in context.form:
             group = DBSession.query(Group).get(context.form.get('groupId'))
             if group is None:
-                raise HTTPGroupNotFound()
+                raise StatusGroupNotFound()
 
         release.update_from_request()
         if release.launch_date < release.cutoff:
-            raise HTTPLaunchDateMustGreaterThanCutoffDate()
+            raise StatusLaunchDateMustGreaterThanCutoffDate()
 
         return release
 

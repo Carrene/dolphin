@@ -1,157 +1,157 @@
 from nanohttp import HTTPKnownStatus
 
 
-class RoomMemberAlreadyExist(HTTPKnownStatus):
+class StatusRoomMemberAlreadyExist(HTTPKnownStatus):
     status = '604 Already Added To Target'
 
 
-class RoomMemberNotFound(HTTPKnownStatus):
+class StatusRoomMemberNotFound(HTTPKnownStatus):
     status = '611 User Not Found'
 
 
-class ChatServerNotFound(HTTPKnownStatus):
+class StatusChatServerNotFound(HTTPKnownStatus):
     status = '617 Chat Server Not Found'
 
 
-class ChatRoomNotFound(HTTPKnownStatus):
+class StatusChatRoomNotFound(HTTPKnownStatus):
     status = '618 Chat Room Not Found'
 
 
-class ChatServerNotAvailable(HTTPKnownStatus):
+class StatusChatServerNotAvailable(HTTPKnownStatus):
     status = '800 Chat Server Not Available'
 
 
-class ChatInternallError(HTTPKnownStatus):
+class StatusChatInternallError(HTTPKnownStatus):
     status = '801 Chat Server Internal Error'
 
 
-class OutOfLimitRoomSubscription(HTTPKnownStatus):
+class StatusOutOfLimitRoomSubscription(HTTPKnownStatus):
     status = '804 Number Of Chat Room Subscription Is Out Of Limit'
 
 
-class CASServerNotFound(HTTPKnownStatus):
+class StatusCASServerNotFound(HTTPKnownStatus):
     status = '619 CAS Server Not Found'
 
 
-class CASServerNotAvailable(HTTPKnownStatus):
+class StatusCASServerNotAvailable(HTTPKnownStatus):
     status = '802 CAS Server Not Available'
 
 
-class CASServerInternalError(HTTPKnownStatus):
+class StatusCASServerInternalError(HTTPKnownStatus):
     status = '803 CAS Server Internall Error'
 
 
-class InvalidApplicationID(HTTPKnownStatus):
+class StatusInvalidApplicationID(HTTPKnownStatus):
     status = '620 Invalid Application ID'
 
 
-class InvalidSecret(HTTPKnownStatus):
+class StatusInvalidSecret(HTTPKnownStatus):
     status = '621 Invalid Secret'
 
 
-class HTTPRepetitiveTitle(HTTPKnownStatus):
+class StatusRepetitiveTitle(HTTPKnownStatus):
     status = '600 Repetitive Title'
 
 
-class HTTPTokenExpired(HTTPKnownStatus):
+class StatusTokenExpired(HTTPKnownStatus):
     status = '627 Token Expired'
 
 
-class HTTPMalformedToken(HTTPKnownStatus):
+class StatusMalformedToken(HTTPKnownStatus):
     status = '626 Malformed Token'
 
 
-class HTTPAlreadyInThisOrganization(HTTPKnownStatus):
+class StatusAlreadyInThisOrganization(HTTPKnownStatus):
     status = '628 Already In This Organization'
 
 
-class HTTPAlreadyTagAdded(HTTPKnownStatus):
+class StatusAlreadyTagAdded(HTTPKnownStatus):
     status = '634 Already Tag Added'
 
 
-class HTTPAlreadyTagRemoved(HTTPKnownStatus):
+class StatusAlreadyTagRemoved(HTTPKnownStatus):
     status = '635 Already Tag Removed'
 
 
-class HTTPNotSubscribedIssue(HTTPKnownStatus):
+class StatusNotSubscribedIssue(HTTPKnownStatus):
     status = '637 Not Subscribed Issue'
 
 
-class HTTPRelatedIssueNotFound(HTTPKnownStatus):
+class StatusRelatedIssueNotFound(HTTPKnownStatus):
     def __init__(self, related_issue_id):
         self.status = f'647 relatedIssue With Id {related_issue_id} Not Found'
 
 
-class HTTPResourceNotFound(HTTPKnownStatus):
+class StatusResourceNotFound(HTTPKnownStatus):
 
     def __init__(self, resource_id):
         self.status = f'609 Resource not found with id: {resource_id}'
 
 
-class HTTPIssueBugMustHaveRelatedIssue(HTTPKnownStatus):
+class StatusIssueBugMustHaveRelatedIssue(HTTPKnownStatus):
     status = '649 The Issue Bug Must Have A Related Issue'
 
 
-class HTTPManagerNotFound(HTTPKnownStatus):
+class StatusManagerNotFound(HTTPKnownStatus):
     status = '608 Manager Not Found'
 
 
-class HTTPSecondaryManagerNotFound(HTTPKnownStatus):
+class StatusSecondaryManagerNotFound(HTTPKnownStatus):
     status = '650 Secondary Manager Not Found'
 
 
-class HTTPLaunchDateMustGreaterThanCutoffDate(HTTPKnownStatus):
+class StatusLaunchDateMustGreaterThanCutoffDate(HTTPKnownStatus):
     status = '651 The Launch Date Must Greater Than Cutoff Date'
 
 
-class HTTPIssueNotFound(HTTPKnownStatus):
+class StatusIssueNotFound(HTTPKnownStatus):
     status = '605 Issue Not Found'
 
 
-class HTTPMemberNotFound(HTTPKnownStatus):
+class StatusMemberNotFound(HTTPKnownStatus):
     status = '610 Member Not Found'
 
 
-class HTTPAlreadyAddedToGroup(HTTPKnownStatus):
+class StatusAlreadyAddedToGroup(HTTPKnownStatus):
     status = '652 Already Added To Group'
 
 
-class HTTPMemberNotExistsInGroup(HTTPKnownStatus):
+class StatusMemberNotExistsInGroup(HTTPKnownStatus):
     status = '653 Member Not Exists In Group'
 
 
-class HTTPAlreadyGrantedSkill(HTTPKnownStatus):
+class StatusAlreadyGrantedSkill(HTTPKnownStatus):
     status = '655 Skill Already Granted'
 
 
-class HTTPSkillNotGrantedYet(HTTPKnownStatus):
+class StatusSkillNotGrantedYet(HTTPKnownStatus):
     status = '656 Skill Not Granted Yet'
 
 
-class HTTPRepetitiveOrder(HTTPKnownStatus):
+class StatusRepetitiveOrder(HTTPKnownStatus):
     status = '615 Repetitive Order'
 
 
-class HTTPSkillNotFound(HTTPKnownStatus):
+class StatusSkillNotFound(HTTPKnownStatus):
     status = '645 Skill Not Found'
 
 
-class HTTPGroupNotFound(HTTPKnownStatus):
+class StatusGroupNotFound(HTTPKnownStatus):
     status = '659 Group Not Found'
 
 
-class HTTPEventTypeNotFound(HTTPKnownStatus):
+class StatusEventTypeNotFound(HTTPKnownStatus):
     status = '658 Event Type Not Found'
 
 
-class HTTPEndDateMustBeGreaterThanStartDate(HTTPKnownStatus):
+class StatusEndDateMustBeGreaterThanStartDate(HTTPKnownStatus):
     status = '657 End Date Must Be Greater Than Start Date'
 
 
-class HTTPInvalidStartDateFormat(HTTPKnownStatus):
+class StatusInvalidStartDateFormat(HTTPKnownStatus):
     status = '791 Invalid Start Date Format'
 
 
-class HTTPInvalidEndDateFormat(HTTPKnownStatus):
+class StatusInvalidEndDateFormat(HTTPKnownStatus):
     status = '790 Invalid End Date Format'
 

@@ -2,7 +2,7 @@ import itsdangerous
 from nanohttp import settings
 from restfulpy.principal import BaseJwtPrincipal
 
-from .exceptions import HTTPTokenExpired, HTTPMalformedToken
+from .exceptions import StatusTokenExpired, StatusMalformedToken
 
 
 class OrganizationInvitationToken(BaseJwtPrincipal):
@@ -13,10 +13,10 @@ class OrganizationInvitationToken(BaseJwtPrincipal):
             return super().load(token)
 
         except itsdangerous.SignatureExpired:
-            raise HTTPTokenExpired()
+            raise StatusTokenExpired()
 
         except itsdangerous.BadSignature:
-            raise HTTPMalformedToken()
+            raise StatusMalformedToken()
 
     @classmethod
     def get_config(cls):
