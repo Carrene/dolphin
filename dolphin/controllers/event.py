@@ -48,6 +48,8 @@ class EventController(ModelRestController):
 
         return event
 
+    @authorize
+    @json(prevent_form='709 Form Not Allowed')
     @Event.expose
     def list(self):
         return DBSession.query(Event)
