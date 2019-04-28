@@ -880,3 +880,27 @@ event_update_validator = validate(
     ),
 )
 
+
+timecard_create_validator = validate(
+    summary=dict(
+        max_length=(
+            1024,
+            '902 At Most 1024 Characters Are Valid For Summary'
+        ),
+        required='799 Summary Not In Form',
+    ),
+    startDate=dict(
+        required='792 Start Date Not In Form',
+        pattern=(DATETIME_PATTERN, StatusInvalidStartDateFormat),
+    ),
+    endDate=dict(
+        required='793 End Date Not In Form',
+        pattern=(DATETIME_PATTERN, StatusInvalidEndDateFormat),
+    ),
+    estimatedTime=dict(
+        required='901 Estimated Time Not In Form',
+        type_=(int, '900 Invalid Estimated Time Type'),
+    ),
+)
+
+
