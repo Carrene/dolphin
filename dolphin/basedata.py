@@ -4,7 +4,7 @@ from restfulpy.orm import DBSession
 from sqlalchemy_media import StoreManager
 
 from .models import Release, Member, Organization, OrganizationMember,\
-    Workflow, Phase, Tag, Group, Skill
+    Workflow, Phase, Tag, Group, Skill, EventType
 
 
 def insert(): # pragma: no cover
@@ -47,6 +47,16 @@ def insert(): # pragma: no cover
         skill=skill
     )
     DBSession.add(phase4)
+
+    event_type1 = EventType(
+        title='Personal',
+    )
+    DBSession.add(event_type1)
+
+    event_type2 = EventType(
+        title='Company-Wide',
+    )
+    DBSession.add(event_type2)
     DBSession.commit()
 
     with Context(dict()), StoreManager(DBSession):
@@ -114,6 +124,10 @@ def insert(): # pragma: no cover
         print(code_review_tag)
         print(database_tag)
         print(documentation_tag)
+
+        print('Following event-type has been added:')
+        print(event_type1)
+        print(event_type2)
 
         print('Following group has been added:')
         print(public_group)
