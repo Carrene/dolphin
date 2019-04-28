@@ -46,6 +46,6 @@ class EventType(OrderingMixin, FilteringMixin, PaginationMixin,
         protected=True,
     )
 
-    def __repr__(self):
+    def __repr__(self): # pragma: no cover
         return f'\tTitle: {self.title}, Description: {self.description}\n'
 
