@@ -46,3 +46,6 @@ class EventType(OrderingMixin, FilteringMixin, PaginationMixin,
         protected=True,
     )
 
+    def __repr__(self):
+        return f'\tTitle: {self.title}, Description: {self.description}\n'
+
