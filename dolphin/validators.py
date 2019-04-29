@@ -10,7 +10,8 @@ from .exceptions import StatusResourceNotFound, StatusRepetitiveTitle, \
     StatusInvalidStartDateFormat, StatusInvalidEndDateFormat, \
     StatusLimitedCharecterForSummary, StatusInvalidEstimatedTimeType, \
     StatusSummaryNotInForm, StatusEstimatedTimeNotInForm, \
-    StatusEndDateNotInForm, StatusStartDateNotInForm
+    StatusEndDateNotInForm, StatusStartDateNotInForm, StatusSummaryIsNull, \
+    StatusEstimatedTimeIsNull, StatusStartDateIsNull, StatusEndDateIsNull
 
 
 TITLE_PATTERN = re.compile(r'^(?!\s).*[^\s]$')
@@ -888,18 +889,22 @@ timecard_create_validator = validate(
     summary=dict(
         required=StatusSummaryNotInForm,
         max_length=(1024, StatusLimitedCharecterForSummary),
+        not_none=StatusSummaryIsNull,
     ),
     startDate=dict(
         required=StatusStartDateNotInForm,
         pattern=(DATETIME_PATTERN, StatusInvalidStartDateFormat),
+        not_none=StatusStartDateIsNull,
     ),
     endDate=dict(
         required=StatusEndDateNotInForm,
         pattern=(DATETIME_PATTERN, StatusInvalidEndDateFormat),
+        not_none=StatusEndDateIsNull,
     ),
     estimatedTime=dict(
         required=StatusEstimatedTimeNotInForm,
         type_=(int, StatusInvalidEstimatedTimeType),
+        not_none=StatusEstimatedTimeIsNull,
     ),
 )
 

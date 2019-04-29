@@ -179,3 +179,18 @@ class StatusEndDateNotInForm(HTTPKnownStatus):
 class StatusEstimatedTimeNotInForm(HTTPKnownStatus):
     status = '901 Estimated Time Not In Form'
 
+
+class StatusSummaryIsNull(HTTPKnownStatus):
+    status = '903 Summary Is Null'
+
+
+class StatusEstimatedTimeIsNull(HTTPKnownStatus):
+    status = '904 Estimated Time Is Null'
+
+
+class StatusStartDateIsNull(HTTPKnownStatus):
+    status = '905 Start Date Is Null'
+
+
+class StatusEndDateIsNull(HTTPKnownStatus):
+    status = '906 End Date Is Null'
