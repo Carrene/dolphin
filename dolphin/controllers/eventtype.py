@@ -78,3 +78,15 @@ class EventTypeController(ModelRestController):
     def list(self):
         return DBSession.query(EventType)
 
+    @authorize
+    @json(prevent_form='709 Form Not Allowed')
+    @commit
+    def delete(self, id):
+        id = int_or_notfound(id)
+        event_type = DBSession.query(EventType).get(id)
+        if event_type is None:
+            raise HTTPNotFound()
+
+        DBSession.delete(event_type)
+        return event_type
+
