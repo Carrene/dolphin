@@ -1,6 +1,8 @@
+import datetime
+
 from bddrest import status, response, when
 
-from dolphin.models import Member, EventType
+from dolphin.models import Member, EventType, Event
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -23,14 +25,21 @@ class TestEventType(LocalApplicationTestCase):
             title='type1',
         )
         session.add(cls.event_type)
+
+        cls.event = Event(
+            title='event1',
+            event_type=cls.event_type,
+            start_date=datetime.datetime.now().isoformat(),
+            end_date=datetime.datetime.now().isoformat(),
+        )
+        session.add(cls.event)
         session.commit()
-        session.flush()
 
     def test_delete(self):
         self.login(self.member.email)
 
         with oauth_mockup_server(), self.given(
-            f'Removing a event types',
+            f'Deleting an event types',
             f'/apiv1/eventtypes/id: {self.event_type.id}',
             f'DELETE',
         ):
@@ -38,8 +47,13 @@ class TestEventType(LocalApplicationTestCase):
             assert response.json['id'] == self.event_type.id
 
             session = self.create_session()
-            assert not session.query(EventType).filter \
-                (EventType.id == self.event_type.id).one_or_none()
+            assert not session.query(EventType) \
+                .filter(EventType.id == self.event_type.id) \
+                .one_or_none()
+
+            assert not session.query(Event) \
+                .filter(Event.id == self.event.id) \
+                .one_or_none()
 
             when(
                 'Intended event type with string type not found',
