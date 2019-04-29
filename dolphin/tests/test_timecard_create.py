@@ -107,6 +107,19 @@ class TestTimecard(LocalApplicationTestCase):
             )
             assert status == '657 End Date Must Be Greater Than Start Date'
 
+            when('Start date is null', json=given | dict(startDate=None))
+            assert status == '905 Start Date Is Null'
+
+            when('End date is null', json=given | dict(endDate=None))
+            assert status == '906 End Date Is Null'
+
+            when('Estimated time is null', json=given | dict(estimatedTime=None))
+            assert status == '904 Estimated Time Is Null'
+
+            when('Summary is null', json=given | dict(summary=None))
+            assert status == '903 Summary Is Null'
+
+
             when('Request is not authorized', authorization=None)
             assert status == 401
 
