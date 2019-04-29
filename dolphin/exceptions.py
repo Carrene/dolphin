@@ -155,3 +155,11 @@ class StatusInvalidStartDateFormat(HTTPKnownStatus):
 class StatusInvalidEndDateFormat(HTTPKnownStatus):
     status = '790 Invalid End Date Format'
 
+
+class StatusLimitedCharecterForSummary(HTTPKnownStatus):
+    status = '902 At Most 1024 Characters Valid For Summary'
+
+
+class StatusInvalidEstimatedTimeType(HTTPKnownStatus):
+    status = '900 Invalid Estimated Time Type'
+

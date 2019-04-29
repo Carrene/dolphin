@@ -21,5 +21,5 @@ from .skill import Skill, SkillMember
 from .activity import Activity
 from .eventtype import EventType
 from .event import Event
-from .timecard import TimeCard
+from .timecard import Timecard
 

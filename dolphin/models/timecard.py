@@ -1,10 +1,11 @@
 import datetime
 
-from restfulpy.orm import Field, DeclarativeBase, OrderingMixin, FilteringMixin, PaginationMixin
+from restfulpy.orm import Field, DeclarativeBase, OrderingMixin, \
+    FilteringMixin, PaginationMixin
 from sqlalchemy import Integer, Unicode, DateTime
 
 
-class TimeCard(OrderingMixin, FilteringMixin, PaginationMixin, \
+class Timecard(OrderingMixin, FilteringMixin, PaginationMixin, \
                DeclarativeBase):
     __tablename__ = 'timecard'
 
@@ -48,8 +49,8 @@ class TimeCard(OrderingMixin, FilteringMixin, PaginationMixin, \
     estimated_time = Field(
         Integer,
         python_type=int,
-        watermark='estimated time',
-        label='estimated time',
+        watermark='Estimated time',
+        label='Estimated time',
         nullable=False,
         not_none=True,
         required=True
@@ -60,9 +61,9 @@ class TimeCard(OrderingMixin, FilteringMixin, PaginationMixin, \
         max_length=1024,
         label='Lorem Isum',
         watermark='Lorem Ipsum',
-        not_none=False,
-        nullable=True,
-        required=False,
+        not_none=True,
+        nullable=False,
+        required=True,
         python_type=str,
         example='Lorem Ipsum',
     )
