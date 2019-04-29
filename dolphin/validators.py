@@ -7,7 +7,8 @@ from .models import *
 from .models.organization import roles
 from .exceptions import StatusResourceNotFound, StatusRepetitiveTitle, \
     StatusRelatedIssueNotFound, StatusEventTypeNotFound, \
-    StatusInvalidStartDateFormat, StatusInvalidEndDateFormat
+    StatusInvalidStartDateFormat, StatusInvalidEndDateFormat, \
+    StatusLimitedCharecterForSummary, StatusInvalidEstimatedTimeType
 
 
 TITLE_PATTERN = re.compile(r'^(?!\s).*[^\s]$')
@@ -883,10 +884,7 @@ event_update_validator = validate(
 
 timecard_create_validator = validate(
     summary=dict(
-        max_length=(
-            1024,
-            '902 At Most 1024 Characters Are Valid For Summary'
-        ),
+        max_length=(1024, StatusLimitedCharecterForSummary),
         required='799 Summary Not In Form',
     ),
     startDate=dict(
@@ -899,8 +897,7 @@ timecard_create_validator = validate(
     ),
     estimatedTime=dict(
         required='901 Estimated Time Not In Form',
-        type_=(int, '900 Invalid Estimated Time Type'),
+        type_=(int, StatusInvalidEstimatedTimeType),
     ),
 )
-
 

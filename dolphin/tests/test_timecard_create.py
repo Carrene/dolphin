@@ -6,7 +6,7 @@ from dolphin.models import Member
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
-class TestTimeCard(LocalApplicationTestCase):
+class TestTimecard(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
@@ -29,7 +29,7 @@ class TestTimeCard(LocalApplicationTestCase):
         summary = 'Some summary'
 
         with oauth_mockup_server(), self.given(
-            'Adding an time-card',
+            'Adding a timecard',
             '/apiv1/timecards',
             'CREATE',
             json=dict(
@@ -86,7 +86,6 @@ class TestTimeCard(LocalApplicationTestCase):
             )
             assert status == '900 Invalid Estimated Time Type'
 
-
             when(
                 'Start date format is wrong',
                 json=given | dict(startDate='30-20-20')
@@ -107,7 +106,6 @@ class TestTimeCard(LocalApplicationTestCase):
                 )
             )
             assert status == '657 End Date Must Be Greater Than Start Date'
-
 
             when('Request is not authorized', authorization=None)
             assert status == 401
