@@ -25,7 +25,7 @@ from .group import GroupController
 from .activity import ActivityController
 from .eventtype import EventTypeController
 from .event import EventController
-from .timecard import TimeCardController
+from .timecard import TimecardController
 
 
 here = abspath(dirname(__file__))

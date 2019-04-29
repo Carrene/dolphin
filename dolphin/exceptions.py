@@ -157,7 +157,7 @@ class StatusInvalidEndDateFormat(HTTPKnownStatus):
 
 
 class StatusLimitedCharecterForSummary(HTTPKnownStatus):
-    status = '902 At Most 1024 Characters Valid For Summary'
+    status = '902 At Most 1024 Characters Are Valid For Summary'
 
 
 class StatusInvalidEstimatedTimeType(HTTPKnownStatus):
