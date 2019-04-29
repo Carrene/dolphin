@@ -119,7 +119,6 @@ class TestTimecard(LocalApplicationTestCase):
             when('Summary is null', json=given | dict(summary=None))
             assert status == '903 Summary Is Null'
 
-
             when('Request is not authorized', authorization=None)
             assert status == 401
 
