@@ -24,3 +24,9 @@ class TimecardController(ModelRestController):
         DBSession.add(time_card)
         return time_card
 
+    @authorize
+    @json(prevent_form='709 Form Not Allowed')
+    @Timecard.expose
+    def list(self):
+        return DBSession.query(Timecard)
+
