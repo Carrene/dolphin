@@ -29,7 +29,7 @@ class TestTimecard(LocalApplicationTestCase):
         summary = 'Some summary'
 
         with oauth_mockup_server(), self.given(
-            'Adding a timecard',
+            'Creating a timecard',
             '/apiv1/timecards',
             'CREATE',
             json=dict(
