@@ -81,7 +81,7 @@ class TestTimecard(LocalApplicationTestCase):
             assert status == '901 Estimated Time Not In Form'
 
             when(
-                'Trying to pass without estimated time',
+                'Estimated time type is wrong',
                 json=given | dict(estimatedTime='time'),
             )
             assert status == '900 Invalid Estimated Time Type'
