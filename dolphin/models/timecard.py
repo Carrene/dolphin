@@ -49,11 +49,12 @@ class Timecard(OrderingMixin, FilteringMixin, PaginationMixin, \
     estimated_time = Field(
         Integer,
         python_type=int,
-        watermark='Estimated time',
-        label='Estimated time',
+        watermark='Estimated Time',
+        label='Estimated Time',
+        example=2,
         nullable=False,
         not_none=True,
-        required=True
+        required=True,
     )
     summary = Field(
         Unicode,

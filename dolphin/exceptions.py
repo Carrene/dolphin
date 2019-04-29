@@ -163,3 +163,19 @@ class StatusLimitedCharecterForSummary(HTTPKnownStatus):
 class StatusInvalidEstimatedTimeType(HTTPKnownStatus):
     status = '900 Invalid Estimated Time Type'
 
+
+class StatusSummaryNotInForm(HTTPKnownStatus):
+    status = '799 Summary Not In Form'
+
+
+class StatusStartDateNotInForm(HTTPKnownStatus):
+    status = '792 Start Date Not In Form'
+
+
+class StatusEndDateNotInForm(HTTPKnownStatus):
+    status = '793 End Date Not In Form'
+
+
+class StatusEstimatedTimeNotInForm(HTTPKnownStatus):
+    status = '901 Estimated Time Not In Form'
+
