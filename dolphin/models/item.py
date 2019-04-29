@@ -1,10 +1,11 @@
-
 from restfulpy.orm import Field, DeclarativeBase, relationship
-from restfulpy.orm.mixins import TimestampMixin
+from restfulpy.orm.mixins import TimestampMixin, OrderingMixin, \
+    FilteringMixin, PaginationMixin
 from sqlalchemy import Integer, ForeignKey, UniqueConstraint
 
 
-class Item(TimestampMixin, DeclarativeBase):
+class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
+           DeclarativeBase):
     __tablename__ = 'item'
 
     id = Field(

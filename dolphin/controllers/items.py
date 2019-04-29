@@ -36,3 +36,9 @@ class ItemController(ModelRestController):
 
         return item
 
+    @authorize
+    @json(prevent_form='709 Form Not Allowed')
+    @Item.expose
+    def list(self):
+        return DBSession.query(Item)
+
