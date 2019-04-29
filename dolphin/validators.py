@@ -908,3 +908,23 @@ timecard_create_validator = validate(
     ),
 )
 
+
+timecard_update_validator = validate(
+    summary=dict(
+        max_length=(1024, StatusLimitedCharecterForSummary),
+        not_none=StatusSummaryIsNull,
+    ),
+    startDate=dict(
+        pattern=(DATETIME_PATTERN, StatusInvalidStartDateFormat),
+        not_none=StatusStartDateIsNull,
+    ),
+    endDate=dict(
+        pattern=(DATETIME_PATTERN, StatusInvalidEndDateFormat),
+        not_none=StatusEndDateIsNull,
+    ),
+    estimatedTime=dict(
+        type_=(int, StatusInvalidEstimatedTimeType),
+        not_none=StatusEstimatedTimeIsNull,
+    ),
+)
+
