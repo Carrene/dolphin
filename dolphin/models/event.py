@@ -83,6 +83,6 @@ class Event(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
     event_type = relationship(
         'EventType',
         back_populates='events',
-        protected=True,
+        protected=True
     )
 
