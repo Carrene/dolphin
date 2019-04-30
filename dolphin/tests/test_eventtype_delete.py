@@ -22,12 +22,12 @@ class TestEventType(LocalApplicationTestCase):
         session.add(cls.member)
 
         cls.event_type = EventType(
-            title='type1',
+            title='Type1',
         )
         session.add(cls.event_type)
 
         cls.event = Event(
-            title='event1',
+            title='Event1',
             event_type=cls.event_type,
             start_date=datetime.datetime.now().isoformat(),
             end_date=datetime.datetime.now().isoformat(),
@@ -39,7 +39,7 @@ class TestEventType(LocalApplicationTestCase):
         self.login(self.member.email)
 
         with oauth_mockup_server(), self.given(
-            f'Deleting an event types',
+            f'Deleting an event type',
             f'/apiv1/eventtypes/id: {self.event_type.id}',
             f'DELETE',
         ):
