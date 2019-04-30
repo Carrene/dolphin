@@ -186,7 +186,7 @@ class TestIssue(LocalApplicationTestCase):
                 'Project not found with integer type',
                 json=given | dict(projectId=0, title='New title')
             )
-            assert status == '601 Project not found with id: 0'
+            assert status == '601 Project Not Found'
 
             when(
                 'Relate issue not found with string type',
@@ -217,8 +217,7 @@ class TestIssue(LocalApplicationTestCase):
                 'Title is repetitive',
                 json=Update(title='First issue')
             )
-            assert status == '600 Another issue with title: "First issue" '\
-                'is already exists.'
+            assert status == '600 Repetitive Title'
 
             when(
                 'Title length is more than limit',
@@ -284,7 +283,7 @@ class TestIssue(LocalApplicationTestCase):
                 json=given | dict(status='progressing') | \
                     dict(title='Another title')
             )
-            assert status == '705 Invalid status, only one of "to-do, ' \
+            assert status == '705 Invalid status value, only one of "to-do, ' \
                 'in-progress, on-hold, complete, done" will be accepted'
 
             when(

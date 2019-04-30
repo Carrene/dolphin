@@ -100,7 +100,7 @@ class TestPhase(LocalApplicationTestCase):
                 'Title length is more than limit',
                 json=given | dict(title=(50 + 1) * 'a')
             )
-            assert status == '704 At Most 50 Characters Valid For Title'
+            assert status == '704 At Most 50 Characters Are Valid For Title'
 
             when(
                 'Title length is more than limit',
@@ -109,7 +109,7 @@ class TestPhase(LocalApplicationTestCase):
             assert status == '703 At Most 512 Characters Are Valid For Description'
 
             when('Title is not in form', json=given - 'title')
-            assert status == '610 Title Not In Form'
+            assert status == '710 Title Not In Form'
 
             when(
                 'Order type is wrong',

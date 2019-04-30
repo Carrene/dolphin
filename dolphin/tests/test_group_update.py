@@ -78,7 +78,7 @@ class TestGroup(LocalApplicationTestCase):
                 'Title length is more than limit',
                 json=given | dict(title=(50 + 1) * 'a')
             )
-            assert status == '704 At Most 50 Characters Valid For Title'
+            assert status == '704 At Most 50 Characters Are Valid For Title'
 
             when('Invalid parameter is in the form', json=dict(a='a'))
             assert status == '707 Invalid field, only following fields are ' \

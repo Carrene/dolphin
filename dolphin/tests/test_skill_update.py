@@ -82,7 +82,7 @@ class TestSkill(LocalApplicationTestCase):
                 'Trying to pass with null title',
                 json=dict(title=None)
             )
-            assert status == '727 Title Is Null'
+            assert status == '727 Title Is None'
 
             when(
                 'Description length is more than limit',

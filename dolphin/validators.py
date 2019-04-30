@@ -34,14 +34,12 @@ def release_exists_validator(releaseId, project, field):
     try:
         releaseId = int(releaseId)
     except (TypeError, ValueError):
-        raise HTTPStatus('750 Invalid Release Id Type')
+        raise StatusInvalidReleaseIdType()
 
     if 'releaseId' in form and not DBSession.query(Release) \
             .filter(Release.id == releaseId) \
             .one_or_none():
-        raise HTTPStatus(
-            f'607 Release not found with id: {context.form["releaseId"]}'
-        )
+        raise StatusReleaseNotFound()
 
     return releaseId
 
@@ -49,10 +47,7 @@ def release_exists_validator(releaseId, project, field):
 def release_status_value_validator(status, project, field):
     form = context.form
     if 'status' in form and form['status'] not in release_statuses:
-        raise HTTPStatus(
-            f'705 Invalid status value, only one of ' \
-            f'"{", ".join(release_statuses)}" will be accepted'
-        )
+        raise StatusInvalidStatusValue(statuses_values=release_statuses)
     return form['status']
 
 
@@ -61,9 +56,8 @@ def release_not_exists_validator(title, project, field):
     release = DBSession.query(Release).filter(Release.title == title) \
         .one_or_none()
     if release is not None:
-        raise HTTPStatus(
-            f'600 Another release with title: {title} is already exists.'
-        )
+        raise StatusRepetitiveTitle()
+
     return title
 
 
@@ -72,9 +66,8 @@ def project_not_exists_validator(title, project, field):
     project = DBSession.query(Project).filter(Project.title == title) \
         .one_or_none()
     if project is not None:
-        raise HTTPStatus(
-            f'600 Another project with title: {title} is already exists.'
-        )
+        raise StatusRepetitiveTitle()
+
     return title
 
 
@@ -83,12 +76,10 @@ def project_accessible_validator(projectId, project, field):
     project = DBSession.query(Project) \
             .filter(Project.id == context.form['projectId']).one_or_none()
     if not project:
-        raise HTTPStatus(
-            f'601 Project not found with id: {context.form["projectId"]}'
-        )
+        raise StatusProjectNotFound()
 
     if project.is_deleted:
-        raise HTTPStatus('746 Hidden Project Is Not Editable')
+        raise StatusHiddenProjectIsNotEditable()
 
     return projectId
 
@@ -107,10 +98,7 @@ def event_repeat_value_validator(repeat, project, field):
 def project_status_value_validator(status, project, field):
     form = context.form
     if 'status' in form and form['status'] not in project_statuses:
-        raise HTTPStatus(
-            f'705 Invalid status value, only one of ' \
-            f'"{", ".join(project_statuses)}" will be accepted'
-        )
+        raise StatusInvalidStatusValue(statuses_values=project_statuses)
     return form['status']
 
 
@@ -122,9 +110,8 @@ def issue_not_exists_validator(title, project, field):
 
     for issue in project.issues:
         if issue.title == title:
-            raise HTTPStatus(
-                f'600 Another issue with title: "{title}" is already exists.'
-            )
+            raise StatusRepetitiveTitle()
+
 
     return title
 
@@ -142,32 +129,22 @@ def relate_to_issue_exists_validator(relatedIssueId, container, field):
 def kind_value_validator(kind, project, field):
     form = context.form
     if 'kind' in form and form['kind'] not in issue_kinds:
-        raise HTTPStatus(
-            f'717 Invalid kind, only one of ' \
-            f'"{", ".join(issue_kinds)}" will be accepted'
-        )
+        raise StatusInvalidKind(issue_kinds)
     return form['kind']
 
 
 def issue_status_value_validator(status, project, field):
     form = context.form
-    if 'status' in form  \
-            and form['status'] is not None and \
-            form['status'] not in issue_statuses:
-        raise HTTPStatus(
-            f'705 Invalid status, only one of ' \
-            f'"{", ".join(issue_statuses)}" will be accepted'
-        )
+    if 'status' in form and form['status'] not in issue_statuses:
+        raise StatusInvalidStatusValue(statuses_values=issue_statuses)
+
     return form['status']
 
 
 def issue_priority_value_validator(priority, project, field):
     form = context.form
     if 'priority' in form and form['priority'] not in issue_priorities:
-        raise HTTPStatus(
-            f'767 Invalid priority, only one of ' \
-            f'"{", ".join(issue_priorities)}" will be accepted'
-        )
+        raise StatusInvalidPriority(issue_priorities)
     return form['priority']
 
 
@@ -177,12 +154,12 @@ def phase_exists_validator(phaseId, project, field):
     try:
         phaseId = int(phaseId)
     except (TypeError, ValueError):
-        raise HTTPStatus(f'613 Phase not found with id: {form["phaseId"]}')
+        raise StatusPhaseNotFound()
 
     if 'phaseId' in form and not DBSession.query(Phase) \
             .filter(Phase.id == form['phaseId']) \
             .one_or_none():
-        raise HTTPStatus(f'613 Phase not found with id: {form["phaseId"]}')
+        raise StatusPhaseNotFound()
 
     return phaseId
 
@@ -192,12 +169,12 @@ def workflow_exists_validator(workflowId, project, field):
     try:
         workflowId = int(workflowId)
     except (TypeError, ValueError):
-        raise HTTPStatus('743 Invalid Workflow Id Type')
+        raise StatusInvalidWorkflowIdType()
 
     if not DBSession.query(Workflow) \
             .filter(Workflow.id == workflowId) \
             .one_or_none():
-        raise HTTPStatus(f'616 Workflow not found with id: {workflowId}')
+        raise StatusWorkflowNotFound()
 
     return workflowId
 
@@ -205,10 +182,8 @@ def workflow_exists_validator(workflowId, project, field):
 def item_status_value_validator(status, project, field):
     form = context.form
     if 'status' in form and form['status'] not in item_statuses:
-        raise HTTPStatus(
-            f'705 Invalid status value, only one of ' \
-            f'"{", ".join(item_statuses)}" will be accepted'
-        )
+        raise StatusInvalidStatusValue(statuses_value=item_statuses)
+
     return form['status']
 
 
@@ -234,15 +209,13 @@ def resource_exists_validator(resourceId, project, field):
         .filter(Resource.id == form['resourceId']) \
         .one_or_none()
     if not resource:
-        raise HTTPStatus(
-            f'609 Resource not found with id: {form["resourceId"]}'
-        )
+        raise StatusResourceNotFound(resource_id=context.form['resourceId'])
     return resourceId
 
 
 def organization_value_of_role_validator(role, container, field):
     if context.form.get('role') not in roles:
-        raise HTTPStatus('756 Invalid Role Value')
+        raise StatusInvalidRoleValue()
 
     return role
 
@@ -251,7 +224,7 @@ def group_exists_validator(title, project, field):
 
     group = DBSession.query(Group).filter(Group.title == title).one_or_none()
     if group is not None:
-        raise HTTPStatus('600 Repetitive Title')
+        raise StatusRepetitiveTitle()
 
     return title
 
@@ -262,7 +235,7 @@ def workflow_exists_validator_by_title(title, project, field):
         .filter(Workflow.title == title) \
         .one_or_none()
     if workflow is not None:
-        raise HTTPStatus('600 Repetitive Title')
+        raise StatusRepetitiveTitle()
 
     return title
 
@@ -284,7 +257,7 @@ def tag_exists_validator(title, project, field):
 def skill_exists_validator(title, project, field):
     skill = DBSession.query(Skill).filter(Skill.title == title).one_or_none()
     if skill is not None:
-        raise HTTPStatus('600 Repetitive Title')
+        raise StatusRepetitiveTitle()
 
     return title
 
@@ -329,17 +302,17 @@ def item_exists_validator(item_id, container, field):
 
 release_validator = validate(
     title=dict(
-        required='710 Title Not In Form',
-        max_length=(128, '704 At Most 128 Characters Are Valid For Title'),
-        pattern=(TITLE_PATTERN, '747 Invalid Title Format'),
+        required=StatusTitleNotInForm,
+        max_length=(128, StatusMaxLenghtForTitle(128)),
+        pattern=(TITLE_PATTERN, StatusInvalidTitleFormat),
         callback=release_not_exists_validator
     ),
     description=dict(
-        max_length=(8192, '703 At Most 8192 Characters Are Valid For Description')
+        max_length=(8192, StatusMaxLenghtForDescription(8192))
     ),
     cutoff=dict(
-        pattern=(DATETIME_PATTERN, '702 Invalid Cutoff Format'),
-        required='712 Cutoff Not In Form'
+        pattern=(DATETIME_PATTERN, StatusInvalidCutoffFormat),
+        required=StatusCutoffNotInForm
     ),
     status=dict(
         callback=release_status_value_validator
@@ -350,27 +323,28 @@ release_validator = validate(
         not_none='778 Manager Id Is Null',
     ),
     launchDate=dict(
-        pattern=(DATETIME_PATTERN, '784 Invalid Launch Date Format'),
-        required='783 Launch Date Not In Form'
+        pattern=(DATETIME_PATTERN, StatusInvalidLaunchDateFormat),
+        required=StatusLaunchDateNotInForm
     ),
     groupId=dict(
-        type_=(int, '797 Invalid Group Id Type'),
-        required='795 Group Id Not In Form',
-        not_none='796 Group Id Is Null',
+        type_=(int, StatusInvalidGroupIdType),
+        required=StatusGroupIdNotInForm,
+        not_none=StatusGroupIdIsNull,
     ),
 )
 
 
 update_release_validator = validate(
     title=dict(
-        max_length=(128, '704 At Most 128 Characters Are Valid For Title'),
-        pattern=(TITLE_PATTERN, '747 Invalid Title Format'),
+        max_length=(128, StatusMaxLenghtForTitle(128)),
+        pattern=(TITLE_PATTERN, StatusInvalidTitleFormat),
+
     ),
     description=dict(
-        max_length=(8192, '703 At Most 8192 Characters Are Valid For Description')
+        max_length=(8192, StatusMaxLenghtForDescription(8192))
     ),
     cutoff=dict(
-        pattern=(DATETIME_PATTERN, '702 Invalid Cutoff Format'),
+        pattern=(DATETIME_PATTERN, StatusInvalidCutoffFormat),
     ),
     status=dict(
         callback=release_status_value_validator
@@ -380,24 +354,24 @@ update_release_validator = validate(
         not_none='778 Manager Id Is Null',
     ),
     launchDate=dict(
-        pattern=(DATETIME_PATTERN, '784 Invalid Launch Date Format'),
+        pattern=(DATETIME_PATTERN, StatusInvalidLaunchDateFormat),
     ),
     groupId=dict(
-        type_=(int, '797 Invalid Group Id Type'),
-        not_none='796 Group Id Is Null',
+        type_=(int, StatusInvalidGroupIdType),
+        not_none= StatusGroupIdIsNull,
     ),
 )
 
 
 project_validator = validate(
     title=dict(
-        required='710 Title Not In Form',
+        required=StatusTitleNotInForm,
         callback=project_not_exists_validator,
-        max_length=(128, '704 At Most 128 Characters Are Valid For Title'),
-        pattern=(TITLE_PATTERN, '747 Invalid Title Format'),
+        max_length=(128, StatusMaxLenghtForTitle(128)),
+        pattern=(TITLE_PATTERN, StatusInvalidTitleFormat),
     ),
     description=dict(
-        max_length=(8192, '703 At Most 8192 Characters Are Valid For Description')
+        max_length=(8192, StatusMaxLenghtForDescription(8192))
     ),
     status=dict(
         callback=project_status_value_validator
@@ -409,40 +383,40 @@ project_validator = validate(
         callback=release_exists_validator
     ),
     managerId=dict(
-        type_=(int, '608 Manager Not Found'),
-        required='786 Manager Id Not In Form',
-        not_none='785 Manager Id Is Null',
+        type_=(int, StatusManagerNotFound),
+        required=StatusManagerIdNotInForm,
+        not_none=StatusManagerIdIsNull,
     ),
     secondaryManagerId=dict(
-        type_=(int, '650 Secondary Manager Not Found'),
+        type_=(int, StatusSecondaryManagerNotFound),
     ),
 )
 
 
 update_project_validator = validate(
     title=dict(
-        max_length=(128, '704 At Most 128 Characters Are Valid For Title'),
-        pattern=(TITLE_PATTERN, '747 Invalid Title Format'),
+        max_length=(128, StatusMaxLenghtForTitle(128)),
+        pattern=(TITLE_PATTERN, StatusInvalidTitleFormat),
     ),
     description=dict(
-        max_length=(8192, '703 At Most 8192 Characters Are Valid For Description')
+        max_length=(8192, StatusMaxLenghtForDescription(8192))
     ),
     status=dict(
         callback=project_status_value_validator
     ),
     secondaryManagerId=dict(
-        type_=(int, '650 Secondary Manager Not Found'),
+        type_=(int, StatusSecondaryManagerNotFound),
     ),
     managerId=dict(
-        type_=(int, '608 Manager Not Found'),
-        not_none='785 Manager Id Is Null',
+        type_=(int, StatusManagerNotFound),
+        not_none=StatusManagerIdIsNull,
     ),
 )
 
 
 draft_issue_define_validator = validate(
     relatedIssueId=dict(
-        type_=(int, '722 Invalid Issue Id Type'),
+        type_=(int, StatusInvalidIssueIdType),
         callback=relate_to_issue_exists_validator,
     ),
 )
@@ -450,41 +424,41 @@ draft_issue_define_validator = validate(
 
 draft_issue_finalize_validator = validate(
     priority=dict(
-        required='768 Priority Not In Form',
+        required=StatusPriorityNotInForm,
         callback=issue_priority_value_validator
     ),
     projectId=dict(
-        required='713 Project Id Not In Form',
-        type_=(int, '714 Invalid Project Id Type'),
+        required=StatusProjectIdNotInForm,
+        type_=(int, StatusInvalidProjectIdType),
         callback=project_accessible_validator,
     ),
     title=dict(
-        required='710 Title Not In Form',
-        max_length=(128, '704 At Most 128 Characters Are Valid For Title'),
-        pattern=(TITLE_PATTERN, '747 Invalid Title Format'),
+        required=StatusTitleNotInForm,
+        max_length=(128, StatusMaxLenghtForTitle(128)),
+        pattern=(TITLE_PATTERN, StatusInvalidTitleFormat),
         callback=issue_not_exists_validator
     ),
     description=dict(
-        max_length=(8192, '703 At Most 8192 Characters Are Valid For Description')
+        max_length=(8192, StatusMaxLenghtForDescription(8192))
     ),
     dueDate=dict(
-        pattern=(DATETIME_PATTERN, '701 Invalid Due Date Format'),
-        required='711 Due Date Not In Form'
+        pattern=(DATETIME_PATTERN, StatusInvalidDueDateFormat),
+        required=StatusDueDateNotInForm
     ),
     kind=dict(
-        required='718 Kind Not In Form',
+        required=StatusKindNotInForm,
         callback=kind_value_validator
     ),
     status=dict(
         callback=issue_status_value_validator
     ),
     days=dict(
-        type_=(int, '721 Invalid Days Type'),
-        required='720 Days Not In Form'
+        type_=(int, StatusInvalidDaysType),
+        required=StatusDaysNotInForm
     ),
     relatedIssueId=dict(
-        type_=(int, '722 Invalid Issue Id Type'),
-        not_none='775 Issue Id Is None',
+        type_=(int, StatusInvalidIssueIdType),
+        not_none=StatusIssueIdIsNone,
         callback=relate_to_issue_exists_validator,
     ),
 )
@@ -492,14 +466,14 @@ draft_issue_finalize_validator = validate(
 
 update_issue_validator = validate(
     title=dict(
-        max_length=(128, '704 At Most 128 Characters Are Valid For Title'),
-        pattern=(TITLE_PATTERN, '747 Invalid Title Format'),
+        max_length=(128, StatusMaxLenghtForTitle(128)),
+        pattern=(TITLE_PATTERN, StatusInvalidTitleFormat),
     ),
     description=dict(
-        max_length=(8192, '703 At Most 8192 Characters Are Valid For Description')
+        max_length=(8192, StatusMaxLenghtForDescription(8192))
     ),
     dueDate=dict(
-        pattern=(DATETIME_PATTERN, '701 Invalid Due Date Format'),
+        pattern=(DATETIME_PATTERN, StatusInvalidDueDateFormat),
     ),
     kind=dict(
         callback=kind_value_validator
@@ -508,7 +482,7 @@ update_issue_validator = validate(
         callback=issue_status_value_validator
     ),
     days=dict(
-        type_=(int, '721 Invalid Days Type'),
+        type_=(int, StatusInvalidDaysType),
     ),
     priority=dict(
         callback=issue_priority_value_validator,
@@ -518,7 +492,7 @@ update_issue_validator = validate(
 
 update_item_validator = validate(
     status=dict(
-        required='719 Status Not In Form',
+        required=StatusStatusNotInForm,
         callback=item_status_value_validator
     )
 )
@@ -526,13 +500,13 @@ update_item_validator = validate(
 
 assign_issue_validator = validate(
     memberId=dict(
-        not_none='769 Resource Id Is None',
-        type_=(int, '716 Invalid Resource Id Type'),
+        not_none=StatusResourceIdIsNone,
+        type_=(int, StatusInvalidResourceIdType),
         callback=member_exists_validator
     ),
     phaseId=dict(
-        required='737 Phase Id Not In Form',
-        type_=(int, '738 Invalid Phase Id Type'),
+        required=StatusPhaseIdNotInForm,
+        type_=(int, StatusInvalidPhaseIdType),
         callback=phase_exists_validator
     ),
     status=dict(
@@ -549,15 +523,15 @@ assign_issue_validator = validate(
 
 unassign_issue_validator = validate(
     memberId=dict(
-        not_none='769 Resource Id Is None',
-        required='715 Resource Id Not In Form',
-        type_=(int, '716 Invalid Resource Id Type'),
+        not_none=StatusResourceIdIsNone,
+        required=StatusResourceIdNotInForm,
+        type_=(int, StatusInvalidResourceIdType),
         callback=member_exists_validator
     ),
     phaseId=dict(
-        not_none='770 Phase Id Is None',
-        required='737 Phase Id Not In Form',
-        type_=(int, '738 Invalid Phase Id Type'),
+        not_none=StatusPhaseIdIsNone,
+        required=StatusPhaseIdNotInForm,
+        type_=(int, StatusInvalidPhaseIdType),
         callback=phase_exists_validator
     )
 )
@@ -565,56 +539,56 @@ unassign_issue_validator = validate(
 
 organization_create_validator = validate(
     title=dict(
-        required='710 Title Not In Form',
-        max_length=(50,'704 At Most 50 Characters Are Valid For Title'),
-        pattern=(ORGANIZATION_TITLE_PATTERN, '747 Invalid Title Format'),
+        required=StatusTitleNotInForm,
+        max_length=(50, StatusMaxLenghtForTitle(50)),
+        pattern=(ORGANIZATION_TITLE_PATTERN, StatusInvalidTitleFormat),
     ),
 )
 
 
 organization_invite_validator = validate(
     email=dict(
-        required='753 Email Not In Form',
-        pattern=(USER_EMAIL_PATTERN, '754 Invalid Email Format')
+        required=StatusEmailNotInForm,
+        pattern=(USER_EMAIL_PATTERN, StatusInvalidEmailFormat)
     ),
     role=dict(
-        required='755 Role Not In Form',
+        required=StatusRoleNotInForm,
         callback=organization_value_of_role_validator,
     ),
     scopes=dict(
-        required='765 Scopes Not In Form'
+        required=StatusScopesNotInForm
     ),
     applicationId=dict(
-        required='764 Application Id Not In form'
+        required=StatusApplicationIdNotInForm
     ),
     redirectUri=dict(
-        required='766 Redirect Uri Not In form'
+        required=StatusRedirectUriNotInForm
     ),
 )
 
 
 organization_join_validator = validate(
     token=dict(
-        required='757 Token Not In Form',
+        required=StatusTokenNotInForm,
     ),
 )
 
 
 token_obtain_validator = validate(
     organizationId=dict(
-        required='761 Organization Id Not In Form',
-        type_=(int, '763 Invalid Organization Id Type')
+        required=StatusOrganizationIdNotINForm,
+        type_=(int, StatusInvalidOrganizationIdType)
     ),
     authorizationCode=dict(
-        required='762 Authorization Code Not In Form'
+        required=StatusAuthorizationCodeNotInForm,
     ),
 )
 
 
 issue_move_validator = validate(
     projectId=dict(
-        required='713 Project Id Not In Form',
-        type_=(int, '714 Invalid Project Id Type'),
+        required=StatusProjectIdNotInForm,
+        type_=(int, StatusInvalidProjectIdType),
         callback=project_accessible_validator,
     ),
 )
@@ -622,11 +596,11 @@ issue_move_validator = validate(
 
 attachment_validator = validate(
     title=dict(
-        max_length=(128, '704 At Most 128 Characters Are Valid For Title'),
-        pattern=(TITLE_PATTERN, '747 Invalid Title Format'),
+        max_length=(128, StatusMaxLenghtForTitle(128)),
+        pattern=(TITLE_PATTERN, StatusInvalidTitleFormat),
     ),
     attachment=dict(
-        required='758 File Not In Form'
+        required=StatusFileNotInForm
     )
 )
 
@@ -634,14 +608,13 @@ attachment_validator = validate(
 group_create_validator = validate(
     description=dict(
         max_length=(
-            8192,
-            '703 At Most 8192 Characters Are Valid For Description'
+            8192, StatusMaxLenghtForDescription(8192)
         )
     ),
     title=dict(
-        not_none='727 Title Is None',
-        required='710 Title Not In Form',
-        max_length=(128, '704 At Most 128 Characters Are Valid For Title'),
+        not_none=StatusTitleIsNone,
+        required=StatusTitleNotInForm,
+        max_length=(128, StatusMaxLenghtForTitle(128)),
         callback=group_exists_validator,
     )
 )
@@ -650,31 +623,30 @@ group_create_validator = validate(
 group_update_validator = validate(
     description=dict(
         max_length=(
-            8192,
-            '703 At Most 8192 Characters Are Valid For Description'
+            8192, StatusMaxLenghtForDescription(8192)
         )
     ),
     title=dict(
-        not_none='727 Title Is None',
-        max_length=(50, '704 At Most 50 Characters Valid For Title'),
+        not_none=StatusTitleIsNone,
+        max_length=(50, StatusMaxLenghtForTitle(50)),
     )
 )
 
 
 group_add_validator = validate(
     memberId=dict(
-        not_none='774 Member Id Is Null',
-        required='735 Member Id Not In Form',
-        type_=(int , '736 Invalid Member Id Type'),
+        not_none=StatusMemberIdIsNull,
+        required=StatusMemberIdNotInForm,
+        type_=(int , StatusInvalidMemberIdType),
     ),
 )
 
 
 group_remove_validator = validate(
     memberId=dict(
-        not_none='774 Member Id Is Null',
-        required='735 Member Id Not In Form',
-        type_=(int , '736 Invalid Member Id Type'),
+        not_none=StatusMemberIdIsNull,
+        required=StatusMemberIdNotInForm,
+        type_=(int , StatusInvalidMemberIdType),
     ),
 )
 
@@ -682,15 +654,14 @@ group_remove_validator = validate(
 workflow_create_validator = validate(
     description=dict(
         max_length=(
-            8192,
-            '703 At Most 8192 Characters Are Valid For Description'
+            8192, StatusMaxLenghtForDescription(8192)
         )
     ),
     title=dict(
-        not_none='727 Title Is None',
-        required='710 Title Not In Form',
-        max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
-        pattern=(WORKFLOW_TITLE_PATTERN, '747 Invalid Title Format'),
+        not_none=StatusTitleIsNone,
+        required=StatusTitleNotInForm,
+        max_length=(50, StatusMaxLenghtForTitle(50)),
+        pattern=(WORKFLOW_TITLE_PATTERN, StatusInvalidTitleFormat),
         callback=workflow_exists_validator_by_title,
     )
 )
@@ -699,14 +670,13 @@ workflow_create_validator = validate(
 tag_create_validator = validate(
     description=dict(
         max_length=(
-            8192,
-            '703 At Most 8192 Characters Are Valid For Description'
+            8192, StatusMaxLenghtForDescription(8192)
         )
     ),
     title=dict(
-        not_none='727 Title Is None',
-        required='710 Title Not In Form',
-        max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
+        not_none=StatusTitleIsNone,
+        required=StatusTitleNotInForm,
+        max_length=(50, StatusMaxLenghtForTitle(50)),
         callback=tag_exists_validator,
     )
 )
@@ -715,40 +685,39 @@ tag_create_validator = validate(
 tag_update_validator = validate(
     description=dict(
         max_length=(
-            8192,
-            '703 At Most 8192 Characters Are Valid For Description'
+            8192, StatusMaxLenghtForDescription(8192)
         )
     ),
     title=dict(
-        not_none='727 Title Is Null',
-        max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
+        not_none=StatusTitleIsNone,
+        max_length=(50, StatusMaxLenghtForTitle(50)),
     )
 )
 
 
 issue_relate_validator = validate(
     targetIssueId=dict(
-        not_none='779 Target Issue Id Is None',
-        required='780 Target Issue Id Not In Form',
-        type_=(int, '781 Invalid Target Issue Id Type'),
+        not_none=StatusTargetIssueIdIsNone,
+        required=StatusTargetIssueIdNotInForm,
+        type_=(int, StatusInvalidTargetIssueIdType),
     )
 )
 
 
 issue_unrelate_validator = validate(
     targetIssueId=dict(
-        not_none='779 Target Issue Id Is None',
-        required='780 Target Issue Id Not In Form',
-        type_=(int, '781 Invalid Target Issue Id Type'),
+        not_none=StatusTargetIssueIdIsNone,
+        required=StatusTargetIssueIdNotInForm,
+        type_=(int, StatusInvalidTargetIssueIdType),
     )
 )
 
 
 draft_issue_relate_validator = validate(
     targetIssueId=dict(
-        not_none='779 Target Issue Id Is None',
-        required='780 Target Issue Id Not In Form',
-        type_=(int, '781 Invalid Target Issue Id Type'),
+        not_none=StatusTargetIssueIdIsNone,
+        required=StatusTargetIssueIdNotInForm,
+        type_=(int, StatusInvalidTargetIssueIdType),
     )
 )
 
@@ -756,14 +725,13 @@ draft_issue_relate_validator = validate(
 skill_create_validator = validate(
     description=dict(
         max_length=(
-            512,
-            '703 At Most 512 Characters Are Valid For Description'
+            512, StatusMaxLenghtForDescription(512),
         ),
     ),
     title = dict(
-        required='710 Title Not In Form',
-        not_none='727 Title Is Null',
-        max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
+        required=StatusTitleNotInForm,
+        not_none=StatusTitleIsNone,
+        max_length=(50, StatusMaxLenghtForTitle(50)),
         callback=skill_exists_validator,
     ),
 )
@@ -772,13 +740,12 @@ skill_create_validator = validate(
 skill_update_validator = validate(
     description=dict(
         max_length=(
-            512,
-            '703 At Most 512 Characters Are Valid For Description'
+            512, StatusMaxLenghtForDescription(512),
         ),
     ),
     title = dict(
-        not_none='727 Title Is Null',
-        max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
+        not_none=StatusTitleIsNone,
+        max_length=(50, StatusMaxLenghtForTitle(50)),
     ),
 )
 
@@ -786,32 +753,30 @@ skill_update_validator = validate(
 workflow_update_validator = validate(
     description=dict(
         max_length=(
-            8192,
-            '703 At Most 8192 Characters Are Valid For Description'
+            8192, StatusMaxLenghtForDescription(8192)
         ),
     ),
     title = dict(
-        not_none='727 Title Is Null',
-        max_length=(50, '704 At Most 50 Characters Are Valid For Title'),
+        not_none=StatusTitleIsNone,
+        max_length=(50, StatusMaxLenghtForTitle(50)),
     ),
 )
 
 
 phase_update_validator = validate(
     skillId=dict(
-        type_=(int, '788 Invalid Skill Id Type'),
+        type_=(int, StatusInvalidSkillIdType),
     ),
     order=dict(
-        type_=(int, '741 Invalid Order Type'),
+        type_=(int, StatusInvalidOrderType),
     ),
     title=dict(
-        not_none='727 Title Is Null',
-        max_length=(50, '704 At Most 50 Characters Valid For Title'),
+        not_none=StatusTitleIsNone,
+        max_length=(50, StatusMaxLenghtForTitle(50)),
     ),
     description=dict(
         max_length=(
-            512,
-            '703 At Most 512 Characters Are Valid For Description'
+            512, StatusMaxLenghtForDescription(512),
         ),
     )
 )
@@ -819,17 +784,16 @@ phase_update_validator = validate(
 
 phase_validator = validate(
     title=dict(
-        required='610 Title Not In Form',
-        max_length=(50, '704 At Most 50 Characters Valid For Title'),
+        required=StatusTitleNotInForm,
+        max_length=(50, StatusMaxLenghtForTitle(50)),
     ),
     order=dict(
-        required='742 Order Not In Form',
-        type_=(int, '741 Invalid Order Type'),
+        required=StatusOrderNotInForm,
+        type_=(int, StatusInvalidOrderType),
     ),
     description=dict(
         max_length=(
-            512,
-            '703 At Most 512 Characters Are Valid For Description'
+            512, StatusMaxLenghtForDescription(512),
         ),
     )
 )
@@ -838,14 +802,13 @@ phase_validator = validate(
 eventtype_create_validator = validate(
    description=dict(
         max_length=(
-            512,
-            '703 At Most 512 Characters Are Valid For Description'
+            512, StatusMaxLenghtForDescription(512),
         ),
     ),
     title=dict(
-        required='710 Title Not In Form',
-        not_none='727 Title Is None',
-        max_length=(50, '704 At Most 50 Characters Valid For Title'),
+        required=StatusTitleNotInForm,
+        not_none=StatusTitleIsNone,
+        max_length=(50, StatusMaxLenghtForTitle(50)),
         callback=eventtype_exists_validator_by_title
     ),
 )
@@ -857,22 +820,22 @@ event_add_validator = validate(
         callback=event_repeat_value_validator,
     ),
     eventTypeId=dict(
-        required='794 Type Id Not In Form',
-        not_none='798 Event Type Id Is Null',
+        required=StatusTypeIdNotInForm,
+        not_none=StatusEventTypeIdIsNull,
         callback=eventtype_exists_validator_by_id,
     ),
     startDate=dict(
-        required='792 Start Date Not In Form',
+        required=StatusStartDateNotInForm,
         pattern=(DATETIME_PATTERN, StatusInvalidStartDateFormat),
     ),
     endDate=dict(
-        required='793 End Date Not In Form',
+        required=StatusEndDateNotInForm,
         pattern=(DATETIME_PATTERN, StatusInvalidEndDateFormat),
     ),
     title=dict(
-        required='710 Title Not In Form',
-        not_none='727 Title Is None',
-        max_length=(50, '704 At Most 50 Characters Valid For Title'),
+        required=StatusTitleNotInForm,
+        not_none=StatusTitleIsNone,
+        max_length=(50, StatusMaxLenghtForTitle(50)),
         callback=event_exists_validator,
     ),
 )
@@ -881,14 +844,14 @@ event_add_validator = validate(
 eventtype_update_validator = validate(
     description=dict(
         max_length=(
-            512,
-            '703 At Most 512 Characters Are Valid For Description'
-        )
+            512, StatusMaxLenghtForDescription(512),
+        ),
     ),
+
     title=dict(
-        not_none='727 Title Is None',
-        max_length=(50, '704 At Most 50 Characters Valid For Title'),
-    )
+        not_none=StatusTitleIsNone,
+        max_length=(50, StatusMaxLenghtForTitle(50))
+    ),
 )
 
 
@@ -897,7 +860,7 @@ event_update_validator = validate(
         callback=event_repeat_value_validator,
     ),
     eventTypeId=dict(
-        not_none='798 Event Type Id Is Null',
+        not_none=StatusEventTypeIdIsNull,
         callback=eventtype_exists_validator_by_id,
     ),
     startDate=dict(
@@ -907,8 +870,8 @@ event_update_validator = validate(
         pattern=(DATETIME_PATTERN, StatusInvalidEndDateFormat),
     ),
     title=dict(
-        not_none='727 Title Is None',
-        max_length=(50, '704 At Most 50 Characters Valid For Title'),
+        not_none=StatusTitleIsNone,
+        max_length=(50, StatusMaxLenghtForTitle(50)),
     ),
 )
 

@@ -90,7 +90,7 @@ class TestEvent(LocalApplicationTestCase):
                 'Title length is more than limit',
                 json=given | dict(title=((50 + 1) * 'a'))
             )
-            assert status == '704 At Most 50 Characters Valid For Title'
+            assert status == '704 At Most 50 Characters Are Valid For Title'
 
             when(
                 'Trying to pass with none title',

@@ -147,7 +147,7 @@ class TestProject(LocalApplicationTestCase):
                 'Workflow id is in form but not found(numeric)',
                 json=given | dict(title='New title', workflowId=0)
             )
-            assert status == '616 Workflow not found with id: 0'
+            assert status == '616 Workflow Not Found'
 
             when(
                 'Title format is wrong',
@@ -159,8 +159,7 @@ class TestProject(LocalApplicationTestCase):
                 'Title is repetetive',
                 json=given | dict(title='My first project')
             )
-            assert status == '600 Another project with title: My first '\
-                'project is already exists.'
+            assert status == '600 Repetitive Title'
 
             when(
                 'Release ID type is wrong',
@@ -172,7 +171,7 @@ class TestProject(LocalApplicationTestCase):
                 'Release not found with integer type',
                 json=given | dict(releaseId=0, title='New title')
             )
-            assert status == '607 Release not found with id: 0'
+            assert status == '607 Release Not Found'
 
             when(
                 'Title is not in form',

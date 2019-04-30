@@ -69,7 +69,7 @@ class TestSkill(LocalApplicationTestCase):
                 'Trying to pass with null title',
                 json=dict(title=None)
             )
-            assert status == '727 Title Is Null'
+            assert status == '727 Title Is None'
 
             when(
                 'Trying to pass without title',

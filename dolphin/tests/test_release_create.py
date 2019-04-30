@@ -98,8 +98,7 @@ class TestRelease(LocalApplicationTestCase):
                 'Title is repetetive',
                 json=given | dict(title='My first release')
             )
-            assert status == '600 Another release with title: My first '\
-                'release is already exists.'
+            assert status == '600 Repetitive Title'
 
             when(
                 'Description length is less than limit',
