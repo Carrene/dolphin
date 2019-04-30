@@ -156,7 +156,7 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
         yield MetadataField(
             name='managerReferenceId',
             key='manager_reference_id',
-            label='Lorem Ipsum',
+            label='Manager',
             required=True,
             not_none=True,
             readonly=False,
