@@ -29,6 +29,7 @@ class TestEvent(LocalApplicationTestCase):
             start_date=datetime.datetime.now().isoformat(),
             end_date=datetime.datetime.now().isoformat(),
             event_type=event_type,
+            repeat='never',
         )
         session.add(event1)
 
@@ -37,6 +38,7 @@ class TestEvent(LocalApplicationTestCase):
             start_date=datetime.datetime.now().isoformat(),
             end_date=datetime.datetime.now().isoformat(),
             event_type=event_type,
+            repeat='never',
         )
         session.add(event2)
 
@@ -45,6 +47,7 @@ class TestEvent(LocalApplicationTestCase):
             start_date=datetime.datetime.now().isoformat(),
             end_date=datetime.datetime.now().isoformat(),
             event_type=event_type,
+            repeat='never',
         )
         session.add(event3)
         session.commit()
