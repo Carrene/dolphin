@@ -57,7 +57,7 @@ class TestRelease(LocalApplicationTestCase):
                 description='Decription for my release',
                 cutoff='2030-2-20',
                 launchDate='2030-2-20',
-                managerReferenceId=self.member.reference_id,
+                managerId=self.member.id,
                 groupId=self.group.id,
             )
         ):
@@ -67,7 +67,7 @@ class TestRelease(LocalApplicationTestCase):
             assert response.json['cutoff'] == '2030-02-20T00:00:00'
             assert response.json['launchDate'] == '2030-02-20T00:00:00'
             assert response.json['status'] is None
-            assert response.json['managerId'] == self.member.reference_id
+            assert response.json['managerId'] == self.member.id
             assert response.json['roomId'] is not None
             assert len(response.json['projects']) == 0
 
@@ -170,22 +170,22 @@ class TestRelease(LocalApplicationTestCase):
                 '"in-progress, on-hold, delayed, complete" will be accepted'
 
             when(
-                'Manager reference id is null',
-                json=Update(title='New Release', managerReferenceId=None)
+                'Manager id is null',
+                json=Update(title='New Release', managerId=None)
             )
-            assert status == '778 Manager Reference Id Is Null'
+            assert status == '778 Manager Id Is Null'
 
             when(
                 'Manager is not found',
-                json=Update(title='New Release', managerReferenceId=0)
+                json=Update(title='New Release', managerId=0)
             )
             assert status == '608 Manager Not Found'
 
             when(
-                'Maneger reference id is not in form',
-                json=given - 'managerReferenceId' | dict(title='New Release')
+                'Maneger id is not in form',
+                json=given - 'managerId' | dict(title='New Release')
             )
-            assert status == '777 Manager Reference Id Not In Form'
+            assert status == '777 Manager Id Not In Form'
 
             when(
                 'Group id is null',
@@ -214,7 +214,7 @@ class TestRelease(LocalApplicationTestCase):
             )
             assert status == '707 Invalid field, only following fields are ' \
                 'accepted: title, description, status, cutoff, ' \
-                'managerReferenceId, launchDate, groupId'
+                'managerId, launchDate, groupId'
 
             with chat_server_status('404 Not Found'):
                 when(
