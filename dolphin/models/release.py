@@ -48,8 +48,8 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
         label='Manager',
         nullable=False,
         not_none=True,
-        readonly=True,
-        required=True
+        readonly=False,
+        required=True,
     )
     room_id = Field(
         Integer,
@@ -151,17 +151,6 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
             readonly=True,
             example='Lorem Ipsum',
             watermark='Lorem Ipsum',
-            message='Lorem Ipsum',
-        )
-        yield MetadataField(
-            name='managerReferenceId',
-            key='manager_reference_id',
-            label='Lorem Ipsum',
-            required=True,
-            not_none=True,
-            readonly=False,
-            watermark='Lorem Ipsum',
-            example='Lorem Ipsum',
             message='Lorem Ipsum',
         )
 
