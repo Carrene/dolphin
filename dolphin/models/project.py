@@ -273,7 +273,7 @@ class Project(ModifiedByMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         yield MetadataField(
             name='releaseCutoff',
             key='release_cutoff',
-            label='release cutoff',
+            label='Release Cutoff',
             required=False,
             readonly=True
         )
