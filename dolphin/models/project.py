@@ -270,6 +270,13 @@ class Project(ModifiedByMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             example='Lorem Ipsum',
             message='Lorem Ipsum',
         )
+        yield MetadataField(
+            name='releaseCutoff',
+            key='release_cutoff',
+            label='release cutoff',
+            required=False,
+            readonly=True
+        )
 
     def to_dict(self):
         project_dict = super().to_dict()
