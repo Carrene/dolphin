@@ -17,7 +17,7 @@ FORM_WHITELIST = [
     'description',
     'status',
     'cutoff',
-    'managerReferenceId',
+    'managerId',
     'launchDate',
     'groupId',
 ]
@@ -43,15 +43,11 @@ class ReleaseController(ModelRestController):
     @commit
     def create(self):
         token = context.environ['HTTP_AUTHORIZATION']
-        manager = DBSession.query(Member) \
-            .filter(
-                Member.reference_id == context.form['managerReferenceId']
-            ) \
-            .one_or_none()
-        creator = Member.current()
+        manager = DBSession.query(Member).get(context.form['managerId'])
         if manager is None:
             raise StatusManagerNotFound()
 
+        creator = Member.current()
         group = DBSession.query(Group).get(context.form.get('groupId'))
         if group is None:
             raise StatusGroupNotFound()
@@ -117,11 +113,9 @@ class ReleaseController(ModelRestController):
                 f'"{form["title"]}" is already exists.'
             )
 
-        manager_reference_id = context.form.get('managerReferenceId')
-        if manager_reference_id is not None:
-            member = DBSession.query(Member) \
-                .filter(Member.reference_id == manager_reference_id) \
-                .one_or_none()
+        manager_id = context.form.get('managerId')
+        if manager_id is not None:
+            member = DBSession.query(Member).get(manager_id)
             if member is None:
                 raise StatusManagerNotFound()
 
