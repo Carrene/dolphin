@@ -7,7 +7,8 @@ from .models import *
 from .models.organization import roles
 from .exceptions import StatusResourceNotFound, StatusRepetitiveTitle, \
     StatusRelatedIssueNotFound, StatusEventTypeNotFound, \
-    StatusInvalidStartDateFormat, StatusInvalidEndDateFormat
+    StatusInvalidStartDateFormat, StatusInvalidEndDateFormat, \
+    StatusRepeatNotInForm
 
 
 TITLE_PATTERN = re.compile(r'^(?!\s).*[^\s]$')
@@ -86,6 +87,17 @@ def project_accessible_validator(projectId, project, field):
         raise HTTPStatus('746 Hidden Project Is Not Editable')
 
     return projectId
+
+
+def event_repeat_value_validator(repeat, project, field):
+    form = context.form
+    if 'repeat' in form and form['repeat'] not in event_repeats:
+        raise HTTPStatus(
+            f'910 Invalid Repeat, only one of ' \
+            f'"{", ".join(event_repeats)}" will be accepted'
+        )
+
+    return repeat
 
 
 def project_status_value_validator(status, project, field):
@@ -817,11 +829,9 @@ eventtype_create_validator = validate(
 
 
 event_add_validator = validate(
-   description=dict(
-        max_length=(
-            512,
-            '703 At Most 512 Characters Are Valid For Description'
-        ),
+    repeat=dict(
+        required=StatusRepeatNotInForm,
+        callback=event_repeat_value_validator,
     ),
     eventTypeId=dict(
         required='794 Type Id Not In Form',
@@ -860,11 +870,8 @@ eventtype_update_validator = validate(
 
 
 event_update_validator = validate(
-   description=dict(
-        max_length=(
-            512,
-            '703 At Most 512 Characters Are Valid For Description'
-        ),
+    repeat=dict(
+        callback=event_repeat_value_validator,
     ),
     eventTypeId=dict(
         not_none='798 Event Type Id Is Null',

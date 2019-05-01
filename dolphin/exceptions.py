@@ -155,3 +155,7 @@ class StatusInvalidStartDateFormat(HTTPKnownStatus):
 class StatusInvalidEndDateFormat(HTTPKnownStatus):
     status = '790 Invalid End Date Format'
 
+
+class StatusRepeatNotInForm(HTTPKnownStatus):
+    status = '911 Repeat Not In Form'
+

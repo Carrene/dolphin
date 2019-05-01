@@ -12,7 +12,7 @@ from ..validators import event_add_validator, event_update_validator
 
 FORM_WHITELIST = [
     'title',
-    'description',
+    'repeat',
     'startDate',
     'endDate',
     'eventTypeId',
