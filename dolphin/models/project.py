@@ -175,6 +175,7 @@ class Project(ModifiedByMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         .where(status == 'active')
     )
 
+
     @hybrid_property
     def boarding(self):
         if self.status == 'on-hold':
@@ -276,6 +277,7 @@ class Project(ModifiedByMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         project_dict['isSubscribed'] = True if self.is_subscribed else False
         project_dict['dueDate'] = self.due_date.isoformat() \
             if self.due_date else None
+        project_dict['releaseCutoff'] = self.release_cutoff.isoformat()
         return project_dict
 
     def get_room_title(self):
@@ -284,6 +286,8 @@ class Project(ModifiedByMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     @classmethod
     def __declare_last__(cls):
+        from . import Release
+
         super().__declare_last__()
         observe(
             cls,
@@ -296,5 +300,9 @@ class Project(ModifiedByMixin, OrderingMixin, FilteringMixin, PaginationMixin,
                 'manager_id',
                 'secondary_manager_id',
             ]
+        )
+        cls.release_cutoff = column_property(
+            select([Release.cutoff])
+            .where(Release.id == cls.release_id)
         )
 
