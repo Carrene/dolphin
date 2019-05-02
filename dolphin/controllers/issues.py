@@ -7,12 +7,13 @@ from nanohttp import HTTPStatus, json, context, HTTPNotFound, \
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import DBSession, commit
-from sqlalchemy import and_, exists, select, func, join, or_
+from sqlalchemy import and_, exists, select, func, join, or_, Text, cast
 
 from ..backends import ChatClient
 from ..exceptions import StatusRoomMemberAlreadyExist, \
     StatusRoomMemberNotFound, StatusChatRoomNotFound, StatusRelatedIssueNotFound, \
-    StatusIssueBugMustHaveRelatedIssue, StatusIssueNotFound
+    StatusIssueBugMustHaveRelatedIssue, StatusIssueNotFound, \
+    StatusQueryParameterNotInFormOrQueryString
 from ..models import Issue, Subscription, Phase, Item, Member, Project, \
     RelatedIssue, Subscribable, IssueTag, Tag
 from ..validators import update_issue_validator, assign_issue_validator, \
@@ -773,14 +774,16 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     @json
     @Issue.expose
     def search(self):
-        import pudb; pudb.set_trace()  # XXX BREAKPOINT
         query = context.form.get('query') or context.query.get('query')
-#        query = f'%{query}%'
+        if query is None:
+            raise StatusQueryParameterNotInFormOrQueryString()
+
+        query = f'%{query}%'
         query = DBSession.query(Issue) \
             .filter(or_(
                 Issue.title.ilike(query),
+                cast(Issue.id, Text).ilike(query)
             ))
-#                Issue.id.ilike(query)
 
         return query
 

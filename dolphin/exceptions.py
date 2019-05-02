@@ -155,3 +155,7 @@ class StatusInvalidStartDateFormat(HTTPKnownStatus):
 class StatusInvalidEndDateFormat(HTTPKnownStatus):
     status = '790 Invalid End Date Format'
 
+
+class StatusQueryParameterNotInFormOrQueryString(HTTPKnownStatus):
+    status = '912 Query Parameter Not In Form Or Query String'
+

@@ -1,6 +1,6 @@
 from nanohttp import context
 from nanohttp.contexts import Context
-from bddrest.authoring import status, response
+from bddrest.authoring import status, response, when, given
 from auditor.context import Context as AuditLogContext
 
 from dolphin.models import Member, Release, Project, Issue, Group, Workflow, \
@@ -98,78 +98,79 @@ class TestIssue(LocalApplicationTestCase):
     def test_search_user(self):
         self.login(self.member.email)
 
-        import pudb; pudb.set_trace()  # XXX BREAKPOINT
         with oauth_mockup_server(), self.given(
             'Search for a issue by submitting form',
             '/apiv1/issues',
             'SEARCH',
-            form=dict(query='First'),
+            form=dict(query='Fir'),
         ):
             assert status == 200
-            assert response.json[0]['title'] == self.user2.title
-            assert len(response.json) == 2
+            assert len(response.json) == 1
+            assert response.json[0]['title'] == self.issue1.title
 
-#            when('Search using email', form=Update(query='exam'))
-#            assert status == 200
-#            assert len(response.json) == 1
-#
-#            when('Search without query parameter', form=Remove('query'))
-#            assert status == '708 Search Query Is Required'
-#
-#            when(
-#                'Search string must be less than 20 charecters',
-#                form=Update(
-#                    query= \
-#                        'The search string should be less than 20 charecters'
-#                )
-#            )
-#            assert status == '702 Must Be Less Than 20 Charecters'
-#
-#            when('Try to sort the respone', query=dict(sort='id'))
-#            assert len(response.json) == 2
-#            assert response.json[0]['id'] == 1
-#
-#            when(
-#                'Trying ro sort the response in descend ordering',
-#                 query=dict(sort='-id')
-#            )
-#            assert response.json[0]['id'] == 2
-#
-#            when('Filtering the response', query=dict(title='user2'))
-#            assert len(response.json) == 1
-#            assert response.json[0]['title'] == 'user2'
-#
-#            when(
-#                'Trying to filter the response ignoring the title',
-#                 query=dict(title='!user2')
-#            )
-#            assert len(response.json) == 1
-#            assert response.json[0]['title'] != 'user2'
-#
-#            when('Testing pagination', query=dict(take=1, skip=1))
-#            assert len(response.json) == 1
-#            assert response.json[0]['title'] == self.user1.title
-#
-#            when(
-#                'Sort before pagination',
-#                query=dict(sort='-id', take=3, skip=1)
-#            )
-#            assert len(response.json) == 1
-#            assert response.json[0]['title'] == 'user1'
-#
-#    def test_request_with_query_string(self):
-#        self.login('user1@example.com')
-#
-#        with cas_mockup_server(), self.given(
-#            'Test request using query string',
-#            '/apiv1/members',
-#            'SEARCH',
-#            query=dict(query='user')
-#        ):
-#            assert status == 200
-#            assert len(response.json) == 2
-#
-#            when('An unauthorized search', authorization=None)
-#            assert status == 401
-#
-#
+            when('Search without query parameter', form=given - 'query')
+            assert status == '912 Query Parameter Not In Form Or Query String'
+
+            when(
+                'Search string must be less than 20 charecters',
+                form=given | dict(query=(50 + 1) * 'a')
+            )
+            assert status == '704 At Most 50 Characters Valid For Title'
+
+            when(
+                'Try to sort the response',
+                query=dict(sort='id'),
+                form=given | dict(query='issue')
+            )
+            assert len(response.json) == 4
+            assert response.json[0]['id'] < response.json[1]['id']
+
+            when(
+                'Trying ro sort the response in descend ordering',
+                query=dict(sort='-id'),
+                form=given | dict(query='issue')
+            )
+            assert len(response.json) == 4
+            assert response.json[0]['id'] > response.json[1]['id']
+
+            when('Filtering the response', query=dict(title=self.issue1.title))
+            assert len(response.json) == 1
+            assert response.json[0]['title'] == self.issue1.title
+
+            when(
+                'Trying to filter the response ignoring the title',
+                query=dict(title=f'!{self.issue1.title}'),
+                form=given | dict(query='issue')
+            )
+            assert len(response.json) == 3
+
+            when(
+                'Testing pagination',
+                query=dict(take=1, skip=1),
+                form=given | dict(query='issue')
+            )
+            assert len(response.json) == 1
+
+            when(
+                'Sort before pagination',
+                query=dict(sort='-id', take=3, skip=1),
+                form=given | dict(query='issue')
+            )
+            assert len(response.json) == 3
+            assert response.json[0]['id'] > response.json[1]['id']
+
+    def test_request_with_query_string(self):
+        self.login(self.member.email)
+
+        with oauth_mockup_server(), self.given(
+            'Test request using query string',
+            '/apiv1/issues',
+            'SEARCH',
+            query=dict(query='Sec')
+        ):
+            assert status == 200
+            assert len(response.json) == 1
+
+            when('An unauthorized search', authorization=None)
+            assert status == 401
+
