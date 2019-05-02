@@ -7,7 +7,7 @@ from nanohttp import HTTPStatus, json, context, HTTPNotFound, \
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import DBSession, commit
-from sqlalchemy import and_, exists, select, func, join
+from sqlalchemy import and_, exists, select, func, join, or_
 
 from ..backends import ChatClient
 from ..exceptions import StatusRoomMemberAlreadyExist, \
@@ -17,7 +17,7 @@ from ..models import Issue, Subscription, Phase, Item, Member, Project, \
     RelatedIssue, Subscribable, IssueTag, Tag
 from ..validators import update_issue_validator, assign_issue_validator, \
     issue_move_validator, unassign_issue_validator, issue_relate_validator, \
-    issue_unrelate_validator
+    issue_unrelate_validator, search_issue_validator
 from .activity import ActivityController
 from .files import FileController
 from .phases import PhaseController
@@ -767,4 +767,20 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     def _unsee_subscriptions(self, subscriptions):
         for subscription in subscriptions:
             subscription.seen_at = None
+
+    @authorize
+    @search_issue_validator
+    @json
+    @Issue.expose
+    def search(self):
+        import pudb; pudb.set_trace()  # XXX BREAKPOINT
+        query = context.form.get('query') or context.query.get('query')
+#        query = f'%{query}%'
+        query = DBSession.query(Issue) \
+            .filter(or_(
+                Issue.title.ilike(query),
+            ))
+#                Issue.id.ilike(query)
+
+        return query
 
