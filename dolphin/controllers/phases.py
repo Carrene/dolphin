@@ -59,21 +59,6 @@ class PhaseController(ModelRestController):
         return query
 
     @authorize
-    @json
-    @Phase.expose
-    @commit
-    def set(self, id):
-        id = int_or_notfound(id)
-
-        phase = DBSession.query(Phase).get(id)
-        if phase is None:
-            raise HTTPNotFound()
-
-        phase.issues.append(self.issue)
-        DBSession.add(phase)
-        return phase
-
-    @authorize
     @json(form_whitelist=(
         FORM_WHITELIST,
         f'707 Invalid field, only following fields are accepted: '
