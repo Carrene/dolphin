@@ -114,16 +114,16 @@ class TestOrganization(LocalApplicationTestCase):
                     'Aspect ratio of the logo is invalid',
                     multipart=dict(title='newtitle', logo=io.BytesIO(f.read()))
                 )
-                assert status == '622 Invalid aspect ratio 150 / 100 = 1.5'\
-                    ',accepted_range: 1 - 1'
+                assert status == '622 Invalid aspect ratio Only ' \
+                    '1/1 is accepted.'
 
             with open(INVALID_FORMAT_LOGO_PATH, 'rb') as f:
                 when(
                     'Format of the avatar is invalid',
                     multipart=dict(title='newtitle', logo=io.BytesIO(f.read()))
                 )
-                assert status == '623 Content type is not supported '\
-                    'application/pdf.Valid options are: image/png, image/jpeg'
+                assert status == '623 Invalid content type, Valid options '\
+                    'are: image/jpeg, image/png'
 
             with open(INVALID_MAXMIMUM_LENGTH_LOGO_PATH, 'rb') as f:
                 when(
