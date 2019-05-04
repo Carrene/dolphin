@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 from restfulpy.orm import Field, DeclarativeBase, OrderingMixin, \
     FilteringMixin, PaginationMixin, relationship
@@ -39,6 +39,8 @@ class Event(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
         not_none=True,
         required=True,
         python_type=str,
+        readonly=False,
+        message='Lorem ipsum',
     )
     start_date= Field(
         DateTime,
@@ -53,6 +55,8 @@ class Event(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
         nullable=False,
         not_none=True,
         required=True,
+        readonly=False,
+        message='Lorem ipsum',
     )
     end_date = Field(
         DateTime,
@@ -67,6 +71,8 @@ class Event(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
         nullable=False,
         not_none=True,
         required=True,
+        readonly=False,
+        message='Lorem ipsum',
     )
     description = Field(
         Unicode,
