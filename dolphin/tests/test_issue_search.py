@@ -95,7 +95,7 @@ class TestIssue(LocalApplicationTestCase):
             session.add(cls.issue4)
         session.commit()
 
-    def test_search_user(self):
+    def test_search_issue(self):
         self.login(self.member.email)
 
         with oauth_mockup_server(), self.given(

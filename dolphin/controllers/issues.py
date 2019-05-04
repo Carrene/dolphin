@@ -782,6 +782,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         query = DBSession.query(Issue) \
             .filter(or_(
                 Issue.title.ilike(query),
+                Issue.description.ilike(query),
                 cast(Issue.id, Text).ilike(query)
             ))
 
