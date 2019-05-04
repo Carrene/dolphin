@@ -154,7 +154,7 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
             message='Lorem Ipsum',
         )
 
-    def __repr__(self):
+    def __repr__(self): # pragma: no cover
         return f'\tTitle: {self.title}\n'
 
     def get_room_title(self):
