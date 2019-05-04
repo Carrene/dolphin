@@ -72,7 +72,7 @@ class Dolphin(Application):
           min_length: 1  # KB
         organizations:
           logos:
-            max_length: 50 # KB
+            max_length: 30 # KB
             min_length: 1  # KB
    '''
 

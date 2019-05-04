@@ -83,6 +83,18 @@ class TestPhase(LocalApplicationTestCase):
             assert status == '600 Repetitive Title'
 
             when(
+                'Trying to pass using id is alphabetical',
+                url_parameters=Update(id='not-integer')
+            )
+            assert status == 404
+
+            when(
+                'Phase not exit with this id',
+                url_parameters=Update(id=0)
+            )
+            assert status == 404
+
+            when(
                 'Order is repetitive',
                 json=given | dict(order=self.phase2.order)
             )

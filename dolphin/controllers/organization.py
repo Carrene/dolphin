@@ -47,6 +47,7 @@ class OrganizationController(ModelRestController):
         return super().__call__(*remaining_paths)
 
     @authorize
+    @store_manager(DBSession)
     @json(prevent_empty_form=True)
     @organization_create_validator
     @Organization.expose
@@ -61,6 +62,7 @@ class OrganizationController(ModelRestController):
         member = Member.current()
         organization = Organization(
             title=context.form.get('title'),
+            logo=context.form.get('logo'),
         )
         DBSession.add(organization)
         DBSession.flush()
