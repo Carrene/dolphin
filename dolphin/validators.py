@@ -889,3 +889,10 @@ event_update_validator = validate(
     ),
 )
 
+
+search_issue_validator = validate(
+    query=dict(
+        max_length=(50, '704 At Most 50 Characters Valid For Title'),
+    )
+)
+
