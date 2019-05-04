@@ -84,10 +84,10 @@ class Dolphin(Application):
             version=__version__
         )
 
-    def insert_basedata(self, *args):
+    def insert_basedata(self, *args):# pragma: no cover
         basedata.insert()
 
-    def insert_mockup(self, *args):
+    def insert_mockup(self, *args):# pragma: no cover
         mockup.insert()
 
     def register_cli_launchers(self, subparsers):
