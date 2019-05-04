@@ -138,6 +138,12 @@ class TestProject(LocalApplicationTestCase):
             assert status == 200
 
             when(
+                'Group id is not in form',
+                json=given - 'groupId' | dict(title='New Project1')
+            )
+            assert status == 200
+
+            when(
                 'Workflow id is in form but not found(alphabetical)',
                 json=given | dict(title='New title', workflowId='Alphabetical')
             )

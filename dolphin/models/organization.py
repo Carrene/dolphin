@@ -255,7 +255,7 @@ class Organization(OrderingMixin, FilteringMixin, PaginationMixin,
         organization['logo'] = self.logo
         return organization
 
-    def __repr__(self):
+    def __repr__(self):# pragma: no cover
         return f'\tTitle: {self.title}\n'
 
     @classmethod
