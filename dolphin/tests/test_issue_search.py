@@ -4,7 +4,7 @@ from bddrest.authoring import status, response, when, given
 from auditor.context import Context as AuditLogContext
 
 from dolphin.models import Member, Release, Project, Issue, Group, Workflow, \
-    Skill
+    Skill, Subscription
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -93,7 +93,14 @@ class TestIssue(LocalApplicationTestCase):
                 room_id=4,
             )
             session.add(cls.issue4)
-        session.commit()
+            session.flush()
+
+            subscription1 = Subscription(
+                subscribable_id=cls.issue1.id,
+                member_id=cls.member.id,
+            )
+            session.add(subscription1)
+            session.commit()
 
     def test_search_issue(self):
         self.login(self.member.email)
@@ -158,6 +165,14 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert len(response.json) == 3
             assert response.json[0]['id'] > response.json[1]['id']
+
+            when(
+                'Filtering unread issues',
+                query=dict(unread='true'),
+                form=given | dict(query='issue')
+            )
+            assert len(response.json) == 1
+            assert response.json[0]['id'] == self.issue1.id
 
     def test_request_with_query_string(self):
         self.login(self.member.email)
