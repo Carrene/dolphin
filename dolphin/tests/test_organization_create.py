@@ -1,6 +1,7 @@
 import io
 from os.path import dirname, abspath, join
 
+from nanohttp import settings
 from bddrest.authoring import when, status, response, given
 
 from dolphin.models import Member, Organization, OrganizationMember
@@ -48,6 +49,7 @@ class TestOrganization(LocalApplicationTestCase):
     def test_create(self):
         title = 'My-organization'
         self.login(email='member1@example.com')
+        settings.attachments.organizations.logos.max_length = 30
 
         with oauth_mockup_server(),  self.given(
             'The organization has successfully created',
