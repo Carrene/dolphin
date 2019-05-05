@@ -130,6 +130,15 @@ class TestEvent(LocalApplicationTestCase):
             assert status == '910 Invalid Repeat, only one of ' \
                 '"yearly, monthly, never" will be accepted'
 
+            when('Event not found', url_parameters=dict(id=0))
+            assert status == 404
+
+            when(
+                'Intended event with string type not found',
+                url_parameters=dict(id='Alphabetical')
+            )
+            assert status == 404
+
             when('Request is not authorized', authorization=None)
             assert status == 401
 

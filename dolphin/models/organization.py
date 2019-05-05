@@ -18,7 +18,12 @@ roles = [
     'owner',
     'member',
 ]
-AVATAR_CONTENT_TYPES = ['image/jpeg', 'image/png']
+
+
+AVATAR_CONTENT_TYPES = [
+    'image/jpeg',
+    'image/png',
+]
 
 
 class OrganizationMember(DeclarativeBase):
