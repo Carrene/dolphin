@@ -6,7 +6,6 @@ from restfulpy.controllers import RootController, RestController, \
 
 import dolphin
 from .issues import IssueController
-from .items import ItemController
 from .members import MemberController
 from .oauth2 import OAUTHController
 from .projects import ProjectController
@@ -38,7 +37,6 @@ class Apiv1(RestController, JsonPatchControllerMixin):
     projects = ProjectController()
     members = MemberController()
     issues = IssueController()
-    items = ItemController()
     tokens = TokenController()
     oauth2 = OAUTHController()
     organizations = OrganizationController()

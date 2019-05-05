@@ -128,6 +128,15 @@ class TestEvent(LocalApplicationTestCase):
             when('The event-type not found', json=given | dict(eventTypeId=0))
             assert status == '658 Event Type Not Found'
 
+            when('Event not found', url_parameters=dict(id=0))
+            assert status == 404
+
+            when(
+                'Intended event with string type not found',
+                url_parameters=dict(id='Alphabetical')
+            )
+            assert status == 404
+
             when('Request is not authorized', authorization=None)
             assert status == 401
 

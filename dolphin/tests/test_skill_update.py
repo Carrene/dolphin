@@ -50,6 +50,15 @@ class TestSkill(LocalApplicationTestCase):
             assert response.json['id'] is not None
             assert response.json['description'] is not None
 
+            when('Skill not found', url_parameters=dict(id=0))
+            assert status == 404
+
+            when(
+                'Intended skill with string type not found',
+                url_parameters=dict(id='Alphabetical'),
+            )
+            assert status == 404
+
             when(
                 'Trying to send title which intended skill already has',
                 json=dict(title=title),

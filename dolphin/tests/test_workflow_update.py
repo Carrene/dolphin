@@ -51,6 +51,15 @@ class TestWorkflow(LocalApplicationTestCase):
             assert response.json['title'] == title
             assert response.json['description'] == description
 
+            when('Workflow not found', url_parameters=dict(id=0))
+            assert status == 404
+
+            when(
+                'Intended workflow with string type not found',
+                url_parameters=dict(id='Alphabetical')
+            )
+            assert status == 404
+
             when('There is no parameters in form', json={})
             assert status == '708 Empty Form'
 

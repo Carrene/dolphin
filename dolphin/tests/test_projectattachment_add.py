@@ -95,7 +95,7 @@ class TestProject(LocalApplicationTestCase):
 
             when(
                 'The project not exist with this id',
-                url_parameters=dict(id=10)
+                url_parameters=dict(id=0)
             )
             assert status == 404
 

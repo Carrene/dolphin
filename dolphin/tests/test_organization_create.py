@@ -14,10 +14,7 @@ INVALID_FORMAT_LOGO_PATH = join(STUFF_DIR, 'test.pdf')
 INVALID_MAXIMUM_SIZE_LOGO_PATH = join(STUFF_DIR, 'logo-550x550.jpg')
 INVALID_MINIMUM_SIZE_LOGO_PATH = join(STUFF_DIR, 'logo-50x50.jpg')
 INVALID_RATIO_LOGO_PATH = join(STUFF_DIR, 'logo-150x100.jpg')
-INVALID_MAXMIMUM_LENGTH_LOGO_PATH = join(
-    STUFF_DIR,
-    'maximum-length-30.jpg'
-)
+INVALID_MAXMIMUM_LENGTH_LOGO_PATH = join(STUFF_DIR, 'maximum-length-30.jpg')
 
 
 class TestOrganization(LocalApplicationTestCase):

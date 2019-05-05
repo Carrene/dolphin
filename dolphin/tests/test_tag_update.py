@@ -88,6 +88,15 @@ class TestTag(LocalApplicationTestCase):
             assert response.json['description'] == description
             assert response.json['id'] == self.tag1.id
 
+            when('Tag not found', url_parameters=dict(id=0))
+            assert status == 404
+
+            when(
+                'Intended tag with string type not found',
+                url_parameters=dict(id='Alphabetical')
+            )
+            assert status == 404
+
             when(
                 'Title is repetitive',
                 json=dict(title=self.tag2.title)

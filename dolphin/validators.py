@@ -188,16 +188,6 @@ def workflow_exists_validator(workflowId, project, field):
     return workflowId
 
 
-def item_status_value_validator(status, project, field):
-    form = context.form
-    if 'status' in form and form['status'] not in item_statuses:
-        raise HTTPStatus(
-            f'705 Invalid status value, only one of ' \
-            f'"{", ".join(item_statuses)}" will be accepted'
-        )
-    return form['status']
-
-
 def member_exists_validator(memberId, project, field):
     form = context.form
     try:
@@ -489,14 +479,6 @@ update_issue_validator = validate(
     priority=dict(
         callback=issue_priority_value_validator,
     ),
-)
-
-
-update_item_validator = validate(
-    status=dict(
-        required='719 Status Not In Form',
-        callback=item_status_value_validator
-    )
 )
 
 
