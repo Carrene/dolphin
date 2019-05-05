@@ -1,3 +1,5 @@
+from nanohttp.contexts import Context
+from nanohttp import context
 from auditor import MiddleWare
 from auditor.context import Context as AuditLogContext
 from auditor.logentry import RequestLogEntry, InstantiationLogEntry
@@ -74,56 +76,61 @@ class TestIssue(LocalApplicationTestCase):
             room_id=1
         )
 
-        issue1 = Issue(
-            project=cls.project,
-            title='First issue',
-            description='This is description of first issue',
-            due_date='2020-2-20',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(issue1)
+        with Context(dict()):
+            context.identity = cls.member
 
-        cls.draft_issue1 = DraftIssue()
-        session.add(cls.draft_issue1)
+            cls.issue1 = Issue(
+                project=cls.project,
+                title='First issue',
+                description='This is description of first issue',
+                due_date='2020-2-20',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(cls.issue1)
 
-        organization = Organization(
-            title='organization-title',
-        )
-        session.add(organization)
-        session.flush()
+            cls.draft_issue1 = DraftIssue()
+            session.add(cls.draft_issue1)
 
-        organization_member = OrganizationMember(
-            organization_id=organization.id,
-            member_id=cls.member.id,
-            role='owner',
-        )
-        session.add(organization_member)
+            organization = Organization(
+                title='organization-title',
+            )
+            session.add(organization)
+            session.flush()
 
-        cls.tag1 = Tag(
-            title='tag 1',
-            organization_id=organization.id,
-        )
-        session.add(cls.tag1)
+            cls.draft_issue1.related_issues = [cls.issue1]
 
-        cls.tag2 = Tag(
-            title='tag 2',
-            organization_id=organization.id,
-        )
-        session.add(cls.tag2)
+            organization_member = OrganizationMember(
+                organization_id=organization.id,
+                member_id=cls.member.id,
+                role='owner',
+            )
+            session.add(organization_member)
 
-        cls.tag3 = Tag(
-            title='tag 3',
-            organization_id=organization.id,
-        )
-        session.add(cls.tag3)
+            cls.tag1 = Tag(
+                title='tag 1',
+                organization_id=organization.id,
+            )
+            session.add(cls.tag1)
 
-        cls.draft_issue1.tags = [cls.tag1, cls.tag2]
+            cls.tag2 = Tag(
+                title='tag 2',
+                organization_id=organization.id,
+            )
+            session.add(cls.tag2)
 
-        cls.draft_issue2 = DraftIssue()
-        session.add(cls.draft_issue2)
-        session.commit()
+            cls.tag3 = Tag(
+                title='tag 3',
+                organization_id=organization.id,
+            )
+            session.add(cls.tag3)
+
+            cls.draft_issue1.tags = [cls.tag1, cls.tag2]
+
+            cls.draft_issue2 = DraftIssue()
+            session.add(cls.draft_issue2)
+            session.commit()
 
     def test_finalize(self):
         self.login(self.member.email)
@@ -166,13 +173,15 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Draft issue with string type not found',
-                url_parameters=dict(id='Alphabetical')
+                url_parameters=dict(id='Alphabetical'),
+                form=given | dict(title='New title')
             )
             assert status == 404
 
             when(
                 'Draft issue not found',
-                url_parameters=dict(id=0)
+                url_parameters=dict(id=0),
+                form=given | dict(title='New title')
             )
             assert status == 404
 
@@ -206,6 +215,12 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert status == 647
             assert status.text.startswith('relatedIssue With Id')
+
+            when(
+                'Include related issue',
+                form=Update(relatedIssueId=self.issue1.id, title='New title')
+            )
+            assert status == 200
 
             when(
                 'Title is not in form',
