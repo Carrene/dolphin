@@ -786,5 +786,16 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 cast(Issue.id, Text).ilike(query)
             ))
 
+        if 'unread' in context.query:
+            query = query \
+                .join(
+                    Subscription,
+                    and_(
+                        Subscription.subscribable_id == Issue.id,
+                        Subscription.seen_at.is_(None),
+                    )
+                ) \
+                .filter(Subscription.member_id == context.identity.id)
+
         return query
 
