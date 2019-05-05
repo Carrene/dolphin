@@ -165,6 +165,18 @@ class TestIssue(LocalApplicationTestCase):
                 'normal, high" will be accepted'
 
             when(
+                'Draft issue with string type not found',
+                url_parameters=dict(id='Alphabetical')
+            )
+            assert status == 404
+
+            when(
+                'Draft issue not found',
+                url_parameters=dict(id=0)
+            )
+            assert status == 404
+
+            when(
                 'Project id not in form',
                 form=given - 'projectId' | dict(title='New title')
             )
