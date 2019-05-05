@@ -379,6 +379,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 seen_at=datetime.utcnow()
             )
             DBSession.add(subscription)
+            DBSession.flush()
 
         try:
             chat_client.add_member(
@@ -394,18 +395,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             # no need to call `add_member()` API again and re-add the member to
             # room.
             pass
-
-        try:
-            DBSession.flush()
-
-        except:
-            chat_client.kick_member(
-                issue.room_id,
-                context.identity.reference_id,
-                token,
-                member.access_token
-            )
-            raise
 
         return issue
 
@@ -432,6 +421,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             raise HTTPStatus('612 Not Subscribed Yet')
 
         DBSession.delete(subscription)
+        DBSession.flush()
 
         chat_client = ChatClient()
         try:
@@ -447,18 +437,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             # no need to call `kick_member()` API again and re-add the member
             # to room.
             pass
-
-        try:
-            DBSession.flush()
-
-        except:
-            chat_client.add_member(
-                issue.room_id,
-                context.identity.reference_id,
-                token,
-                member.access_token
-            )
-            raise
 
         return issue
 
