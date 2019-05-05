@@ -201,6 +201,11 @@ class TestIssue(LocalApplicationTestCase):
             assert status == '767 Invalid priority, only one of "low, '\
                 'normal, high" will be accepted'
 
+            when(
+                'ProjectId in form',
+                form=Update(projectId=self.issue2.project.id)
+            )
+            assert status == 200
 
             when(
                 'Invalid parameter is in the form',

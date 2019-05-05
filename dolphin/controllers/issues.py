@@ -66,24 +66,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         return issue
 
-    def _ensure_room(self, title, token, access_token):
-        create_room_error = 1
-        room = None
-        while create_room_error is not None:
-            try:
-                room = ChatClient().create_room(
-                    title,
-                    token,
-                    access_token,
-                    context.identity.reference_id
-                )
-                create_room_error = None
-            except StatusChatRoomNotFound:
-                # FIXME: Cover here
-                create_room_error = 1
-
-        return room
-
     @authorize
     @json(
         prevent_empty_form='708 No Parameter Exists In The Form',
