@@ -53,6 +53,7 @@ class TestEvent(LocalApplicationTestCase):
     def test_add(self):
         self.login(self.member.email)
         title = 'New event'
+        description = 'A description for an event'
         repeat = 'monthly'
         start_date = datetime.datetime.now().isoformat()
         end_date = datetime.datetime.now().isoformat()
@@ -65,6 +66,7 @@ class TestEvent(LocalApplicationTestCase):
                 title=title,
                 startDate=start_date,
                 endDate=end_date,
+                description=description,
                 repeat=repeat,
                 eventTypeId=self.event_type2.id,
             ),
@@ -74,6 +76,7 @@ class TestEvent(LocalApplicationTestCase):
             assert response.json['title'] == title
             assert response.json['startDate'] == start_date
             assert response.json['endDate'] == end_date
+            assert response.json['description'] == description
             assert response.json['repeat'] == repeat
             assert response.json['eventTypeId'] == self.event_type2.id
 
@@ -97,6 +100,13 @@ class TestEvent(LocalApplicationTestCase):
                 json=given | dict(title=None)
             )
             assert status == '727 Title Is None'
+
+            when(
+                'Description length is less than limit',
+                json=given | dict(description=(512 + 1) * 'a'),
+            )
+            assert status == '703 At Most 512 Characters Are Valid For ' \
+                'Description'
 
             when(
                 'Start date format is wrong',
