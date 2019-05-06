@@ -43,7 +43,6 @@ class TestEvent(LocalApplicationTestCase):
                 eventTypeId=self.event_type.id,
                 startDate=start_date,
                 endDate=end_date,
-                description=description,
             ),
         ):
             assert status == 200
@@ -51,7 +50,6 @@ class TestEvent(LocalApplicationTestCase):
             assert response.json['title'] == title
             assert response.json['startDate'] == start_date
             assert response.json['endDate'] == end_date
-            assert response.json['description'] == description
 
             when('Trying to pass without form parameters', json={})
             assert status == '708 Empty Form'
@@ -79,13 +77,6 @@ class TestEvent(LocalApplicationTestCase):
                 json=given | dict(title=None)
             )
             assert status == '727 Title Is None'
-
-            when(
-                'Description length is less than limit',
-                json=given | dict(description=(512 + 1) * 'a'),
-            )
-            assert status == '703 At Most 512 Characters Are Valid For ' \
-                'Description'
 
             when(
                 'Trying to pass without start date',

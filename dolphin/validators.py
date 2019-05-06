@@ -815,12 +815,6 @@ eventtype_create_validator = validate(
 
 
 event_add_validator = validate(
-   description=dict(
-        max_length=(
-            512,
-            '703 At Most 512 Characters Are Valid For Description'
-        ),
-    ),
     eventTypeId=dict(
         required='794 Type Id Not In Form',
         not_none='798 Event Type Id Is Null',
@@ -858,12 +852,6 @@ eventtype_update_validator = validate(
 
 
 event_update_validator = validate(
-   description=dict(
-        max_length=(
-            512,
-            '703 At Most 512 Characters Are Valid For Description'
-        ),
-    ),
     eventTypeId=dict(
         not_none='798 Event Type Id Is Null',
         callback=eventtype_exists_validator_by_id,
