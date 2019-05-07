@@ -831,12 +831,6 @@ eventtype_create_validator = validate(
 
 
 event_add_validator = validate(
-   description=dict(
-        max_length=(
-            512,
-            '703 At Most 512 Characters Are Valid For Description'
-        ),
-    ),
     repeat=dict(
         required=StatusRepeatNotInForm,
         callback=event_repeat_value_validator,
@@ -878,12 +872,6 @@ eventtype_update_validator = validate(
 
 
 event_update_validator = validate(
-   description=dict(
-        max_length=(
-            512,
-            '703 At Most 512 Characters Are Valid For Description'
-        ),
-    ),
     repeat=dict(
         callback=event_repeat_value_validator,
     ),

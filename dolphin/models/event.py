@@ -75,18 +75,6 @@ class Event(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
         not_none=True,
         required=True,
     )
-    description = Field(
-        Unicode,
-        min_length=1,
-        max_length=512,
-        label='Description',
-        watermark='Lorem Ipsum',
-        not_none=False,
-        nullable=True,
-        required=False,
-        python_type=str,
-        example='Lorem Ipsum',
-    )
     repeat = Field(
         Enum(*event_repeats, name='event_repeat'),
         python_type=str,
