@@ -31,6 +31,7 @@ class TestEventType(LocalApplicationTestCase):
             event_type=cls.event_type,
             start_date=datetime.datetime.now().isoformat(),
             end_date=datetime.datetime.now().isoformat(),
+            repeat='never',
         )
         session.add(cls.event)
         session.commit()
