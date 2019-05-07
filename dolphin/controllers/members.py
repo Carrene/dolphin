@@ -4,12 +4,14 @@ from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 from sqlalchemy_media import store_manager
+from sqlalchemy import or_
 
 from ..models import Member, Skill, SkillMember, Organization, \
     OrganizationMember, Group, GroupMember
-from ..exceptions import StatusAlreadyGrantedSkill, StatusSkillNotGrantedYet
+from ..exceptions import StatusAlreadyGrantedSkill, StatusSkillNotGrantedYet, \
+    StatusQueryParameterNotInFormOrQueryString
+from ..validators import search_member_validator
 from .organization import OrganizationController
-
 from .skill import SkillController
 
 
@@ -68,6 +70,24 @@ class MemberController(ModelRestController):
             raise HTTPNotFound()
 
         return member
+
+    @authorize
+    @search_member_validator
+    @json
+    @Member.expose
+    def search(self):
+        query = context.form.get('query') or context.query.get('query')
+        if query is None:
+            raise StatusQueryParameterNotInFormOrQueryString()
+
+        query = f'%{query}%'
+        query = DBSession.query(Member) \
+            .filter(or_(
+                Member.title.ilike(query),
+                Member.name.ilike(query)
+            ))
+
+        return query
 
 
 class MemberSkillController(ModelRestController):

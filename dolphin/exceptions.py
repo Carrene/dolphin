@@ -199,3 +199,7 @@ class StatusEndDateIsNull(HTTPKnownStatus):
 class StatusRepeatNotInForm(HTTPKnownStatus):
     status = '911 Repeat Not In Form'
 
+
+class StatusQueryParameterNotInFormOrQueryString(HTTPKnownStatus):
+    status = '912 Query Parameter Not In Form Or Query String'
+
