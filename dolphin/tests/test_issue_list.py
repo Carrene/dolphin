@@ -475,6 +475,12 @@ class TestIssue(LocalApplicationTestCase):
             assert status == 200
             assert len(response.json) == 1
 
+            when(
+                'filter by triage phase id',
+                query=dict(phaseId='IN(0,1)')
+            )
+            assert len(response.json) == 2
+
             when('Request is not authorized', authorization=None)
             assert status == 401
 
