@@ -44,6 +44,7 @@ class EventType(OrderingMixin, FilteringMixin, PaginationMixin,
         'Event',
         back_populates='event_type',
         protected=True,
+        cascade='delete',
     )
 
     def __repr__(self): # pragma: no cover
