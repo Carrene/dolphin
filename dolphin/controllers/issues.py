@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 
 from auditor import context as AuditLogContext
@@ -27,6 +28,9 @@ from .tag import TagController
 
 PENDING = -1
 UNKNOWN_ASSIGNEE = -1
+
+
+TRIAGE_PHASE_ID_PATTERN = re.compile(r'[(,\s]0[,\)\s]|^0$')
 
 
 class IssueController(ModelRestController, JsonPatchControllerMixin):
@@ -169,6 +173,12 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 Item.phase_id,
                 value
             )
+            if TRIAGE_PHASE_ID_PATTERN.search(value):
+                triage = DBSession.query(Issue) \
+                    .outerjoin(Item, Item.issue_id == Issue.id) \
+                    .filter(Item.id == None)
+                query = query.union(triage)
+
             is_issue_item_joined = True
 
         if 'phaseTitle' in context.query:
