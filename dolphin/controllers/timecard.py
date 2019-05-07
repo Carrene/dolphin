@@ -5,7 +5,7 @@ from restfulpy.orm import DBSession, commit
 
 from ..exceptions import StatusEndDateMustBeGreaterThanStartDate
 from ..models import Timecard
-from ..validators import timecard_create_validator
+from ..validators import timecard_create_validator, timecard_update_validator
 
 
 class TimecardController(ModelRestController):
@@ -31,6 +31,22 @@ class TimecardController(ModelRestController):
         timecard = DBSession.query(Timecard).get(id)
         if timecard is None:
             raise HTTPNotFound()
+
+        return timecard
+
+    @authorize
+    @json(prevent_empty_form='708 Empty Form')
+    @timecard_update_validator
+    @commit
+    def update(self, id):
+        id = int_or_notfound(id)
+        timecard = DBSession.query(Timecard).get(id)
+        if timecard is None:
+            raise HTTPNotFound()
+
+        timecard.update_from_request()
+        if timecard.start_date > timecard.end_date:
+            raise StatusEndDateMustBeGreaterThanStartDate()
 
         return timecard
 

@@ -3,8 +3,6 @@ import re
 from nanohttp import validate, HTTPStatus, context
 from restfulpy.orm import DBSession
 
-from .models import *
-from .models.organization import roles
 from .exceptions import StatusResourceNotFound, StatusRepetitiveTitle, \
     StatusRelatedIssueNotFound, StatusEventTypeNotFound, \
     StatusInvalidStartDateFormat, StatusInvalidEndDateFormat, \
@@ -12,6 +10,8 @@ from .exceptions import StatusResourceNotFound, StatusRepetitiveTitle, \
     StatusSummaryNotInForm, StatusEstimatedTimeNotInForm, \
     StatusEndDateNotInForm, StatusStartDateNotInForm, StatusSummaryIsNull, \
     StatusEstimatedTimeIsNull, StatusStartDateIsNull, StatusEndDateIsNull
+from .models import *
+from .models.organization import roles
 
 
 TITLE_PATTERN = re.compile(r'^(?!\s).*[^\s]$')
@@ -903,6 +903,26 @@ timecard_create_validator = validate(
     ),
     estimatedTime=dict(
         required=StatusEstimatedTimeNotInForm,
+        type_=(int, StatusInvalidEstimatedTimeType),
+        not_none=StatusEstimatedTimeIsNull,
+    ),
+)
+
+
+timecard_update_validator = validate(
+    summary=dict(
+        max_length=(1024, StatusLimitedCharecterForSummary),
+        not_none=StatusSummaryIsNull,
+    ),
+    startDate=dict(
+        pattern=(DATETIME_PATTERN, StatusInvalidStartDateFormat),
+        not_none=StatusStartDateIsNull,
+    ),
+    endDate=dict(
+        pattern=(DATETIME_PATTERN, StatusInvalidEndDateFormat),
+        not_none=StatusEndDateIsNull,
+    ),
+    estimatedTime=dict(
         type_=(int, StatusInvalidEstimatedTimeType),
         not_none=StatusEstimatedTimeIsNull,
     ),
