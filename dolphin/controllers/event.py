@@ -16,6 +16,7 @@ FORM_WHITELIST = [
     'startDate',
     'endDate',
     'eventTypeId',
+    'repeat',
 ]
 
 

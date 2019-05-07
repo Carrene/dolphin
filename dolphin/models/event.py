@@ -2,7 +2,14 @@ import datetime
 
 from restfulpy.orm import Field, DeclarativeBase, OrderingMixin, \
     FilteringMixin, PaginationMixin, relationship
-from sqlalchemy import Integer, Unicode, DateTime, ForeignKey
+from sqlalchemy import Integer, Unicode, DateTime, ForeignKey, Enum
+
+
+event_repeats = [
+    'yearly',
+    'monthly',
+    'never',
+]
 
 
 class Event(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
@@ -79,6 +86,17 @@ class Event(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
         required=False,
         python_type=str,
         example='Lorem Ipsum',
+    )
+    repeat = Field(
+        Enum(*event_repeats, name='event_repeat'),
+        python_type=str,
+        label='Repeat',
+        not_none=True,
+        required=True,
+        nullable=False,
+        example='Lorem ipsum',
+        watermark='Lorem ipsum',
+        message='Lorem ipsum',
     )
     event_type = relationship(
         'EventType',

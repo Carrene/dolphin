@@ -36,6 +36,7 @@ class TestEvent(LocalApplicationTestCase):
             start_date=datetime.datetime.now().isoformat(),
             end_date=datetime.datetime.now().isoformat(),
             event_type=event_type1,
+            repeat='never',
         )
         session.add(cls.event1)
 
@@ -44,6 +45,7 @@ class TestEvent(LocalApplicationTestCase):
             start_date=datetime.datetime.now().isoformat(),
             end_date=datetime.datetime.now().isoformat(),
             event_type=event_type1,
+            repeat='yearly',
         )
         session.add(cls.event2)
         session.commit()
@@ -52,6 +54,7 @@ class TestEvent(LocalApplicationTestCase):
         self.login(self.member.email)
         title = 'New event'
         description = 'A description for an event'
+        repeat = 'monthly'
         start_date = datetime.datetime.now().isoformat()
         end_date = datetime.datetime.now().isoformat()
 
@@ -64,6 +67,7 @@ class TestEvent(LocalApplicationTestCase):
                 startDate=start_date,
                 endDate=end_date,
                 description=description,
+                repeat=repeat,
                 eventTypeId=self.event_type2.id,
             ),
         ):
@@ -73,6 +77,7 @@ class TestEvent(LocalApplicationTestCase):
             assert response.json['startDate'] == start_date
             assert response.json['endDate'] == end_date
             assert response.json['description'] == description
+            assert response.json['repeat'] == repeat
             assert response.json['eventTypeId'] == self.event_type2.id
 
             when('Trying to pass without form parameters', json={})
@@ -127,6 +132,13 @@ class TestEvent(LocalApplicationTestCase):
 
             when('The event-type not found', json=given | dict(eventTypeId=0))
             assert status == '658 Event Type Not Found'
+
+            when(
+                'Invalid repeat value is in form',
+                json=given | dict(repeat='a')
+            )
+            assert status == '910 Invalid Repeat, only one of ' \
+                '"yearly, monthly, never" will be accepted'
 
             when('Request is not authorized', authorization=None)
             assert status == 401

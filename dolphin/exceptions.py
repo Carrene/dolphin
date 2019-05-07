@@ -195,3 +195,7 @@ class StatusStartDateIsNull(HTTPKnownStatus):
 class StatusEndDateIsNull(HTTPKnownStatus):
     status = '906 End Date Is Null'
 
+
+class StatusRepeatNotInForm(HTTPKnownStatus):
+    status = '911 Repeat Not In Form'
+
