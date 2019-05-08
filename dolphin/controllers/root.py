@@ -25,6 +25,7 @@ from .activity import ActivityController
 from .eventtype import EventTypeController
 from .event import EventController
 from .timecard import TimecardController
+from .items import ItemController
 
 
 here = abspath(dirname(__file__))
@@ -53,6 +54,7 @@ class Apiv1(RestController, JsonPatchControllerMixin):
     eventtypes = EventTypeController()
     events = EventController()
     timecards = TimecardController()
+    items = ItemController()
 
     @json
     def version(self):
