@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 from restfulpy.orm import Field, DeclarativeBase, OrderingMixin, \
     FilteringMixin, PaginationMixin
