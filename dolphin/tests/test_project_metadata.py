@@ -84,3 +84,8 @@ class TestProject(LocalApplicationTestCase):
             assert fields['boardingValue']['required'] is not None
             assert fields['boardingValue']['readonly'] is not None
 
+            assert fields['releaseCutoff']['label'] is not None
+            assert fields['releaseCutoff']['name'] is not None
+            assert fields['releaseCutoff']['required'] is not None
+            assert fields['releaseCutoff']['readonly'] is not None
+
