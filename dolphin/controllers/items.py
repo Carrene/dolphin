@@ -3,7 +3,7 @@ from datetime import datetime
 from nanohttp import json, context, HTTPNotFound, int_or_notfound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
-from restfulpy.orm import DBSession, commit
+from restfulpy.orm import DBSession
 
 from ..models import Item, Dailyreport, Event
 from ..validators import update_item_validator, dailyreport_update_validator
@@ -25,21 +25,6 @@ class ItemController(ModelRestController):
         if item is None:
             raise HTTPNotFound()
 
-        return item
-
-    @authorize
-    @json
-    @update_item_validator
-    @Item.expose
-    @commit
-    def update(self, id):
-        id = int_or_notfound(id)
-
-        item = DBSession.query(Item).get(id)
-        if not item:
-            raise HTTPNotFound()
-
-        item.status = context.form['status']
         return item
 
     @authorize
