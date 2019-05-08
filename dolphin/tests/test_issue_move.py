@@ -1,11 +1,16 @@
+from auditor import MiddleWare
 from auditor.context import Context as AuditLogContext
 from bddrest import status, when, given, response
 
+from dolphin import Dolphin
+from dolphin.middleware_callback import callback as auditor_callback
 from dolphin.models import Issue, Project, Member, Workflow, Group, Release
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase, \
+    oauth_mockup_server, chat_mockup_server
 
 
 class TestIssue(LocalApplicationTestCase):
+    __application__ = MiddleWare(Dolphin(), auditor_callback)
 
     @classmethod
     @AuditLogContext(dict())
@@ -83,7 +88,7 @@ class TestIssue(LocalApplicationTestCase):
     def test_move(self):
         self.login('member1@example.com')
 
-        with oauth_mockup_server(), self.given(
+        with oauth_mockup_server(), chat_mockup_server(), self.given(
             f'Move a issue',
             f'/apiv1/issues/id: {self.issue1.id}',
             f'MOVE',
