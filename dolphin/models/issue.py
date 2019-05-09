@@ -142,7 +142,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         watermark='Choose a status',
         not_none=True,
         required=False,
-        default='on-hold',
+        default='to-do',
         example='lorem ipsum',
     )
     priority = Field(
