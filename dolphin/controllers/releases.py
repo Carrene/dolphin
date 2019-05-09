@@ -52,7 +52,7 @@ class ReleaseController(ModelRestController):
             raise StatusGroupNotFound()
 
         release = Release()
-        release.manager_id = member.id
+        release.manager_id = manager.id
         release.update_from_request()
         if release.launch_date < release.cutoff:
             raise StatusLaunchDateMustGreaterThanCutoffDate()
@@ -61,16 +61,16 @@ class ReleaseController(ModelRestController):
         room = chat_client.create_room(
             release.get_room_title(),
             token,
-            member.access_token,
+            creator.access_token,
             context.identity.reference_id
         )
         release.room_id = room['id']
         try:
             chat_client.add_member(
                 release.room_id,
-                member.reference_id,
+                manager.reference_id,
                 token,
-                member.access_token
+                creator.access_token
             )
 
         except StatusRoomMemberAlreadyExist:
