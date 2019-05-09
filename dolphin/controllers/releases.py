@@ -43,14 +43,15 @@ class ReleaseController(ModelRestController):
     @commit
     def create(self):
         token = context.environ['HTTP_AUTHORIZATION']
-        member = DBSession.query(Member).get(context.form['managerId'])
-        if member is None:
+        manager = DBSession.query(Member).get(context.form['managerId'])
+        if manager is None:
             raise StatusManagerNotFound()
 
         group = DBSession.query(Group).get(context.form.get('groupId'))
         if group is None:
             raise StatusGroupNotFound()
 
+        creator = Member.current()
         release = Release()
         release.manager_id = manager.id
         release.update_from_request()
