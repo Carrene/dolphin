@@ -53,5 +53,4 @@ class TestEvent(LocalApplicationTestCase):
             assert fields['endDate']['example'] is not None
             assert fields['endDate']['message'] is not None
             assert fields['endDate']['notNone'] is not None
-            assert fields['title']['type'] is not None
 
