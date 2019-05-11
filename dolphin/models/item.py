@@ -4,7 +4,10 @@ from restfulpy.orm import Field, DeclarativeBase, relationship
 from restfulpy.orm.mixins import TimestampMixin, OrderingMixin, \
     FilteringMixin, PaginationMixin
 from sqlalchemy import Integer, ForeignKey, UniqueConstraint, DateTime, Enum, \
-    String
+    String, select, func
+from sqlalchemy.orm import column_property
+
+from .timecard import Timecard
 
 
 item_statuses = [
