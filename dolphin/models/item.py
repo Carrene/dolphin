@@ -34,7 +34,7 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     start_time = Field(
         DateTime,
         python_type=datetime,
-        label='Assignment Start Time',
+        label='Start Date',
         pattern=
             r'^(\d{4})-(0[1-9]|1[012]|[1-9])-(0[1-9]|[12]\d{1}|3[01]|[1-9])'
             r'(T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z)?)?$',
@@ -48,7 +48,7 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     end_time = Field(
         DateTime,
         python_type=datetime,
-        label='Assignment Start Time',
+        label='Target Date',
         pattern=
             r'^(\d{4})-(0[1-9]|1[012]|[1-9])-(0[1-9]|[12]\d{1}|3[01]|[1-9])'
             r'(T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z)?)?$',
