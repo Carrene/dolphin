@@ -37,13 +37,13 @@ def test_isworkingday(db):
 
     is_workingday = Event.isworkingday(
         session=session,
-        date=datetime.now().date()+one_day
+        date=datetime.now().date() + one_day
     )
     assert is_workingday == False
 
     is_workingday = Event.isworkingday(
         session=session,
-        date=datetime.now().date()+two_day
+        date=datetime.now().date() + two_day
     )
     assert is_workingday == True
 
