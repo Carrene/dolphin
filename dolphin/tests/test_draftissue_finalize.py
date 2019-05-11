@@ -180,14 +180,14 @@ class TestIssue(LocalApplicationTestCase):
             when(
                 'Draft issue with string type not found',
                 url_parameters=dict(id='Alphabetical'),
-                form=given | dict(title='New title')
+                json=given | dict(title='New title')
             )
             assert status == 404
 
             when(
                 'Draft issue not found',
                 url_parameters=dict(id=0),
-                form=given | dict(title='New title')
+                json=given | dict(title='New title')
             )
             assert status == 404
 
@@ -224,7 +224,7 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Include related issue',
-                form=Update(relatedIssueId=self.issue1.id, title='New title')
+                json=Update(relatedIssueId=self.issue1.id, title='New title')
             )
             assert status == 200
 
