@@ -120,6 +120,10 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         foreign_keys=issue_id,
         back_populates='items'
     )
+    timecards = relationship(
+        'Timecard',
+        back_populates='item'
+    )
 
     UniqueConstraint(phase_id, issue_id, member_id)
 

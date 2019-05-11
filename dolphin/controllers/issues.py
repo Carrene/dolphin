@@ -26,9 +26,8 @@ from .phases import PhaseController
 from .tag import TagController
 
 
-PENDING = -1
-UNKNOWN_ASSIGNEE = -1
-
+ASSIGN_ISSUE_WHITELIST = [
+    '
 
 TRIAGE_PHASE_ID_PATTERN = re.compile(r'[(,\s]0[,\)\s]|^0$')
 
