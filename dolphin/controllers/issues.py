@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 
 from auditor import context as AuditLogContext
@@ -7,17 +8,18 @@ from nanohttp import HTTPStatus, json, context, HTTPNotFound, \
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import DBSession, commit
-from sqlalchemy import and_, exists, select, func, join
+from sqlalchemy import and_, exists, select, func, join, or_, Text, cast
 
 from ..backends import ChatClient
 from ..exceptions import StatusRoomMemberAlreadyExist, \
     StatusRoomMemberNotFound, StatusChatRoomNotFound, StatusRelatedIssueNotFound, \
-    StatusIssueBugMustHaveRelatedIssue, StatusIssueNotFound
+    StatusIssueBugMustHaveRelatedIssue, StatusIssueNotFound, \
+    StatusQueryParameterNotInFormOrQueryString
 from ..models import Issue, Subscription, Phase, Item, Member, Project, \
     RelatedIssue, Subscribable, IssueTag, Tag
 from ..validators import update_issue_validator, assign_issue_validator, \
     issue_move_validator, unassign_issue_validator, issue_relate_validator, \
-    issue_unrelate_validator
+    issue_unrelate_validator, search_issue_validator
 from .activity import ActivityController
 from .files import FileController
 from .phases import PhaseController
@@ -26,6 +28,9 @@ from .tag import TagController
 
 PENDING = -1
 UNKNOWN_ASSIGNEE = -1
+
+
+TRIAGE_PHASE_ID_PATTERN = re.compile(r'[(,\s]0[,\)\s]|^0$')
 
 
 class IssueController(ModelRestController, JsonPatchControllerMixin):
@@ -168,6 +173,12 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 Item.phase_id,
                 value
             )
+            if TRIAGE_PHASE_ID_PATTERN.search(value):
+                triage = DBSession.query(Issue) \
+                    .outerjoin(Item, Item.issue_id == Issue.id) \
+                    .filter(Item.id == None)
+                query = query.union(triage)
+
             is_issue_item_joined = True
 
         if 'phaseTitle' in context.query:
@@ -767,4 +778,34 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     def _unsee_subscriptions(self, subscriptions):
         for subscription in subscriptions:
             subscription.seen_at = None
+
+    @authorize
+    @search_issue_validator
+    @json
+    @Issue.expose
+    def search(self):
+        query = context.form.get('query') or context.query.get('query')
+        if query is None:
+            raise StatusQueryParameterNotInFormOrQueryString()
+
+        query = f'%{query}%'
+        query = DBSession.query(Issue) \
+            .filter(or_(
+                Issue.title.ilike(query),
+                Issue.description.ilike(query),
+                cast(Issue.id, Text).ilike(query)
+            ))
+
+        if 'unread' in context.query:
+            query = query \
+                .join(
+                    Subscription,
+                    and_(
+                        Subscription.subscribable_id == Issue.id,
+                        Subscription.seen_at.is_(None),
+                    )
+                ) \
+                .filter(Subscription.member_id == context.identity.id)
+
+        return query
 

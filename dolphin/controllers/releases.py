@@ -17,7 +17,7 @@ FORM_WHITELIST = [
     'description',
     'status',
     'cutoff',
-    'managerReferenceId',
+    'managerId',
     'launchDate',
     'groupId',
 ]
@@ -43,20 +43,17 @@ class ReleaseController(ModelRestController):
     @commit
     def create(self):
         token = context.environ['HTTP_AUTHORIZATION']
-        member = DBSession.query(Member) \
-            .filter(
-                Member.reference_id == context.form['managerReferenceId']
-            ) \
-            .one_or_none()
-        if member is None:
+        manager = DBSession.query(Member).get(context.form['managerId'])
+        if manager is None:
             raise StatusManagerNotFound()
 
         group = DBSession.query(Group).get(context.form.get('groupId'))
         if group is None:
             raise StatusGroupNotFound()
 
+        creator = Member.current()
         release = Release()
-        release.manager_id = member.id
+        release.manager_id = manager.id
         release.update_from_request()
         if release.launch_date < release.cutoff:
             raise StatusLaunchDateMustGreaterThanCutoffDate()
@@ -65,16 +62,16 @@ class ReleaseController(ModelRestController):
         room = chat_client.create_room(
             release.get_room_title(),
             token,
-            member.access_token,
+            creator.access_token,
             context.identity.reference_id
         )
         release.room_id = room['id']
         try:
             chat_client.add_member(
                 release.room_id,
-                member.reference_id,
+                manager.reference_id,
                 token,
-                member.access_token
+                creator.access_token
             )
 
         except StatusRoomMemberAlreadyExist:
@@ -116,11 +113,9 @@ class ReleaseController(ModelRestController):
                 f'"{form["title"]}" is already exists.'
             )
 
-        manager_reference_id = context.form.get('managerReferenceId')
-        if manager_reference_id is not None:
-            member = DBSession.query(Member) \
-                .filter(Member.reference_id == manager_reference_id) \
-                .one_or_none()
+        manager_id = context.form.get('managerId')
+        if manager_id is not None:
+            member = DBSession.query(Member).get(manager_id)
             if member is None:
                 raise StatusManagerNotFound()
 

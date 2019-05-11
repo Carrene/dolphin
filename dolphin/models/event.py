@@ -1,8 +1,15 @@
-import datetime
+from datetime import datetime
 
 from restfulpy.orm import Field, DeclarativeBase, OrderingMixin, \
     FilteringMixin, PaginationMixin, relationship
-from sqlalchemy import Integer, Unicode, DateTime, ForeignKey
+from sqlalchemy import Integer, Unicode, DateTime, ForeignKey, Enum
+
+
+event_repeats = [
+    'yearly',
+    'monthly',
+    'never',
+]
 
 
 class Event(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
@@ -22,7 +29,7 @@ class Event(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
         ForeignKey('event_type.id'),
         python_type=int,
         watermark='lorem ipsum',
-        label='Lorem ipsum',
+        label='Type',
         nullable=False,
         not_none=True,
         readonly=False,
@@ -32,13 +39,15 @@ class Event(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
         Unicode,
         max_length=50,
         min_length=1,
-        label='lorem ipsum',
+        label='Name',
         watermark='lorem ipsum',
         example='lorem ipsum',
         nullable=False,
         not_none=True,
         required=True,
         python_type=str,
+        readonly=False,
+        message='Lorem ipsum',
     )
     start_date= Field(
         DateTime,
@@ -53,6 +62,8 @@ class Event(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
         nullable=False,
         not_none=True,
         required=True,
+        readonly=False,
+        message='Lorem ipsum',
     )
     end_date = Field(
         DateTime,
@@ -67,18 +78,19 @@ class Event(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
         nullable=False,
         not_none=True,
         required=True,
+        readonly=False,
+        message='Lorem ipsum',
     )
-    description = Field(
-        Unicode,
-        min_length=1,
-        max_length=512,
-        label='Description',
-        watermark='Lorem Ipsum',
-        not_none=False,
-        nullable=True,
-        required=False,
+    repeat = Field(
+        Enum(*event_repeats, name='event_repeat'),
         python_type=str,
-        example='Lorem Ipsum',
+        label='Repeat',
+        not_none=True,
+        required=True,
+        nullable=False,
+        example='Lorem ipsum',
+        watermark='Lorem ipsum',
+        message='Lorem ipsum',
     )
     event_type = relationship(
         'EventType',

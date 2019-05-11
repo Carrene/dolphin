@@ -3,15 +3,16 @@ import re
 from nanohttp import validate, HTTPStatus, context
 from restfulpy.orm import DBSession
 
-from .models import *
-from .models.organization import roles
 from .exceptions import StatusResourceNotFound, StatusRepetitiveTitle, \
     StatusRelatedIssueNotFound, StatusEventTypeNotFound, \
     StatusInvalidStartDateFormat, StatusInvalidEndDateFormat, \
     StatusLimitedCharecterForSummary, StatusInvalidEstimatedTimeType, \
     StatusSummaryNotInForm, StatusEstimatedTimeNotInForm, \
     StatusEndDateNotInForm, StatusStartDateNotInForm, StatusSummaryIsNull, \
-    StatusEstimatedTimeIsNull, StatusStartDateIsNull, StatusEndDateIsNull
+    StatusEstimatedTimeIsNull, StatusStartDateIsNull, StatusEndDateIsNull, \
+    StatusRepeatNotInForm
+from .models import *
+from .models.organization import roles
 
 
 TITLE_PATTERN = re.compile(r'^(?!\s).*[^\s]$')
@@ -92,6 +93,17 @@ def project_accessible_validator(projectId, project, field):
     return projectId
 
 
+def event_repeat_value_validator(repeat, project, field):
+    form = context.form
+    if 'repeat' in form and form['repeat'] not in event_repeats:
+        raise HTTPStatus(
+            f'910 Invalid Repeat, only one of ' \
+            f'"{", ".join(event_repeats)}" will be accepted'
+        )
+
+    return repeat
+
+
 def project_status_value_validator(status, project, field):
     form = context.form
     if 'status' in form and form['status'] not in project_statuses:
@@ -139,7 +151,9 @@ def kind_value_validator(kind, project, field):
 
 def issue_status_value_validator(status, project, field):
     form = context.form
-    if 'status' in form and form['status'] not in issue_statuses:
+    if 'status' in form  \
+            and form['status'] is not None and \
+            form['status'] not in issue_statuses:
         raise HTTPStatus(
             f'705 Invalid status, only one of ' \
             f'"{", ".join(issue_statuses)}" will be accepted'
@@ -320,10 +334,10 @@ release_validator = validate(
     status=dict(
         callback=release_status_value_validator
     ),
-    managerReferenceId=dict(
+    managerId=dict(
         type_=(int, '608 Manager Not Found'),
-        required='777 Manager Reference Id Not In Form',
-        not_none='778 Manager Reference Id Is Null',
+        required='777 Manager Id Not In Form',
+        not_none='778 Manager Id Is Null',
     ),
     launchDate=dict(
         pattern=(DATETIME_PATTERN, '784 Invalid Launch Date Format'),
@@ -351,9 +365,9 @@ update_release_validator = validate(
     status=dict(
         callback=release_status_value_validator
     ),
-    managerReferenceId=dict(
+    managerId=dict(
         type_=(int, '608 Manager Not Found'),
-        not_none='778 Manager Reference Id Is Null',
+        not_none='778 Manager Id Is Null',
     ),
     launchDate=dict(
         pattern=(DATETIME_PATTERN, '784 Invalid Launch Date Format'),
@@ -819,11 +833,9 @@ eventtype_create_validator = validate(
 
 
 event_add_validator = validate(
-   description=dict(
-        max_length=(
-            512,
-            '703 At Most 512 Characters Are Valid For Description'
-        ),
+    repeat=dict(
+        required=StatusRepeatNotInForm,
+        callback=event_repeat_value_validator,
     ),
     eventTypeId=dict(
         required='794 Type Id Not In Form',
@@ -862,11 +874,8 @@ eventtype_update_validator = validate(
 
 
 event_update_validator = validate(
-   description=dict(
-        max_length=(
-            512,
-            '703 At Most 512 Characters Are Valid For Description'
-        ),
+    repeat=dict(
+        callback=event_repeat_value_validator,
     ),
     eventTypeId=dict(
         not_none='798 Event Type Id Is Null',
@@ -906,5 +915,39 @@ timecard_create_validator = validate(
         type_=(int, StatusInvalidEstimatedTimeType),
         not_none=StatusEstimatedTimeIsNull,
     ),
+)
+
+
+timecard_update_validator = validate(
+    summary=dict(
+        max_length=(1024, StatusLimitedCharecterForSummary),
+        not_none=StatusSummaryIsNull,
+    ),
+    startDate=dict(
+        pattern=(DATETIME_PATTERN, StatusInvalidStartDateFormat),
+        not_none=StatusStartDateIsNull,
+    ),
+    endDate=dict(
+        pattern=(DATETIME_PATTERN, StatusInvalidEndDateFormat),
+        not_none=StatusEndDateIsNull,
+    ),
+    estimatedTime=dict(
+        type_=(int, StatusInvalidEstimatedTimeType),
+        not_none=StatusEstimatedTimeIsNull,
+    ),
+)
+
+
+search_member_validator = validate(
+    query=dict(
+        max_length=(50, '704 At Most 50 Characters Valid For Title'),
+    )
+)
+
+
+search_issue_validator = validate(
+    query=dict(
+        max_length=(50, '704 At Most 50 Characters Valid For Title'),
+    )
 )
 

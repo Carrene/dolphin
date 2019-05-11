@@ -133,7 +133,7 @@ class TestIssue(LocalApplicationTestCase):
             f'Define an issue',
             f'/apiv1/draftissues/id: {self.draft_issue1.id}',
             f'FINALIZE',
-            form=dict(
+            json=dict(
                 title='Defined issue',
                 status='in-progress',
                 description='A description for defined issue',
@@ -157,72 +157,78 @@ class TestIssue(LocalApplicationTestCase):
             assert isinstance(logs[0], InstantiationLogEntry)
             assert isinstance(logs[1], RequestLogEntry)
 
-            when('Priority value not in form', form=Remove('priority'))
+            when(
+                'Status is null',
+                json=given | dict(status=None, title='new title')
+            )
+            assert status == 200
+
+            when('Priority value not in form', json=Remove('priority'))
             assert status == '768 Priority Not In Form'
 
-            when('Invalid the priority value', form=Update(priority='lorem'))
+            when('Invalid the priority value', json=Update(priority='lorem'))
             assert status == '767 Invalid priority, only one of "low, '\
                 'normal, high" will be accepted'
 
             when(
                 'Project id not in form',
-                form=given - 'projectId' | dict(title='New title')
+                json=given - 'projectId' | dict(title='New title')
             )
             assert status == '713 Project Id Not In Form'
 
             when(
                 'Project not found with string type',
-                form=given | dict(projectId='Alphabetical', title='New title')
+                json=given | dict(projectId='Alphabetical', title='New title')
             )
             assert status == '714 Invalid Project Id Type'
 
             when(
                 'Project not found with integer type',
-                form=given | dict(projectId=0, title='New title')
+                json=given | dict(projectId=0, title='New title')
             )
             assert status == '601 Project not found with id: 0'
 
             when(
                 'Relate issue not found with string type',
-                form=Update(relatedIssueId='Alphabetical', title='New title')
+                json=Update(relatedIssueId='Alphabetical', title='New title')
             )
             assert status == '722 Invalid Issue Id Type'
 
             when(
                 'Relate to issue not found with integer type',
-                form=Update(relatedIssueId=0, title='New title')
+                json=Update(relatedIssueId=0, title='New title')
             )
             assert status == 647
             assert status.text.startswith('relatedIssue With Id')
 
             when(
                 'Title is not in form',
-                form=given - 'title'
+                json=given - 'title'
             )
             assert status == '710 Title Not In Form'
 
             when(
                 'Title format is wrong',
-                form=given | dict(title=' Invalid Format ')
+                json=given | dict(title=' Invalid Format ')
             )
             assert status == '747 Invalid Title Format'
 
             when(
                 'Title is repetitive',
-                form=Update(title='First issue')
+                json=Update(title='First issue')
             )
             assert status == '600 Another issue with title: "First issue" '\
                 'is already exists.'
 
             when(
                 'Title length is more than limit',
-                form=given | dict(title=((128 + 1) * 'a'))
+                json=given | dict(title=((128 + 1) * 'a'))
             )
             assert status == '704 At Most 128 Characters Are Valid For Title'
 
             when(
                 'Description length is less than limit',
-                form=given | dict(
+                json=given | dict(
                     description=((8192 + 1) * 'a'),
                     title=('Another title')
                 )
@@ -232,7 +238,7 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Due date format is wrong',
-                form=given | dict(
+                json=given | dict(
                     dueDate='20-20-20',
                     title='Another title'
                 )
@@ -241,25 +247,25 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Due date is not in form',
-                form=given - 'dueDate' | dict(title='Another title')
+                json=given - 'dueDate' | dict(title='Another title')
             )
             assert status == '711 Due Date Not In Form'
 
             when(
                 'Kind is not in form',
-                form=given - 'kind' | dict(title='Another title')
+                json=given - 'kind' | dict(title='Another title')
             )
             assert status == '718 Kind Not In Form'
 
             when(
                 'Days is not in form',
-                form=given - 'days' | dict(title='Another title')
+                json=given - 'days' | dict(title='Another title')
             )
             assert status == '720 Days Not In Form'
 
             when(
                 'Days type is wrong',
-                form=given | dict(
+                json=given | dict(
                     days='Alphabetical',
                     title='Another title'
                 )
@@ -268,14 +274,14 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Invalid kind value is in form',
-                form=given | dict(kind='enhancing', title='Another title')
+                json=given | dict(kind='enhancing', title='Another title')
             )
             assert status == '717 Invalid kind, only one of "feature, bug" '\
                 'will be accepted'
 
             when(
                 'Invalid status value is in form',
-                form=given | dict(status='progressing') | \
+                json=given | dict(status='progressing') | \
                     dict(title='Another title')
             )
             assert status == '705 Invalid status, only one of "to-do, ' \
@@ -283,7 +289,7 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Trying to pass with invalid form parameters',
-                form=Update(a=1)
+                json=Update(a=1)
             )
             assert status == '707 Invalid field, only following fields are ' \
                 'accepted: title, description, kind, days, status, projectId, ' \
@@ -295,7 +301,7 @@ class TestIssue(LocalApplicationTestCase):
             when(
                 'Trying to pass draft issue bug without related issue',
                 url_parameters=dict(id=self.draft_issue2.id),
-                form=Update(
+                json=Update(
                     title='Another title',
                     kind='bug'
                 )
@@ -305,35 +311,35 @@ class TestIssue(LocalApplicationTestCase):
             with chat_server_status('404 Not Found'):
                 when(
                     'Chat server is not found',
-                    form=given | dict(title='Another title')
+                    json=given | dict(title='Another title')
                 )
                 assert status == '617 Chat Server Not Found'
 
             with chat_server_status('503 Service Not Available'):
                 when(
                     'Chat server is not available',
-                    form=given | dict(title='Another title')
+                    json=given | dict(title='Another title')
                 )
                 assert status == '800 Chat Server Not Available'
 
             with chat_server_status('500 Internal Service Error'):
                 when(
                     'Chat server faces with internal error',
-                    form=given | dict(title='Another title')
+                    json=given | dict(title='Another title')
                 )
                 assert status == '801 Chat Server Internal Error'
 
             with chat_server_status('615 Room Already Exists'):
                 when(
                     'Chat server faces with internal error',
-                    form=given | dict(title='Another title')
+                    json=given | dict(title='Another title')
                 )
                 assert status == 200
 
             with chat_server_status('604 Already Added To Target'):
                 when(
                     'Chat server faces with internal error',
-                    form=given | dict(title='Awesome project')
+                    json=given | dict(title='Awesome project')
                 )
                 assert status == 200
 

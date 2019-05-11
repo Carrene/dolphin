@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from auditor import MiddleWare
 from auditor.context import Context as AuditLogContext
 from auditor.logentry import RequestLogEntry, InstantiationLogEntry
@@ -34,11 +36,11 @@ class TestProject(LocalApplicationTestCase):
 
         cls.group = Group(title='Public', public=True)
 
-        release1 = Release(
+        cls.release1 = Release(
             title='My first release',
             description='A decription for my first release',
-            cutoff='2030-2-20',
-            launch_date='2030-2-20',
+            cutoff='2030-02-20T00:00:00',
+            launch_date='2030-02-20T00:00:00',
             manager=cls.member,
             room_id=0,
             group=cls.group,
@@ -47,7 +49,7 @@ class TestProject(LocalApplicationTestCase):
         project1 = Project(
             workflow=cls.workflow,
             group=cls.group,
-            release=release1,
+            release=cls.release1,
             manager=cls.member,
             title='My first project',
             description='A decription for my project',
@@ -83,6 +85,7 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['dueDate'] == None
             assert response.json['managerId'] == self.member.id
             assert response.json['secondaryManagerId'] is None
+            assert response.json['releaseCutoff'] == self.release1.cutoff
 
             created_project_id = response.json['id']
             created_project = session.query(Project).get(created_project_id)

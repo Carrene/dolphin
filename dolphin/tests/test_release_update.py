@@ -80,7 +80,7 @@ class TestRelease(LocalApplicationTestCase):
                 cutoff='2030-2-21',
                 launchDate='2030-2-21',
                 status='in-progress',
-                managerReferenceId=self.member2.reference_id,
+                managerId=self.member2.id,
                 groupId=self.group2.id,
             )
         ):
@@ -172,14 +172,14 @@ class TestRelease(LocalApplicationTestCase):
                 '"in-progress, on-hold, delayed, complete" will be accepted'
 
             when(
-                'Manager reference id is null',
-                json=Update(title='New Release', managerReferenceId=None)
+                'Manager id is null',
+                json=Update(title='New Release', managerId=None)
             )
-            assert status == '778 Manager Reference Id Is Null'
+            assert status == '778 Manager Id Is Null'
 
             when(
                 'Manager is not found',
-                json=Update(title='New Release', managerReferenceId=0)
+                json=Update(title='New Release', managerId=0)
             )
             assert status == '608 Manager Not Found'
 

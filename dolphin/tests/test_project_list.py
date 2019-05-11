@@ -287,8 +287,8 @@ class TestProject(LocalApplicationTestCase):
                 assert len(response.json) == 4
                 assert response.json[0]['title'] == self.project3.title
                 assert response.json[1]['title'] == self.project2.title
-                assert response.json[2]['title'] == self.project1.title
-                assert response.json[3]['title'] == self.project4.title
+                assert response.json[2]['title'] == self.project4.title
+                assert response.json[3]['title'] == self.project1.title
 
             with self.given(
                 'Filter projects',
@@ -337,10 +337,9 @@ class TestProject(LocalApplicationTestCase):
                     query=dict(boarding='IN(on-time,frozen)')
                 )
                 assert status == 200
-                assert len(response.json) == 3
-                assert response.json[0]['title'] == self.project1.title
-                assert response.json[1]['title'] == self.project2.title
-                assert response.json[2]['title'] == self.project4.title
+                assert len(response.json) == 2
+                assert response.json[0]['title'] == self.project2.title
+                assert response.json[1]['title'] == self.project4.title
 
             with self.given(
                 'Project pagination',

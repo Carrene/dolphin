@@ -2,11 +2,11 @@ import datetime
 
 from bddrest import status, response, when
 
-from dolphin.models import Member, Event, EventType
+from dolphin.models import Member, Timecard
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
-class TestEvent(LocalApplicationTestCase):
+class TestTimecard(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
@@ -21,30 +21,25 @@ class TestEvent(LocalApplicationTestCase):
         )
         session.add(cls.member)
 
-        event_type = EventType(
-            title='First type',
-        )
-
-        cls.event1 = Event(
-            title='First event',
+        cls.timecard = Timecard(
             start_date=datetime.datetime.now().isoformat(),
             end_date=datetime.datetime.now().isoformat(),
-            event_type=event_type,
-            repeat='never',
+            estimated_time=2,
+            summary='Summary for timecard',
         )
-        session.add(cls.event1)
+        session.add(cls.timecard)
         session.commit()
 
     def test_get(self):
         self.login(self.member.email)
 
         with oauth_mockup_server(), self.given(
-            f'Get an event',
-            f'/apiv1/events/id: {self.event1.id}',
+            f'Get a timecard',
+            f'/apiv1/timecards/id: {self.timecard.id}',
             f'GET',
         ):
             assert status == 200
-            assert response.json['id'] == self.event1.id
+            assert response.json['id'] == self.timecard.id
 
             when(
                 'Intended group with string type not found',

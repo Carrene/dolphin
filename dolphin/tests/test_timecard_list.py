@@ -2,11 +2,11 @@ import datetime
 
 from bddrest import when, response, status
 
-from dolphin.models import Member, Event, EventType
+from dolphin.models import Member, Timecard
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
-class TestEvent(LocalApplicationTestCase):
+class TestTimecard(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
@@ -20,44 +20,37 @@ class TestEvent(LocalApplicationTestCase):
         )
         session.add(cls.member)
 
-        event_type = EventType(
-            title='First type',
-        )
-
-        event1 = Event(
-            title='First event',
+        timecard1 = Timecard(
             start_date=datetime.datetime.now().isoformat(),
             end_date=datetime.datetime.now().isoformat(),
-            event_type=event_type,
-            repeat='never',
+            estimated_time=1,
+            summary='Summary for timecard1',
         )
-        session.add(event1)
+        session.add(timecard1)
 
-        event2 = Event(
-            title='Second event',
+        timecard2 = Timecard(
             start_date=datetime.datetime.now().isoformat(),
             end_date=datetime.datetime.now().isoformat(),
-            event_type=event_type,
-            repeat='never',
+            estimated_time=2,
+            summary='Summary for timecard2',
         )
-        session.add(event2)
+        session.add(timecard2)
 
-        event3 = Event(
-            title='Third event',
+        timecard3 = Timecard(
             start_date=datetime.datetime.now().isoformat(),
             end_date=datetime.datetime.now().isoformat(),
-            event_type=event_type,
-            repeat='never',
+            estimated_time=3,
+            summary='Summary for timecard3',
         )
-        session.add(event3)
+        session.add(timecard3)
         session.commit()
 
     def test_list(self):
         self.login(self.member.email)
 
         with oauth_mockup_server(), self.given(
-            'List of events',
-            '/apiv1/events',
+            'List of timecards',
+            '/apiv1/timecards',
             'LIST',
         ):
             assert status == 200

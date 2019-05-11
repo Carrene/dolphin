@@ -31,6 +31,7 @@ class TestEvent(LocalApplicationTestCase):
         self.login(self.member.email)
         title = 'Event 1'
         description = 'A description for an event'
+        repeat = 'never'
         start_date = datetime.datetime.now().isoformat()
         end_date = datetime.datetime.now().isoformat()
 
@@ -43,7 +44,7 @@ class TestEvent(LocalApplicationTestCase):
                 eventTypeId=self.event_type.id,
                 startDate=start_date,
                 endDate=end_date,
-                description=description,
+                repeat=repeat,
             ),
         ):
             assert status == 200
@@ -51,7 +52,7 @@ class TestEvent(LocalApplicationTestCase):
             assert response.json['title'] == title
             assert response.json['startDate'] == start_date
             assert response.json['endDate'] == end_date
-            assert response.json['description'] == description
+            assert response.json['repeat'] == repeat
 
             when('Trying to pass without form parameters', json={})
             assert status == '708 Empty Form'
@@ -79,13 +80,6 @@ class TestEvent(LocalApplicationTestCase):
                 json=given | dict(title=None)
             )
             assert status == '727 Title Is None'
-
-            when(
-                'Description length is less than limit',
-                json=given | dict(description=(512 + 1) * 'a'),
-            )
-            assert status == '703 At Most 512 Characters Are Valid For ' \
-                'Description'
 
             when(
                 'Trying to pass without start date',
@@ -129,6 +123,19 @@ class TestEvent(LocalApplicationTestCase):
                 json=given - 'eventTypeId'
             )
             assert status == '794 Type Id Not In Form'
+
+            when(
+                'Trying to pass without repeat',
+                json=given - 'repeat'
+            )
+            assert status == '911 Repeat Not In Form'
+
+            when(
+                'Invalid repeat value is in form',
+                json=given | dict(repeat='a')
+            )
+            assert status == '910 Invalid Repeat, only one of ' \
+                '"yearly, monthly, never" will be accepted'
 
             when('Request is not authorized', authorization=None)
             assert status == 401
