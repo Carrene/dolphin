@@ -59,6 +59,16 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         required=False,
         readonly=True,
     )
+    estimated_hours = Field(
+        Integer,
+        python_type=int,
+        label='Estimated Hours',
+        watermark='Enter hours you estimate',
+        readonly=False,
+        nullable=True,
+        not_none=False,
+        required=False,
+    )
     status = Field(
         Enum(*item_statuses, name='item_status'),
         python_type=str,

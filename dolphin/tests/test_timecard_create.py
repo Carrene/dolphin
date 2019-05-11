@@ -1,14 +1,17 @@
 import datetime
 
 from bddrest import status, response, when, given
+from auditor.context import Context as AuditLogContext
 
-from dolphin.models import Member
+from dolphin.models import Member, Workflow, Skill, Group, Phase, Release, \
+    Project, Issue, Item
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
 class TestTimecard(LocalApplicationTestCase):
 
     @classmethod
+    @AuditLogContext(dict())
     def mockup(cls):
         session = cls.create_session()
 
@@ -20,31 +23,100 @@ class TestTimecard(LocalApplicationTestCase):
             reference_id=1,
         )
         session.add(cls.member)
+
+        workflow = Workflow(title='Default')
+        skill = Skill(title='First Skill')
+        group = Group(title='default')
+
+        phase = Phase(
+            title='backlog',
+            order=-1,
+            workflow=workflow,
+            skill=skill,
+        )
+        session.add(phase)
+
+        release = Release(
+            title='My first release',
+            description='A decription for my first release',
+            cutoff='2030-2-20',
+            launch_date='2030-2-20',
+            manager=cls.member,
+            room_id=0,
+            group=group,
+        )
+
+        project = Project(
+            release=release,
+            workflow=workflow,
+            group=group,
+            manager=cls.member,
+            title='My first project',
+            description='A decription for my project',
+            room_id=1
+        )
+
+        issue = Issue(
+            project=project,
+            title='First issue',
+            description='This is description of first issue',
+            due_date='2020-2-20',
+            kind='feature',
+            days=1,
+            room_id=2
+        )
+        session.add(issue)
+        session.flush()
+
+        cls.item = Item(
+            issue_id=issue.id,
+            phase_id=phase.id,
+            member_id=cls.member.id,
+        )
+        session.add(cls.item)
         session.commit()
 
     def test_create(self):
         self.login(self.member.email)
-        start_date = datetime.datetime.now().isoformat()
-        end_date = datetime.datetime.now().isoformat()
-        summary = 'Some summary'
+        form = dict(
+            startDate=datetime.datetime.now().isoformat(),
+            endDate=datetime.datetime.now().isoformat(),
+            summary='Some summary',
+            estimatedTime=2,
+            itemId=self.item.id,
+        )
 
         with oauth_mockup_server(), self.given(
             'Creating a timecard',
             '/apiv1/timecards',
             'CREATE',
-            json=dict(
-                startDate=start_date,
-                endDate=end_date,
-                estimatedTime=2,
-                summary=summary,
-            ),
+            json=form
         ):
             assert status == 200
             assert response.json['id'] is not None
-            assert response.json['startDate'] == start_date
-            assert response.json['endDate'] == end_date
-            assert response.json['estimatedTime'] == 2
-            assert response.json['summary'] == summary
+            assert response.json['startDate'] == form['startDate']
+            assert response.json['endDate'] == form['endDate']
+            assert response.json['estimatedTime'] == form['estimatedTime']
+            assert response.json['summary'] == form['summary']
+            assert response.json['itemId'] == form['itemId']
+
+            when(
+                'Item id is null',
+                json=given | dict(itemId=None)
+            )
+            assert status == '913 Item Id Is Null'
+
+            when(
+                'Item id is not in form',
+                json=given - 'itemId'
+            )
+            assert status == '732 Item Id Not In Form'
+
+            when(
+                'Item is not found',
+                json=given | dict(itemId=0)
+            )
+            assert status == '660 Item Not Found'
 
             when('Trying to pass without form parameters', json={})
             assert status == '708 Empty Form'
@@ -101,8 +173,8 @@ class TestTimecard(LocalApplicationTestCase):
             when(
                 'End date must be greater than start date',
                 json=given | dict(
-                    startDate=end_date,
-                    endDate=start_date,
+                    startDate=form['endDate'],
+                    endDate=form['startDate'],
                 )
             )
             assert status == '657 End Date Must Be Greater Than Start Date'

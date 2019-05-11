@@ -1,6 +1,6 @@
 import re
 
-from nanohttp import validate, HTTPStatus, context
+from nanohttp import validate, HTTPStatus, context, int_or_notfound
 from restfulpy.orm import DBSession
 
 from .exceptions import StatusResourceNotFound, StatusRepetitiveTitle, \
@@ -317,6 +317,16 @@ def event_exists_validator(title, project, field):
     return title
 
 
+def item_exists_validator(item_id, container, field):
+    int = int_or_notfound(item_id)
+
+    item = DBSession.query(Item).filter(Item.id == item_id).one_or_none()
+    if item is None:
+        raise HTTPStatus('660 Item Not Found')
+
+    return item_id
+
+
 release_validator = validate(
     title=dict(
         required='710 Title Not In Form',
@@ -524,6 +534,15 @@ assign_issue_validator = validate(
         required='737 Phase Id Not In Form',
         type_=(int, '738 Invalid Phase Id Type'),
         callback=phase_exists_validator
+    ),
+    status=dict(
+        callback=item_status_value_validator
+    ),
+    description=dict(
+        max_length=(
+            512,
+            '703 At Most 512 Characters Are Valid For Description'
+        )
     )
 )
 
@@ -915,6 +934,11 @@ timecard_create_validator = validate(
         type_=(int, StatusInvalidEstimatedTimeType),
         not_none=StatusEstimatedTimeIsNull,
     ),
+    itemId=dict(
+        required='732 Item Id Not In Form',
+        not_none='913 Item Id Is Null',
+        callback=item_exists_validator
+    )
 )
 
 
