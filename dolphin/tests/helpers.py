@@ -6,7 +6,7 @@ from nanohttp import RegexRouteController, json, settings, context, HTTPStatus
 from restfulpy.application import Application
 from restfulpy.mockup import mockup_http_server
 from restfulpy.orm.metadata import FieldInfo
-from restfulpy.testing import ApplicableTestCase
+from restfulpy.testing import ApplicableTestCase, db
 
 from dolphin import Dolphin
 from dolphin.authentication import Authenticator

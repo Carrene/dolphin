@@ -2,7 +2,8 @@ from datetime import datetime
 
 from restfulpy.orm import Field, DeclarativeBase, OrderingMixin, \
     FilteringMixin, PaginationMixin, relationship
-from sqlalchemy import Integer, Unicode, DateTime, ForeignKey, Enum
+from sqlalchemy import Integer, Unicode, DateTime, ForeignKey, Enum, exists, \
+    and_
 
 
 event_repeats = [
@@ -97,4 +98,11 @@ class Event(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
         back_populates='events',
         protected=True
     )
+
+    @classmethod
+    def isworkingday(cls, session, date=datetime.now().date()):
+        is_event_already_exist = session.query(
+            exists().where(and_(cls.start_date <= date, date <= cls.end_date))
+        ).scalar()
+        return False if is_event_already_exist else True
 
