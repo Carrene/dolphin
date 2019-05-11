@@ -26,7 +26,12 @@ from .phases import PhaseController
 from .tag import TagController
 
 
-ASSIGN_WHITELIST = [
+# FIXME: Remove these two redundant lines
+PENDING = -1
+UNKNOWN_ASSIGNEE = -1
+
+
+FORM_WHITELIST = [
     'status',
     'description',
     'phaseId',
@@ -34,7 +39,7 @@ ASSIGN_WHITELIST = [
 ]
 
 
-ASSIGN_WHITELIST_STRING = ', '.join(ASSIGN_WHITELIST)
+FORM_WHITELIST_STRING = ', '.join(FORM_WHITELIST)
 
 
 TRIAGE_PHASE_ID_PATTERN = re.compile(r'[(,\s]0[,\)\s]|^0$')
@@ -477,9 +482,9 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
     @authorize
     @json(form_whitelist=(
-            ASSIGN_WHITELIST,
+            FORM_WHITELIST,
             f'707 Invalid field, only following fields are accepted: '
-            f'{ASSIGN_WHITELIST_STRING}'
+            f'{FORM_WHITELIST_STRING}'
         )
     )
     @assign_issue_validator
