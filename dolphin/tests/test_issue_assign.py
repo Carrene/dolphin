@@ -1,5 +1,5 @@
 from auditor.context import Context as AuditLogContext
-from bddrest import status, when, response, Remove, Update
+from bddrest import status, when, response, Remove, Update, given
 
 from dolphin.models import Issue, Project, Member, Phase, Group, Workflow, \
     Release, Skill
@@ -86,15 +86,42 @@ class TestIssue(LocalApplicationTestCase):
 
     def test_assign(self):
         self.login(self.member1.email)
+        form = dict(
+            memberId=self.member2.id,
+            phaseId=1,
+            description='A description for item',
+            status='in-progress'
+        )
 
         with oauth_mockup_server(), self.given(
             'Assign an issue to a resource',
-            f'/apiv1/issues/id:{self.issue1.id}',
+            f'/apiv1/issues/id: {self.issue1.id}',
             'ASSIGN',
-            form=dict(memberId=self.member2.id, phaseId=1)
+            form=form
         ):
             assert status == 200
             assert response.json['id'] == self.issue1.id
+
+            when(
+                'There is invalid parameter in the form',
+                form=given | dict(parameter='invalid parameter')
+            )
+            assert status == '707 Invalid field, only following fields are ' \
+                'accepted: status, description, phaseId, memberId'
+
+            when(
+                'Status value is wrong',
+                form=given | dict(status='invalid value')
+            )
+            assert status == 705
+            assert status.text.startswith('Invalid status value')
+
+            when(
+                'Description is more than limit',
+                form=given | dict(description=(512 + 1) * 'a')
+            )
+            assert status == '703 At Most 512 Characters Are Valid For ' \
+                'Description'
 
             when(
                 'Intended issue with string type not found',

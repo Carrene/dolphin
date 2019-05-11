@@ -1,14 +1,25 @@
 from datetime import datetime
 
 from restfulpy.orm import Field, DeclarativeBase, OrderingMixin, \
-    FilteringMixin, PaginationMixin
-from sqlalchemy import Integer, Unicode, DateTime
+    FilteringMixin, PaginationMixin, relationship
+from sqlalchemy import Integer, Unicode, DateTime, ForeignKey
 
 
 class Timecard(OrderingMixin, FilteringMixin, PaginationMixin, \
                DeclarativeBase):
     __tablename__ = 'timecard'
 
+    item_id = Field(
+        Integer,
+        ForeignKey('item.id'),
+        python_type=int,
+        nullable=False,
+        watermark='Choose a assginment',
+        label='Assginment',
+        not_none=True,
+        required=True,
+        example='Lorem Ipsum'
+    )
     id = Field(
         Integer,
         primary_key=True,
@@ -67,5 +78,10 @@ class Timecard(OrderingMixin, FilteringMixin, PaginationMixin, \
         required=True,
         python_type=str,
         example='Lorem Ipsum',
+    )
+
+    item = relationship(
+        'Item',
+        back_populates='timecards'
     )
 

@@ -4,7 +4,10 @@ from restfulpy.orm import Field, DeclarativeBase, relationship
 from restfulpy.orm.mixins import TimestampMixin, OrderingMixin, \
     FilteringMixin, PaginationMixin
 from sqlalchemy import Integer, ForeignKey, UniqueConstraint, DateTime, Enum, \
-    String
+    String, select, func
+from sqlalchemy.orm import column_property
+
+from .timecard import Timecard
 
 
 item_statuses = [
@@ -58,6 +61,16 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         not_none=False,
         required=False,
         readonly=True,
+    )
+    estimated_hours = Field(
+        Integer,
+        python_type=int,
+        label='Estimated Hours',
+        watermark='Enter hours you estimate',
+        readonly=False,
+        nullable=True,
+        not_none=False,
+        required=False,
     )
     status = Field(
         Enum(*item_statuses, name='item_status'),
@@ -120,6 +133,20 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         foreign_keys=issue_id,
         back_populates='items'
     )
+    timecards = relationship(
+        'Timecard',
+        back_populates='item'
+    )
+
+    hours_worked = column_property(
+        select([func.sum(Timecard.estimated_time)])
+        .where(Timecard.item_id == id)
+    )
 
     UniqueConstraint(phase_id, issue_id, member_id)
+
+    def to_dict(self):
+        item_dict = super().to_dict()
+        item_dict['hoursWorked'] = self.hours_worked
+        return item_dict
 

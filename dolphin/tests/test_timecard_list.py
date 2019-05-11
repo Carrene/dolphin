@@ -1,14 +1,17 @@
 import datetime
 
 from bddrest import when, response, status
+from auditor.context import Context as AuditLogContext
 
-from dolphin.models import Member, Timecard
+from dolphin.models import Member, Timecard, Workflow, Skill, Group, Phase, \
+    Release, Project, Issue, Item
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
 class TestTimecard(LocalApplicationTestCase):
 
     @classmethod
+    @AuditLogContext(dict())
     def mockup(cls):
         session = cls.create_session()
         cls.member = Member(
@@ -20,11 +23,63 @@ class TestTimecard(LocalApplicationTestCase):
         )
         session.add(cls.member)
 
+        workflow = Workflow(title='Default')
+        skill = Skill(title='First Skill')
+        group = Group(title='default')
+
+        phase = Phase(
+            title='backlog',
+            order=-1,
+            workflow=workflow,
+            skill=skill,
+        )
+        session.add(phase)
+
+        release = Release(
+            title='My first release',
+            description='A decription for my first release',
+            cutoff='2030-2-20',
+            launch_date='2030-2-20',
+            manager=cls.member,
+            room_id=0,
+            group=group,
+        )
+
+        project = Project(
+            release=release,
+            workflow=workflow,
+            group=group,
+            manager=cls.member,
+            title='My first project',
+            description='A decription for my project',
+            room_id=1
+        )
+
+        issue = Issue(
+            project=project,
+            title='First issue',
+            description='This is description of first issue',
+            due_date='2020-2-20',
+            kind='feature',
+            days=1,
+            room_id=2
+        )
+        session.add(issue)
+        session.flush()
+
+        item = Item(
+            issue_id=issue.id,
+            phase_id=phase.id,
+            member_id=cls.member.id,
+        )
+        session.add(item)
+
         timecard1 = Timecard(
             start_date=datetime.datetime.now().isoformat(),
             end_date=datetime.datetime.now().isoformat(),
             estimated_time=1,
             summary='Summary for timecard1',
+            item=item,
         )
         session.add(timecard1)
 
@@ -33,6 +88,7 @@ class TestTimecard(LocalApplicationTestCase):
             end_date=datetime.datetime.now().isoformat(),
             estimated_time=2,
             summary='Summary for timecard2',
+            item=item,
         )
         session.add(timecard2)
 
@@ -41,6 +97,7 @@ class TestTimecard(LocalApplicationTestCase):
             end_date=datetime.datetime.now().isoformat(),
             estimated_time=3,
             summary='Summary for timecard3',
+            item=item,
         )
         session.add(timecard3)
         session.commit()
