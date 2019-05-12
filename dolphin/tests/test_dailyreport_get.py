@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 from bddrest import status, response, when
 from auditor.context import Context as AuditLogContext
@@ -76,7 +76,7 @@ class TestDailyreport(LocalApplicationTestCase):
         session.add(cls.item)
 
         cls.dailyreport = Dailyreport(
-            date=datetime.datetime.now().date(),
+            date=datetime.strptime('2019-1-2', '%Y-%m-%d').date(),
             hours=3,
             note='The note for a daily report',
             item=cls.item,
@@ -86,14 +86,25 @@ class TestDailyreport(LocalApplicationTestCase):
 
     def test_get(self):
         self.login(self.member.email)
+        session = self.create_session()
 
         with oauth_mockup_server(), self.given(
             f'Get a dailyreport',
-            f'/apiv1/dailyreports/id: {self.dailyreport.id}',
+            f'/apiv1/items/item_id: {self.item.id}/'
+            f'dailyreports/id: {self.dailyreport.id}',
             f'GET',
         ):
             assert status == 200
             assert response.json['id'] == self.dailyreport.id
+            assert session.query(Dailyreport) \
+                .filter(Dailyreport.date == datetime.now().date()) \
+                .one()
+
+            when(
+                'The item in not found',
+                url_parameters=dict(item_id=0)
+            )
+            assert status == 404
 
             when(
                 'Intended group with string type not found',
