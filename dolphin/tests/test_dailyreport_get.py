@@ -3,12 +3,12 @@ import datetime
 from bddrest import status, response, when
 from auditor.context import Context as AuditLogContext
 
-from dolphin.models import Member, Timecard, Workflow, Skill, Group, Release, \
+from dolphin.models import Member, Dailyreport, Workflow, Skill, Group, Release, \
     Project, Issue, Item, Phase
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
-class TestTimecard(LocalApplicationTestCase):
+class TestDailyreport(LocalApplicationTestCase):
 
     @classmethod
     @AuditLogContext(dict())
@@ -75,26 +75,25 @@ class TestTimecard(LocalApplicationTestCase):
         )
         session.add(cls.item)
 
-        cls.timecard = Timecard(
-            start_date=datetime.datetime.now().isoformat(),
-            end_date=datetime.datetime.now().isoformat(),
-            estimated_time=2,
-            summary='Summary for timecard',
+        cls.dailyreport = Dailyreport(
+            date=datetime.datetime.now().date(),
+            hours=3,
+            note='The note for a daily report',
             item=cls.item,
         )
-        session.add(cls.timecard)
+        session.add(cls.dailyreport)
         session.commit()
 
     def test_get(self):
         self.login(self.member.email)
 
         with oauth_mockup_server(), self.given(
-            f'Get a timecard',
-            f'/apiv1/timecards/id: {self.timecard.id}',
+            f'Get a dailyreport',
+            f'/apiv1/dailyreports/id: {self.dailyreport.id}',
             f'GET',
         ):
             assert status == 200
-            assert response.json['id'] == self.timecard.id
+            assert response.json['id'] == self.dailyreport.id
 
             when(
                 'Intended group with string type not found',

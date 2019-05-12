@@ -7,7 +7,7 @@ from sqlalchemy import Integer, ForeignKey, UniqueConstraint, DateTime, Enum, \
     String, select, func
 from sqlalchemy.orm import column_property
 
-from .timecard import Timecard
+from .dailyreport import Dailyreport
 
 
 item_statuses = [
@@ -133,14 +133,14 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         foreign_keys=issue_id,
         back_populates='items'
     )
-    timecards = relationship(
-        'Timecard',
+    dailyreports = relationship(
+        'Dailyreport',
         back_populates='item'
     )
 
     hours_worked = column_property(
-        select([func.sum(Timecard.estimated_time)])
-        .where(Timecard.item_id == id)
+        select([func.sum(Dailyreport.hours)])
+        .where(Dailyreport.item_id == id)
     )
 
     UniqueConstraint(phase_id, issue_id, member_id)

@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 from bddrest import status, response, when, given
 from auditor.context import Context as AuditLogContext
@@ -8,7 +8,7 @@ from dolphin.models import Member, Workflow, Skill, Group, Phase, Release, \
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
-class TestTimecard(LocalApplicationTestCase):
+class TestDailyreport(LocalApplicationTestCase):
 
     @classmethod
     @AuditLogContext(dict())
@@ -79,25 +79,22 @@ class TestTimecard(LocalApplicationTestCase):
     def test_create(self):
         self.login(self.member.email)
         form = dict(
-            startDate=datetime.datetime.now().isoformat(),
-            endDate=datetime.datetime.now().isoformat(),
-            summary='Some summary',
-            estimatedTime=2,
+            note='Some summary',
+            hours=2,
             itemId=self.item.id,
         )
 
         with oauth_mockup_server(), self.given(
-            'Creating a timecard',
-            '/apiv1/timecards',
+            'Creating a dailyreport',
+            '/apiv1/dailyreports',
             'CREATE',
             json=form
         ):
             assert status == 200
             assert response.json['id'] is not None
-            assert response.json['startDate'] == form['startDate']
-            assert response.json['endDate'] == form['endDate']
-            assert response.json['estimatedTime'] == form['estimatedTime']
-            assert response.json['summary'] == form['summary']
+            assert response.json['date'] == str(datetime.now().date())
+            assert response.json['hours'] == form['hours']
+            assert response.json['note'] == form['note']
             assert response.json['itemId'] == form['itemId']
 
             when(
@@ -122,74 +119,29 @@ class TestTimecard(LocalApplicationTestCase):
             assert status == '708 Empty Form'
 
             when(
-                'Summary length is less than limit',
-                json=given | dict(summary=(1024 + 1) * 'a'),
+                'Invalid parameter is in form',
+                json=given | dict(parameter='invalid parameter')
             )
-            assert status == '902 At Most 1024 Characters Are Valid For ' \
-                'Summary'
+            assert status == '707 Invalid field, only following fields are ' \
+                'accepted: hours, note and itemId'
 
             when(
-                'Trying to pass without start date',
-                json=given - 'startDate',
+                'Note length is less than limit',
+                json=given | dict(note=(1024 + 1) * 'a'),
             )
-            assert status == '792 Start Date Not In Form'
+            assert status == '902 At Most 1024 Characters Are Valid For Note'
 
             when(
-                'Trying to pass without end date',
-                json=given - 'endDate',
+                'Hours value type is wrong',
+                json=given | dict(hours='a')
             )
-            assert status == '793 End Date Not In Form'
+            assert status == '900 Invalid Hours Type'
 
             when(
-                'Trying to pass without summary',
-                json=given - 'summary',
+                'Hours value is less then 1',
+                json=given | dict(hours=0)
             )
-            assert status == '799 Summary Not In Form'
-
-            when(
-                'Trying to pass without estimated time',
-                json=given - 'estimatedTime',
-            )
-            assert status == '901 Estimated Time Not In Form'
-
-            when(
-                'Estimated time type is wrong',
-                json=given | dict(estimatedTime='time'),
-            )
-            assert status == '900 Invalid Estimated Time Type'
-
-            when(
-                'Start date format is wrong',
-                json=given | dict(startDate='30-20-20')
-            )
-            assert status == '791 Invalid Start Date Format'
-
-            when(
-                'End date format is wrong',
-                json=given | dict(endDate='30-20-20')
-            )
-            assert status == '790 Invalid End Date Format'
-
-            when(
-                'End date must be greater than start date',
-                json=given | dict(
-                    startDate=form['endDate'],
-                    endDate=form['startDate'],
-                )
-            )
-            assert status == '657 End Date Must Be Greater Than Start Date'
-
-            when('Start date is null', json=given | dict(startDate=None))
-            assert status == '905 Start Date Is Null'
-
-            when('End date is null', json=given | dict(endDate=None))
-            assert status == '906 End Date Is Null'
-
-            when('Estimated time is null', json=given | dict(estimatedTime=None))
-            assert status == '904 Estimated Time Is Null'
-
-            when('Summary is null', json=given | dict(summary=None))
-            assert status == '903 Summary Is Null'
+            assert status == '914 Hours Must Be Greater Than 0'
 
             when('Request is not authorized', authorization=None)
             assert status == 401

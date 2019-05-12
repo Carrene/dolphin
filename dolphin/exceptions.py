@@ -156,12 +156,12 @@ class StatusInvalidEndDateFormat(HTTPKnownStatus):
     status = '790 Invalid End Date Format'
 
 
-class StatusLimitedCharecterForSummary(HTTPKnownStatus):
-    status = '902 At Most 1024 Characters Are Valid For Summary'
+class StatusLimitedCharecterForNote(HTTPKnownStatus):
+    status = '902 At Most 1024 Characters Are Valid For Note'
 
 
-class StatusInvalidEstimatedTimeType(HTTPKnownStatus):
-    status = '900 Invalid Estimated Time Type'
+class StatusInvalidHoursType(HTTPKnownStatus):
+    status = '900 Invalid Hours Type'
 
 
 class StatusSummaryNotInForm(HTTPKnownStatus):
@@ -180,8 +180,8 @@ class StatusEstimatedTimeNotInForm(HTTPKnownStatus):
     status = '901 Estimated Time Not In Form'
 
 
-class StatusSummaryIsNull(HTTPKnownStatus):
-    status = '903 Summary Is Null'
+class StatusNoteIsNull(HTTPKnownStatus):
+    status = '903 Note Is Null'
 
 
 class StatusEstimatedTimeIsNull(HTTPKnownStatus):
@@ -202,4 +202,8 @@ class StatusRepeatNotInForm(HTTPKnownStatus):
 
 class StatusQueryParameterNotInFormOrQueryString(HTTPKnownStatus):
     status = '912 Query Parameter Not In Form Or Query String'
+
+
+class StatusHoursMustBeGreaterThanZero(HTTPKnownStatus):
+    status = '914 Hours Must Be Greater Than 0'
 

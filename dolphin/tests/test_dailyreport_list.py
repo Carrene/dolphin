@@ -3,12 +3,12 @@ import datetime
 from bddrest import when, response, status
 from auditor.context import Context as AuditLogContext
 
-from dolphin.models import Member, Timecard, Workflow, Skill, Group, Phase, \
+from dolphin.models import Member, Dailyreport, Workflow, Skill, Group, Phase, \
     Release, Project, Issue, Item
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
-class TestTimecard(LocalApplicationTestCase):
+class TestDailyreport(LocalApplicationTestCase):
 
     @classmethod
     @AuditLogContext(dict())
@@ -74,40 +74,37 @@ class TestTimecard(LocalApplicationTestCase):
         )
         session.add(item)
 
-        timecard1 = Timecard(
-            start_date=datetime.datetime.now().isoformat(),
-            end_date=datetime.datetime.now().isoformat(),
-            estimated_time=1,
-            summary='Summary for timecard1',
+        dailyreport1 = Dailyreport(
+            date=datetime.datetime.now().date(),
+            hours=1,
+            note='note for dailyreport1',
             item=item,
         )
-        session.add(timecard1)
+        session.add(dailyreport1)
 
-        timecard2 = Timecard(
-            start_date=datetime.datetime.now().isoformat(),
-            end_date=datetime.datetime.now().isoformat(),
-            estimated_time=2,
-            summary='Summary for timecard2',
+        dailyreport2 = Dailyreport(
+            date=datetime.datetime.now().date(),
+            hours=2,
+            note='note for dailyreport2',
             item=item,
         )
-        session.add(timecard2)
+        session.add(dailyreport2)
 
-        timecard3 = Timecard(
-            start_date=datetime.datetime.now().isoformat(),
-            end_date=datetime.datetime.now().isoformat(),
-            estimated_time=3,
-            summary='Summary for timecard3',
+        dailyreport3 = Dailyreport(
+            date=datetime.datetime.now().date(),
+            hours=3,
+            note='note for dailyreport3',
             item=item,
         )
-        session.add(timecard3)
+        session.add(dailyreport3)
         session.commit()
 
     def test_list(self):
         self.login(self.member.email)
 
         with oauth_mockup_server(), self.given(
-            'List of timecards',
-            '/apiv1/timecards',
+            'List of dailyreports',
+            '/apiv1/dailyreports',
             'LIST',
         ):
             assert status == 200
