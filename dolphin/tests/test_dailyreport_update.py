@@ -128,7 +128,7 @@ class TestDailyreport(LocalApplicationTestCase):
                 'Hours value type is wrong',
                 json=given | dict(hours='a')
             )
-            assert status == '900 Invalid Hours Type'
+            assert status == '915 Invalid Hours Type'
 
             when(
                 'Hours value is less then 1',

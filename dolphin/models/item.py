@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from restfulpy.orm import Field, DeclarativeBase, relationship
+from restfulpy.orm.metadata import MetadataField
 from restfulpy.orm.mixins import TimestampMixin, OrderingMixin, \
     FilteringMixin, PaginationMixin
 from sqlalchemy import Integer, ForeignKey, UniqueConstraint, DateTime, Enum, \
@@ -46,7 +47,7 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         nullable=True,
         not_none=False,
         required=False,
-        readonly=True,
+        readonly=False,
     )
     end_date = Field(
         DateTime,
@@ -60,7 +61,7 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         nullable=True,
         not_none=False,
         required=False,
-        readonly=True,
+        readonly=False,
     )
     estimated_hours = Field(
         Integer,
@@ -128,10 +129,11 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         example='Lorem Ipsum'
     )
 
-    issues = relationship(
+    issue = relationship(
         'Issue',
         foreign_keys=issue_id,
-        back_populates='items'
+        back_populates='items',
+        protected=False,
     )
     dailyreports = relationship(
         'Dailyreport',
@@ -153,10 +155,24 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             'priority',
             'boarding',
         )
-        issue_dict = {i: getattr(self.issues, i) for i in issue_fields}
+        issue_dict = {i: getattr(self.issue, i) for i in issue_fields}
 
         item_dict = super().to_dict()
         item_dict['hoursWorked'] = self.hours_worked
         item_dict['issue'] = issue_dict
         return item_dict
+
+    @classmethod
+    def iter_metadata_fields(cls):
+        yield from super().iter_metadata_fields()
+        yield MetadataField(
+            name='issue',
+            key='issue',
+            label='Lorem Ipsun',
+            required=False,
+            readonly=True,
+            watermark='Lorem Ipsum',
+            example='Lorem Ipsum',
+            message='Lorem Ipsun',
+        )
 
