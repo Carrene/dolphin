@@ -77,7 +77,7 @@ class TestWorkflow(LocalApplicationTestCase):
                 'Title is null',
                 json=dict(title=None)
             )
-            assert status == '727 Title Is None'
+            assert status == '727 Title Is Null'
 
             when(
                 'Description length is more than limit',

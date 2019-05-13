@@ -451,7 +451,7 @@ draft_issue_finalize_validator = validate(
     ),
     relatedIssueId=dict(
         type_=(int, StatusInvalidIssueIdType),
-        not_none=StatusIssueIdIsNone,
+        not_none=StatusIssueIdIsNull,
         callback=relate_to_issue_exists_validator,
     ),
 )
@@ -493,7 +493,7 @@ update_item_validator = validate(
 
 assign_issue_validator = validate(
     memberId=dict(
-        not_none=StatusResourceIdIsNone,
+        not_none=StatusResourceIdIsNull,
         type_=(int, StatusInvalidResourceIdType),
         callback=member_exists_validator
     ),
@@ -516,13 +516,13 @@ assign_issue_validator = validate(
 
 unassign_issue_validator = validate(
     memberId=dict(
-        not_none=StatusResourceIdIsNone,
+        not_none=StatusResourceIdIsNull,
         required=StatusResourceIdNotInForm,
         type_=(int, StatusInvalidResourceIdType),
         callback=member_exists_validator
     ),
     phaseId=dict(
-        not_none=StatusPhaseIdIsNone,
+        not_none=StatusPhaseIdIsNull,
         required=StatusPhaseIdNotInForm,
         type_=(int, StatusInvalidPhaseIdType),
         callback=phase_exists_validator
@@ -605,7 +605,7 @@ group_create_validator = validate(
         )
     ),
     title=dict(
-        not_none=StatusTitleIsNone,
+        not_none=StatusTitleIsNull,
         required=StatusTitleNotInForm,
         max_length=(128, StatusMaxLenghtForTitle(128)),
         callback=group_exists_validator,
@@ -620,7 +620,7 @@ group_update_validator = validate(
         )
     ),
     title=dict(
-        not_none=StatusTitleIsNone,
+        not_none=StatusTitleIsNull,
         max_length=(50, StatusMaxLenghtForTitle(50)),
     )
 )
@@ -651,7 +651,7 @@ workflow_create_validator = validate(
         )
     ),
     title=dict(
-        not_none=StatusTitleIsNone,
+        not_none=StatusTitleIsNull,
         required=StatusTitleNotInForm,
         max_length=(50, StatusMaxLenghtForTitle(50)),
         pattern=(WORKFLOW_TITLE_PATTERN, StatusInvalidTitleFormat),
@@ -667,7 +667,7 @@ tag_create_validator = validate(
         )
     ),
     title=dict(
-        not_none=StatusTitleIsNone,
+        not_none=StatusTitleIsNull,
         required=StatusTitleNotInForm,
         max_length=(50, StatusMaxLenghtForTitle(50)),
         callback=tag_exists_validator,
@@ -682,7 +682,7 @@ tag_update_validator = validate(
         )
     ),
     title=dict(
-        not_none=StatusTitleIsNone,
+        not_none=StatusTitleIsNull,
         max_length=(50, StatusMaxLenghtForTitle(50)),
     )
 )
@@ -690,7 +690,7 @@ tag_update_validator = validate(
 
 issue_relate_validator = validate(
     targetIssueId=dict(
-        not_none=StatusTargetIssueIdIsNone,
+        not_none=StatusTargetIssueIdIsNull,
         required=StatusTargetIssueIdNotInForm,
         type_=(int, StatusInvalidTargetIssueIdType),
     )
@@ -699,7 +699,7 @@ issue_relate_validator = validate(
 
 issue_unrelate_validator = validate(
     targetIssueId=dict(
-        not_none=StatusTargetIssueIdIsNone,
+        not_none=StatusTargetIssueIdIsNull,
         required=StatusTargetIssueIdNotInForm,
         type_=(int, StatusInvalidTargetIssueIdType),
     )
@@ -708,7 +708,7 @@ issue_unrelate_validator = validate(
 
 draft_issue_relate_validator = validate(
     targetIssueId=dict(
-        not_none=StatusTargetIssueIdIsNone,
+        not_none=StatusTargetIssueIdIsNull,
         required=StatusTargetIssueIdNotInForm,
         type_=(int, StatusInvalidTargetIssueIdType),
     )
@@ -723,7 +723,7 @@ skill_create_validator = validate(
     ),
     title = dict(
         required=StatusTitleNotInForm,
-        not_none=StatusTitleIsNone,
+        not_none=StatusTitleIsNull,
         max_length=(50, StatusMaxLenghtForTitle(50)),
         callback=skill_exists_validator,
     ),
@@ -737,7 +737,7 @@ skill_update_validator = validate(
         ),
     ),
     title = dict(
-        not_none=StatusTitleIsNone,
+        not_none=StatusTitleIsNull,
         max_length=(50, StatusMaxLenghtForTitle(50)),
     ),
 )
@@ -750,7 +750,7 @@ workflow_update_validator = validate(
         ),
     ),
     title = dict(
-        not_none=StatusTitleIsNone,
+        not_none=StatusTitleIsNull,
         max_length=(50, StatusMaxLenghtForTitle(50)),
     ),
 )
@@ -764,7 +764,7 @@ phase_update_validator = validate(
         type_=(int, StatusInvalidOrderType),
     ),
     title=dict(
-        not_none=StatusTitleIsNone,
+        not_none=StatusTitleIsNull,
         max_length=(50, StatusMaxLenghtForTitle(50)),
     ),
     description=dict(
@@ -800,7 +800,7 @@ eventtype_create_validator = validate(
     ),
     title=dict(
         required=StatusTitleNotInForm,
-        not_none=StatusTitleIsNone,
+        not_none=StatusTitleIsNull,
         max_length=(50, StatusMaxLenghtForTitle(50)),
         callback=eventtype_exists_validator_by_title
     ),
@@ -827,7 +827,7 @@ event_add_validator = validate(
     ),
     title=dict(
         required=StatusTitleNotInForm,
-        not_none=StatusTitleIsNone,
+        not_none=StatusTitleIsNull,
         max_length=(50, StatusMaxLenghtForTitle(50)),
         callback=event_exists_validator,
     ),
@@ -842,7 +842,7 @@ eventtype_update_validator = validate(
     ),
 
     title=dict(
-        not_none=StatusTitleIsNone,
+        not_none=StatusTitleIsNull,
         max_length=(50, StatusMaxLenghtForTitle(50))
     ),
 )
@@ -863,7 +863,7 @@ event_update_validator = validate(
         pattern=(DATETIME_PATTERN, StatusInvalidEndDateFormat),
     ),
     title=dict(
-        not_none=StatusTitleIsNone,
+        not_none=StatusTitleIsNull,
         max_length=(50, StatusMaxLenghtForTitle(50)),
     ),
 )

@@ -96,7 +96,7 @@ class TestEvent(LocalApplicationTestCase):
                 'Trying to pass with none title',
                 json=given | dict(title=None)
             )
-            assert status == '727 Title Is None'
+            assert status == '727 Title Is Null'
 
             when(
                 'Start date format is wrong',

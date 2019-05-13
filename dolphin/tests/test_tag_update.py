@@ -113,7 +113,7 @@ class TestTag(LocalApplicationTestCase):
                 'Trying to pass with none title',
                 json=dict(title=None)
             )
-            assert status == '727 Title Is None'
+            assert status == '727 Title Is Null'
 
             when(
                 'Description length is less than limit',

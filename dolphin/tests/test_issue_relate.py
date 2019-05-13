@@ -127,7 +127,7 @@ class TestIssue(LocalApplicationTestCase):
                 'Trying to pass with none issue id',
                 json=dict(targetIssueId=None)
             )
-            assert status == '779 Target Issue Id Is None'
+            assert status == '779 Target Issue Id Is Null'
 
             when(
                 'Trying to pass with invalid issue id type',

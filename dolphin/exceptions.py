@@ -205,8 +205,8 @@ class StatusInvalidRoleValue(HTTPKnownStatus):
     status = '756 Invalid Role Value'
 
 
-class StatusTitleIsNone(HTTPKnownStatus):
-    status = '727 Title Is None'
+class StatusTitleIsNull(HTTPKnownStatus):
+    status = '727 Title Is Null'
 
 
 class StatusMaxLenghtForTitle(HTTPKnownStatus):
@@ -297,8 +297,8 @@ class StatusTargetIssueIdNotInForm(HTTPKnownStatus):
     status = '780 Target Issue Id Not In Form'
 
 
-class StatusTargetIssueIdIsNone(HTTPKnownStatus):
-    status = '779 Target Issue Id Is None'
+class StatusTargetIssueIdIsNull(HTTPKnownStatus):
+    status = '779 Target Issue Id Is Null'
 
 
 class StatusInvalidTitleFormat(HTTPKnownStatus):
@@ -385,8 +385,8 @@ class StatusFileNotInForm(HTTPKnownStatus):
     status = '758 File Not In Form'
 
 
-class StatusPhaseIdIsNone(HTTPKnownStatus):
-    status = '770 Phase Id Is None'
+class StatusPhaseIdIsNull(HTTPKnownStatus):
+    status = '770 Phase Id Is Null'
 
 
 class StatusInvalidResourceIdType(HTTPKnownStatus):
@@ -397,8 +397,8 @@ class StatusResourceIdNotInForm(HTTPKnownStatus):
     status = '715 Resource Id Not In Form'
 
 
-class StatusResourceIdIsNone(HTTPKnownStatus):
-    status = '769 Resource Id Is None'
+class StatusResourceIdIsNull(HTTPKnownStatus):
+    status = '769 Resource Id Is Null'
 
 
 class StatusStatusNotInForm(HTTPKnownStatus):
@@ -449,8 +449,8 @@ class StatusManagerIdIsNull(HTTPKnownStatus):
     status = '785 Manager Id Is Null'
 
 
-class StatusIssueIdIsNone(HTTPKnownStatus):
-    status = '775 Issue Id Is None'
+class StatusIssueIdIsNull(HTTPKnownStatus):
+    status = '775 Issue Id Is Null'
 
 
 class StatusInvalidIssueIdType(HTTPKnownStatus):
