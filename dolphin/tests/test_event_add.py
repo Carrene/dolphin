@@ -91,7 +91,7 @@ class TestEvent(LocalApplicationTestCase):
                 'Trying to pass without end date',
                 json=given - 'endDate',
             )
-            assert status == '793 End Date Not IN Form'
+            assert status == '793 End Date Not In Form'
 
             when(
                 'Start date format is wrong',

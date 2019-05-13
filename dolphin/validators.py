@@ -175,7 +175,7 @@ def workflow_exists_validator(workflowId, project, field):
 def item_status_value_validator(status, project, field):
     form = context.form
     if 'status' in form and form['status'] not in item_statuses:
-        raise StatusInvalidStatusValue(statuses_value=item_statuses)
+        raise StatusInvalidStatusValue(statuses_values=item_statuses)
 
     return form['status']
 
