@@ -15,8 +15,9 @@ from ..exceptions import StatusEndDateMustBeGreaterThanStartDate
 FORM_WHITLELIST = [
     'startDate',
     'endDate',
-    'estimatedHours'
+    'estimatedHours',
 ]
+
 
 FORM_WHITELIST_STRING = ', '.join(FORM_WHITLELIST)
 
