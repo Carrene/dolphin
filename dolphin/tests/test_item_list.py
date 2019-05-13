@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from bddrest import status, response, when, given
 from auditor.context import Context as AuditLogContext
 
@@ -124,7 +126,10 @@ class TestListGroup(LocalApplicationTestCase):
         cls.item2 = Item(
             issue_id=cls.issue2.id,
             phase_id=cls.phase3.id,
-            member_id=cls.member2.id,
+            member_id=cls.member1.id,
+            start_date=datetime.strptime('2020-2-2', '%Y-%m-%d'),
+            end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
+            estimated_hours=3,
         )
         session.add(cls.item2)
         session.flush()
@@ -133,6 +138,9 @@ class TestListGroup(LocalApplicationTestCase):
             issue_id=cls.issue3.id,
             phase_id=cls.phase2.id,
             member_id=cls.member1.id,
+            start_date=datetime.strptime('2018-2-2', '%Y-%m-%d'),
+            end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
+            estimated_hours=3,
         )
         session.add(cls.item3)
         session.commit()
@@ -166,6 +174,27 @@ class TestListGroup(LocalApplicationTestCase):
 
             when('Filter by id', query=dict(id=f'!{self.item1.id}'))
             assert len(response.json) == 2
+
+            when(
+                'Filter by `needEstimate` zone',
+                query=dict(zone='needEstimate')
+            )
+            assert len(response.json) == 1
+            assert response.json[0]['id'] == self.item1.id
+
+            when(
+                'Filter by `upcomingNuggets` zone',
+                query=dict(zone='upcomingNuggets')
+            )
+            assert len(response.json) == 1
+            assert response.json[0]['id'] == self.item2.id
+
+            when(
+                'Filter by `inProcessNuggets` zone',
+                query=dict(zone='inProcessNuggets')
+            )
+            assert len(response.json) == 1
+            assert response.json[0]['id'] == self.item3.id
 
             when(
                 'Paginate item',
