@@ -20,6 +20,6 @@ from .attachment import Attachment
 from .skill import Skill, SkillMember
 from .activity import Activity
 from .eventtype import EventType
-from .timecard import Timecard
+from .dailyreport import Dailyreport
 from .event import Event, event_repeats
 

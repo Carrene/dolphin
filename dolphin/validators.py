@@ -6,11 +6,11 @@ from restfulpy.orm import DBSession
 from .exceptions import StatusResourceNotFound, StatusRepetitiveTitle, \
     StatusRelatedIssueNotFound, StatusEventTypeNotFound, \
     StatusInvalidStartDateFormat, StatusInvalidEndDateFormat, \
-    StatusLimitedCharecterForSummary, StatusInvalidEstimatedTimeType, \
+    StatusLimitedCharecterForNote, StatusHoursMustBeGreaterThanZero, \
     StatusSummaryNotInForm, StatusEstimatedTimeNotInForm, \
-    StatusEndDateNotInForm, StatusStartDateNotInForm, StatusSummaryIsNull, \
+    StatusEndDateNotInForm, StatusStartDateNotInForm, StatusNoteIsNull, \
     StatusEstimatedTimeIsNull, StatusStartDateIsNull, StatusEndDateIsNull, \
-    StatusRepeatNotInForm
+    StatusRepeatNotInForm, StatusInvalidHoursType
 from .models import *
 from .models.organization import roles
 
@@ -913,26 +913,13 @@ event_update_validator = validate(
 )
 
 
-timecard_create_validator = validate(
-    summary=dict(
-        required=StatusSummaryNotInForm,
-        max_length=(1024, StatusLimitedCharecterForSummary),
-        not_none=StatusSummaryIsNull,
+dailyreport_create_validator = validate(
+    note=dict(
+        max_length=(1024, StatusLimitedCharecterForNote),
     ),
-    startDate=dict(
-        required=StatusStartDateNotInForm,
-        pattern=(DATETIME_PATTERN, StatusInvalidStartDateFormat),
-        not_none=StatusStartDateIsNull,
-    ),
-    endDate=dict(
-        required=StatusEndDateNotInForm,
-        pattern=(DATETIME_PATTERN, StatusInvalidEndDateFormat),
-        not_none=StatusEndDateIsNull,
-    ),
-    estimatedTime=dict(
-        required=StatusEstimatedTimeNotInForm,
-        type_=(int, StatusInvalidEstimatedTimeType),
-        not_none=StatusEstimatedTimeIsNull,
+    hours=dict(
+        type_=(int, StatusInvalidHoursType),
+        minimum=(1, StatusHoursMustBeGreaterThanZero)
     ),
     itemId=dict(
         required='732 Item Id Not In Form',
@@ -942,22 +929,13 @@ timecard_create_validator = validate(
 )
 
 
-timecard_update_validator = validate(
-    summary=dict(
-        max_length=(1024, StatusLimitedCharecterForSummary),
-        not_none=StatusSummaryIsNull,
+dailyreport_update_validator = validate(
+    note=dict(
+        max_length=(1024, StatusLimitedCharecterForNote),
     ),
-    startDate=dict(
-        pattern=(DATETIME_PATTERN, StatusInvalidStartDateFormat),
-        not_none=StatusStartDateIsNull,
-    ),
-    endDate=dict(
-        pattern=(DATETIME_PATTERN, StatusInvalidEndDateFormat),
-        not_none=StatusEndDateIsNull,
-    ),
-    estimatedTime=dict(
-        type_=(int, StatusInvalidEstimatedTimeType),
-        not_none=StatusEstimatedTimeIsNull,
+    hours=dict(
+        type_=(int, StatusInvalidHoursType),
+        minimum=(1, StatusHoursMustBeGreaterThanZero)
     ),
 )
 

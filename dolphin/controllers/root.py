@@ -25,7 +25,7 @@ from .group import GroupController
 from .activity import ActivityController
 from .eventtype import EventTypeController
 from .event import EventController
-from .timecard import TimecardController
+from .dailyreport import DailyreportController
 
 
 here = abspath(dirname(__file__))
@@ -54,7 +54,7 @@ class Apiv1(RestController, JsonPatchControllerMixin):
     activities = ActivityController()
     eventtypes = EventTypeController()
     events = EventController()
-    timecards = TimecardController()
+    dailyreports = DailyreportController()
 
     @json
     def version(self):

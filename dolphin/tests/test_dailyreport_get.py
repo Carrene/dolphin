@@ -1,14 +1,14 @@
-import datetime
+from datetime import datetime
 
-from bddrest import status, response, when
+from bddrest import status, response, when, given
 from auditor.context import Context as AuditLogContext
 
-from dolphin.models import Member, Timecard, Workflow, Skill, Group, Release, \
+from dolphin.models import Member, Dailyreport, Workflow, Skill, Group, Release, \
     Project, Issue, Item, Phase
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
-class TestTimecard(LocalApplicationTestCase):
+class TestDailyreport(LocalApplicationTestCase):
 
     @classmethod
     @AuditLogContext(dict())
@@ -75,36 +75,46 @@ class TestTimecard(LocalApplicationTestCase):
         )
         session.add(cls.item)
 
-        cls.timecard = Timecard(
-            start_date=datetime.datetime.now().isoformat(),
-            end_date=datetime.datetime.now().isoformat(),
-            estimated_time=2,
-            summary='Summary for timecard',
+        cls.dailyreport = Dailyreport(
+            date=datetime.strptime('2019-1-2', '%Y-%m-%d').date(),
+            hours=3,
+            note='The note for a daily report',
             item=cls.item,
         )
-        session.add(cls.timecard)
+        session.add(cls.dailyreport)
         session.commit()
 
     def test_get(self):
         self.login(self.member.email)
+        session = self.create_session()
 
         with oauth_mockup_server(), self.given(
-            f'Get a timecard',
-            f'/apiv1/timecards/id: {self.timecard.id}',
+            f'Get a dailyreport',
+            f'/apiv1/items/item_id: {self.item.id}/'
+            f'dailyreports/id: {self.dailyreport.id}',
             f'GET',
         ):
             assert status == 200
-            assert response.json['id'] == self.timecard.id
+            assert response.json['id'] == self.dailyreport.id
+            assert session.query(Dailyreport) \
+                .filter(Dailyreport.date == datetime.now().date()) \
+                .one()
+
+            when(
+                'The item in not found',
+                url_parameters=given | dict(item_id=0)
+            )
+            assert status == 404
 
             when(
                 'Intended group with string type not found',
-                url_parameters=dict(id='Alphabetical')
+                url_parameters=given | dict(id='Alphabetical')
             )
             assert status == 404
 
             when(
                 'Intended group not found',
-                url_parameters=dict(id=0)
+                url_parameters=given | dict(id=0)
             )
             assert status == 404
 
