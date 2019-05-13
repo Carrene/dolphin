@@ -909,3 +909,19 @@ search_issue_validator = validate(
     )
 )
 
+
+estimate_item_validator = validate(
+    startDate=dict(
+        pattern=(DATETIME_PATTERN, StatusInvalidStartDateFormat),
+        not_none=StatusStartDateIsNull,
+    ),
+    endDate=dict(
+        pattern=(DATETIME_PATTERN, StatusInvalidEndDateFormat),
+        not_none=StatusEndDateIsNull,
+    ),
+    estimatedHours=dict(
+        type_=(int, StatusInvalidEstimatedHours),
+        not_none=StatusEstimatedHoursIsNull,
+    )
+)
+
