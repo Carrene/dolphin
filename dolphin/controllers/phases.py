@@ -47,49 +47,6 @@ class PhaseController(ModelRestController):
         return phase
 
     @authorize
-    @json(form_whitelist=(
-        FORM_WHITELIST,
-        f'707 Invalid field, only following fields are accepted: '
-        f'{FORM_WHITELISTS_STRING}'
-    ))
-    @phase_update_validator
-    @commit
-    def update(self, id):
-        id = int_or_notfound(id)
-        form = context.form
-        phase = DBSession.query(Phase).get(id)
-        if phase is None:
-            raise HTTPNotFound()
-
-        is_repetitive_title = DBSession.query(Phase) \
-            .filter(
-                Phase.title == context.form.get('title'),
-                Phase.workflow_id == self.workflow.id
-            ) \
-            .one_or_none()
-        if phase.title != context.form.get('title') \
-                and is_repetitive_title is not None:
-            raise StatusRepetitiveTitle()
-
-        is_repetitive_order = DBSession.query(Phase) \
-            .filter(
-                Phase.order == context.form.get('order'),
-                Phase.workflow_id == self.workflow.id
-            ) \
-            .one_or_none()
-        if phase.order != context.form.get('order') \
-                and is_repetitive_order is not None:
-            raise StatusRepetitiveOrder()
-
-        if 'skillId' in form and not DBSession.query(Skill) \
-                .filter(Skill.id == form.get('skillId')) \
-                .one_or_none():
-            raise StatusSkillNotFound()
-
-        phase.update_from_request()
-        return phase
-
-    @authorize
     @json(prevent_form='709 Form Not Allowed')
     def get(self, id):
         id = int_or_notfound(id)
