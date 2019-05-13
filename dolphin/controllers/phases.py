@@ -99,3 +99,9 @@ class PhaseController(ModelRestController):
 
         return phase
 
+    @authorize
+    @json(prevent_form='709 Form Not Allowed')
+    @Phase.expose
+    def list(self):
+        return DBSession.query(Phase)
+
