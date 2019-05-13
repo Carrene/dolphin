@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 from bddrest import when, response, status
 from auditor.context import Context as AuditLogContext
@@ -75,7 +75,7 @@ class TestDailyreport(LocalApplicationTestCase):
         session.add(cls.item)
 
         dailyreport1 = Dailyreport(
-            date=datetime.datetime.now().date(),
+            date=datetime.strptime('2019-1-2', '%Y-%m-%d').date(),
             hours=1,
             note='note for dailyreport1',
             item=cls.item,
@@ -83,7 +83,7 @@ class TestDailyreport(LocalApplicationTestCase):
         session.add(dailyreport1)
 
         dailyreport2 = Dailyreport(
-            date=datetime.datetime.now().date(),
+            date=datetime.strptime('2019-1-3', '%Y-%m-%d').date(),
             hours=2,
             note='note for dailyreport2',
             item=cls.item,
@@ -91,7 +91,7 @@ class TestDailyreport(LocalApplicationTestCase):
         session.add(dailyreport2)
 
         dailyreport3 = Dailyreport(
-            date=datetime.datetime.now().date(),
+            date=datetime.strptime('2019-1-4', '%Y-%m-%d').date(),
             hours=3,
             note='note for dailyreport3',
             item=cls.item,
@@ -101,6 +101,7 @@ class TestDailyreport(LocalApplicationTestCase):
 
     def test_list(self):
         self.login(self.member.email)
+        session = self.create_session()
 
         with oauth_mockup_server(), self.given(
             'List of dailyreports',
@@ -108,16 +109,19 @@ class TestDailyreport(LocalApplicationTestCase):
             'LIST',
         ):
             assert status == 200
-            assert len(response.json) == 3
+            assert len(response.json) == 4
+            assert session.query(Dailyreport) \
+                .filter(Dailyreport.date == datetime.now().date()) \
+                .one()
 
             when('The request with form parameter', form=dict(param='param'))
             assert status == '709 Form Not Allowed'
 
             when('Trying to sorting response', query=dict(sort='id'))
-            assert response.json[0]['id'] < response.json[1]['id'] == 2
+            assert response.json[0]['id'] < response.json[1]['id']
 
             when('Sorting the response descending', query=dict(sort='-id'))
-            assert response.json[0]['id'] > response.json[1]['id'] == 2
+            assert response.json[0]['id'] > response.json[1]['id']
 
             when('Trying pagination response', query=dict(take=1))
             assert response.json[0]['id'] == 1
