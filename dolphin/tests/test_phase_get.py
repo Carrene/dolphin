@@ -36,8 +36,7 @@ class TestPhase(LocalApplicationTestCase):
         self.login(self.member.email)
         with oauth_mockup_server(), self.given(
             f'Getting a phase',
-            f'/apiv1/workflows/workflow_id: {self.workflow.id}' \
-               f'/phases/phase_id: {self.phase.id}',
+            f'/apiv1/phases/phase_id: {self.phase.id}',
             f'GET',
         ):
             assert status == 200

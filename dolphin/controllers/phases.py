@@ -37,10 +37,6 @@ class PhaseController(ModelRestController):
 
         return super().__call__(*remaining_paths)
 
-    def __init__(self, workflow=None, issue=None):
-        self.workflow = workflow
-        self.issue = issue
-
     def _get_phase(self, id):
         id = int_or_notfound(id)
 
@@ -48,29 +44,6 @@ class PhaseController(ModelRestController):
         if phase is None:
             raise HTTPNotFound()
 
-        return phase
-
-    @authorize
-    @json(prevent_form='709 Form Not Allowed')
-    @Phase.expose
-    def list(self):
-        query = DBSession.query(Phase) \
-            .filter(Phase.workflow_id == self.workflow.id)
-        return query
-
-    @authorize
-    @json
-    @Phase.expose
-    @commit
-    def set(self, id):
-        id = int_or_notfound(id)
-
-        phase = DBSession.query(Phase).get(id)
-        if phase is None:
-            raise HTTPNotFound()
-
-        phase.issues.append(self.issue)
-        DBSession.add(phase)
         return phase
 
     @authorize
@@ -125,39 +98,4 @@ class PhaseController(ModelRestController):
             raise HTTPNotFound()
 
         return phase
-
-    @authorize
-    @phase_validator
-    @json
-    @commit
-    def create(self):
-        form = context.form
-        self._check_title_repetition(
-            workflow=self.workflow,
-            title=form['title']
-        )
-        self._check_order_repetition(
-            workflow=self.workflow,
-            order=form['order'],
-        )
-        phase = Phase()
-        phase.update_from_request()
-        phase.workflow = self.workflow
-        phase.skill_id = form['skillId']
-        DBSession.add(phase)
-        return phase
-
-    def _check_title_repetition(self, workflow, title):
-        phase = DBSession.query(Phase) \
-            .filter(Phase.title == title, Phase.workflow_id == workflow.id) \
-            .one_or_none()
-        if phase is not None:
-            raise HTTPStatus('600 Repetitive Title')
-
-    def _check_order_repetition(self, workflow, order):
-        phase = DBSession.query(Phase) \
-            .filter(Phase.order == order, Phase.workflow_id == workflow.id) \
-            .one_or_none()
-        if phase is not None:
-            raise HTTPStatus('615 Repetitive Order')
 
