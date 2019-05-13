@@ -9,14 +9,14 @@ class TestListPhase(LocalApplicationTestCase):
     @classmethod
     def mockup(cls):
         session = cls.create_session()
-        member = Member(
+        cls.member = Member(
             title='First Member',
             email='member1@example.com',
             access_token='access token 1',
             phone=123456789,
             reference_id=2
         )
-        session.add(member)
+        session.add(cls.member)
 
         skill = Skill(title='First Skill')
         cls.triage = Phase(title='triage', order=0, skill=skill)
@@ -72,7 +72,7 @@ class TestListPhase(LocalApplicationTestCase):
             assert status == 401
 
     def test_list_phases_without_workflow(self):
-        self.login('member1@example.com')
+        self.login(self.member.email)
 
         with oauth_mockup_server(), self.given(
             'List all phases',
