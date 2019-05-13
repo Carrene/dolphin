@@ -159,8 +159,8 @@ class StatusLimitedCharecterForNote(HTTPKnownStatus):
     status = '902 At Most 1024 Characters Are Valid For Note'
 
 
-class StatusInvalidHoursType(HTTPKnownStatus):
-    status = '900 Invalid Hours Type'
+class StatusInvalidEstimatedHoursType(HTTPKnownStatus):
+    status = '900 Invalid Estimated Hours Type'
 
 
 class StatusSummaryNotInForm(HTTPKnownStatus):
@@ -241,16 +241,16 @@ class StatusEndDateNotInForm(HTTPKnownStatus):
     status = '793 End Date Not In Form'
 
 
-class StatusEstimatedTimeNotInForm(HTTPKnownStatus):
-    status = '901 Estimated Time Not In Form'
+class StatusEstimatedHoursNotInForm(HTTPKnownStatus):
+    status = '901 Estimated Hours Not In Form'
 
 
 class StatusNoteIsNull(HTTPKnownStatus):
     status = '903 Note Is Null'
 
 
-class StatusEstimatedTimeIsNull(HTTPKnownStatus):
-    status = '904 Estimated Time Is Null'
+class StatusEstimatedHoursIsNull(HTTPKnownStatus):
+    status = '904 Estimated Hours Is Null'
 
 
 class StatusStartDateIsNull(HTTPKnownStatus):
@@ -483,4 +483,8 @@ class StatusInvalidKind(HTTPKnownStatus):
     def __init__(self, issue_kinds):
         self.status = f'717 Invalid kind, only one of ' \
             f'"{", ".join(issue_kinds)}" will be accepted'
+
+
+class StatusInvalidHoursType(HTTPKnownStatus):
+    status = '915 Invalid Hours Type'
 

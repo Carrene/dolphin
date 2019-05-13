@@ -9,6 +9,7 @@ from sqlalchemy import select, func
 from ..models import Item, Dailyreport, Event
 from ..validators import update_item_validator, dailyreport_update_validator, \
     estimate_item_validator
+from ..exceptions import StatusEndDateMustBeGreaterThanStartDate
 
 
 FORM_WHITLELIST = [
@@ -17,8 +18,7 @@ FORM_WHITLELIST = [
     'estimatedHours'
 ]
 
-
-FORM_WHITLELIST_STRING = ', '.join(FORM_WHITLELIST)
+FORM_WHITELIST_STRING = ', '.join(FORM_WHITLELIST)
 
 
 class ItemController(ModelRestController):
@@ -76,11 +76,11 @@ class ItemController(ModelRestController):
 
     @authorize
     @json(
-        prevent_form='709 Form Not Allowed',
+        prevent_empty_form='708 Empty Form',
         form_whitelist=(
             FORM_WHITLELIST,
             f'707 Invalid field, only following fields are accepted: '
-            f'{FORM_WHITELISTS_STRING}'
+            f'{FORM_WHITELIST_STRING}'
         )
     )
     @estimate_item_validator
@@ -93,6 +93,9 @@ class ItemController(ModelRestController):
             raise HTTPNotFound()
 
         item.update_from_request()
+        if item.start_date > item.end_date:
+            raise StatusEndDateMustBeGreaterThanStartDate()
+
         return item
 
 

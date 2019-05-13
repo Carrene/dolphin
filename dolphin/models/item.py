@@ -46,7 +46,7 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         nullable=True,
         not_none=False,
         required=False,
-        readonly=True,
+        readonly=False,
     )
     end_date = Field(
         DateTime,
@@ -60,7 +60,7 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         nullable=True,
         not_none=False,
         required=False,
-        readonly=True,
+        readonly=False,
     )
     estimated_hours = Field(
         Integer,
