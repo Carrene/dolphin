@@ -128,7 +128,7 @@ class TestIssue(LocalApplicationTestCase):
                 'Intended phase with integer type not found',
                 form=Update(phaseId=0)
             )
-            assert status == '613 Phase not found with id: 0'
+            assert status == '613 Phase Not Found'
 
             when('Phase id is not in form', form=Remove('phaseId'))
             assert status == '737 Phase Id Not In Form'

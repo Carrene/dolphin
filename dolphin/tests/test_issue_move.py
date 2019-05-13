@@ -117,7 +117,7 @@ class TestIssue(LocalApplicationTestCase):
                 'Intended project with integer type not found',
                 form=dict(projectId=0),
             )
-            assert status == '601 Project not found with id: 0'
+            assert status == '601 Project Not Found'
 
             when(
                 'Trying to pass with hidden project',

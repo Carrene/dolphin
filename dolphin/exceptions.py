@@ -83,7 +83,6 @@ class StatusRelatedIssueNotFound(HTTPKnownStatus):
 
 
 class StatusResourceNotFound(HTTPKnownStatus):
-
     def __init__(self, resource_id):
         self.status = f'609 Resource not found with id: {resource_id}'
 
@@ -168,6 +167,72 @@ class StatusSummaryNotInForm(HTTPKnownStatus):
     status = '799 Summary Not In Form'
 
 
+class StatusReleaseNotFound(HTTPKnownStatus):
+    status = '607 Release Not Found'
+
+
+class StatusInvalidReleaseIdType(HTTPKnownStatus):
+    status = '750 Invalid Release Id Type'
+
+
+class StatusInvalidStatusValue(HTTPKnownStatus):
+    def __init__(self, statuses_values):
+        self.status = f'705 Invalid status value, only one of ' \
+            f'"{", ".join(statuses_values)}" will be accepted'
+
+
+class StatusProjectNotFound(HTTPKnownStatus):
+    status = '601 Project Not Found'
+
+
+class StatusHiddenProjectIsNotEditable(HTTPKnownStatus):
+    status = '746 Hidden Project Is Not Editable'
+
+
+class StatusPhaseNotFound(HTTPKnownStatus):
+    status = '613 Phase Not Found'
+
+
+class StatusInvalidWorkflowIdType(HTTPKnownStatus):
+    status = '743 Invalid Workflow Id Type'
+
+
+class StatusWorkflowNotFound(HTTPKnownStatus):
+    status = '616 Workflow Not Found'
+
+
+class StatusInvalidRoleValue(HTTPKnownStatus):
+    status = '756 Invalid Role Value'
+
+
+class StatusTitleIsNull(HTTPKnownStatus):
+    status = '727 Title Is Null'
+
+
+class StatusMaxLenghtForTitle(HTTPKnownStatus):
+
+    def __init__(self, lenght):
+        self.status = f'704 At Most {lenght} Characters Are Valid For Title'
+
+
+class StatusEventTypeIdIsNull(HTTPKnownStatus):
+    status = '798 Event Type Id Is Null'
+
+
+class StatusMaxLenghtForDescription(HTTPKnownStatus):
+    def __init__(self, lenght):
+        self.status = f'703 At Most {lenght} Characters Are Valid For '\
+            'Description'
+
+
+class StatusTitleNotInForm(HTTPKnownStatus):
+    status = '710 Title Not In Form'
+
+
+class StatusEndDateNotInForm(HTTPKnownStatus):
+    status = '793 End Date Not IN Form'
+
+
 class StatusStartDateNotInForm(HTTPKnownStatus):
     status = '792 Start Date Not In Form'
 
@@ -206,4 +271,216 @@ class StatusQueryParameterNotInFormOrQueryString(HTTPKnownStatus):
 
 class StatusHoursMustBeGreaterThanZero(HTTPKnownStatus):
     status = '914 Hours Must Be Greater Than 0'
+
+
+class StatusTypeIdNotInForm(HTTPKnownStatus):
+    status = '794 Type Id Not In Form'
+
+
+class StatusInvalidOrderType(HTTPKnownStatus):
+    status = '741 Invalid Order Type'
+
+
+class StatusInvalidSkillIdType(HTTPKnownStatus):
+    status = '788 Invalid Skill Id Type'
+
+
+class StatusOrderNotInForm(HTTPKnownStatus):
+    status = '742 Order Not In Form'
+
+
+class StatusInvalidTargetIssueIdType(HTTPKnownStatus):
+    status = '781 Invalid Target Issue Id Type'
+
+
+class StatusTargetIssueIdNotInForm(HTTPKnownStatus):
+    status = '780 Target Issue Id Not In Form'
+
+
+class StatusTargetIssueIdIsNull(HTTPKnownStatus):
+    status = '779 Target Issue Id Is Null'
+
+
+class StatusInvalidTitleFormat(HTTPKnownStatus):
+    status = '747 Invalid Title Format'
+
+
+class StatusInvalidMemberIdType(HTTPKnownStatus):
+    status = '736 Invalid Member Id Type'
+
+
+class StatusMemberIdNotInForm(HTTPKnownStatus):
+    status = '735 Member Id Not In Form'
+
+
+class StatusMemberIdIsNull(HTTPKnownStatus):
+    status = '774 Member Id Is Null'
+
+
+class StatusInvalidProjectIdType(HTTPKnownStatus):
+    status = '714 Invalid Project Id Type'
+
+
+class StatusProjectIdNotInForm(HTTPKnownStatus):
+    status = '713 Project Id Not In Form'
+
+
+class StatusAuthorizationCodeNotInForm(HTTPKnownStatus):
+    status = '762 Authorization Code Not In Form'
+
+
+class StatusInvalidOrganizationIdType(HTTPKnownStatus):
+    status = '763 Invalid Organization Id Type'
+
+
+class StatusOrganizationIdNotINForm(HTTPKnownStatus):
+    status = '761 Organization Id Not In Form'
+
+
+class StatusTokenNotInForm(HTTPKnownStatus):
+    status = '757 Token Not In Form'
+
+
+class StatusRedirectUriNotInForm(HTTPKnownStatus):
+    status = '766 Redirect Uri Not In From'
+
+
+class StatusApplicationIdNotInForm(HTTPKnownStatus):
+    status = '764 Application Id Not In Form'
+
+
+class StatusScopesNotInForm(HTTPKnownStatus):
+    status = '765 Scopes Not In Form'
+
+
+class StatusRoleNotInForm(HTTPKnownStatus):
+    status = '755 Role Not In Form'
+
+
+class StatusInvalidEmailFormat(HTTPKnownStatus):
+    status = '754 Invalid Email Format'
+
+
+class StatusEmailNotInForm(HTTPKnownStatus):
+    status = '753 Email Not In Form'
+
+
+class StatusInvalidPhaseIdType(HTTPKnownStatus):
+    status = '738 Invalid Phase Id Type'
+
+
+class StatusPhaseIdNotInForm(HTTPKnownStatus):
+    status = '737 Phase Id Not In Form'
+
+
+class StatusInvalidCutoffFormat(HTTPKnownStatus):
+    status = '702 Invalid Cutoff Format'
+
+
+class StatusCutoffNotInForm(HTTPKnownStatus):
+    status = '712 Cutoff Not In Form'
+
+
+class StatusFileNotInForm(HTTPKnownStatus):
+    status = '758 File Not In Form'
+
+
+class StatusPhaseIdIsNull(HTTPKnownStatus):
+    status = '770 Phase Id Is Null'
+
+
+class StatusInvalidResourceIdType(HTTPKnownStatus):
+    status = '716 Invalid Resource Id Type'
+
+
+class StatusResourceIdNotInForm(HTTPKnownStatus):
+    status = '715 Resource Id Not In Form'
+
+
+class StatusResourceIdIsNull(HTTPKnownStatus):
+    status = '769 Resource Id Is Null'
+
+
+class StatusStatusNotInForm(HTTPKnownStatus):
+    status = '719 Status Not In Form'
+
+
+class StatusInvalidDaysType(HTTPKnownStatus):
+    status = '721 Invalid Days Type'
+
+
+class StatusInvalidDueDateFormat(HTTPKnownStatus):
+    status ='701 Invalid Due Date Format'
+
+
+class StatusManagerReferenceIdNotInForm(HTTPKnownStatus):
+    status = '777 Manager Reference Id Not In Form'
+
+
+class StatusManagerReferenceIdIsNull(HTTPKnownStatus):
+    status = '778 Manager Reference Id Is Null'
+
+
+class StatusInvalidLaunchDateFormat(HTTPKnownStatus):
+    status = '784 Invalid Launch Date Format'
+
+
+class StatusLaunchDateNotInForm(HTTPKnownStatus):
+    status = '783 Launch Date Not In Form'
+
+
+class StatusInvalidGroupIdType(HTTPKnownStatus):
+    status = '797 Invalid Group Id Type'
+
+
+class StatusGroupIdNotInForm(HTTPKnownStatus):
+    status = '795 Group Id Not In Form'
+
+
+class StatusGroupIdIsNull(HTTPKnownStatus):
+    status = '796 Group Id Is Null'
+
+
+class StatusManagerIdNotInForm(HTTPKnownStatus):
+    status = '786 Manager Id Not In Form'
+
+
+class StatusManagerIdIsNull(HTTPKnownStatus):
+    status = '785 Manager Id Is Null'
+
+
+class StatusIssueIdIsNull(HTTPKnownStatus):
+    status = '775 Issue Id Is Null'
+
+
+class StatusInvalidIssueIdType(HTTPKnownStatus):
+    status = '722 Invalid Issue Id Type'
+
+
+class StatusDaysNotInForm(HTTPKnownStatus):
+    status = '720 Days Not In Form'
+
+
+class StatusKindNotInForm(HTTPKnownStatus):
+    status = '718 Kind Not In Form'
+
+
+class StatusDueDateNotInForm(HTTPKnownStatus):
+    status = '711 Due Date Not In Form'
+
+
+class StatusPriorityNotInForm(HTTPKnownStatus):
+    status = '768 Priority Not In Form'
+
+
+class StatusInvalidPriority(HTTPKnownStatus):
+    def __init__(self, issue_priorities):
+        self.status = f'767 Invalid priority, only one of ' \
+            f'"{", ".join(issue_priorities)}" will be accepted'
+
+
+class StatusInvalidKind(HTTPKnownStatus):
+    def __init__(self, issue_kinds):
+        self.status = f'717 Invalid kind, only one of ' \
+            f'"{", ".join(issue_kinds)}" will be accepted'
 

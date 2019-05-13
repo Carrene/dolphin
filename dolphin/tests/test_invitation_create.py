@@ -148,13 +148,13 @@ class TestOrganization(LocalApplicationTestCase):
                 'Trying to pass without application id parameter in form',
                 form=Remove('applicationId')
             )
-            assert status == '764 Application Id Not In form'
+            assert status == '764 Application Id Not In Form'
 
             when(
                 'Trying to pass without redirect uri parameter in form',
                 form=Remove('redirectUri')
             )
-            assert status == '766 Redirect Uri Not In form'
+            assert status == '766 Redirect Uri Not In From'
 
             when(
                 'The user already in this organization',
