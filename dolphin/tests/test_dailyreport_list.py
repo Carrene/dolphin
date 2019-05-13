@@ -67,18 +67,18 @@ class TestDailyreport(LocalApplicationTestCase):
         session.add(issue)
         session.flush()
 
-        item = Item(
+        cls.item = Item(
             issue_id=issue.id,
             phase_id=phase.id,
             member_id=cls.member.id,
         )
-        session.add(item)
+        session.add(cls.item)
 
         dailyreport1 = Dailyreport(
             date=datetime.datetime.now().date(),
             hours=1,
             note='note for dailyreport1',
-            item=item,
+            item=cls.item,
         )
         session.add(dailyreport1)
 
@@ -86,7 +86,7 @@ class TestDailyreport(LocalApplicationTestCase):
             date=datetime.datetime.now().date(),
             hours=2,
             note='note for dailyreport2',
-            item=item,
+            item=cls.item,
         )
         session.add(dailyreport2)
 
@@ -94,7 +94,7 @@ class TestDailyreport(LocalApplicationTestCase):
             date=datetime.datetime.now().date(),
             hours=3,
             note='note for dailyreport3',
-            item=item,
+            item=cls.item,
         )
         session.add(dailyreport3)
         session.commit()
@@ -104,7 +104,7 @@ class TestDailyreport(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             'List of dailyreports',
-            '/apiv1/dailyreports',
+            f'/apiv1/items/item_id: {self.item.id}/dailyreports',
             'LIST',
         ):
             assert status == 200

@@ -68,18 +68,18 @@ class TestDailyreport(LocalApplicationTestCase):
         session.add(issue)
         session.flush()
 
-        item = Item(
+        cls.item = Item(
             issue_id=issue.id,
             phase_id=phase.id,
             member_id=cls.member.id,
         )
-        session.add(item)
+        session.add(cls.item)
 
         cls.dailyreport = Dailyreport(
             date=datetime.datetime.now().date(),
             hours=3,
             note='The note for a daily report',
-            item=item,
+            item=cls.item,
         )
         session.add(cls.dailyreport)
         session.commit()
@@ -93,7 +93,7 @@ class TestDailyreport(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             f'Updating a dailyreport',
-            f'/apiv1/dailyreports/id: {self.dailyreport.id}',
+            f'/apiv1/items/item_id: {self.item.id}/dailyreports/id: {self.dailyreport.id}',
             f'UPDATE',
             json=form,
         ):
@@ -107,7 +107,7 @@ class TestDailyreport(LocalApplicationTestCase):
 
             when(
                 'Intended timecard with string type not found',
-                url_parameters=dict(id='Alphabetical')
+                url_parameters=given | dict(id='Alphabetical')
             )
             assert status == 404
 
