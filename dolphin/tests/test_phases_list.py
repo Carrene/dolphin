@@ -71,3 +71,38 @@ class TestListPhase(LocalApplicationTestCase):
             when('Try to pass an Unauthorized request', authorization=None)
             assert status == 401
 
+    def test_list_phases_without_workflow(self):
+        self.login('member1@example.com')
+
+        with oauth_mockup_server(), self.given(
+            'List all phases',
+            '/apiv1/phases',
+            'LIST',
+        ):
+            assert status == 200
+            assert len(response.json) == 2
+
+            when(
+                'Try to send a form in the request',
+                form=dict(parameter='form parameter')
+            )
+            assert status == '709 Form Not Allowed'
+
+            when('Try to sort the response', query=dict(sort='id'))
+            assert len(response.json) == 2
+            assert response.json[0]['id'] == 1
+
+            when('Sorting the response descending', query=dict(sort='-id'))
+            assert response.json[0]['id'] == 2
+
+            when('Testing pagination', query=dict(take=1, skip=1))
+            assert len(response.json) == 1
+            assert response.json[0]['order'] == -1
+
+            when('Filtering the response', query=dict(id=self.triage.id))
+            assert len(response.json) == 1
+            assert response.json[0]['title'] == self.triage.title
+
+            when('Try to pass an Unauthorized request', authorization=None)
+            assert status == 401
+
