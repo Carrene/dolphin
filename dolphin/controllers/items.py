@@ -84,6 +84,7 @@ class ItemDailyreportController(ModelRestController):
 
     @authorize
     @json(prevent_form='709 Form Not Allowed')
+    @commit
     def get(self, id):
         id = int_or_notfound(id)
         self._create_dailyreport_if_needed()
@@ -115,6 +116,8 @@ class ItemDailyreportController(ModelRestController):
     @authorize
     @json(prevent_form='709 Form Not Allowed')
     @Dailyreport.expose
+    @commit
     def list(self):
+        self._create_dailyreport_if_needed()
         return DBSession.query(Dailyreport)
 
