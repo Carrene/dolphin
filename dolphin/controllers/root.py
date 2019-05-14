@@ -25,6 +25,7 @@ from .activity import ActivityController
 from .eventtype import EventTypeController
 from .event import EventController
 from .dailyreport import DailyreportController
+from .items import ItemController
 
 
 here = abspath(dirname(__file__))
@@ -52,12 +53,8 @@ class Apiv1(RestController, JsonPatchControllerMixin):
     activities = ActivityController()
     eventtypes = EventTypeController()
     events = EventController()
-<<<<<<< HEAD
     dailyreports = DailyreportController()
-=======
-    timecards = TimecardController()
     items = ItemController()
->>>>>>> Resolved the conflict
 
     @json
     def version(self):

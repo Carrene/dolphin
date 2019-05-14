@@ -3,7 +3,7 @@ from datetime import datetime
 from nanohttp import json, context, HTTPNotFound, int_or_notfound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
-from restfulpy.orm import DBSession
+from restfulpy.orm import DBSession, commit
 
 from ..models import Item, Dailyreport, Event
 from ..validators import update_item_validator, dailyreport_update_validator
