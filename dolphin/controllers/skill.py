@@ -52,6 +52,8 @@ class SkillController(ModelRestController):
     def update(self, id):
         id = int_or_notfound(id)
         skill = DBSession.query(Skill).get(id)
+        if skill is None:
+            raise HTTPNotFound()
 
         if DBSession.query(Skill) \
                 .filter(
@@ -60,9 +62,6 @@ class SkillController(ModelRestController):
                 ) \
                 .one_or_none():
             raise StatusRepetitiveTitle()
-
-        if skill is None:
-            raise HTTPNotFound()
 
         skill.update_from_request()
         DBSession.add(skill)

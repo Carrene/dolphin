@@ -83,24 +83,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         return issue
 
-    def _ensure_room(self, title, token, access_token):
-        create_room_error = 1
-        room = None
-        while create_room_error is not None:
-            try:
-                room = ChatClient().create_room(
-                    title,
-                    token,
-                    access_token,
-                    context.identity.reference_id
-                )
-                create_room_error = None
-            except StatusChatRoomNotFound:
-                # FIXME: Cover here
-                create_room_error = 1
-
-        return room
-
     @authorize
     @json(
         prevent_empty_form='708 No Parameter Exists In The Form',
@@ -397,6 +379,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 seen_at=datetime.utcnow()
             )
             DBSession.add(subscription)
+            DBSession.flush()
 
         try:
             chat_client.add_member(
@@ -412,18 +395,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             # no need to call `add_member()` API again and re-add the member to
             # room.
             pass
-
-        try:
-            DBSession.flush()
-
-        except:
-            chat_client.kick_member(
-                issue.room_id,
-                context.identity.reference_id,
-                token,
-                member.access_token
-            )
-            raise
 
         return issue
 
@@ -450,6 +421,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             raise HTTPStatus('612 Not Subscribed Yet')
 
         DBSession.delete(subscription)
+        DBSession.flush()
 
         chat_client = ChatClient()
         try:
@@ -465,18 +437,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             # no need to call `kick_member()` API again and re-add the member
             # to room.
             pass
-
-        try:
-            DBSession.flush()
-
-        except:
-            chat_client.add_member(
-                issue.room_id,
-                context.identity.reference_id,
-                token,
-                member.access_token
-            )
-            raise
 
         return issue
 

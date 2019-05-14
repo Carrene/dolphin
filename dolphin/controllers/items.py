@@ -28,21 +28,6 @@ class ItemController(ModelRestController):
         return item
 
     @authorize
-    @json
-    @update_item_validator
-    @Item.expose
-    @commit
-    def update(self, id):
-        id = int_or_notfound(id)
-
-        item = DBSession.query(Item).get(id)
-        if not item:
-            raise HTTPNotFound()
-
-        item.status = context.form['status']
-        return item
-
-    @authorize
     @json(prevent_form='709 Form Not Allowed')
     def get(self, id):
         id = int_or_notfound(id)

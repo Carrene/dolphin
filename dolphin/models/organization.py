@@ -20,6 +20,12 @@ roles = [
 ]
 
 
+AVATAR_CONTENT_TYPES = [
+    'image/jpeg',
+    'image/png',
+]
+
+
 class OrganizationMember(DeclarativeBase):
     __tablename__ = 'organization_member'
 
@@ -229,13 +235,22 @@ class Organization(OrderingMixin, FilteringMixin, PaginationMixin,
                 raise HTTPStatus(f'625 {e}')
 
             except AspectRatioValidationError as e:
-                raise HTTPStatus(f'622 {e}')
+                raise HTTPStatus(
+                    '622 Invalid aspect ratio Only 1/1 is accepted.'
+                 )
 
             except ContentTypeValidationError as e:
-                raise HTTPStatus(f'623 {e}')
+                raise HTTPStatus(
+                    f'623 Invalid content type, Valid options are: '\
+                    f'{", ".join(type for type in AVATAR_CONTENT_TYPES)}'
+                )
 
             except MaximumLengthIsReachedError as e:
-                raise HTTPStatus(f'624 {e}')
+                max_length = settings.attachments.organizations.logos.max_length
+                raise HTTPStatus(
+                    f'624 Cannot store files larger than: '\
+                    f'{max_length * 1024} bytes'
+                )
 
         else:
             self._logo = None
@@ -245,7 +260,7 @@ class Organization(OrderingMixin, FilteringMixin, PaginationMixin,
         organization['logo'] = self.logo
         return organization
 
-    def __repr__(self):
+    def __repr__(self):# pragma: no cover
         return f'\tTitle: {self.title}\n'
 
     @classmethod

@@ -93,6 +93,11 @@ class TestProject(LocalApplicationTestCase):
             )
             assert status == '704 At Most 128 Characters Are Valid For Title'
 
+            when(
+                'The project not exist with this id',
+                url_parameters=dict(id=0)
+            )
+            assert status == 404
 
             with open(maximum_image_path, 'rb') as f:
                 when(

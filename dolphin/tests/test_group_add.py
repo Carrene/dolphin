@@ -64,6 +64,15 @@ class TestGroup(LocalApplicationTestCase):
             when('Trying to pass without form parameters', json={})
             assert status == '708 Empty Form'
 
+            when('Group not found', url_parameters=dict(id=0))
+            assert status == 404
+
+            when(
+                'Intended group with string type not found',
+                url_parameters=dict(id='Alphabetical')
+            )
+            assert status == 404
+
             when(
                 'Member is not found',
                 json=dict(memberId=0),

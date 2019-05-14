@@ -6,13 +6,16 @@ from nanohttp import context
 from nanohttp.contexts import Context
 
 from dolphin import Dolphin
+from dolphin.middleware_callback import callback as auditor_callback
 from dolphin.models import Issue, Project, Member, Workflow, Group, Release
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase, \
+    oauth_mockup_server, chat_mockup_server
 
 
 def callback(audit_logs):
     global logs
     logs = audit_logs
+    auditor_callback(audit_logs)
 
 
 class TestIssue(LocalApplicationTestCase):
@@ -101,7 +104,7 @@ class TestIssue(LocalApplicationTestCase):
             days=4,
             priority='high',
         )
-        with oauth_mockup_server(), self.given(
+        with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Update a issue',
             f'/apiv1/issues/id:{self.issue2.id}',
             'UPDATE',
@@ -201,6 +204,11 @@ class TestIssue(LocalApplicationTestCase):
             assert status == '767 Invalid priority, only one of "low, '\
                 'normal, high" will be accepted'
 
+            when(
+                'ProjectId in form',
+                form=Update(projectId=self.issue2.project.id)
+            )
+            assert status == 200
 
             when(
                 'Invalid parameter is in the form',

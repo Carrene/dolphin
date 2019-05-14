@@ -7,6 +7,7 @@ from nanohttp.contexts import Context
 from nanohttp import context
 
 from dolphin import Dolphin
+from dolphin.middleware_callback import callback as auditor_callback
 from dolphin.models import Project, Member, Workflow, Group, Release
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server
@@ -15,6 +16,7 @@ from dolphin.tests.helpers import LocalApplicationTestCase, \
 def callback(audit_logs):
     global logs
     logs = audit_logs
+    auditor_callback(audit_logs)
 
 
 class TestProject(LocalApplicationTestCase):
