@@ -4,6 +4,7 @@ from auditor.logentry import RequestLogEntry, InstantiationLogEntry
 from bddrest import status, response, when, Remove, given, Update
 
 from dolphin import Dolphin
+from dolphin.middleware_callback import callback as auditor_callback
 from dolphin.models import Member, Release, Group
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
@@ -12,6 +13,7 @@ from dolphin.tests.helpers import LocalApplicationTestCase, \
 def callback(audit_logs):
     global logs
     logs = audit_logs
+    auditor_callback(audit_logs)
 
 
 class TestRelease(LocalApplicationTestCase):

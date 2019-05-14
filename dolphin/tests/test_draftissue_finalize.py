@@ -6,6 +6,7 @@ from auditor.logentry import RequestLogEntry, InstantiationLogEntry
 from bddrest import status, response, Update, when, given, Remove
 
 from dolphin import Dolphin
+from dolphin.middleware_callback import callback as auditor_callback
 from dolphin.models import Issue, Project, Workflow, Phase, Tag, \
     DraftIssue, Organization, OrganizationMember, Group, Release, Skill, Resource
 from dolphin.tests.helpers import LocalApplicationTestCase, \
@@ -15,6 +16,7 @@ from dolphin.tests.helpers import LocalApplicationTestCase, \
 def callback(audit_logs):
     global logs
     logs = audit_logs
+    auditor_callback(audit_logs)
 
 
 class TestIssue(LocalApplicationTestCase):
