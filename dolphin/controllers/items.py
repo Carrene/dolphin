@@ -4,8 +4,9 @@ from nanohttp import json, context, HTTPNotFound, int_or_notfound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
+from sqlalchemy import select, func
 
-from ..models import Item, Dailyreport, Event
+from ..models import Item, Dailyreport, Event, Member
 from ..validators import update_item_validator, dailyreport_update_validator
 
 
@@ -41,7 +42,26 @@ class ItemController(ModelRestController):
     @json(prevent_form='709 Form Not Allowed')
     @Item.expose
     def list(self):
-        return DBSession.query(Item)
+        resource = Member.current()
+        query = DBSession.query(Item).filter(Item.member_id == resource.id)
+        active_item_cte = select([func.max(Item.id).label('max_item_id')]) \
+            .group_by(Item.issue_id) \
+            .cte()
+
+        if 'zone' in context.query:
+            if context.query['zone'] == 'needEstimate':
+                query = query.filter(Item.id == active_item_cte.c.max_item_id) \
+                    .filter(Item.estimated_hours.is_(None))
+
+            elif context.query['zone'] == 'upcomingNuggets':
+                query = query.filter(Item.id == active_item_cte.c.max_item_id) \
+                    .filter(Item.start_date > datetime.now())
+
+            elif context.query['zone'] == 'inProcessNuggets':
+                query = query.filter(Item.id == active_item_cte.c.max_item_id) \
+                    .filter(Item.start_date < datetime.now())
+
+        return query
 
 
 class ItemDailyreportController(ModelRestController):

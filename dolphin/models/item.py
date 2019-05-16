@@ -34,7 +34,7 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         example=1,
         protected=False,
     )
-    start_time = Field(
+    start_date = Field(
         DateTime,
         python_type=datetime,
         label='Start Date',
@@ -48,7 +48,7 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         required=False,
         readonly=True,
     )
-    end_time = Field(
+    end_date = Field(
         DateTime,
         python_type=datetime,
         label='Target Date',
