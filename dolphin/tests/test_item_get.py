@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when
 
@@ -55,20 +57,20 @@ class TestItem(LocalApplicationTestCase):
             room_id=1
         )
 
-        issue1 = Issue(
+        cls.issue1 = Issue(
             project=project,
             title='First issue',
             description='This is description of first issue',
-            due_date='2020-2-20',
+            due_date=datetime.strptime('2020-2-20', '%Y-%m-%d'),
             kind='feature',
             days=1,
             room_id=2
         )
-        session.add(issue1)
+        session.add(cls.issue1)
         session.flush()
 
         cls.item = Item(
-            issue_id=issue1.id,
+            issue_id=cls.issue1.id,
             phase_id=phase1.id,
             member_id=cls.member1.id,
         )
@@ -85,6 +87,13 @@ class TestItem(LocalApplicationTestCase):
         ):
             assert status == 200
             assert response.json['id'] == self.item.id
+
+            issue = response.json['issue']
+            assert issue['title'] == self.issue1.title
+            assert issue['kind'] == self.issue1.kind
+            assert issue['status'] == self.issue1.status
+            assert issue['priority'] == self.issue1.priority
+            assert issue['boarding'] == self.issue1.boarding
 
             when(
                 'Intended item with string type not found',
