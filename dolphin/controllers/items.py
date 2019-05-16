@@ -6,7 +6,7 @@ from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 from sqlalchemy import select, func
 
-from ..models import Item, Dailyreport, Event
+from ..models import Item, Dailyreport, Event, Member
 from ..validators import update_item_validator, dailyreport_update_validator, \
     estimate_item_validator
 from ..exceptions import StatusEndDateMustBeGreaterThanStartDate
