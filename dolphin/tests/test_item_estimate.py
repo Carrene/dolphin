@@ -104,7 +104,7 @@ class TestItem(LocalApplicationTestCase):
         )
 
         with oauth_mockup_server(), self.given(
-            'Estimating a item',
+            'Estimating an item',
             f'/apiv1/items/id: {self.item1.id}',
             'ESTIMATE',
             json=json
@@ -163,6 +163,12 @@ class TestItem(LocalApplicationTestCase):
             assert status == '905 Start Date Is Null'
 
             when(
+                'Start date pattern is wrong',
+                json=given | dict(startDate='invalid pattern')
+            )
+            assert status == '791 Invalid Start Date Format'
+
+            when(
                 'End date is not in form',
                 json=given - 'endDate'
             )
@@ -173,6 +179,12 @@ class TestItem(LocalApplicationTestCase):
                 json=given | dict(endDate=None)
             )
             assert status == '906 End Date Is Null'
+
+            when(
+                'End date pattern is wrong',
+                json=given | dict(endDate='invalid pattern')
+            )
+            assert status == '790 Invalid End Date Format'
 
             when(
                 'Estimated hours field is not in form',
