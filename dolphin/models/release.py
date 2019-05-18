@@ -2,16 +2,15 @@ from datetime import datetime
 
 from auditor import observe
 from nanohttp import context
-from restfulpy.orm import Field, relationship, ModifiedMixin, FilteringMixin, \
-    OrderingMixin, PaginationMixin
+from restfulpy.orm import Field, relationship
 from restfulpy.orm.metadata import MetadataField
 from sqlalchemy import Integer, Enum, DateTime, ForeignKey, select, func, \
     join, bindparam
 from sqlalchemy.orm import column_property
 
+from .member import Member
 from .project import Project
 from .subscribable import Subscribable, Subscription
-from .member import Member
 
 
 release_statuses = [
@@ -22,8 +21,7 @@ release_statuses = [
 ]
 
 
-class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
-              Subscribable):
+class Release(Subscribable):
 
     __tablename__ = 'release'
     __mapper_args__ = {'polymorphic_identity': __tablename__}
