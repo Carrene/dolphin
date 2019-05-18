@@ -1,4 +1,5 @@
-from restfulpy.orm import DeclarativeBase, Field, TimestampMixin, relationship
+from restfulpy.orm import DeclarativeBase, Field, relationship, \
+    ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin
 from restfulpy.orm.metadata import MetadataField
 from sqlalchemy import Integer, String, ForeignKey, DateTime, BOOLEAN
 
@@ -26,7 +27,8 @@ class Subscription(DeclarativeBase):
     one_shot = Field(BOOLEAN, nullable=True)
 
 
-class Subscribable(TimestampMixin, DeclarativeBase):
+class Subscribable(ModifiedMixin, OrderingMixin, FilteringMixin, \
+                   PaginationMixin, DeclarativeBase):
     __tablename__ = 'subscribable'
 
     type_ = Field(String(50), readonly=True)

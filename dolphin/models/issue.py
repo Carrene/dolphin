@@ -2,18 +2,17 @@ from datetime import datetime
 
 from auditor import observe
 from nanohttp import context
-from restfulpy.orm import Field, DeclarativeBase, relationship, \
-    OrderingMixin, FilteringMixin, PaginationMixin
+from restfulpy.orm import Field, DeclarativeBase, relationship
 from restfulpy.orm.metadata import MetadataField
 from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
     DateTime, case, join
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import column_property
 
-from ..mixins import ModifiedByMixin
 from .item import Item
 from .member import Member
 from .subscribable import Subscribable, Subscription
+from ..mixins import ModifiedByMixin
 
 
 class IssueTag(DeclarativeBase):
@@ -67,8 +66,7 @@ class Boarding:
     atrisk =    (4, 'at-risk')
 
 
-class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
-            Subscribable):
+class Issue(ModifiedByMixin, Subscribable):
 
     __tablename__ = 'issue'
     __mapper_args__ = {'polymorphic_identity': __tablename__}
