@@ -355,11 +355,6 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
 
     def to_dict(self, include_relations=True):
         items_list = []
-        item_fields = (
-            'memberId',
-            'phaseId',
-            'createdAt',
-        )
         for item in self.items:
             items_list.append(dict(
                 memberId=item.member_id,
