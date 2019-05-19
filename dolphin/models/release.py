@@ -11,6 +11,7 @@ from sqlalchemy.orm import column_property
 from .member import Member
 from .project import Project
 from .subscribable import Subscribable, Subscription
+from .room import Room
 
 
 release_statuses = [
@@ -21,7 +22,7 @@ release_statuses = [
 ]
 
 
-class Release(Subscribable):
+class Release(Room):
 
     __tablename__ = 'release'
     __mapper_args__ = {'polymorphic_identity': __tablename__}

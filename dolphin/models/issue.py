@@ -12,6 +12,7 @@ from sqlalchemy.orm import column_property
 from .item import Item
 from .member import Member
 from .subscribable import Subscribable, Subscription
+from .room import Room
 from ..mixins import ModifiedByMixin
 
 
@@ -66,7 +67,7 @@ class Boarding:
     atrisk =    (4, 'at-risk')
 
 
-class Issue(ModifiedByMixin, Subscribable):
+class Issue(ModifiedByMixin, Room):
 
     __tablename__ = 'issue'
     __mapper_args__ = {'polymorphic_identity': __tablename__}
