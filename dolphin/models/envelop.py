@@ -29,9 +29,7 @@ class MemberMessageSeen(DeclarativeBase, TimestampMixin):
 class FileAttachment(File):
 
     _internal_max_length = None
-
     _internal_min_length = None
-
     __pre_processors__ = [
         MagicAnalyzer(),
     ]
