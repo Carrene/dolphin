@@ -10,6 +10,7 @@ from sqlalchemy.orm import column_property
 from .issue import Issue, Boarding
 from .member import Member
 from .subscribable import Subscribable, Subscription
+from .room import Room
 from ..mixins import ModifiedByMixin
 
 
@@ -21,7 +22,7 @@ project_statuses = [
 ]
 
 
-class Project(SoftDeleteMixin, ModifiedByMixin, Subscribable):
+class Project(SoftDeleteMixin, ModifiedByMixin, Room):
 
     __tablename__ = 'project'
     __mapper_args__ = {'polymorphic_identity': __tablename__}
