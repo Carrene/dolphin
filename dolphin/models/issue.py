@@ -169,7 +169,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         'Project',
         foreign_keys=[project_id],
         back_populates='issues',
-        protected=True
+        protected=False
     )
     members = relationship(
         'Member',
@@ -193,7 +193,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
 
     items = relationship(
         'Item',
-        protected=False,
+        protected=True,
         order_by=Item.created_at,
     )
 
@@ -354,11 +354,25 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         )
 
     def to_dict(self, include_relations=True):
+        # The `issue` relationship on Item model is `protected=False`, So the
+        # `items` relationship on Issue model must be `protected=True`, So that
+        # this causes recursively getting the instances of `issue` and `item`
+        # model. But there is some field from Item model that is needed in Issue
+        # which are appended to Issue.to_dict return value manually.
+        items_list = []
+        for item in self.items:
+            items_list.append(dict(
+                memberId=item.member_id,
+                phaseId=item.phase_id,
+                createdAt=item.created_at,
+            ))
+
         issue_dict = super().to_dict()
         issue_dict['boarding'] = self.boarding
         issue_dict['isSubscribed'] = True if self.is_subscribed else False
         issue_dict['seenAt'] \
             = self.seen_at.isoformat() if self.seen_at else None
+        issue_dict['items'] = items_list
 
         if include_relations:
             issue_dict['relations'] = []

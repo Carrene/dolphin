@@ -1,7 +1,8 @@
 from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when
 
-from dolphin.models import Issue, Member, Workflow, Group, Project, Release
+from dolphin.models import Issue, Member, Workflow, Group, Project, Release, \
+    Skill, Phase, Item
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -22,6 +23,7 @@ class TestIssue(LocalApplicationTestCase):
         session.add(member)
 
         workflow = Workflow(title='default')
+        skill = Skill(title='First Skill')
         group = Group(title='default')
 
         release = Release(
@@ -34,7 +36,7 @@ class TestIssue(LocalApplicationTestCase):
             group=group,
         )
 
-        project = Project(
+        cls.project = Project(
             release=release,
             workflow=workflow,
             group=group,
@@ -45,7 +47,7 @@ class TestIssue(LocalApplicationTestCase):
         )
 
         cls.issue = Issue(
-            project=project,
+            project=cls.project,
             title='First issue',
             description='This is description of first issue',
             due_date='2020-2-20',
@@ -54,6 +56,22 @@ class TestIssue(LocalApplicationTestCase):
             room_id=2
         )
         session.add(cls.issue)
+
+        cls.phase = Phase(
+            workflow=workflow,
+            title='Backlog',
+            order=1,
+            skill=skill,
+        )
+        session.add(cls.phase)
+        session.flush()
+
+        cls.item = Item(
+            member_id=member.id,
+            phase_id=cls.phase.id,
+            issue_id=cls.issue.id,
+        )
+        session.add(cls.item)
         session.commit()
 
     def test_get(self):
@@ -66,7 +84,9 @@ class TestIssue(LocalApplicationTestCase):
         ):
             assert status == 200
             assert response.json['id'] == self.issue.id
-            assert response.json['title'] == 'First issue'
+            assert response.json['title'] == self.issue.title
+            assert response.json['project']['id'] == self.project.id
+            assert response.json['items'][0]['phaseId'] == self.phase.id
 
             when(
                 'Intended project with string type not found',
