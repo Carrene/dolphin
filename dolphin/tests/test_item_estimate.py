@@ -163,15 +163,12 @@ class TestItem(LocalApplicationTestCase):
             assert status == '905 Start Date Is Null'
 
             when(
-<<<<<<< HEAD
                 'Start date pattern is wrong',
                 json=given | dict(startDate='invalid pattern')
             )
             assert status == '791 Invalid Start Date Format'
 
             when(
-=======
->>>>>>> Remove CREATE verb on Daily report controller
                 'End date is not in form',
                 json=given - 'endDate'
             )
@@ -184,15 +181,12 @@ class TestItem(LocalApplicationTestCase):
             assert status == '906 End Date Is Null'
 
             when(
-<<<<<<< HEAD
                 'End date pattern is wrong',
                 json=given | dict(endDate='invalid pattern')
             )
             assert status == '790 Invalid End Date Format'
 
             when(
-=======
->>>>>>> Remove CREATE verb on Daily report controller
                 'Estimated hours field is not in form',
                 json=given - 'estimatedHours'
             )
