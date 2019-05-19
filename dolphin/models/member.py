@@ -1,4 +1,6 @@
+import os
 import uuid
+from hashlib import sha256
 
 from cas import CASPrincipal
 from nanohttp import context

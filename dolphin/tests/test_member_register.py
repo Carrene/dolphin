@@ -16,7 +16,8 @@ class TestRegisteration(LocalApplicationTestCase):
             email='already.added@example.com',
             title='username',
             password='123abcABC',
-            role='member'
+            role='member',
+            reference_id=1,
         )
         session = cls.create_session()
         session.add(member)
