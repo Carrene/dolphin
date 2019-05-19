@@ -89,8 +89,9 @@ class Envelop(OrderingMixin, PaginationMixin, FilteringMixin, ModifiedMixin,
 
 
 class Message(Envelop):
-
-    __mapper_args__ = {'polymorphic_identity': 'message'}
+    __mapper_args__ = {
+        'polymorphic_identity': 'message'
+    }
     __exclude__ = {'seen_by'}
 
     mimetype = Field(
@@ -136,7 +137,6 @@ class Message(Envelop):
 
         else:
             self._attachment = None
-
 
     # Since this relationship should be a many to one relationship,
     # The remote_side is declared
