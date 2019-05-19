@@ -354,6 +354,11 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         )
 
     def to_dict(self, include_relations=True):
+        # The `issue` relationship on Item model is `protected=False`, So the
+        # `items` relationship on Issue model must be `protected=True`, So that
+        # this causes recursively getting the instances of `issue` and `item`
+        # model. But there is some field from Item model that is needed in Issue
+        # which are appended to Issue.to_dict return value manually.
         items_list = []
         for item in self.items:
             items_list.append(dict(
