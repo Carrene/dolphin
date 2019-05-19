@@ -148,18 +148,8 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     UniqueConstraint(phase_id, issue_id, member_id)
 
     def to_dict(self):
-        issue_fields = (
-            'title',
-            'kind',
-            'status',
-            'priority',
-            'boarding',
-        )
-        issue_dict = {i: getattr(self.issue, i) for i in issue_fields}
-
         item_dict = super().to_dict()
         item_dict['hoursWorked'] = self.hours_worked
-        item_dict['issue'] = issue_dict
         return item_dict
 
     @classmethod
