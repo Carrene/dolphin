@@ -7,7 +7,19 @@ from restfulpy.orm import DBSession, commit
 from sqlalchemy import select, func
 
 from ..models import Item, Dailyreport, Event, Member
-from ..validators import update_item_validator, dailyreport_update_validator
+from ..validators import update_item_validator, dailyreport_update_validator, \
+    estimate_item_validator
+from ..exceptions import StatusEndDateMustBeGreaterThanStartDate
+
+
+FORM_WHITLELIST = [
+    'startDate',
+    'endDate',
+    'estimatedHours',
+]
+
+
+FORM_WHITELIST_STRING = ', '.join(FORM_WHITLELIST)
 
 
 class ItemController(ModelRestController):
@@ -62,6 +74,30 @@ class ItemController(ModelRestController):
                     .filter(Item.start_date < datetime.now())
 
         return query
+
+    @authorize
+    @json(
+        prevent_empty_form='708 Empty Form',
+        form_whitelist=(
+            FORM_WHITLELIST,
+            f'707 Invalid field, only following fields are accepted: '
+            f'{FORM_WHITELIST_STRING}'
+        )
+    )
+    @estimate_item_validator
+    @commit
+    def estimate(self, id):
+        id = int_or_notfound(id)
+
+        item = DBSession.query(Item).get(id)
+        if not item:
+            raise HTTPNotFound()
+
+        item.update_from_request()
+        if item.start_date > item.end_date:
+            raise StatusEndDateMustBeGreaterThanStartDate()
+
+        return item
 
 
 class ItemDailyreportController(ModelRestController):
