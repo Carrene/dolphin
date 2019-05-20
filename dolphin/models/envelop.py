@@ -162,23 +162,19 @@ class Message(Envelop):
             )
         ) \
         .where(MemberMessageSeen.message_id == Envelop.id) \
-        .where(Member.reference_id == bindparam(
-            'reference_id',
-            callable_=lambda: context.identity.reference_id
-        )) \
         .correlate_except(MemberMessageSeen),
         deferred=True
     )
 
     @hybrid_property
     def is_mine(self):
-        return Member.current().reference_id == self.sender_reference_id
+        return Member.current().id == self.sender_id
 
     @is_mine.expression
     def is_mine(cls):
-        return cls.sender_reference_id == bindparam(
-            'reference_id',
-            callable_=lambda: context.identity.reference_id
+        return cls.sender_id == bindparam(
+            'id',
+            callable_=lambda: context.identity.id,
         )
 
     def to_dict(self):
@@ -186,7 +182,6 @@ class Message(Envelop):
         for member in self.seen_by:
             seen_by_list.append({
                 'id': member.id,
-                'referenceId': member.reference_id,
                 'email': member.email,
                 'title': member.title,
                 'avatar': member.avatar,
