@@ -160,5 +160,6 @@ class ItemDailyreportController(ModelRestController):
     @commit
     def list(self):
         self._create_dailyreport_if_needed()
-        return DBSession.query(Dailyreport)
+        return DBSession.query(Dailyreport) \
+            .filter(Dailyreport.item_id == self.item.id)
 
