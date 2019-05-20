@@ -50,3 +50,9 @@ class TestItem(LocalApplicationTestCase):
             assert fields['memberId']['notNone'] is not None
             assert fields['memberId']['watermark'] is not None
 
+            assert fields['issue']['label'] is not None
+            assert fields['issue']['name'] is not None
+            assert fields['issue']['type'] is not None
+            assert fields['issue']['required'] is not None
+            assert fields['issue']['watermark'] is not None
+
