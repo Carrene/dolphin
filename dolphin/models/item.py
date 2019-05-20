@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from restfulpy.orm import Field, DeclarativeBase, relationship
+from restfulpy.orm.metadata import MetadataField
 from restfulpy.orm.mixins import TimestampMixin, OrderingMixin, \
     FilteringMixin, PaginationMixin
 from sqlalchemy import Integer, ForeignKey, UniqueConstraint, DateTime, Enum, \
@@ -150,4 +151,18 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         item_dict = super().to_dict()
         item_dict['hoursWorked'] = self.hours_worked
         return item_dict
+
+    @classmethod
+    def iter_metadata_fields(cls):
+        yield from super().iter_metadata_fields()
+        yield MetadataField(
+            name='issue',
+            key='issue',
+            label='Lorem Ipsun',
+            required=False,
+            readonly=True,
+            watermark='Lorem Ipsum',
+            example='Lorem Ipsum',
+            message='Lorem Ipsun',
+        )
 
