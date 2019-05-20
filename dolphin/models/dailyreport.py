@@ -56,7 +56,7 @@ class Dailyreport(OrderingMixin, FilteringMixin, PaginationMixin, \
         Unicode,
         min_length=1,
         max_length=1024,
-        label='Lorem Isum',
+        label='Notes',
         watermark='Lorem Ipsum',
         not_none=False,
         nullable=True,
