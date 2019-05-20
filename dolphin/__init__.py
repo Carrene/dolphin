@@ -74,6 +74,13 @@ class Dolphin(Application):
           logos:
             max_length: 50 # KB
             min_length: 1  # KB
+
+      registration:
+        secret: !!binary xxSN/uarj5SpcEphAHhmsab8Ql2Og/2IcieNfQ3PysI=
+        max_age: 86400  # seconds
+        algorithm: HS256
+        callback_url: http://localhost:8083
+
    '''
 
     def __init__(self, application_name='dolphin', root=Root()):

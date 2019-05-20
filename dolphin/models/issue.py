@@ -207,14 +207,11 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
 
     is_subscribed = column_property(
         select([func.count(Subscription.member_id)])
-        .select_from(
-            join(Subscription, Member, Subscription.member_id == Member.id)
-        )
         .where(Subscription.subscribable_id == id)
-        .where(Member.reference_id == bindparam(
-            'reference_id',
+        .where(Subscription.member_id == bindparam(
+            'member_id',
             callable_=lambda:
-                context.identity.reference_id if context.identity else None
+                context.identity.id if context.identity else None
             )
         )
         .where(Subscription.one_shot.is_(None))
@@ -224,14 +221,11 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
 
     seen_at = column_property(
         select([Subscription.seen_at])
-        .select_from(
-            join(Subscription, Member, Subscription.member_id == Member.id)
-        )
         .where(Subscription.subscribable_id == id)
-        .where(Member.reference_id == bindparam(
-            'reference_id',
+        .where(Subscription.member_id == bindparam(
+            'member_id',
             callable_=lambda:
-                context.identity.reference_id if context.identity else None
+                context.identity.id if context.identity else None
             )
         )
         .where(Subscription.one_shot.is_(None))

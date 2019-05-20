@@ -20,6 +20,8 @@ USER_EMAIL_PATTERN = re.compile(
     r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'
 )
 WORKFLOW_TITLE_PATTERN = re.compile(r'^[^\s].+[^\s]$')
+USER_TITLE_PATTERN = re.compile(r'^[a-zA-Z][\w\ ]{5,19}$')
+USER_PASSWORD_PATTERN = re.compile(r'(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).+')
 
 
 def release_exists_validator(releaseId, project, field):
@@ -907,5 +909,19 @@ search_issue_validator = validate(
     query=dict(
         max_length=(50, '704 At Most 50 Characters Valid For Title'),
     )
+)
+
+register_member_validator = validate(
+    title=dict(
+        required=StatusTitleNotInForm,
+        pattern=(USER_TITLE_PATTERN, StatusInvalidTitleFormat),
+    ),
+    password=dict(
+        required=StatusPasswordNotInForm,
+        min_length=(6, StatusInvalidPasswordLength),
+        max_length=(20, StatusInvalidPasswordLength),
+        pattern=(USER_PASSWORD_PATTERN, StatusPasswordNotComplexEnough)
+    ),
+    ownershipToken=dict(required=StatusTokenNotInForm)
 )
 

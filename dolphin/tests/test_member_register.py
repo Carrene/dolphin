@@ -12,14 +12,13 @@ class TestRegisteration(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
+        session = cls.create_session()
         member = Member(
             email='already.added@example.com',
             title='username',
             password='123abcABC',
             role='member',
-            reference_id=1,
         )
-        session = cls.create_session()
         session.add(member)
         session.commit()
 
@@ -46,19 +45,19 @@ class TestRegisteration(LocalApplicationTestCase):
             assert 'X-New-JWT-Token' in response.headers
 
             when('Invalid password min length', form=Update(password='1Aa'))
-            assert status == '702 Invalid Password Length'
+            assert status == '920 Invalid Password Length'
 
             when(
                 'Invalid password max length',
                 form=Update(password='1Aa123456789abcdeABCD')
             )
-            assert status == '702 Invalid Password Length'
+            assert status == '920 Invalid Password Length'
 
             when(
                 'Invalid title format',
                 form=Update(password='123AAAaaa', title='1username')
             )
-            assert status == '705 Invalid Title Format'
+            assert status == '747 Invalid Title Format'
 
             when('Duplicate title', form=Update(title='username'))
             assert status == '604 Title Is Already Registered'

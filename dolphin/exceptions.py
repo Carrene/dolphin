@@ -484,3 +484,15 @@ class StatusInvalidKind(HTTPKnownStatus):
         self.status = f'717 Invalid kind, only one of ' \
             f'"{", ".join(issue_kinds)}" will be accepted'
 
+
+class StatusPasswordNotInForm(HTTPKnownStatus):
+    status = '919 Password Not In Form'
+
+
+class StatusInvalidPasswordLength(HTTPKnownStatus):
+    status = '920 Invalid Password Length'
+
+
+class StatusPasswordNotComplexEnough(HTTPKnownStatus):
+    status = '921 Password Not Complex Enough'
+

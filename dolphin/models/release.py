@@ -128,13 +128,10 @@ class Release(ModifiedMixin, FilteringMixin, OrderingMixin, PaginationMixin,
     )
     is_subscribed = column_property(
         select([func.count(Subscription.member_id)])
-        .select_from(
-            join(Subscription, Member, Subscription.member_id == Member.id)
-        )
         .where(Subscription.subscribable_id == id)
-        .where(Member.reference_id == bindparam(
-                'reference_id',
-                callable_=lambda: context.identity.reference_id
+        .where(Subscription.member_id == bindparam(
+                'member_id',
+                callable_=lambda: context.identity.id
             )
         )
         .correlate_except(Subscription),

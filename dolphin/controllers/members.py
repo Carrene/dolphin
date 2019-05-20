@@ -6,11 +6,12 @@ from restfulpy.orm import DBSession, commit
 from sqlalchemy_media import store_manager
 from sqlalchemy import or_
 
+from ..tokens import RegistrationToken
 from ..models import Member, Skill, SkillMember, Organization, \
     OrganizationMember, Group, GroupMember
 from ..exceptions import StatusAlreadyGrantedSkill, StatusSkillNotGrantedYet, \
     StatusQueryParameterNotInFormOrQueryString
-from ..validators import search_member_validator
+from ..validators import search_member_validator, register_member_validator
 from .organization import OrganizationController
 from .skill import SkillController
 
@@ -88,6 +89,35 @@ class MemberController(ModelRestController):
             ))
 
         return query
+
+    @json(prevent_empty_form=True)
+    @register_member_validator
+    @Member.expose
+    @commit
+    def register(self):
+        title = context.form.get('title')
+        password = context.form.get('password')
+        ownership_token = context.form.get('ownershipToken')
+        registration_token_principal = RegistrationToken.load(ownership_token)
+        email = registration_token_principal.email
+
+        if DBSession.query(Member.title).filter(Member.title == title).count():
+            raise HTTPTitleAlreadyRegistered()
+
+        if DBSession.query(Member.email).filter(Member.email == email).count():
+            raise HTTPEmailAddressAlreadyRegistered()
+
+        member = Member(
+            email=email,
+            title=title,
+            password=password,
+            role='member'
+        )
+        DBSession.add(member)
+        DBSession.flush()
+        principal = member.create_jwt_principal()
+        context.application.__authenticator__.setup_response_headers(principal)
+        return member
 
 
 class MemberSkillController(ModelRestController):

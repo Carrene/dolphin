@@ -77,7 +77,6 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         'polymorphic_identity': __tablename__
     }
 
-    reference_id = Field(Integer, unique=True)
     id = Field(
         Integer,
         primary_key=True,
@@ -126,7 +125,6 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         example='user@example.com',
         label='Email',
     )
-    access_token = Field(Unicode(512), protected=True)
     phone = Field(
         BigInteger,
         label='Phone',
@@ -234,7 +232,8 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         .select_from(OrganizationMember) \
         .where(OrganizationMember.organization_id == bindparam(
             'organization_id',
-            callable_=lambda: context.identity.payload['organizationId']
+            callable_=lambda: context.identity.payload['organizationId'] \
+                if context.identity else None
         )) \
         .where(OrganizationMember.member_id == id) \
         .correlate_except(OrganizationMember),
@@ -314,22 +313,6 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             .filter(cls.email == context.identity.email) \
             .one()
 
-    def to_dict(self):
-        if not isinstance(context.identity, AccessToken):
-            result = super().to_dict()
-            result['avatar'] = self.avatar
-            return result
-
-        member = dict.fromkeys(SCOPES.keys(), None)
-        member['id'] = self.id
-        if context.identity.scopes is None:
-            return member
-
-        for scope in context.identity.scopes:
-            member[scope] = SCOPES[scope](self)
-
-        return member
-
     @classmethod
     def _create_activation_session(cls, phone):
         ocra_suite = OCRASuite(
@@ -382,7 +365,6 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             name=self.name,
             title=self.title,
             avatar=self.avatar,
-            referenceId=self.reference_id,
             sessionId=session_id,
         ))
 
@@ -394,7 +376,7 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     @classmethod
     def current(cls):
         return DBSession.query(cls) \
-            .filter(cls.reference_id == context.identity.reference_id) \
+            .filter(cls.email == context.identity.email) \
             .one()
 
     def __repr__(self):

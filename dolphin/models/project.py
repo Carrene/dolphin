@@ -156,13 +156,10 @@ class Project(ModifiedByMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     is_subscribed = column_property(
         select([func.count(Subscription.member_id)])
-        .select_from(
-            join(Subscription, Member, Subscription.member_id == Member.id)
-        )
         .where(Subscription.subscribable_id == id)
-        .where(Member.reference_id == bindparam(
-                'reference_id',
-                callable_=lambda: context.identity.reference_id
+        .where(Subscription.member_id == bindparam(
+                'member_id',
+                callable_=lambda: context.identity.id
             )
         )
         .correlate_except(Subscription),
@@ -229,28 +226,6 @@ class Project(ModifiedByMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             required=False,
             readonly=True,
             watermark='Lorem Ipsum',
-        )
-        yield MetadataField(
-            name='managerReferenceId',
-            key='manager_reference_id',
-            label='Manager',
-            required=True,
-            not_none=True,
-            readonly=False,
-            watermark='Lorem Ipsum',
-            example='Lorem Ipsum',
-            message=None,
-        )
-        yield MetadataField(
-            name='secondaryManagerReferenceId',
-            key='secondary_manager_reference_id',
-            label='Secondary Manager (optional)',
-            required=False,
-            not_none=False,
-            readonly=False,
-            watermark='Lorem Ipsum',
-            example='Lorem Ipsum',
-            message=None,
         )
         yield MetadataField(
             name='boardingValue',
