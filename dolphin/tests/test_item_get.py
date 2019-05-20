@@ -47,7 +47,7 @@ class TestItem(LocalApplicationTestCase):
             group=group,
         )
 
-        project = Project(
+        cls.project = Project(
             release=release,
             workflow=workflow,
             group=group,
@@ -58,7 +58,7 @@ class TestItem(LocalApplicationTestCase):
         )
 
         cls.issue1 = Issue(
-            project=project,
+            project=cls.project,
             title='First issue',
             description='This is description of first issue',
             due_date=datetime.strptime('2020-2-20', '%Y-%m-%d'),
@@ -90,10 +90,9 @@ class TestItem(LocalApplicationTestCase):
 
             issue = response.json['issue']
             assert issue['title'] == self.issue1.title
-            assert issue['kind'] == self.issue1.kind
-            assert issue['status'] == self.issue1.status
-            assert issue['priority'] == self.issue1.priority
-            assert issue['boarding'] == self.issue1.boarding
+
+            project = issue['project']
+            assert project['title'] == self.project.title
 
             when(
                 'Intended item with string type not found',
