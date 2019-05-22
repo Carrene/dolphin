@@ -12,11 +12,8 @@ from .dailyreport import Dailyreport
 
 
 item_statuses = [
-    'to-do',
     'in-progress',
-    'on-hold',
-    'delayed',
-    'complete',
+    'done',
 ]
 
 
@@ -76,7 +73,7 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     status = Field(
         Enum(*item_statuses, name='item_status'),
         python_type=str,
-        default='to-do',
+        default='in-progress',
         label='Status',
         watermark='Choose a status',
         nullable=True,
