@@ -3,7 +3,7 @@ from nanohttp.contexts import Context
 from restfulpy.orm import DBSession
 from sqlalchemy_media import StoreManager
 
-from .models import Release, Member, Organization, OrganizationMember,\
+from .models import Release, Admin, Organization, OrganizationMember,\
     Workflow, Phase, Tag, Group, Skill, EventType
 
 
@@ -60,7 +60,7 @@ def insert(): # pragma: no cover
     DBSession.commit()
 
     with Context(dict()), StoreManager(DBSession):
-        god = Member(
+        god = Admin(
             id=1,
             title='GOD',
             email='god@example.com',

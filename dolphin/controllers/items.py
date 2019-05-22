@@ -54,8 +54,14 @@ class ItemController(ModelRestController):
     @json(prevent_form='709 Form Not Allowed')
     @Item.expose
     def list(self):
-        resource = Member.current()
-        query = DBSession.query(Item).filter(Item.member_id == resource.id)
+        member = Member.current()
+
+        if member.role == 'admin':
+            query = DBSession.query(Item)
+
+        else:
+            query = DBSession.query(Item).filter(Item.member_id == member.id)
+
         active_item_cte = select([func.max(Item.id).label('max_item_id')]) \
             .group_by(Item.issue_id) \
             .cte()

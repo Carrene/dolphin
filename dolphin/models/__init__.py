@@ -22,4 +22,5 @@ from .activity import Activity
 from .eventtype import EventType
 from .dailyreport import Dailyreport
 from .event import Event, event_repeats
+from .admin import Admin
 
