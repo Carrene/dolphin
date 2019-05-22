@@ -137,7 +137,9 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     )
     dailyreports = relationship(
         'Dailyreport',
-        back_populates='item'
+        back_populates='item',
+        lazy='selectin',
+        order_by='Dailyreport.id',
     )
 
     hours_worked = column_property(
@@ -147,9 +149,23 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     UniqueConstraint(phase_id, issue_id, member_id)
 
+    @property
+    def perspective(self):
+        if len(self.dailyreports) == 0:
+            return 'due'
+
+        if self.dailyreports[-1].note != None:
+            return 'submitted'
+
+        if self.dailyreports[-1].date == datetime.now().date():
+            return 'due'
+
+        return 'over due'
+
     def to_dict(self):
         item_dict = super().to_dict()
         item_dict['hoursWorked'] = self.hours_worked
+        item_dict['perspective'] = self.perspective
         return item_dict
 
     @classmethod
