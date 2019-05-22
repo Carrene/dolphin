@@ -91,3 +91,19 @@ class TokenController(RestController):
         ensured_member = ChatClient().ensure_member(token, member.access_token)
         return dict(token=token)
 
+    @json(prevent_empty_form=True)
+    @email_validator
+    def create(self):
+        email = context.form.get('email')
+        password = context.form.get('password')
+        if email and password is None:
+            raise HTTPIncorrectEmailOrPassword()
+
+        principal = context.application.__authenticator__.\
+            login((email, password))
+
+        if principal is None:
+            raise HTTPIncorrectEmailOrPassword()
+
+        return dict(token=principal.dump())
+
