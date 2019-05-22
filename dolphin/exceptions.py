@@ -413,12 +413,12 @@ class StatusInvalidDueDateFormat(HTTPKnownStatus):
     status ='701 Invalid Due Date Format'
 
 
-class StatusManagerReferenceIdNotInForm(HTTPKnownStatus):
-    status = '777 Manager Reference Id Not In Form'
+class StatusManagerId(HTTPKnownStatus):
+    status = '777 Manager Id Id Not In Form'
 
 
-class StatusManagerReferenceIdIsNull(HTTPKnownStatus):
-    status = '778 Manager Reference Id Is Null'
+class StatusManagerId(HTTPKnownStatus):
+    status = '778 Manager Id Id Is Null'
 
 
 class StatusInvalidLaunchDateFormat(HTTPKnownStatus):
@@ -495,4 +495,12 @@ class StatusInvalidPasswordLength(HTTPKnownStatus):
 
 class StatusPasswordNotComplexEnough(HTTPKnownStatus):
     status = '921 Password Not Complex Enough'
+
+
+class StatusTitleAlreadyRegistered(HTTPKnownStatus):
+    status = '661 Title Already Registered'
+
+
+class StatusEmailAddressAlreadyRegistered(HTTPKnownStatus):
+    status = '662 Email Address Already Registered'
 

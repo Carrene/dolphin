@@ -72,7 +72,7 @@ class InvitationController(ModelRestController, JsonPatchControllerMixin):
         token = OrganizationInvitationToken(dict(
             email=email,
             organizationId=self.organization.id,
-            byMemberReferenceId=context.identity.reference_id,
+            byMemberId=context.identity.id,
             role=role,
         ))
         DBSession.add(

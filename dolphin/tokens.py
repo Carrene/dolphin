@@ -32,7 +32,7 @@ class OrganizationInvitationToken(BaseJwtPrincipal):
 
     @property
     def by_member_reference_id(self):
-        return self.payload.get('byMemberReferenceId')
+        return self.payload.get('byMemberId')
 
     @property
     def role(self):
@@ -46,10 +46,10 @@ class RegistrationToken(BaseJwtPrincipal):
             return super().load(token)
 
         except itsdangerous.SignatureExpired:
-            raise HTTPTokenExpired()
+            raise StatusTokenExpired()
 
         except itsdangerous.BadSignature:
-            raise HTTPMalformedToken()
+            raise StatusMalformedToken()
 
     @classmethod
     def get_config(cls):

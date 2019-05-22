@@ -16,18 +16,14 @@ class TestToken(LocalApplicationTestCase):
         cls.owner = Member(
             title='Owner',
             email='owner1@example.com',
-            access_token='access token 1',
             phone=222222222,
-            reference_id=1
         )
         session.add(cls.owner)
 
         cls.member= Member(
             title='Member',
             email='member2@example.com',
-            access_token='access token 2',
             phone=333333333,
-            reference_id=2
         )
         session.add(cls.member)
 
@@ -54,7 +50,6 @@ class TestToken(LocalApplicationTestCase):
         session.add(invitation)
         session.commit()
 
-    def test_get_access_token(self):
         with oauth_mockup_server(), chat_mockup_server(), self.given(
                 'Try to get an access token from CAS',
                 '/apiv1/oauth2/tokens',

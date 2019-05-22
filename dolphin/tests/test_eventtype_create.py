@@ -14,7 +14,6 @@ class TestEventType(LocalApplicationTestCase):
             email='member1@example.com',
             access_token='access token 1',
             phone=123456789,
-            reference_id=1,
         )
         session.add(cls.member)
         session.commit()

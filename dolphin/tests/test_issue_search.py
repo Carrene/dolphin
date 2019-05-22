@@ -17,8 +17,6 @@ class TestIssue(LocalApplicationTestCase):
         cls.member = Member(
             email='member@example.com',
             title='member',
-            access_token='access token 1',
-            reference_id=2
         )
         workflow = Workflow(title='Default')
         skill = Skill(title='First Skill')

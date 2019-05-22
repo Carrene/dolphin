@@ -56,13 +56,13 @@ class TokenController(RestController):
 
         cas_member = cas_client.get_member(access_token)
         member = DBSession.query(Member) \
-            .filter(Member.reference_id == cas_member['id']) \
+            .filter(Member.id == cas_member['id']) \
             .one_or_none()
 
         if member is None:
 
             member = Member(
-                reference_id=cas_member['id'],
+                id=cas_member['id'],
                 email=cas_member['email'],
                 title=cas_member['title'],
                 access_token=access_token

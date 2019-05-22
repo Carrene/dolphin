@@ -60,15 +60,15 @@ class TestRegisteration(LocalApplicationTestCase):
             assert status == '747 Invalid Title Format'
 
             when('Duplicate title', form=Update(title='username'))
-            assert status == '604 Title Is Already Registered'
+            assert status == '661 Title Already Registered'
 
             when('Duplicate Email', form=Update(title='user_name'))
-            assert status == '601 Email Address Is Already Registered'
+            assert status == '662 Email Address Already Registered'
 
             when('The token has been damaged',
                 form=Update(ownershipToken='token')
             )
-            assert status == '611 Malformed Token'
+            assert status == '626 Malformed Token'
 
             settings.registration.max_age = 0.3
             registration_token = RegistrationToken(dict(email=email)).dump()
@@ -77,7 +77,7 @@ class TestRegisteration(LocalApplicationTestCase):
                 'The token is expired',
                 form=Update(ownershipToken=registration_token)
             )
-            assert status == '609 Token Expired'
+            assert status == '627 Token Expired'
 
             when('Trying to pass with empty form', form={})
             assert status == '400 Empty Form'
@@ -86,11 +86,11 @@ class TestRegisteration(LocalApplicationTestCase):
                 'Trying to pass without ownership token',
                 form=Remove('ownershipToken')
             )
-            assert status == '727 Token Not In Form'
+            assert status == '757 Token Not In Form'
 
             when('Trying to pass without title', form=Remove('title'))
-            assert status == '718 Title Not In Form'
+            assert status == '710 Title Not In Form'
 
             when('Trying to pass without password', form=Remove('password'))
-            assert status == '728 Password Not In Form'
+            assert status == '919 Password Not In Form'
 

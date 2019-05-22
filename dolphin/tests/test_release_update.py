@@ -25,9 +25,7 @@ class TestRelease(LocalApplicationTestCase):
         member1 = Member(
             title='First Member',
             email='member1@example.com',
-            access_token='access token 1',
             phone=123456789,
-            reference_id=1
         )
         session.add(member1)
 
@@ -38,9 +36,7 @@ class TestRelease(LocalApplicationTestCase):
         cls.member2 = Member(
             title='Second Member',
             email='member2@example.com',
-            access_token='access token 2',
             phone=123456788,
-            reference_id=2
         )
         session.add(cls.member2)
 

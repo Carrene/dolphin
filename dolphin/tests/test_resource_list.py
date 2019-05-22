@@ -26,9 +26,7 @@ class TestResource(LocalApplicationTestCase):
         cls.resource1 = Resource(
             title='First Resource',
             email='resource1@example.com',
-            access_token='access token 1',
             phone=222222222,
-            reference_id=2,
             skill=skill1
         )
         session.add(cls.resource1)
@@ -36,9 +34,7 @@ class TestResource(LocalApplicationTestCase):
         resource2 = Resource(
             title='Second Resource',
             email='resource2@example.com',
-            access_token='access token 2',
             phone=333333333,
-            reference_id=3,
             skill=skill1
         )
         session.add(resource2)
@@ -46,9 +42,7 @@ class TestResource(LocalApplicationTestCase):
         resource3 = Resource(
             title='Third Resource',
             email='resource3@example.com',
-            access_token='access token 3',
             phone=444444444,
-            reference_id=4,
             skill=skill2
         )
         session.add(resource3)

@@ -18,18 +18,14 @@ class TestSentMessegeWebhook(LocalApplicationTestCase):
         cls.member1 = Member(
             title='First Member',
             email='member1@example.com',
-            access_token='access token 1',
             phone=123456789,
-            reference_id=1
         )
         session.add(cls.member1)
 
         cls.member2 = Member(
             title='Second Member',
             email='member2@example.com',
-            access_token='access token 2',
             phone=123456788,
-            reference_id=2
         )
         session.add(cls.member2)
 
@@ -93,7 +89,7 @@ class TestSentMessegeWebhook(LocalApplicationTestCase):
             f'SENT',
             query=dict(
                 roomId=self.issue1.room_id,
-                memberReferenceId=self.member1.reference_id,
+                memberId=self.member1.reference_id,
             )
         ):
             assert status == 204
@@ -127,19 +123,19 @@ class TestSentMessegeWebhook(LocalApplicationTestCase):
 
             when(
                 'Member reference id not in query',
-                query=Remove('memberReferenceId'),
+                query=Remove('memberId'),
             )
             assert status == 400
 
             when(
                 'Member reference id must be integer',
-                query=Update(memberReferenceId='not-integer'),
+                query=Update(memberId='not-integer'),
             )
             assert status == 400
 
             when(
                 'Member not found',
-                query=Update(memberReferenceId=0),
+                query=Update(memberId=0),
             )
             assert status == '611 User Not Found'
 

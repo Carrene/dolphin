@@ -384,7 +384,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         try:
             chat_client.add_member(
                 issue.room_id,
-                context.identity.reference_id,
+                context.identity.id,
                 token,
                 member.access_token
             )
@@ -427,7 +427,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         try:
             chat_client.kick_member(
                 issue.room_id,
-                context.identity.reference_id,
+                context.identity.id,
                 token,
                 member.access_token
             )
@@ -674,7 +674,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             type_=int,
             required=True,
         ),
-        memberReferenceId=dict(
+        memberId=dict(
             type_=int,
             required=True,
         )
@@ -690,7 +690,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         member = DBSession.query(Member) \
             .filter(
-                Member.reference_id == context.query['memberReferenceId']
+                Member.id == context.query['memberId']
             ) \
             .one_or_none()
         if member is None:
@@ -711,7 +711,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             type_=int,
             required=True,
         ),
-        memberReferenceId=dict(
+        memberId=dict(
             type_=int,
             required=True,
         ),
@@ -727,7 +727,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         member = DBSession.query(Member) \
             .filter(
-                Member.reference_id == context.query['memberReferenceId']
+                Member.id == context.query['memberId']
             ) \
             .one_or_none()
         if member is None:

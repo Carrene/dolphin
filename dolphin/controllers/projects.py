@@ -61,7 +61,7 @@ class ProjectController(ModelRestController):
                     title,
                     token,
                     access_token,
-                    context.identity.reference_id
+                    context.identity.id
                 )
                 create_room_error = None
             except StatusChatRoomNotFound:
@@ -195,7 +195,7 @@ class ProjectController(ModelRestController):
         try:
             chat_client.add_member(
                 project.room_id,
-                manager.reference_id,
+                manager.id,
                 token,
                 creator.access_token
             )
@@ -384,7 +384,7 @@ class ProjectController(ModelRestController):
         try:
             chat_client.add_member(
                 project.room_id,
-                identity.reference_id,
+                identity.id,
                 token,
                 member.access_token
             )
@@ -400,7 +400,7 @@ class ProjectController(ModelRestController):
         except:
             chat_client.kick_member(
                 project.room_id,
-                identity.reference_id,
+                identity.id,
                 token,
                 member.access_token
             )
@@ -435,7 +435,7 @@ class ProjectController(ModelRestController):
         try:
             chat_client.kick_member(
                 project.room_id,
-                identity.reference_id,
+                identity.id,
                 token,
                 member.access_token
             )
@@ -453,7 +453,7 @@ class ProjectController(ModelRestController):
         except:
             chat_client.add_member(
                 project.room_id,
-                identity.reference_id,
+                identity.id,
                 token,
                 member.access_token
             )

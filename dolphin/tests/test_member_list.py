@@ -13,27 +13,21 @@ class TestMember(LocalApplicationTestCase):
         member1 = Member(
             title='First Member',
             email='member1@example.com',
-            access_token='access token 1',
             phone=123987465,
-            reference_id=3
         )
         session.add(member1)
 
         member2 = Member(
             title='Second Member',
             email='member2@example.com',
-            access_token='access token',
             phone=1287465,
-            reference_id=4
         )
         session.add(member2)
 
         member3 = Member(
             title='Third Member',
             email='member3@example.com',
-            access_token='access token',
             phone=1287456,
-            reference_id=5
         )
         session.add(member3)
         session.commit()

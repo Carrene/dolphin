@@ -13,18 +13,14 @@ class TestOrganizationMembers(LocalApplicationTestCase):
         cls.owner = Member(
             title='Owner',
             email='owner1@example.com',
-            access_token='access token 1',
             phone=222222222,
-            reference_id=2
         )
         session.add(cls.owner)
 
         cls.member= Member(
             title='Member',
             email='member1@example.com',
-            access_token='access token 2',
             phone=333333333,
-            reference_id=3
         )
         session.add(cls.member)
 

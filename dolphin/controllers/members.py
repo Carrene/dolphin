@@ -10,7 +10,8 @@ from ..tokens import RegistrationToken
 from ..models import Member, Skill, SkillMember, Organization, \
     OrganizationMember, Group, GroupMember
 from ..exceptions import StatusAlreadyGrantedSkill, StatusSkillNotGrantedYet, \
-    StatusQueryParameterNotInFormOrQueryString
+    StatusQueryParameterNotInFormOrQueryString, \
+    StatusTitleAlreadyRegistered, StatusEmailAddressAlreadyRegistered
 from ..validators import search_member_validator, register_member_validator
 from .organization import OrganizationController
 from .skill import SkillController
@@ -28,7 +29,7 @@ class MemberController(ModelRestController):
             id = int_or_notfound(remaining_paths[0])
             member = DBSession.query(Member).get(id)
             if member is None \
-                    or member.reference_id != context.identity.reference_id:
+                    or member.id != context.identity.id:
                 raise HTTPNotFound()
 
             return MemberOrganizationController(member=member) \
@@ -102,10 +103,10 @@ class MemberController(ModelRestController):
         email = registration_token_principal.email
 
         if DBSession.query(Member.title).filter(Member.title == title).count():
-            raise HTTPTitleAlreadyRegistered()
+            raise StatusTitleAlreadyRegistered()
 
         if DBSession.query(Member.email).filter(Member.email == email).count():
-            raise HTTPEmailAddressAlreadyRegistered()
+            raise StatusEmailAddressAlreadyRegistered()
 
         member = Member(
             email=email,

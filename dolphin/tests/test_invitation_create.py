@@ -19,27 +19,21 @@ class TestOrganization(LocalApplicationTestCase):
         cls.member1 = Member(
             title='First Member',
             email='member1@example.com',
-            access_token='access token 1',
             phone=123456789,
-            reference_id=2
         )
         session.add(cls.member1)
 
         cls.member2 = Member(
             title='Second Member',
             email='member2@example.com',
-            access_token='access token 2',
             phone=123456788,
-            reference_id=3
         )
         session.add(cls.member2)
 
         cls.member3 = Member(
             title='Third Member',
             email='member3@example.com',
-            access_token='access token 3',
             phone=123456787,
-            reference_id=4
         )
         session.add(cls.member3)
 

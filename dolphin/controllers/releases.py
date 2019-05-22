@@ -63,13 +63,13 @@ class ReleaseController(ModelRestController):
             release.get_room_title(),
             token,
             creator.access_token,
-            context.identity.reference_id
+            context.identity.id
         )
         release.room_id = room['id']
         try:
             chat_client.add_member(
                 release.room_id,
-                manager.reference_id,
+                manager.id,
                 token,
                 creator.access_token
             )

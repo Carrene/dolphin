@@ -16,9 +16,7 @@ class TestMentionedMemberWebhook(LocalApplicationTestCase):
         cls.member1 = Member(
             title='First Member',
             email='member1@example.com',
-            access_token='access token 1',
             phone=123456789,
-            reference_id=1
         )
         session.add(cls.member1)
 
@@ -84,7 +82,7 @@ class TestMentionedMemberWebhook(LocalApplicationTestCase):
             f'MENTIONED',
             query=dict(
                 roomId=self.issue1.room_id,
-                memberReferenceId=self.member1.reference_id,
+                memberId=self.member1.reference_id,
             )
         ):
             assert status == 204
@@ -122,20 +120,20 @@ class TestMentionedMemberWebhook(LocalApplicationTestCase):
             assert status == '605 Issue Not Found'
 
             when(
-                'memberReferenceId not in query',
-                query=given - 'memberReferenceId',
+                'memberId not in query',
+                query=given - 'memberId',
             )
             assert status == 400
 
             when(
-                'memberReferenceId must be integer',
-                query=given | dict(memberReferenceId='not-integer'),
+                'memberId must be integer',
+                query=given | dict(memberId='not-integer'),
             )
             assert status == 400
 
             when(
                 'Member not found',
-                query=given | dict(memberReferenceId=0),
+                query=given | dict(memberId=0),
             )
             assert status == '610 Member Not Found'
 

@@ -19,17 +19,15 @@ class TestActivity(LocalApplicationTestCase):
         cls.member = Member(
             title='First Member',
             email='member1@example.com',
-            access_token='access token 1',
             phone=123456789,
-            reference_id=1
+            password='123ABCabc',
         )
 
         member2 = Member(
             title='Second Member',
             email='member2@example.com',
-            access_token='access token 2',
             phone=1234567890,
-            reference_id=2
+            password='123ABCabc',
         )
 
         workflow = create_workflow()

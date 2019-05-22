@@ -18,9 +18,7 @@ class TestItem(LocalApplicationTestCase):
         cls.member1 = Member(
             title='First Member',
             email='member1@example.com',
-            access_token='access token 1',
             phone=123456789,
-            reference_id=2
         )
 
         workflow = Workflow(title='Default')

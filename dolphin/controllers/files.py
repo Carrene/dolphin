@@ -27,7 +27,7 @@ class FileController(ModelRestController):
             raise HTTPNotFound()
 
         current_member = DBSession.query(Member) \
-            .filter(Member.reference_id == context.identity.reference_id) \
+            .filter(Member.id == context.identity.id) \
             .one()
         attachment = Attachment(
             file=form['attachment'],

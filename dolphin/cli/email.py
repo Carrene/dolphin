@@ -47,7 +47,7 @@ class SendEmailLauncher(Launcher):  # pragma: no cover
         token = OrganizationInvitationToken(dict(
             email=self.args.email,
             organizationId=self.args.organization_id,
-            byMemberReferenceId=self.args.inviter_id,
+            byMemberId=self.args.inviter_id,
             role=self.args.role,
         ))
         email = OrganizationInvitationEmail(

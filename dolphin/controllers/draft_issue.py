@@ -43,7 +43,7 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
                     title,
                     token,
                     access_token,
-                    context.identity.reference_id
+                    context.identity.id
                 )
                 create_room_error = None
 
@@ -122,7 +122,7 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
         try:
             chat_client.add_member(
                 issue.room_id,
-                current_member.reference_id,
+                current_member.id,
                 token,
                 current_member.access_token
             )
