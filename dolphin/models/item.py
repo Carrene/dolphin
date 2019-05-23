@@ -134,7 +134,8 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     )
     dailyreports = relationship(
         'Dailyreport',
-        back_populates='item'
+        back_populates='item',
+        cascade='delete'
     )
 
     hours_worked = column_property(
