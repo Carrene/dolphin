@@ -89,9 +89,6 @@ class TestItem(LocalApplicationTestCase):
             assert response.json['id'] == self.item.id
             assert response.json['perspective'] == 'due'
 
-            session = self.create_session()
-            item = session.query(Item).get(self.item.id)
-
             issue = response.json['issue']
             assert issue['title'] == self.issue1.title
 
