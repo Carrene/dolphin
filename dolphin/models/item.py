@@ -162,7 +162,6 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
         return 'due'
 
-
     def to_dict(self):
         item_dict = super().to_dict()
         item_dict['hoursWorked'] = self.hours_worked
