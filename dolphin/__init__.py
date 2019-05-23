@@ -74,6 +74,9 @@ class Dolphin(Application):
           logos:
             max_length: 50 # KB
             min_length: 1  # KB
+
+      item:
+        response_time: 48 # Hours
    '''
 
     def __init__(self, application_name='dolphin', root=Root()):
