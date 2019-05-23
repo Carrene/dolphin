@@ -4,7 +4,7 @@ from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when
 
 from dolphin.models import Project, Member, Workflow, Group, Release, Skill, \
-    Phase, Issue, Item
+    Phase, Issue, Item, Dailyreport
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -87,6 +87,7 @@ class TestItem(LocalApplicationTestCase):
         ):
             assert status == 200
             assert response.json['id'] == self.item.id
+            assert response.json['perspective'] == 'due'
 
             issue = response.json['issue']
             assert issue['title'] == self.issue1.title

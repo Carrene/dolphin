@@ -135,7 +135,9 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     dailyreports = relationship(
         'Dailyreport',
         back_populates='item',
-        cascade='delete'
+        cascade='delete',
+        lazy='selectin',
+        order_by='Dailyreport.id',
     )
 
     hours_worked = column_property(
@@ -145,9 +147,23 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     UniqueConstraint(phase_id, issue_id, member_id)
 
+    @property
+    def perspective(self):
+        if len(self.dailyreports) == 0:
+            return 'due'
+
+        if self.dailyreports[-1].date < datetime.now().date():
+            return 'over due'
+
+        if self.dailyreports[-1].note != None:
+            return 'submitted'
+
+        return 'due'
+
     def to_dict(self):
         item_dict = super().to_dict()
         item_dict['hoursWorked'] = self.hours_worked
+        item_dict['perspective'] = self.perspective
         return item_dict
 
     @classmethod
@@ -159,6 +175,18 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             label='Lorem Ipsun',
             required=False,
             readonly=True,
+            watermark='Lorem Ipsum',
+            example='Lorem Ipsum',
+            message='Lorem Ipsun',
+        )
+
+        yield MetadataField(
+            name='perspective',
+            key='perspective',
+            label='Perspective',
+            required=False,
+            readonly=True,
+            not_none=True,
             watermark='Lorem Ipsum',
             example='Lorem Ipsum',
             message='Lorem Ipsun',
