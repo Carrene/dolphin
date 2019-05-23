@@ -182,3 +182,15 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             message='Lorem Ipsun',
         )
 
+        yield MetadataField(
+            name='perspective',
+            key='perspective',
+            label='Perspective',
+            required=False,
+            readonly=True,
+            not_none=True,
+            watermark='Lorem Ipsum',
+            example='Lorem Ipsum',
+            message='Lorem Ipsun',
+        )
+
