@@ -154,13 +154,14 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         if len(self.dailyreports) == 0:
             return 'due'
 
+        if self.dailyreports[-1].date < datetime.now().date():
+            return 'over due'
+
         if self.dailyreports[-1].note != None:
             return 'submitted'
 
-        if self.dailyreports[-1].date == datetime.now().date():
-            return 'due'
+        return 'due'
 
-        return 'over due'
 
     def to_dict(self):
         item_dict = super().to_dict()
