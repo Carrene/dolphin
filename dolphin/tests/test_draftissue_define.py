@@ -1,7 +1,7 @@
 from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when
 
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 from dolphin.models import Member, Workflow, Group, Project, Issue, Release
 
 
@@ -12,12 +12,13 @@ class TestDraftIssue(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        cls.member1 = Member(
+        cls.member = Member(
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
-        session.add(cls.member1)
+        session.add(cls.member)
 
         workflow = Workflow(title='default')
 
@@ -28,7 +29,7 @@ class TestDraftIssue(LocalApplicationTestCase):
             description='A decription for my first release',
             cutoff='2030-2-20',
             launch_date='2030-2-20',
-            manager=cls.member1,
+            manager=cls.member,
             room_id=0,
             group=group,
         )
@@ -37,7 +38,7 @@ class TestDraftIssue(LocalApplicationTestCase):
             release=release,
             workflow=workflow,
             group=group,
-            manager=cls.member1,
+            manager=cls.member,
             title='My first project',
             description='A decription for my project',
             room_id=1
@@ -56,9 +57,9 @@ class TestDraftIssue(LocalApplicationTestCase):
         session.commit()
 
     def test_define(self):
-        self.login(self.member1.email)
+        self.login(self.member.email, self.member.password)
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             'Define a draft issue',
             '/apiv1/draftissues',
             'DEFINE',

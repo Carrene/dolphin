@@ -5,7 +5,7 @@ from auditor.context import Context as AuditLogContext
 
 from dolphin.models import Member, Release, Project, Issue, Group, Workflow, \
     Skill, Subscription
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestIssue(LocalApplicationTestCase):
@@ -17,6 +17,7 @@ class TestIssue(LocalApplicationTestCase):
         cls.member = Member(
             email='member@example.com',
             title='member',
+            password='123ABCabc',
         )
         workflow = Workflow(title='Default')
         skill = Skill(title='First Skill')
@@ -103,7 +104,7 @@ class TestIssue(LocalApplicationTestCase):
     def test_search_issue(self):
         self.login(self.member.email)
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             'Search for a issue by submitting form',
             '/apiv1/issues',
             'SEARCH',
@@ -173,9 +174,9 @@ class TestIssue(LocalApplicationTestCase):
             assert response.json[0]['id'] == self.issue1.id
 
     def test_request_with_query_string(self):
-        self.login(self.member.email)
+        self.login(self.member.email, self.member.password)
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             'Test request using query string',
             '/apiv1/issues',
             'SEARCH',

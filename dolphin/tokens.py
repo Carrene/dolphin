@@ -31,7 +31,7 @@ class OrganizationInvitationToken(BaseJwtPrincipal):
         return self.payload.get('organizationId')
 
     @property
-    def by_member_reference_id(self):
+    def by_member_id(self):
         return self.payload.get('byMemberId')
 
     @property

@@ -3,7 +3,7 @@ from bddrest import status, when, response, Remove, Update, given
 
 from dolphin.models import Issue, Project, Member, Phase, Group, Workflow, \
     Release, Skill
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestIssue(LocalApplicationTestCase):
@@ -17,12 +17,14 @@ class TestIssue(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
 
         cls.member2 = Member(
             title='Second Member',
             email='member2@example.com',
             phone=123456788,
+            password='123ABCabc',
         )
         session.add(cls.member2)
 
@@ -81,7 +83,7 @@ class TestIssue(LocalApplicationTestCase):
         session.commit()
 
     def test_assign(self):
-        self.login(self.member1.email)
+        self.login(self.member1.email, self.member1.password)
         form = dict(
             memberId=self.member2.id,
             phaseId=1,
@@ -89,7 +91,7 @@ class TestIssue(LocalApplicationTestCase):
             status='in-progress'
         )
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             'Assign an issue to a resource',
             f'/apiv1/issues/id: {self.issue1.id}',
             'ASSIGN',

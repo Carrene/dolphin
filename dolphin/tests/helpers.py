@@ -108,66 +108,6 @@ class Authorization(Authenticator):
 
 
 @contextmanager
-def oauth_mockup_server():
-    class Root(RegexRouteController):
-        def __init__(self):
-            super().__init__([
-                ('/apiv1/accesstokens', self.create),
-                ('/apiv1/members/me', self.get),
-            ])
-
-        @json
-        def create(self):
-            code = context.form.get('code')
-            if not code.startswith('authorization code'):
-                return dict(accessToken='token is damage', memberId=1)
-
-            if _oauth_server_status != 'idle':
-                raise HTTPStatus(_oauth_server_status)
-
-            if code.startswith('authorization code 2'):
-                return dict(accessToken='access token 2', memberId=2)
-
-            return dict(accessToken='access token', memberId=1)
-
-        @json
-        def get(self):
-            access_token = context.environ['HTTP_AUTHORIZATION']
-
-            if 'access token 2' in access_token:
-                return dict(
-                    id=2,
-                    title='member2',
-                    email='member2@example.com',
-                    avatar='avatar2',
-                    name='full name'
-                )
-
-            if 'access token' in access_token:
-                return dict(
-                    id=1,
-                    title='member1',
-                    email='member1@example.com',
-                    avatar='avatar1',
-                    name='full name'
-                )
-
-            raise HTTPForbidden()
-
-    app = MockupApplication('root', Root())
-    with mockup_http_server(app) as (server, url):
-        settings.merge(f'''
-            tokenizer:
-              url: {url}
-            oauth:
-              secret: oauth2-secret
-              application_id: 1
-              url: {url}
-        ''')
-        yield app
-
-
-@contextmanager
 def chat_mockup_server():
     class Root(RegexRouteController):
         def __init__(self):
@@ -262,14 +202,6 @@ def chat_server_status(status):
     _chat_server_status = status
     yield
     _chat_server_status = 'idle'
-
-
-@contextmanager
-def oauth_server_status(status):
-    global _oauth_server_status
-    _oauth_server_status = status
-    yield
-    _oauth_server_status = 'idle'
 
 
 def create_group(title='already exist'):

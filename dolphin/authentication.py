@@ -1,10 +1,9 @@
 from cas import CASPrincipal
 from itsdangerous import JSONWebSignatureSerializer
-from nanohttp import context, HTTPStatus, HTTPUnauthorized
+from nanohttp import context, HTTPStatus
 from restfulpy.authentication import StatefulAuthenticator
 from restfulpy.orm import DBSession
 
-from .backends import CASClient
 from .models import Member
 
 
@@ -42,33 +41,20 @@ class Authenticator(StatefulAuthenticator):
         return member
 
     def verify_token(self, encoded_token):
-        principal = CASPrincipal.load(encoded_token)
+        if not encoded_token.startswith('oauth2-accesstoken'):
+            return CASPrincipal.load(encoded_token)
 
-        member = DBSession.query(Member) \
-            .filter(Member.reference_id == principal.reference_id) \
-            .one_or_none()
-        if not member:
-            raise HTTPUnauthorized()
+        access_token = AccessToken.load(encoded_token.split(' ')[1])
+        if not DBSession.query(ApplicationMember) \
+                .filter(
+                    ApplicationMember.application_id ==  \
+                    access_token.application_id,
+                    ApplicationMember.member_id == access_token.member_id
+                ) \
+                .one_or_none():
+            raise HTTPForbidden()
 
-        cas_member = CASClient().get_member(member.access_token)
-
-        self.update_member_if_needed(member, cas_member)
-        return principal
-
-    def update_member_if_needed(self, member, cas_member):
-
-        # FIXME: If any item added to scopes, the additional scopes item must
-        # be considered here
-        if member.title != cas_member['title']:
-            member.title = cas_member['title']
-
-        if member.avatar != cas_member['avatar']:
-            member.avatar = cas_member['avatar']
-
-        if member.name != cas_member['name']:
-            member.name = cas_member['name']
-
-        DBSession.commit()
+        return access_token
 
     def get_previous_payload(self):
         if hasattr(context, 'identity') and context.identity:

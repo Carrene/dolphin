@@ -3,8 +3,7 @@ from bddrest import status, when, given, response
 
 from dolphin.models import Release, Member, Project, Subscription, Workflow, \
     Group
-from dolphin.tests.helpers import LocalApplicationTestCase, \
-    oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestRelease(LocalApplicationTestCase):
@@ -18,6 +17,7 @@ class TestRelease(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(member)
 
@@ -64,7 +64,7 @@ class TestRelease(LocalApplicationTestCase):
     def test_unsubscribe(self):
         self.login('member1@example.com')
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             'Unsubscribe release',
             f'/apiv1/releases/id:{self.release1.id}',
             'UNSUBSCRIBE',

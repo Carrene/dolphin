@@ -1,6 +1,6 @@
 from bddrest import status, response, when, given
 from dolphin.models import Member
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestEventType(LocalApplicationTestCase):
@@ -12,8 +12,8 @@ class TestEventType(LocalApplicationTestCase):
         cls.member = Member(
             title='First Member',
             email='member1@example.com',
-            access_token='access token 1',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(cls.member)
         session.commit()
@@ -23,7 +23,7 @@ class TestEventType(LocalApplicationTestCase):
         title = 'Type1'
         description = 'A description for a type1'
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             'Creating an event type',
             '/apiv1/eventtypes',
             'CREATE',

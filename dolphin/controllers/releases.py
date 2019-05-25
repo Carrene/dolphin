@@ -62,7 +62,6 @@ class ReleaseController(ModelRestController):
         room = chat_client.create_room(
             release.get_room_title(),
             token,
-            creator.access_token,
             context.identity.id
         )
         release.room_id = room['id']
@@ -71,7 +70,6 @@ class ReleaseController(ModelRestController):
                 release.room_id,
                 manager.id,
                 token,
-                creator.access_token
             )
 
         except StatusRoomMemberAlreadyExist:

@@ -5,7 +5,7 @@ from auditor.context import Context as AuditLogContext
 
 from dolphin.models import Member, Dailyreport, Workflow, Skill, Group, Phase, \
     Release, Project, Issue, Item
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestDailyreport(LocalApplicationTestCase):
@@ -19,6 +19,7 @@ class TestDailyreport(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(cls.member)
 
@@ -89,7 +90,7 @@ class TestDailyreport(LocalApplicationTestCase):
             note='Some note'
         )
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             f'Updating a dailyreport',
             f'/apiv1/items/item_id: {self.item.id}/dailyreports/id: {self.dailyreport.id}',
             f'UPDATE',

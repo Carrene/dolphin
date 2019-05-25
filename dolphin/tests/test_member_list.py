@@ -1,7 +1,7 @@
 from bddrest import status, response, when
 
 from dolphin.models import Member
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestMember(LocalApplicationTestCase):
@@ -10,32 +10,35 @@ class TestMember(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        member1 = Member(
+        cls.member1 = Member(
             title='First Member',
             email='member1@example.com',
             phone=123987465,
+            password='123ABCabc',
         )
-        session.add(member1)
+        session.add(cls.member1)
 
         member2 = Member(
             title='Second Member',
             email='member2@example.com',
             phone=1287465,
+            password='123ABCabc',
         )
         session.add(member2)
 
-        member3 = Member(
+        cls.member3 = Member(
             title='Third Member',
             email='member3@example.com',
             phone=1287456,
+            password='123ABCabc',
         )
-        session.add(member3)
+        session.add(cls.member3)
         session.commit()
 
     def test_list(self):
-        self.login('member1@example.com')
+        self.login(self.member1.email)
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             'List members',
             '/apiv1/members',
             'LIST',
@@ -48,13 +51,13 @@ class TestMember(LocalApplicationTestCase):
                 query=dict(sort='title')
             )
             assert status == 200
-            assert response.json[0]['title'] == 'member1'
+            assert response.json[0]['title'] == self.member1.title
 
             when(
                 'Reverse sorting titles by alphabet',
                 query=dict(sort='-title')
             )
-            assert response.json[0]['title'] == 'Third Member'
+            assert response.json[0]['title'] == self.member3.title
 
             when(
                 'List members except one of them',
@@ -66,13 +69,13 @@ class TestMember(LocalApplicationTestCase):
                 'Member pagination',
                 query=dict(sort='id', take=1, skip=2)
             )
-            assert response.json[0]['title'] == 'Third Member'
+            assert response.json[0]['title'] == self.member3.title
 
             when(
                 'Manipulate sorting and pagination',
                 query=dict(sort='-title', take=1, skip=2)
             )
-            assert response.json[0]['title'] == 'member1'
+            assert response.json[0]['title'] == self.member1.title
 
             when('Request is not authorized', authorization=None)
             assert status == 401

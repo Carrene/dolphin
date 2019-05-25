@@ -6,7 +6,7 @@ from nanohttp import context
 
 from dolphin import Dolphin
 from dolphin.models import Release, Member, Group
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 def callback(audit_logs):
@@ -26,6 +26,7 @@ class TestRelease(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(member1)
 
@@ -37,6 +38,7 @@ class TestRelease(LocalApplicationTestCase):
             title='Second Member',
             email='member2@example.com',
             phone=123456788,
+            password='123ABCabc',
         )
         session.add(cls.member2)
 
@@ -66,7 +68,7 @@ class TestRelease(LocalApplicationTestCase):
     def test_update(self):
         self.login('member1@example.com')
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             'Updating a release',
             '/apiv1/releases/id:1',
             'UPDATE',
@@ -197,7 +199,7 @@ class TestRelease(LocalApplicationTestCase):
             when('Request is not authorized', authorization=None)
             assert status == 401
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             'Send HTTP request with empty form parameter',
             '/apiv1/releases/id:1',
             'UPDATE',

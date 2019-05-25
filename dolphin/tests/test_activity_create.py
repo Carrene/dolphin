@@ -6,7 +6,7 @@ from auditor.context import Context as AuditLogContext
 from dolphin.models import Member, Skill, Phase, Release, \
     Project, Issue, Item
 from dolphin.tests.helpers import create_group, LocalApplicationTestCase, \
-    oauth_mockup_server, create_workflow
+    create_workflow
 
 
 class TestActivity(LocalApplicationTestCase):
@@ -118,9 +118,9 @@ class TestActivity(LocalApplicationTestCase):
         session.commit()
 
     def test_create(self):
-        self.login(self.member.email)
+        self.login(self.member.email, self.member.password)
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             f'Creating an activity',
             f'/apiv1/issues/id: {self.issue1.id}/activities',
             f'CREATE',

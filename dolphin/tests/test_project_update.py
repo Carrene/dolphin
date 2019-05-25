@@ -9,8 +9,7 @@ from nanohttp import context
 from dolphin import Dolphin
 from dolphin.middleware_callback import callback as auditor_callback
 from dolphin.models import Project, Member, Workflow, Group, Release
-from dolphin.tests.helpers import LocalApplicationTestCase, \
-    oauth_mockup_server, chat_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase, chat_mockup_server
 
 
 def callback(audit_logs):
@@ -31,6 +30,7 @@ class TestProject(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(cls.member1)
 
@@ -38,6 +38,7 @@ class TestProject(LocalApplicationTestCase):
             title='Second Member',
             email='member2@example.com',
             phone=123457689,
+            password='123ABCabc',
         )
         session.add(cls.member2)
 
@@ -132,7 +133,7 @@ class TestProject(LocalApplicationTestCase):
         class Identity:
             def __init__(self, member):
                 self.id = member.id
-                self.reference_id = member.reference_id
+                self.id = member.id
 
         with Context({}):
             context.identity = Identity(self.member1)
@@ -152,7 +153,7 @@ class TestProject(LocalApplicationTestCase):
             secondaryManagerId=self.member1.id,
         )
 
-        with oauth_mockup_server(), chat_mockup_server(), self.given(
+        with chat_mockup_server(), self.given(
             'Updating a project',
             f'/apiv1/projects/id:{self.project1.id}',
             'UPDATE',

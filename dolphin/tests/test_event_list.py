@@ -3,7 +3,7 @@ import datetime
 from bddrest import when, response, status
 
 from dolphin.models import Member, Event, EventType
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestEvent(LocalApplicationTestCase):
@@ -15,6 +15,7 @@ class TestEvent(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(cls.member)
 
@@ -53,7 +54,7 @@ class TestEvent(LocalApplicationTestCase):
     def test_list(self):
         self.login(self.member.email)
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             'List of events',
             '/apiv1/events',
             'LIST',

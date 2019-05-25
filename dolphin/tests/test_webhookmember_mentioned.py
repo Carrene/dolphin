@@ -3,7 +3,7 @@ from bddrest import status, when, given
 
 from dolphin.models import Issue, Project, Member, Workflow, Group, \
     Subscription, Release
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestMentionedMemberWebhook(LocalApplicationTestCase):
@@ -17,6 +17,7 @@ class TestMentionedMemberWebhook(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(cls.member1)
 
@@ -76,13 +77,13 @@ class TestMentionedMemberWebhook(LocalApplicationTestCase):
 
     def test_mentioned_member_webhook(self):
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             f'MENTIONED member webhook handler',
             f'/apiv1/issues',
             f'MENTIONED',
             query=dict(
                 roomId=self.issue1.room_id,
-                memberId=self.member1.reference_id,
+                memberId=self.member1.id,
             )
         ):
             assert status == 204

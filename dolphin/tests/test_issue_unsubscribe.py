@@ -6,7 +6,7 @@ from auditor.context import Context as AuditLogContext
 from dolphin.models import Issue, Project, Member, Subscription, Workflow, \
     Group, Release
 from dolphin.tests.helpers import LocalApplicationTestCase, \
-    oauth_mockup_server, chat_mockup_server, chat_server_status
+    chat_mockup_server, chat_server_status
 
 
 class TestIssue(LocalApplicationTestCase):
@@ -16,12 +16,13 @@ class TestIssue(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        member = Member(
+        cls.member = Member(
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
-        session.add(member)
+        session.add(cls.member)
 
         workflow = Workflow(title='Default')
         group = Group(title='default')
@@ -31,7 +32,7 @@ class TestIssue(LocalApplicationTestCase):
             description='A decription for my first release',
             cutoff='2030-2-20',
             launch_date='2030-2-20',
-            manager=member,
+            manager=cls.member,
             room_id=0,
             group=group,
         )
@@ -40,7 +41,7 @@ class TestIssue(LocalApplicationTestCase):
             release=release,
             workflow=workflow,
             group=group,
-            manager=member,
+            manager=cls.member,
             title='My first project',
             description='A decription for my project',
             room_id=1
@@ -48,7 +49,7 @@ class TestIssue(LocalApplicationTestCase):
         session.add(project)
 
         with Context(dict()):
-            context.identity = member
+            context.identity = cls.member
 
             cls.issue1 = Issue(
                 project=project,
@@ -76,12 +77,12 @@ class TestIssue(LocalApplicationTestCase):
 
             subscription1 = Subscription(
                 subscribable_id=cls.issue1.id,
-                member_id=member.id
+                member_id=cls.member.id
             )
             session.add(subscription1)
 
             one_shot_subscription = Subscription(
-                member_id=member.id,
+                member_id=cls.member.id,
                 subscribable_id=cls.issue1.id,
                 one_shot=True,
             )
@@ -89,15 +90,15 @@ class TestIssue(LocalApplicationTestCase):
 
             subscription2 = Subscription(
                 subscribable_id=issue2.id,
-                member_id=member.id
+                member_id=cls.member.id
             )
             session.add(subscription2)
             session.commit()
 
     def test_unsubscribe(self):
-        self.login('member1@example.com')
+        self.login(self.member.email, self.member.password)
 
-        with oauth_mockup_server(), chat_mockup_server(), self.given(
+        with chat_mockup_server(), self.given(
             'Unsubscribe an issue',
             f'/apiv1/issues/id:{self.issue1.id}',
             'UNSUBSCRIBE',

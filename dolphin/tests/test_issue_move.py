@@ -6,7 +6,7 @@ from dolphin import Dolphin
 from dolphin.middleware_callback import callback as auditor_callback
 from dolphin.models import Issue, Project, Member, Workflow, Group, Release
 from dolphin.tests.helpers import LocalApplicationTestCase, \
-    oauth_mockup_server, chat_mockup_server
+    chat_mockup_server
 
 
 class TestIssue(LocalApplicationTestCase):
@@ -17,12 +17,13 @@ class TestIssue(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        member = Member(
+        cls.member = Member(
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
-        session.add(member)
+        session.add(cls.member)
 
         workflow = Workflow(title='Default')
         group = Group(title='default')
@@ -32,7 +33,7 @@ class TestIssue(LocalApplicationTestCase):
             description='A decription for my first release',
             cutoff='2030-2-20',
             launch_date='2030-2-20',
-            manager=member,
+            manager=cls.member,
             room_id=0,
             group=group,
         )
@@ -41,7 +42,7 @@ class TestIssue(LocalApplicationTestCase):
             release=release,
             workflow=workflow,
             group=group,
-            manager=member,
+            manager=cls.member,
             title='My first project',
             description='A decription for my project',
             room_id=1
@@ -52,7 +53,7 @@ class TestIssue(LocalApplicationTestCase):
             release=release,
             workflow=workflow,
             group=group,
-            manager=member,
+            manager=cls.member,
             title='My second project',
             description='A decription for my project',
             room_id=2
@@ -63,7 +64,7 @@ class TestIssue(LocalApplicationTestCase):
             release=release,
             workflow=workflow,
             group=group,
-            manager=member,
+            manager=cls.member,
             title='My third project',
             description='A decription for my project',
             room_id=3
@@ -84,9 +85,9 @@ class TestIssue(LocalApplicationTestCase):
         session.commit()
 
     def test_move(self):
-        self.login('member1@example.com')
+        self.login(self.member.email, self.member.password)
 
-        with oauth_mockup_server(), chat_mockup_server(), self.given(
+        with chat_mockup_server(), self.given(
             f'Move a issue',
             f'/apiv1/issues/id: {self.issue1.id}',
             f'MOVE',

@@ -2,7 +2,7 @@ from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when
 
 from dolphin.models import Project, Member, Workflow, Group, Release
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestProject(LocalApplicationTestCase):
@@ -12,10 +12,11 @@ class TestProject(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        member1 = Member(
+        cls.member1 = Member(
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
 
         workflow = Workflow(title='Default')
@@ -26,7 +27,7 @@ class TestProject(LocalApplicationTestCase):
             description='A decription for my first release',
             cutoff='2030-2-20',
             launch_date='2030-2-20',
-            manager=member1,
+            manager=cls.member1,
             room_id=0,
             group=group,
         )
@@ -35,7 +36,7 @@ class TestProject(LocalApplicationTestCase):
             release=release,
             workflow=workflow,
             group=group,
-            manager=member1,
+            manager=cls.member1,
             title='My first project',
             description='A decription for my project',
             room_id=1001
@@ -44,9 +45,9 @@ class TestProject(LocalApplicationTestCase):
         session.commit()
 
     def test_get(self):
-        self.login('member1@example.com')
+        self.login(self.member1.email, self.member1.password)
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             'Testing the patch method on APIv1',
             verb='PATCH',
             url='/apiv1',

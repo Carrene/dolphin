@@ -7,7 +7,7 @@ from dolphin import Dolphin
 from dolphin.middleware_callback import callback as auditor_callback
 from dolphin.models import Member, Release, Group
 from dolphin.tests.helpers import LocalApplicationTestCase, \
-    oauth_mockup_server, chat_mockup_server, chat_server_status
+    chat_mockup_server, chat_server_status
 
 
 def callback(audit_logs):
@@ -28,6 +28,7 @@ class TestRelease(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(cls.member)
 
@@ -48,7 +49,7 @@ class TestRelease(LocalApplicationTestCase):
     def test_create(self):
         self.login('member1@example.com')
 
-        with oauth_mockup_server(), chat_mockup_server(), self.given(
+        with chat_mockup_server(), self.given(
             'Createing a release',
             '/apiv1/releases',
             'CREATE',

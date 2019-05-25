@@ -1,7 +1,7 @@
 from bddrest.authoring import when, status, response
 
 from dolphin.models import Member, Organization, OrganizationMember
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestOrganization(LocalApplicationTestCase):
@@ -13,6 +13,7 @@ class TestOrganization(LocalApplicationTestCase):
             title='Owner',
             email='owner1@example.com',
             phone=222222222,
+            password='123ABCabc',
         )
         session.add(cls.owner)
 
@@ -20,6 +21,7 @@ class TestOrganization(LocalApplicationTestCase):
             title='Member',
             email='member1@example.com',
             phone=333333333,
+            password='123ABCabc',
         )
         session.add(cls.member)
 
@@ -40,7 +42,7 @@ class TestOrganization(LocalApplicationTestCase):
     def test_get(self):
         self.login(email=self.owner.email)
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             f'Get one of my organization using id',
             f'/apiv1/organizations/id: {self.organization.id}',
             f'GET',

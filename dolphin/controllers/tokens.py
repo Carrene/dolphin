@@ -1,11 +1,13 @@
-from nanohttp import RestController, json, context, HTTPBadRequest
+from nanohttp import RestController, json, context, HTTPBadRequest, validate
 from restfulpy.authorization import authorize
 from restfulpy.orm import DBSession, commit
 from sqlalchemy import exists, and_
 
 from ..backends import CASClient, ChatClient
 from ..models import Member, Invitation, OrganizationMember
-from ..validators import token_obtain_validator
+from ..validators import token_obtain_validator, USER_EMAIL_PATTERN
+from ..exceptions import StatusEmailNotInForm, StatusInvalidEmailFormat, \
+    StatusIncorrectEMailOrPassword
 
 
 class TokenController(RestController):
@@ -45,65 +47,25 @@ class TokenController(RestController):
         context.application.__authenticator__.logout()
         return {}
 
-    @json
-    @token_obtain_validator
-    @commit
-    def obtain(self):
-        cas_client = CASClient()
-
-        access_token, ___ = cas_client \
-            .get_access_token(context.form.get('authorizationCode'))
-
-        cas_member = cas_client.get_member(access_token)
-        member = DBSession.query(Member) \
-            .filter(Member.id == cas_member['id']) \
-            .one_or_none()
-
-        if member is None:
-
-            member = Member(
-                id=cas_member['id'],
-                email=cas_member['email'],
-                title=cas_member['title'],
-                access_token=access_token
-            )
-            DBSession.add(member)
-
-        if member.title != cas_member['title']:
-            member.title = cas_member['title']
-
-        if member.avatar != cas_member['avatar']:
-            member.avatar = cas_member['avatar']
-
-        if member.name != cas_member['name']:
-            member.name = cas_member['name']
-
-        if member.access_token != access_token:
-            member.access_token = access_token
-
-        DBSession.flush()
-        principal = context.application.__authenticator__.login(member.email)
-
-        organization_id = self._ensure_organization(member)
-        principal.payload['organizationId'] = organization_id
-        token = principal.dump().decode('utf-8')
-
-        ensured_member = ChatClient().ensure_member(token, member.access_token)
-        return dict(token=token)
-
     @json(prevent_empty_form=True)
-    @email_validator
+    @validate(
+        email=dict(
+            required=StatusEmailNotInForm,
+            pattern=(USER_EMAIL_PATTERN, StatusInvalidEmailFormat)
+        )
+    )
     def create(self):
+        import pudb; pudb.set_trace()  # XXX BREAKPOINT
         email = context.form.get('email')
         password = context.form.get('password')
         if email and password is None:
-            raise HTTPIncorrectEmailOrPassword()
+            raise StatusIncorrectEMailOrPassword()
 
         principal = context.application.__authenticator__.\
             login((email, password))
 
         if principal is None:
-            raise HTTPIncorrectEmailOrPassword()
+            raise StatusIncorrectEMailOrPassword()
 
         return dict(token=principal.dump())
 

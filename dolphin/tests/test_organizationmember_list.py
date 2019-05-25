@@ -2,7 +2,7 @@ from bddrest.authoring import when, status, response
 
 from dolphin.models import Member, Organization, OrganizationMember, Group, \
     Skill
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestOrganizationMembers(LocalApplicationTestCase):
@@ -14,6 +14,7 @@ class TestOrganizationMembers(LocalApplicationTestCase):
             title='Owner',
             email='owner1@example.com',
             phone=222222222,
+            password='123ABCabc',
         )
         session.add(cls.owner)
 
@@ -21,6 +22,7 @@ class TestOrganizationMembers(LocalApplicationTestCase):
             title='Member',
             email='member1@example.com',
             phone=333333333,
+            password='123ABCabc',
         )
         session.add(cls.member)
 
@@ -63,7 +65,7 @@ class TestOrganizationMembers(LocalApplicationTestCase):
             organization_id=self.organization1.id
         )
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             f'List of organizationi',
             f'/apiv1/organizations/id: {self.organization1.id}/members',
             f'LIST',

@@ -5,7 +5,7 @@ from bddrest import status, response, when, Update, given
 
 from dolphin.models import Issue, Member, Workflow, Group, Project, Release, \
     RelatedIssue
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestIssue(LocalApplicationTestCase):
@@ -19,6 +19,7 @@ class TestIssue(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(cls.member)
 
@@ -108,9 +109,9 @@ class TestIssue(LocalApplicationTestCase):
             session.commit()
 
     def test_unrelate(self):
-        self.login(self.member.email)
+        self.login(self.member.email, self.member.password)
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             f'Unrelating an issue from another',
             f'/apiv1/issues/id:{self.issue1.id}',
             f'UNRELATE',

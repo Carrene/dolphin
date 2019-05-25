@@ -4,7 +4,7 @@ from bddrest import status, when, response
 from dolphin.models import Issue, Project, Member, Workflow, Group, Release, \
     Subscription
 from dolphin.tests.helpers import LocalApplicationTestCase, \
-    oauth_mockup_server, chat_mockup_server, chat_server_status
+    chat_mockup_server, chat_server_status
 
 
 class TestIssue(LocalApplicationTestCase):
@@ -14,10 +14,11 @@ class TestIssue(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        member = Member(
+        cls.member = Member(
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
 
         workflow = Workflow(title='Default')
@@ -28,7 +29,7 @@ class TestIssue(LocalApplicationTestCase):
             description='A decription for my first release',
             cutoff='2030-2-20',
             launch_date='2030-2-20',
-            manager=member,
+            manager=cls.member,
             room_id=0,
             group=group,
         )
@@ -37,7 +38,7 @@ class TestIssue(LocalApplicationTestCase):
             release=release,
             workflow=workflow,
             group=group,
-            manager=member,
+            manager=cls.member,
             title='My first project',
             description='A decription for my project',
             room_id=1
@@ -79,7 +80,7 @@ class TestIssue(LocalApplicationTestCase):
 
         session.flush()
         subscription1 = Subscription(
-            member_id=member.id,
+            member_id=cls.member.id,
             subscribable_id=cls.issue2.id,
             one_shot=True,
         )
@@ -87,9 +88,9 @@ class TestIssue(LocalApplicationTestCase):
         session.commit()
 
     def test_subscribe(self):
-        self.login('member1@example.com')
+        self.login(self.member.email, self.member.password)
 
-        with oauth_mockup_server(), chat_mockup_server(), self.given(
+        with chat_mockup_server(), self.given(
             'Subscribe an issue',
             f'/apiv1/issues/id: {self.issue1.id}',
             'SUBSCRIBE',

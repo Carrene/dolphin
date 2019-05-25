@@ -8,8 +8,7 @@ from nanohttp.contexts import Context
 from dolphin import Dolphin
 from dolphin.middleware_callback import callback as auditor_callback
 from dolphin.models import Issue, Project, Member, Workflow, Group, Release
-from dolphin.tests.helpers import LocalApplicationTestCase, \
-    oauth_mockup_server, chat_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase, chat_mockup_server
 
 
 def callback(audit_logs):
@@ -30,6 +29,7 @@ class TestIssue(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(cls.member)
 
@@ -89,7 +89,7 @@ class TestIssue(LocalApplicationTestCase):
         class Identity:
             def __init__(self, member):
                 self.id = member.id
-                self.reference_id = member.reference_id
+                self.id = member.id
 
         with Context({}):
             context.identity = Identity(self.member)
@@ -102,7 +102,7 @@ class TestIssue(LocalApplicationTestCase):
             days=4,
             priority='high',
         )
-        with oauth_mockup_server(), chat_mockup_server(), self.given(
+        with chat_mockup_server(), self.given(
             'Update a issue',
             f'/apiv1/issues/id:{self.issue2.id}',
             'UPDATE',
@@ -113,7 +113,7 @@ class TestIssue(LocalApplicationTestCase):
             assert response.json['priority'] == 'high'
             assert response.json['tags'] is not None
             assert response.json['modifiedAt'] is not None
-            assert response.json['modifiedBy'] == self.member.reference_id
+            assert response.json['modifiedBy'] == self.member.id
 
             assert len(logs) == 6
             for log in logs:

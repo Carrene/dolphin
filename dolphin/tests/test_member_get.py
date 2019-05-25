@@ -1,10 +1,10 @@
 from bddrest import status, response, when
 
 from dolphin.models import Member
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
-class TestProject(LocalApplicationTestCase):
+class TestMember(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
@@ -14,21 +14,22 @@ class TestProject(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(cls.member)
         session.commit()
 
     def test_get(self):
-        self.login('member1@example.com')
+        self.login(self.member.email)
 
-        with oauth_mockup_server(), self.given(
-            'Getting a project',
-            f'/apiv1/members/id:{self.member.id}',
+        with self.given(
+            'Getting a member',
+            f'/apiv1/members/id: {self.member.id}',
             'GET'
         ):
             assert status == 200
             assert response.json['id'] == self.member.id
-            assert response.json['title'] == 'member1'
+            assert response.json['title'] == self.member.title
 
             when(
                 'Intended project with string type not found',

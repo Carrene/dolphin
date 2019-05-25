@@ -82,7 +82,7 @@ class ChatClient:
     def __init__(self):
         self._server_name = self.__class__.__name__.replace('Client', '')
 
-    def create_room(self, title, token, x_access_token, owner_id=None):
+    def create_room(self, title, token, owner_id=None):
         url = f'{settings.chat.url}/apiv1/rooms'
         try:
             response = requests.request(
@@ -91,7 +91,6 @@ class ChatClient:
                 data={'title': title},
                 headers={
                     'authorization': token,
-                    'X-Oauth2-Access-Token': x_access_token
                 }
             )
             logger.debug(
@@ -112,7 +111,6 @@ class ChatClient:
                     url,
                     headers={
                         'authorization': token,
-                        'X-Oauth2-Access-Token': x_access_token
                     },
                     params={'title': title, 'ownerId': owner_id}
                 )
@@ -143,22 +141,7 @@ class ChatClient:
             room = json.loads(response.text)
             return room
 
-# TODO: This API is not implemented in Jaguar yet
-#    def delete_room(self, id, token, x_access_token):
-#
-#        url = f'{settings.chat.url}/apiv1/rooms/{id}'
-#        logger.debug(f'DELETE {url}')
-#        response = requests.request(
-#            'DELETE',
-#            url,
-#            headers={
-#                'authorization': token,
-#                'X-Oauth2-Access-Token': x_access_token
-#            }
-#        )
-#        return response
-
-    def add_member(self, id, user_id, token, x_access_token):
+    def add_member(self, id, user_id, token):
 
         url = f'{settings.chat.url}/apiv1/rooms/{id}'
         try:
@@ -168,7 +151,6 @@ class ChatClient:
                 data={'userId': user_id},
                 headers={
                     'authorization': token,
-                    'X-Oauth2-Access-Token': x_access_token
                 }
             )
             logger.debug(
@@ -202,7 +184,7 @@ class ChatClient:
             room = json.loads(response.text)
             return room
 
-    def kick_member(self, id, member_id, token, x_access_token):
+    def kick_member(self, id, member_id, token):
 
         url = f'{settings.chat.url}/apiv1/rooms/{id}'
         try:
@@ -212,7 +194,6 @@ class ChatClient:
                 data={'memberId': member_id},
                 headers={
                     'authorization': token,
-                    'X-Oauth2-Access-Token': x_access_token
                 }
             )
             logger.debug(
@@ -251,7 +232,7 @@ class ChatClient:
             room = json.loads(response.text)
             return room
 
-    def ensure_member(self, token, x_access_token):
+    def ensure_member(self, token):
         url = f'{settings.chat.url}/apiv1/members'
         try:
             response = requests.request(
@@ -259,7 +240,6 @@ class ChatClient:
                 url,
                 headers={
                     'authorization': token,
-                    'X-Oauth2-Access-Token': x_access_token
                 }
             )
             logger.debug(
@@ -287,7 +267,7 @@ class ChatClient:
             member = json.loads(response.text)
             return member
 
-    def send_message(self, room_id, body, mimetype, token, x_access_token):
+    def send_message(self, room_id, body, mimetype, token):
 
         url = f'{settings.chat.url}/apiv1/targets/{room_id}/messages'
         data = dict(body=body, mimetype=mimetype)
@@ -298,7 +278,6 @@ class ChatClient:
                 json=data,
                 headers={
                     'authorization': token,
-                    'X-Oauth2-Access-Token': x_access_token,
                     'content-type': 'application/json',
                 }
             )

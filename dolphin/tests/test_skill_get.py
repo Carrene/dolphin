@@ -1,7 +1,7 @@
 from bddrest import status, response, when
 
 from dolphin.models import Member, Skill
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestSkill(LocalApplicationTestCase):
@@ -14,6 +14,7 @@ class TestSkill(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(cls.member)
 
@@ -27,7 +28,7 @@ class TestSkill(LocalApplicationTestCase):
     def test_get(self):
         self.login(self.member.email)
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             f'Getting a skill',
             f'/apiv1/skills/id: {self.skill.id}',
             f'GET',

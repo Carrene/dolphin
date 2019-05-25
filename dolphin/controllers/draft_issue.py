@@ -34,7 +34,7 @@ FROM_WHITELISTS_STRING = ', '.join(FORM_WHITELIST)
 class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
     __model__ = DraftIssue
 
-    def _ensure_room(self, title, token, access_token):
+    def _ensure_room(self, title, token):
         create_room_error = 1
         room = None
         while create_room_error is not None:
@@ -42,7 +42,6 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
                 room = ChatClient().create_room(
                     title,
                     token,
-                    access_token,
                     context.identity.id
                 )
                 create_room_error = None
@@ -114,7 +113,6 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
         room = self._ensure_room(
             issue.get_room_title(),
             token,
-            current_member.access_token
         )
 
         chat_client = ChatClient()
@@ -124,7 +122,6 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
                 issue.room_id,
                 current_member.id,
                 token,
-                current_member.access_token
             )
 
         except StatusRoomMemberAlreadyExist:
@@ -144,7 +141,6 @@ class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
             chat_client.delete_room(
                 issue.room_id,
                 token,
-                current_member.access_token
             )
             raise
 

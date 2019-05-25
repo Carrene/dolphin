@@ -3,7 +3,7 @@ from bddrest import status, when, response, Update, Remove
 
 from dolphin.models import Issue, Project, Member, Phase, Group, Workflow, \
     Item, Release, Skill
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestIssue(LocalApplicationTestCase):
@@ -17,6 +17,7 @@ class TestIssue(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
 
         workflow = Workflow(title='Default')
@@ -84,9 +85,9 @@ class TestIssue(LocalApplicationTestCase):
         session.commit()
 
     def test_unassign(self):
-        self.login(self.member.email)
+        self.login(self.member.email, self.member.password)
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             f'UNAssign an issue from a resource',
             f'/apiv1/issues/id: {self.issue1.id}',
             f'UNASSIGN',

@@ -3,8 +3,7 @@ from bddrest import status, response, Update, when, Remove, given
 
 from dolphin.models import Project, Member, Group, Workflow, Release
 from dolphin.tests.helpers import LocalApplicationTestCase, \
-    oauth_mockup_server, chat_mockup_server, chat_server_status, \
-    room_mockup_server
+    chat_mockup_server, chat_server_status, room_mockup_server
 
 
 class TestProject(LocalApplicationTestCase):
@@ -18,6 +17,7 @@ class TestProject(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(member1)
 
@@ -60,7 +60,7 @@ class TestProject(LocalApplicationTestCase):
     def test_subscribe(self):
         self.login('member1@example.com')
 
-        with oauth_mockup_server(), chat_mockup_server(), self.given(
+        with chat_mockup_server(), self.given(
             'Subscribe project',
             f'/apiv1/projects/id:{self.project1.id}',
             'SUBSCRIBE',

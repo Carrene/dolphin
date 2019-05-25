@@ -1,8 +1,7 @@
 from bddrest import status, response, when, given, Update
 
 from dolphin.models import Member, Phase, Skill
-from dolphin.tests.helpers import create_workflow, LocalApplicationTestCase, \
-    oauth_mockup_server
+from dolphin.tests.helpers import create_workflow, LocalApplicationTestCase
 
 
 class TestPhase(LocalApplicationTestCase):
@@ -15,6 +14,7 @@ class TestPhase(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(cls.member)
 
@@ -52,7 +52,7 @@ class TestPhase(LocalApplicationTestCase):
         new_order = self.phase1.order + 2
         new_description = 'new description'
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             f'Updating a phase',
             f'/apiv1/workflows/workflow_id: {self.workflow.id}/' \
                 f'phases/id: {self.phase1.id}',

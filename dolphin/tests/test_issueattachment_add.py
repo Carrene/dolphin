@@ -5,7 +5,7 @@ from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when, Update, Remove
 
 from dolphin.models import Project, Member, Workflow, Group, Release, Issue
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 this_dir = abspath(join(dirname(__file__)))
@@ -20,10 +20,11 @@ class TestIssue(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        member1 = Member(
+        cls.member1 = Member(
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
 
         workflow = Workflow(title='Default')
@@ -34,7 +35,7 @@ class TestIssue(LocalApplicationTestCase):
             description='A decription for my first release',
             cutoff='2030-2-20',
             launch_date='2030-2-20',
-            manager=member1,
+            manager=cls.member1,
             room_id=0,
             group=group,
         )
@@ -43,7 +44,7 @@ class TestIssue(LocalApplicationTestCase):
             release=release,
             workflow=workflow,
             group=group,
-            manager=member1,
+            manager=cls.member1,
             title='My first project',
             description='A decription for my project',
             room_id=1001
@@ -63,9 +64,9 @@ class TestIssue(LocalApplicationTestCase):
         session.commit()
 
     def test_add_attachment(self):
-        self.login('member1@example.com')
+        self.login(self.member1.email, self.member1.password)
 
-        with oauth_mockup_server(), open(image_path, 'rb') as f, self.given(
+        with open(image_path, 'rb') as f, self.given(
             'add an attachment to a project',
             f'/apiv1/issues/id:{self.issue.id}/files',
             'ATTACH',

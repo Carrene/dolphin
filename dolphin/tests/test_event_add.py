@@ -3,7 +3,7 @@ import datetime
 from bddrest import status, response, when, given
 
 from dolphin.models import Member, EventType
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestEvent(LocalApplicationTestCase):
@@ -16,6 +16,7 @@ class TestEvent(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(cls.member)
 
@@ -26,38 +27,35 @@ class TestEvent(LocalApplicationTestCase):
         session.commit()
 
     def test_add(self):
-        self.login(self.member.email)
-        title = 'Event 1'
-        description = 'A description for an event'
-        repeat = 'never'
-        start_date = datetime.datetime.now().isoformat()
-        end_date = datetime.datetime.now().isoformat()
+        self.login(self.member.email, self.member.password)
+        json = dict(
+            title='Event 1',
+            description='A description for an event',
+            repeat='never',
+            startDate=datetime.datetime.now().isoformat(),
+            endDate=datetime.datetime.now().isoformat(),
+            eventTypeId=self.event_type.id,
+        )
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             'Adding an event',
             '/apiv1/events',
             'ADD',
-            json=dict(
-                title=title,
-                eventTypeId=self.event_type.id,
-                startDate=start_date,
-                endDate=end_date,
-                repeat=repeat,
-            ),
+            json=json,
         ):
             assert status == 200
             assert response.json['id'] is not None
-            assert response.json['title'] == title
-            assert response.json['startDate'] == start_date
-            assert response.json['endDate'] == end_date
-            assert response.json['repeat'] == repeat
+            assert response.json['title'] == json['title']
+            assert response.json['startDate'] == json['startDate']
+            assert response.json['endDate'] == json['endDate']
+            assert response.json['repeat'] == json['repeat']
 
             when('Trying to pass without form parameters', json={})
             assert status == '708 Empty Form'
 
             when(
                 'Trying to pass with repetitive title',
-                json=given | dict(title=title),
+                json=given | dict(title=json['title']),
             )
             assert status == '600 Repetitive Title'
 
@@ -106,8 +104,8 @@ class TestEvent(LocalApplicationTestCase):
             when(
                 'End date must be greater than start date',
                 json=given | dict(
-                    startDate=end_date,
-                    endDate=start_date,
+                    startDate=json['endDate'],
+                    endDate=json['startDate'],
                     title='Another title',
                 )
             )

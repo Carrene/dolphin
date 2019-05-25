@@ -1,7 +1,7 @@
 from bddrest.authoring import status, response, when, given
 
 from dolphin.models import Member
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestMember(LocalApplicationTestCase):
@@ -14,6 +14,7 @@ class TestMember(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123987465,
+            password='123ABCabc',
         )
         session.add(cls.member1)
 
@@ -21,15 +22,15 @@ class TestMember(LocalApplicationTestCase):
             title='Second Member',
             email='member2@example.com',
             phone=1287465,
+            password='123ABCabc',
         )
         session.add(cls.member2)
 
         member3 = Member(
             title='Third Member',
             email='member3@example.com',
-            access_token='access token',
             phone=1287456,
-            reference_id=5
+            password='123ABCabc',
         )
         session.add(member3)
         session.commit()
@@ -37,7 +38,7 @@ class TestMember(LocalApplicationTestCase):
     def test_search(self):
         self.login(self.member1.email)
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             'Search for a member by submitting form',
             '/apiv1/members',
             'SEARCH',
@@ -104,7 +105,7 @@ class TestMember(LocalApplicationTestCase):
     def test_request_with_query_string(self):
         self.login(self.member1.email)
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             'Test request using query string',
             '/apiv1/members',
             'SEARCH',

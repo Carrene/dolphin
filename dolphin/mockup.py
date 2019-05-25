@@ -50,9 +50,8 @@ def insert(): # pragma: no cover
             id=2,
             title='User_1',
             email='user1@example.com',
-            reference_id=2,
-            access_token='access token 2',
             skill_id=skill.id,
+            password=123456,
         )
         DBSession.add(resource1)
         DBSession.flush()
@@ -68,9 +67,8 @@ def insert(): # pragma: no cover
             id=3,
             title='User_2',
             email='user2@example.com',
-            reference_id=3,
-            access_token='access token 3',
             skill_id=skill.id,
+            password=123456,
         )
         DBSession.add(resource2)
         DBSession.flush()
@@ -86,9 +84,8 @@ def insert(): # pragma: no cover
             id=4,
             title='User_3',
             email='user3@example.com',
-            reference_id=4,
-            access_token='access token 4',
             skill_id=skill.id,
+            password=123456,
         )
         DBSession.add(resource3)
         DBSession.flush()

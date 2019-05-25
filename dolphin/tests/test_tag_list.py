@@ -1,7 +1,7 @@
 from bddrest import when, response, status
 
-from .helpers import  LocalApplicationTestCase, oauth_mockup_server
 from dolphin.models import Tag, Member, Organization, OrganizationMember
+from dolphin.tests.helpers import  LocalApplicationTestCase
 
 
 class TestTag(LocalApplicationTestCase):
@@ -13,6 +13,7 @@ class TestTag(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(cls.member)
 
@@ -48,7 +49,7 @@ class TestTag(LocalApplicationTestCase):
         principal.payload['organizationId'] = self.organization.id
         self._authentication_token = principal.dump().decode('utf-8')
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             'List of tags',
             '/apiv1/tags',
             'LIST',

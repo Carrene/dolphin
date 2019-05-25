@@ -2,7 +2,7 @@ from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when
 
 from dolphin.models import Release, Member, Group
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestRelease(LocalApplicationTestCase):
@@ -16,6 +16,7 @@ class TestRelease(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(member)
 
@@ -58,7 +59,7 @@ class TestRelease(LocalApplicationTestCase):
     def test_list(self):
         self.login('member1@example.com')
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             'List releases',
             '/apiv1/releases',
             'LIST'
@@ -66,7 +67,7 @@ class TestRelease(LocalApplicationTestCase):
             assert status == 200
             assert len(response.json) == 3
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             'Sort releases by title',
             '/apiv1/releases',
             'LIST',
@@ -80,7 +81,7 @@ class TestRelease(LocalApplicationTestCase):
             )
             assert response.json[0]['title'] == 'My third release'
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             'Filter releases',
             '/apiv1/releases',
             'LIST',
@@ -94,7 +95,7 @@ class TestRelease(LocalApplicationTestCase):
             )
             assert response.json[0]['title'] == 'My first release'
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
              'Issues pagination',
              '/apiv1/releases',
              'LIST',

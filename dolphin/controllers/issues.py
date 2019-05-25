@@ -386,7 +386,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 issue.room_id,
                 context.identity.id,
                 token,
-                member.access_token
             )
 
         except StatusRoomMemberAlreadyExist:
@@ -429,7 +428,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 issue.room_id,
                 context.identity.id,
                 token,
-                member.access_token
             )
         except StatusRoomMemberNotFound:
             # Exception is passed because it means `kick_member()` is already

@@ -7,7 +7,7 @@ from auditor.context import Context as AuditLogContext
 
 from dolphin.models import Issue, Project, Member, Workflow, Group, \
     Subscription, Release
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestUnseeIssue(LocalApplicationTestCase):
@@ -17,17 +17,19 @@ class TestUnseeIssue(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        member1 = Member(
+        cls.member1 = Member(
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
-        session.add(member1)
+        session.add(cls.member1)
 
         member2 = Member(
             title='Second Member',
             email='member2@example.com',
             phone=223456789,
+            password='123ABCabc',
         )
         session.add(member2)
 
@@ -39,7 +41,7 @@ class TestUnseeIssue(LocalApplicationTestCase):
             description='A decription for my first release',
             cutoff='2030-2-20',
             launch_date='2030-2-20',
-            manager=member1,
+            manager=cls.member1,
             room_id=0,
             group=group,
         )
@@ -48,7 +50,7 @@ class TestUnseeIssue(LocalApplicationTestCase):
             release=release,
             workflow=workflow,
             group=group,
-            manager=member1,
+            manager=cls.member1,
             title='My first project',
             description='A decription for my project',
             room_id=1
@@ -56,7 +58,7 @@ class TestUnseeIssue(LocalApplicationTestCase):
         session.add(project)
 
         with Context(dict()):
-            context.identity = member1
+            context.identity = cls.member1
 
             cls.issue1 = Issue(
                 project=project,
@@ -72,13 +74,13 @@ class TestUnseeIssue(LocalApplicationTestCase):
 
             cls.subscription_issue1 = Subscription(
                 subscribable_id=cls.issue1.id,
-                member_id=member1.id,
+                member_id=cls.member1.id,
                 seen_at=datetime.utcnow()
             )
             session.add(cls.subscription_issue1)
 
             one_shot_subscription = Subscription(
-                member_id=member1.id,
+                member_id=cls.member1.id,
                 subscribable_id=cls.issue1.id,
                 one_shot=True,
             )
@@ -105,9 +107,9 @@ class TestUnseeIssue(LocalApplicationTestCase):
             session.expunge_all()
 
     def test_unsee_issue(self):
-        self.login('member1@example.com')
+        self.login(self.member1.email, self.member1.password)
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             f'Unsee a issues',
             f'/apiv1/issues/id: {self.issue1.id}',
             f'UNSEE',

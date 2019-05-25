@@ -5,7 +5,7 @@ from bddrest import status, when, Remove, Update
 
 from dolphin.models import Issue, Project, Member, Workflow, Group, \
     Subscription, Release
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestSentMessegeWebhook(LocalApplicationTestCase):
@@ -19,6 +19,7 @@ class TestSentMessegeWebhook(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(cls.member1)
 
@@ -26,6 +27,7 @@ class TestSentMessegeWebhook(LocalApplicationTestCase):
             title='Second Member',
             email='member2@example.com',
             phone=123456788,
+            password='123ABCabc',
         )
         session.add(cls.member2)
 
@@ -83,13 +85,13 @@ class TestSentMessegeWebhook(LocalApplicationTestCase):
 
     def test_sent_messege_webhook(self):
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             f'SENT message webhook handler',
             f'/apiv1/issues',
             f'SENT',
             query=dict(
                 roomId=self.issue1.room_id,
-                memberId=self.member1.reference_id,
+                memberId=self.member1.id,
             )
         ):
             assert status == 204
@@ -122,13 +124,13 @@ class TestSentMessegeWebhook(LocalApplicationTestCase):
             assert status == '605 Issue Not Found'
 
             when(
-                'Member reference id not in query',
+                'Member id not in query',
                 query=Remove('memberId'),
             )
             assert status == 400
 
             when(
-                'Member reference id must be integer',
+                'Member id must be integer',
                 query=Update(memberId='not-integer'),
             )
             assert status == 400

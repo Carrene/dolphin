@@ -1,7 +1,7 @@
 from bddrest import status, response, when
 
 from dolphin.models import Member, Group
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestGetGroup(LocalApplicationTestCase):
@@ -10,12 +10,13 @@ class TestGetGroup(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        member = Member(
+        cls.member = Member(
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
-        session.add(member)
+        session.add(cls.member)
 
         cls.group1 = Group(title='group1')
         session.add(cls.group1)
@@ -23,9 +24,9 @@ class TestGetGroup(LocalApplicationTestCase):
         session.commit()
 
     def test_get_group(self):
-        self.login('member1@example.com')
+        self.login(self.member.email, self.member.password)
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             f'Get group',
             f'/apiv1/groups/id: {self.group1.id}',
             f'GET',

@@ -504,3 +504,7 @@ class StatusTitleAlreadyRegistered(HTTPKnownStatus):
 class StatusEmailAddressAlreadyRegistered(HTTPKnownStatus):
     status = '662 Email Address Already Registered'
 
+
+class StatusIncorrectEMailOrPassword(HTTPKnownStatus):
+    status = '663 Incorrect Email Or Password'
+

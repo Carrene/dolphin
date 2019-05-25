@@ -5,7 +5,7 @@ from nanohttp import settings
 from bddrest.authoring import when, status, response, given
 
 from dolphin.models import Member, Organization, OrganizationMember
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 TEST_DIR = abspath(dirname(__file__))
@@ -23,12 +23,13 @@ class TestOrganization(LocalApplicationTestCase):
     @classmethod
     def mockup(cls):
         session = cls.create_session()
-        member = Member(
+        cls.member = Member(
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
-        session.add(member)
+        session.add(cls.member)
 
         organization = Organization(
             title='organization-title',
@@ -38,7 +39,7 @@ class TestOrganization(LocalApplicationTestCase):
 
         organization_member = OrganizationMember(
             organization_id=organization.id,
-            member_id=member.id,
+            member_id=cls.member.id,
             role='owner',
         )
         session.add(organization_member)
@@ -46,10 +47,10 @@ class TestOrganization(LocalApplicationTestCase):
 
     def test_create(self):
         title = 'My-organization'
-        self.login(email='member1@example.com')
+        self.login(email=self.member.email)
         settings.attachments.organizations.logos.max_length = 30
 
-        with oauth_mockup_server(),  self.given(
+        with self.given(
             'The organization has successfully created',
             '/apiv1/organizations',
             'CREATE',

@@ -3,7 +3,7 @@ from restfulpy.messaging import create_messenger
 
 from dolphin.models import Member, Organization, OrganizationMember, \
    OrganizationInvitationEmail
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 from dolphin.tokens import OrganizationInvitationToken
 
 
@@ -20,6 +20,7 @@ class TestOrganization(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(cls.member1)
 
@@ -27,6 +28,7 @@ class TestOrganization(LocalApplicationTestCase):
             title='Second Member',
             email='member2@example.com',
             phone=123456788,
+            password='123ABCabc',
         )
         session.add(cls.member2)
 
@@ -34,6 +36,7 @@ class TestOrganization(LocalApplicationTestCase):
             title='Third Member',
             email='member3@example.com',
             phone=123456787,
+            password='123ABCabc',
         )
         session.add(cls.member3)
 
@@ -60,9 +63,9 @@ class TestOrganization(LocalApplicationTestCase):
 
     def test_invite(self):
         messenger = create_messenger()
-        self.login(email=self.member1.email)
+        self.login(self.member1.email, self.member1.password)
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             f'Inviting to the organization has successfully created',
             f'/apiv1/organizations/id: {self.organization.id}/invitations',
             f'CREATE',
@@ -87,7 +90,7 @@ class TestOrganization(LocalApplicationTestCase):
             )
             assert token.role == 'member'
             assert token.email == self.member3.email
-            assert token.by_member_reference_id == self.member1.reference_id
+            assert token.by_member_id == self.member1.id
             assert token.organization_id == self.organization.id
 
             when(

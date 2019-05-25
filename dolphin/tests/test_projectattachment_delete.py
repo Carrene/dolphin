@@ -5,7 +5,7 @@ from bddrest import status, response, when, Update
 from sqlalchemy_media import StoreManager
 
 from dolphin.models import Project, Member, Attachment, Workflow, Group, Release
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 this_dir = abspath(join(dirname(__file__)))
@@ -25,6 +25,7 @@ class TestProject(LocalApplicationTestCase):
                 title='First Member',
                 email='member1@example.com',
                 phone=123456789,
+                password='123ABCabc',
                 attachments=[cls.attachment]
             )
 
@@ -57,7 +58,7 @@ class TestProject(LocalApplicationTestCase):
     def test_delete_attachment(self):
         self.login('member1@example.com')
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             'Delete a project attachment',
             f'/apiv1/projects/project_id:{self.project1.id}/files/id:1',
             'DELETE',

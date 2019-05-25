@@ -5,7 +5,7 @@ from auditor.context import Context as AuditLogContext
 
 from dolphin.models import Project, Member, Workflow, Issue, Subscription, \
     Group, Release
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestProject(LocalApplicationTestCase):
@@ -19,6 +19,7 @@ class TestProject(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(member1)
 
@@ -26,6 +27,7 @@ class TestProject(LocalApplicationTestCase):
             title='Second Member',
             email='member2@example.com',
             phone=222222222,
+            password='123ABCabc',
         )
         session.add(member2)
 
@@ -160,7 +162,7 @@ class TestProject(LocalApplicationTestCase):
     def test_list(self):
         self.login('member1@example.com')
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             'List projects',
             '/apiv1/projects',
             'LIST',

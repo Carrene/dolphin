@@ -1,7 +1,7 @@
 from bddrest import when, response, status
 
 from ..models import Workflow, Phase, Resource, Skill
-from .helpers import LocalApplicationTestCase, oauth_mockup_server
+from .helpers import LocalApplicationTestCase
 
 
 class TestResource(LocalApplicationTestCase):
@@ -27,6 +27,7 @@ class TestResource(LocalApplicationTestCase):
             title='First Resource',
             email='resource1@example.com',
             phone=222222222,
+            password='123ABCabc',
             skill=skill1
         )
         session.add(cls.resource1)
@@ -35,6 +36,7 @@ class TestResource(LocalApplicationTestCase):
             title='Second Resource',
             email='resource2@example.com',
             phone=333333333,
+            password='123ABCabc',
             skill=skill1
         )
         session.add(resource2)
@@ -43,6 +45,7 @@ class TestResource(LocalApplicationTestCase):
             title='Third Resource',
             email='resource3@example.com',
             phone=444444444,
+            password='123ABCabc',
             skill=skill2
         )
         session.add(resource3)
@@ -51,7 +54,7 @@ class TestResource(LocalApplicationTestCase):
     def test_list(self):
         self.login(self.resource1.email)
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
            f'Getting list of resources',
            f'/apiv1/phases/id:{self.phase1.id}/resources',
            f'LIST',

@@ -1,7 +1,7 @@
 from bddrest import status, when
 
 from dolphin.models import Member, Organization, OrganizationMember
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestInvitation(LocalApplicationTestCase):
@@ -13,6 +13,7 @@ class TestInvitation(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(cls.member1)
 
@@ -20,6 +21,7 @@ class TestInvitation(LocalApplicationTestCase):
             title='Second Member',
             email='member2@example.com',
             phone=123456788,
+            password='123ABCabc',
         )
         session.add(cls.member2)
 
@@ -27,6 +29,7 @@ class TestInvitation(LocalApplicationTestCase):
             title='Third Member',
             email='member3@example.com',
             phone=123456787,
+            password='123ABCabc',
         )
         session.add(cls.member3)
 
@@ -47,7 +50,7 @@ class TestInvitation(LocalApplicationTestCase):
     def test_invite(self):
         self.login(email=self.member1.email)
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             f'Inviting to the organization has successfully created',
             f'/apiv1/organizations/id: {self.organization.id}/invitations',
             f'PATCH',

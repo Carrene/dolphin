@@ -1,8 +1,7 @@
 from bddrest import status, response, when, given
 
 from dolphin.models import Member
-from dolphin.tests.helpers import create_group, LocalApplicationTestCase, \
-    oauth_mockup_server
+from dolphin.tests.helpers import create_group, LocalApplicationTestCase
 
 
 class TestGroup(LocalApplicationTestCase):
@@ -15,6 +14,7 @@ class TestGroup(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(cls.member)
 
@@ -35,7 +35,7 @@ class TestGroup(LocalApplicationTestCase):
         new_description = 'A description for group'
         new_public = False
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             f'Updating a group',
             f'/apiv1/groups/id: {self.group2.id}',
             f'UPDATE',

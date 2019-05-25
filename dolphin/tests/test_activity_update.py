@@ -6,7 +6,7 @@ from auditor.context import Context as AuditLogContext
 from dolphin.models import Member, Skill, Phase, Release, \
     Project, Issue, Item, Activity
 from dolphin.tests.helpers import create_group, LocalApplicationTestCase, \
-    oauth_mockup_server, create_workflow
+    create_workflow
 
 
 class TestActivity(LocalApplicationTestCase):
@@ -20,12 +20,14 @@ class TestActivity(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
 
         member2 = Member(
             title='Second Member',
             email='member2@example.com',
             phone=1234567890,
+            password='123ABCabc',
         )
         session.add(member2)
 
@@ -127,9 +129,9 @@ class TestActivity(LocalApplicationTestCase):
         session.commit()
 
     def test_update(self):
-        self.login(self.member.email)
+        self.login(self.member.email, self.member.password)
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             f'Updating an activity',
             f'/apiv1'
                 f'/activities/activity_id: {self.activity.id}',

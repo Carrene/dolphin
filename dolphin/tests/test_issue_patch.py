@@ -4,7 +4,7 @@ from bddrest import status, response, when
 from dolphin.models import Issue, Project, Member, Workflow, Phase, Tag, \
     Organization, Group, Release, Skill
 from dolphin.tests.helpers import LocalApplicationTestCase, \
-    oauth_mockup_server, chat_mockup_server
+    chat_mockup_server
 
 
 class TestIssue(LocalApplicationTestCase):
@@ -22,6 +22,7 @@ class TestIssue(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
 
         workflow = Workflow(title='default')
@@ -83,9 +84,9 @@ class TestIssue(LocalApplicationTestCase):
         session.commit()
 
     def test_patch(self):
-        self.login(self.member.email)
+        self.login(self.member.email, self.member.password)
 
-        with oauth_mockup_server(), chat_mockup_server(), self.given(
+        with chat_mockup_server(), self.given(
             'Testing the patch method on issue',
             verb='PATCH',
             url='/apiv1/issues',

@@ -6,7 +6,7 @@ from sqlalchemy_media import StoreManager
 
 from dolphin.models import Project, Member, Attachment, Workflow, Group, \
     Release, Issue
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 this_dir = abspath(join(dirname(__file__)))
@@ -25,7 +25,7 @@ class TestIssue(LocalApplicationTestCase):
             attachment2 = Attachment(title='image2', file=image_path)
             attachment3 = Attachment(title='image3', file=image_path)
             attachment4 = Attachment(title='image4', file=image_path)
-            member1 = Member(
+            cls.member1 = Member(
                 title='First Member',
                 email='member1@example.com',
                 phone=123456789,
@@ -34,7 +34,8 @@ class TestIssue(LocalApplicationTestCase):
                     attachment2,
                     attachment3,
                     attachment4
-                ]
+                ],
+                password='123ABCabc',
             )
 
             workflow = Workflow(title='Default')
@@ -45,7 +46,7 @@ class TestIssue(LocalApplicationTestCase):
                 description='A decription for my first release',
                 cutoff='2030-2-20',
                 launch_date='2030-2-20',
-                manager=member1,
+                manager=cls.member1,
                 room_id=0,
                 group=group,
             )
@@ -54,7 +55,7 @@ class TestIssue(LocalApplicationTestCase):
                 release=release,
                 workflow=workflow,
                 group=group,
-                manager=member1,
+                manager=cls.member1,
                 title='My first project',
                 description='A decription for my project',
                 room_id=1001,
@@ -88,9 +89,9 @@ class TestIssue(LocalApplicationTestCase):
             session.commit()
 
     def test_delete_issue_attachment(self):
-        self.login('member1@example.com')
+        self.login(self.member1.email, self.member1.password)
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             'Delete a project attachment',
             f'/apiv1/issues/issue_id:{self.issue1.id}/'
             f'files/id:{self.attachment1.id}',

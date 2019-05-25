@@ -61,7 +61,6 @@ def callback(audit_log):
                         body=ujson.dumps(message),
                         mimetype=AUDIT_LOG_MIMETYPE,
                         token=context.environ['HTTP_AUTHORIZATION'],
-                        x_access_token=member.access_token,
                     )
 
                     # This exception passed because after consulting with

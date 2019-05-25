@@ -76,7 +76,6 @@ class TestProject(LocalApplicationTestCase):
             assert fields['managerId']['notNone'] is not None
             assert fields['managerId']['watermark'] is not None
             assert fields['managerId']['message'] is None
-            assert fields['managerId']['example'] is not None
             assert fields['managerId']['readonly'] is not None
 
             assert fields['boardingValue']['label'] is not None

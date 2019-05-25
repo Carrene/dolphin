@@ -5,7 +5,7 @@ from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when, Update, Remove
 
 from dolphin.models import Project, Member, Workflow, Group, Release
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 this_dir = abspath(join(dirname(__file__)))
@@ -24,6 +24,7 @@ class TestProject(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
 
         workflow = Workflow(title='Default')
@@ -54,7 +55,7 @@ class TestProject(LocalApplicationTestCase):
     def test_add_attachment(self):
         self.login('member1@example.com')
 
-        with oauth_mockup_server(), open(image_path, 'rb') as f, self.given(
+        with open(image_path, 'rb') as f, self.given(
             'add an attachment to a project',
             f'/apiv1/projects/id:{self.project.id}/files',
             'ATTACH',

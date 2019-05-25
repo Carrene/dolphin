@@ -3,7 +3,7 @@ from bddrest import status, response, when, Update
 
 from dolphin.models import Issue, Member, Workflow, Group, Project, Release, \
     RelatedIssue
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestIssue(LocalApplicationTestCase):
@@ -17,6 +17,7 @@ class TestIssue(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(cls.member)
 
@@ -87,7 +88,7 @@ class TestIssue(LocalApplicationTestCase):
     def test_relate(self):
         self.login(self.member.email)
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             f'Getting a issue',
             f'/apiv1/issues/id:{self.issue1.id}',
             f'RELATE',

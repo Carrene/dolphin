@@ -21,7 +21,7 @@ class ModifiedByMixin(ModifiedMixin):
             connection,
             target
         )
-        target.object.modified_by = context.identity.reference_id
+        target.object.modified_by = context.identity.id
 
     @classmethod
     def __declare_last__(cls):

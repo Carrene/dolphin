@@ -64,8 +64,7 @@ def insert(): # pragma: no cover
             id=1,
             title='GOD',
             email='god@example.com',
-            access_token='access token 1',
-            reference_id=1
+            password='123ABCabc',
         )
         DBSession.add(god)
         DBSession.flush()

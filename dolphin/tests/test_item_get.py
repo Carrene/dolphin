@@ -5,7 +5,7 @@ from bddrest import status, response, when
 
 from dolphin.models import Project, Member, Workflow, Group, Release, Skill, \
     Phase, Issue, Item
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestItem(LocalApplicationTestCase):
@@ -19,6 +19,7 @@ class TestItem(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
 
         workflow = Workflow(title='Default')
@@ -76,9 +77,9 @@ class TestItem(LocalApplicationTestCase):
         session.commit()
 
     def test_get(self):
-        self.login(self.member1.email)
+        self.login(self.member1.email, self.member1.password)
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             'Getting a item',
             f'/apiv1/items/id: {self.item.id}',
             'GET'

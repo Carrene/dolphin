@@ -5,7 +5,7 @@ from bddrest import status, response, when
 
 from dolphin.models import Issue, Project, Member, Workflow, Item, Phase, \
     Group, Release, Skill, Activity
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestActivity(LocalApplicationTestCase):
@@ -19,6 +19,7 @@ class TestActivity(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(cls.member1)
 
@@ -26,6 +27,7 @@ class TestActivity(LocalApplicationTestCase):
             title='Second Member',
             email='member2@example.com',
             phone=123456788,
+            password='123ABCabc',
         )
         session.add(cls.member2)
 
@@ -120,9 +122,9 @@ class TestActivity(LocalApplicationTestCase):
             session.commit()
 
     def test_list(self):
-        self.login(email=self.member1.email)
+        self.login(self.member1.email, self.member1.password)
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             f'List activities',
             f'/apiv1/issues/id:{self.issue1.id}/activities',
             f'LIST',

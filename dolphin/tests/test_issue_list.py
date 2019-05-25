@@ -5,7 +5,7 @@ from nanohttp.contexts import Context
 from bddrest import status, response, when
 from auditor.context import Context as AuditLogContext
 
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 from dolphin.models import Issue, Project, Member, Workflow, Item, Phase, \
     Group, Subscription, Release, Skill, Organization, Tag
 
@@ -23,12 +23,13 @@ class TestIssue(LocalApplicationTestCase):
         session.add(cls.organization)
         session.flush()
 
-        member = Member(
+        cls.member = Member(
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
-        session.add(member)
+        session.add(cls.member)
 
         cls.tag1 = Tag(
             title='First tag',
@@ -53,7 +54,7 @@ class TestIssue(LocalApplicationTestCase):
             description='A decription for my first release',
             cutoff='2030-2-20',
             launch_date='2030-2-20',
-            manager=member,
+            manager=cls.member,
             room_id=0,
             group=group,
         )
@@ -62,14 +63,14 @@ class TestIssue(LocalApplicationTestCase):
             release=release,
             workflow=workflow,
             group=group,
-            manager=member,
+            manager=cls.member,
             title='My first project',
             description='A decription for my project',
             room_id=1
         )
 
         with Context(dict()):
-            context.identity = member
+            context.identity = cls.member
 
             cls.issue1 = Issue(
                 project=cls.project,
@@ -87,7 +88,7 @@ class TestIssue(LocalApplicationTestCase):
 
             subscription_issue1 = Subscription(
                 subscribable_id=cls.issue1.id,
-                member_id=member.id,
+                member_id=cls.member.id,
                 seen_at=datetime.utcnow(),
             )
             session.add(subscription_issue1)
@@ -108,7 +109,7 @@ class TestIssue(LocalApplicationTestCase):
 
             subscription_issue2 = Subscription(
                 subscribable_id=cls.issue2.id,
-                member_id=member.id,
+                member_id=cls.member.id,
                 seen_at=None,
                 one_shot=True,
             )
@@ -129,7 +130,7 @@ class TestIssue(LocalApplicationTestCase):
 
             subscription_issue3 = Subscription(
                 subscribable_id=cls.issue3.id,
-                member_id=member.id,
+                member_id=cls.member.id,
                 seen_at=None,
                 one_shot=True,
             )
@@ -176,7 +177,7 @@ class TestIssue(LocalApplicationTestCase):
             session.flush()
 
             item1 = Item(
-                member_id=member.id,
+                member_id=cls.member.id,
                 phase_id=cls.phase1.id,
                 issue_id=cls.issue1.id,
             )
@@ -184,7 +185,7 @@ class TestIssue(LocalApplicationTestCase):
             session.flush()
 
             item2 = Item(
-                member_id=member.id,
+                member_id=cls.member.id,
                 phase_id=cls.phase2.id,
                 issue_id=cls.issue2.id,
             )
@@ -192,7 +193,7 @@ class TestIssue(LocalApplicationTestCase):
             session.flush()
 
             item3 = Item(
-                member_id=member.id,
+                member_id=cls.member.id,
                 phase_id=cls.phase2.id,
                 issue_id=cls.issue1.id,
             )
@@ -200,7 +201,7 @@ class TestIssue(LocalApplicationTestCase):
             session.flush()
 
             item4 = Item(
-                member_id=member.id,
+                member_id=cls.member.id,
                 phase_id=cls.phase1.id,
                 issue_id=cls.issue2.id,
             )
@@ -208,7 +209,7 @@ class TestIssue(LocalApplicationTestCase):
             session.flush()
 
             item5 = Item(
-                member_id=member.id,
+                member_id=cls.member.id,
                 phase_id=cls.phase3.id,
                 issue_id=cls.issue2.id,
             )
@@ -216,7 +217,7 @@ class TestIssue(LocalApplicationTestCase):
             session.flush()
 
             item6 = Item(
-                member_id=member.id,
+                member_id=cls.member.id,
                 phase_id=cls.phase1.id,
                 issue_id=cls.issue3.id,
             )
@@ -224,9 +225,9 @@ class TestIssue(LocalApplicationTestCase):
             session.commit()
 
     def test_list(self):
-        self.login('member1@example.com')
+        self.login(self.member.email, self.member.password)
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             'List issues',
             '/apiv1/issues',
             'LIST',

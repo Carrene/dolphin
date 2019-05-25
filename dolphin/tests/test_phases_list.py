@@ -1,7 +1,7 @@
 from bddrest.authoring import status, response, when
 
 from dolphin.models import Phase, Workflow, Member, Skill
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestListPhase(LocalApplicationTestCase):
@@ -13,6 +13,7 @@ class TestListPhase(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(cls.member)
 
@@ -30,7 +31,7 @@ class TestListPhase(LocalApplicationTestCase):
     def test_list_phases(self):
         self.login('member1@example.com')
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             'List phases of a workflow',
             '/apiv1/workflows/id:1/phases',
             'LIST',
@@ -72,7 +73,7 @@ class TestListPhase(LocalApplicationTestCase):
     def test_list_phases_without_workflow(self):
         self.login(self.member.email)
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             'List all phases',
             '/apiv1/phases',
             'LIST',

@@ -52,7 +52,7 @@ class ProjectController(ModelRestController):
 
         return project
 
-    def _ensure_room(self, title, token, access_token):
+    def _ensure_room(self, title, token):
         create_room_error = 1
         room = None
         while create_room_error is not None:
@@ -60,7 +60,6 @@ class ProjectController(ModelRestController):
                 room = ChatClient().create_room(
                     title,
                     token,
-                    access_token,
                     context.identity.id
                 )
                 create_room_error = None
@@ -187,7 +186,6 @@ class ProjectController(ModelRestController):
         room = self._ensure_room(
             project.get_room_title(),
             token,
-            creator.access_token
         )
 
         chat_client = ChatClient()
@@ -197,7 +195,6 @@ class ProjectController(ModelRestController):
                 project.room_id,
                 manager.id,
                 token,
-                creator.access_token
             )
 
         except StatusRoomMemberAlreadyExist:
@@ -218,7 +215,6 @@ class ProjectController(ModelRestController):
             chat_client.delete_room(
                 project.room_id,
                 token,
-                creator.access_token
             )
             raise
 
@@ -386,7 +382,6 @@ class ProjectController(ModelRestController):
                 project.room_id,
                 identity.id,
                 token,
-                member.access_token
             )
         except StatusRoomMemberAlreadyExist:
             # Exception is passed because it means `add_member()` is already
@@ -402,7 +397,6 @@ class ProjectController(ModelRestController):
                 project.room_id,
                 identity.id,
                 token,
-                member.access_token
             )
             raise
 
@@ -437,7 +431,6 @@ class ProjectController(ModelRestController):
                 project.room_id,
                 identity.id,
                 token,
-                member.access_token
             )
 
         except StatusRoomMemberNotFound:
@@ -455,7 +448,6 @@ class ProjectController(ModelRestController):
                 project.room_id,
                 identity.id,
                 token,
-                member.access_token
             )
             raise
 

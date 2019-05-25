@@ -2,7 +2,7 @@ from auditor.context import Context as AuditLogContext
 from bddrest import status, when, response
 
 from dolphin.models import Project, Member, Workflow, Group, Release
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestProject(LocalApplicationTestCase):
@@ -16,6 +16,7 @@ class TestProject(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(member1)
 
@@ -59,7 +60,7 @@ class TestProject(LocalApplicationTestCase):
     def test_show(self):
         self.login('member1@example.com')
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             'Showing a hidden project',
             f'/apiv1/projects/id:{self.hidden_project.id}',
             'SHOW'

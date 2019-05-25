@@ -1,7 +1,7 @@
 from bddrest import status, response, when, given
 
 from dolphin.models import Member, EventType
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestEventType(LocalApplicationTestCase):
@@ -14,6 +14,7 @@ class TestEventType(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(cls.member)
 
@@ -29,11 +30,11 @@ class TestEventType(LocalApplicationTestCase):
         session.commit()
 
     def test_update(self):
-        self.login(self.member.email)
+        self.login(self.member.email, self.member.password)
         new_title = 'New title'
         new_description = 'A description for event type'
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             f'Updating an event type',
             f'/apiv1/eventtypes/id: {self.event_type1.id}',
             f'UPDATE',

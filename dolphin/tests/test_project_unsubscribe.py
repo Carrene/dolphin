@@ -4,7 +4,7 @@ from bddrest import status, when, response
 from dolphin.models import Project, Member, Group, Subscription, Workflow, \
     Release
 from dolphin.tests.helpers import LocalApplicationTestCase, \
-    oauth_mockup_server, chat_mockup_server, chat_server_status
+    chat_mockup_server, chat_server_status
 
 
 class TestProject(LocalApplicationTestCase):
@@ -18,6 +18,7 @@ class TestProject(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(member)
 
@@ -74,7 +75,7 @@ class TestProject(LocalApplicationTestCase):
     def test_unsubscribe(self):
         self.login('member1@example.com')
 
-        with oauth_mockup_server(), chat_mockup_server(), self.given(
+        with chat_mockup_server(), self.given(
             'Unsubscribe an project',
             f'/apiv1/projects/id:{self.project1.id}',
             'UNSUBSCRIBE',

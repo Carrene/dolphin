@@ -1,7 +1,7 @@
 from bddrest import status, response, when, given
 
 from dolphin.models import Member, Group
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestListGroup(LocalApplicationTestCase):
@@ -14,6 +14,7 @@ class TestListGroup(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(cls.member)
 
@@ -34,9 +35,9 @@ class TestListGroup(LocalApplicationTestCase):
         session.commit()
 
     def test_list_group(self):
-        self.login('member1@example.com')
+        self.login(self.member.email, self.member.password)
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             'List group',
             '/apiv1/groups',
             'LIST',
@@ -45,9 +46,9 @@ class TestListGroup(LocalApplicationTestCase):
             assert len(response.json) == 3
 
     def test_list_groups_of_member(self):
-        self.login(self.member.email)
+        self.login('member1@example.com')
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             f'List groups of member\'s',
             f'/apiv1/members/id: {self.member.id}/groups',
             f'LIST',

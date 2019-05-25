@@ -1,6 +1,6 @@
 from bddrest import status, response, when, given
 from dolphin.models import Member, Skill, Phase, Workflow
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestPhase(LocalApplicationTestCase):
@@ -12,6 +12,7 @@ class TestPhase(LocalApplicationTestCase):
             title='First Member',
             email='member@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(cls.member)
 
@@ -32,7 +33,7 @@ class TestPhase(LocalApplicationTestCase):
 
     def test_get(self):
         self.login(self.member.email)
-        with oauth_mockup_server(), self.given(
+        with self.given(
             f'Getting a phase',
             f'/apiv1/phases/phase_id: {self.phase.id}',
             f'GET',

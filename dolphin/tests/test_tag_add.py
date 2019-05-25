@@ -1,7 +1,7 @@
 from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when, Update
 
-from .helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 from dolphin.models import Member, Tag, DraftIssue, Issue, Organization, \
     OrganizationMember, Project, DraftIssueTag, IssueTag, Workflow, Group, \
     Release
@@ -17,6 +17,7 @@ class TestTag(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(cls.member1)
         organization = Organization(
@@ -102,7 +103,7 @@ class TestTag(LocalApplicationTestCase):
     def test_add_tag_to_draft_issue(self):
         self.login(self.member1.email)
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             f'Adding a tag to the draft issue',
             f'/apiv1/draftissues/draft_issue_id: {self.draft_issue.id}'
                 f'/tags/id: {self.tag1.id}',
@@ -157,7 +158,7 @@ class TestTag(LocalApplicationTestCase):
     def test_add_tag_to_issue(self):
         self.login(self.member1.email)
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             f'Adding a tag to the draft issue',
             f'/apiv1/issues/issue_id: {self.issue.id}/tags/id: {self.tag1.id}',
             f'ADD',

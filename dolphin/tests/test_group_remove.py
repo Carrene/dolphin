@@ -1,7 +1,7 @@
 from bddrest import status, response, when
 
 from dolphin.models import Member, Group, GroupMember
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.tests.helpers import LocalApplicationTestCase
 
 
 class TestGroup(LocalApplicationTestCase):
@@ -14,6 +14,7 @@ class TestGroup(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             phone=123456789,
+            password='123ABCabc',
         )
         session.add(cls.member1)
 
@@ -21,6 +22,7 @@ class TestGroup(LocalApplicationTestCase):
             title='Second Member',
             email='member2@example.com',
             phone=123456788,
+            password='123ABCabc',
         )
         session.add(cls.member2)
 
@@ -40,7 +42,7 @@ class TestGroup(LocalApplicationTestCase):
     def test_remove(self):
         self.login(self.member1.email)
 
-        with oauth_mockup_server(), self.given(
+        with self.given(
             f'Removing a member from a group',
             f'/apiv1/groups/id: {self.group.id}',
             f'REMOVE',
