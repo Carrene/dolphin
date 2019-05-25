@@ -1,8 +1,10 @@
 from restfulpy.orm import DeclarativeBase, Field, relationship
-from sqlalchemy import Integer, ForeignKey
+from sqlalchemy import Integer, ForeignKey, select, func, join
 from sqlalchemy.orm import column_property
 
 from .member import Member
+from .issue import Issue
+from .item import Item
 
 
 class TeamResource(DeclarativeBase):
@@ -34,5 +36,13 @@ class Resource(Member):
         'Skill',
         back_populates='resources',
         protected=True
+    )
+
+    load = column_property(
+        select([func.sum(Issue.priority_value)]) \
+        .select_from(
+            join(Item, Issue, Item.issue_id == Issue.id),
+        ) \
+        .where(Item.member_id == 1)
     )
 

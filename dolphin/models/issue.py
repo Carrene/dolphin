@@ -67,6 +67,12 @@ class Boarding:
     atrisk =    (4, 'at-risk')
 
 
+class Priority:
+    low =      (1, 'low')
+    normal =   (2, 'normal')
+    high =     (3, 'high')
+
+
 class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             Subscribable):
 
@@ -273,6 +279,18 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             (cls.status == 'on-hold', Boarding.frozen[1]),
             (cls.due_date < datetime.now(), Boarding.delayed[1]),
             (cls.due_date > datetime.now(), Boarding.ontime[1])
+        ])
+
+    @hybrid_property
+    def priority_value(self):
+        return getattr(Priority, self.priority)[0]
+
+    @priority_value.expression
+    def priority_value(cls):
+        return case([
+            (cls.priority == 'low', Priority.low[0]),
+            (cls.priority == 'normal', Priority.normal[0]),
+            (cls.priority == 'high', Priority.high[0])
         ])
 
     @classmethod
