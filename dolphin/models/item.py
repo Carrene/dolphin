@@ -1,12 +1,13 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
+from nanohttp import settings
 from restfulpy.orm import Field, DeclarativeBase, relationship
 from restfulpy.orm.metadata import MetadataField
 from restfulpy.orm.mixins import TimestampMixin, OrderingMixin, \
     FilteringMixin, PaginationMixin
 from sqlalchemy import Integer, ForeignKey, UniqueConstraint, DateTime, Enum, \
     String, select, func
-from sqlalchemy.orm import column_property
+from sqlalchemy.orm import column_property, synonym
 
 from .dailyreport import Dailyreport
 
@@ -70,7 +71,7 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         not_none=False,
         required=False,
     )
-    status = Field(
+    _status = Field(
         Enum(*item_statuses, name='item_status'),
         python_type=str,
         default='in-progress',
@@ -125,6 +126,12 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         required=True,
         example='Lorem Ipsum'
     )
+    _last_status_change = Field(
+        DateTime,
+        python_type=datetime,
+        nullable=True,
+        protected=True,
+    )
 
     issue = relationship(
         'Issue',
@@ -159,6 +166,31 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             return 'Submitted'
 
         return 'Due'
+
+    def _set_status(self, status):
+        if status == 'in-progress':
+            self._last_status_change = datetime.now()
+
+        self._status = status
+
+    def _get_status(self):
+        return self._status
+
+    status = synonym(
+        '_status',
+        descriptor=property(_get_status, _set_status),
+        info=dict(protected=True)
+    )
+
+    @property
+    def response_time(self):
+        if self._last_status_change == None:
+            return None
+
+        return (
+            self._last_status_change + \
+            timedelta(hours=settings.item.response_time)
+        ) - datetime.now()
 
     def to_dict(self):
         item_dict = super().to_dict()

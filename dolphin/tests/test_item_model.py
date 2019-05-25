@@ -1,7 +1,8 @@
 from datetime import datetime
 
-from auditor.context import Context as AuditLogContext
+from nanohttp import settings
 from restfulpy.testing import db
+from auditor.context import Context as AuditLogContext
 
 from dolphin.models import Item, Project, Member, Workflow, Group, Release, \
     Skill, Phase, Issue, Dailyreport
@@ -92,4 +93,85 @@ def test_item_perspective(db):
         session.commit()
 
         assert item.perspective== 'Submitted'
+
+
+def test_response_time(db):
+    settings.merge(
+    '''
+        item:
+          response_time: 1
+    '''
+    )
+
+    with AuditLogContext(dict()):
+        session = db()
+        member2 = Member(
+            title='Second Member',
+            email='member2@example.com',
+            access_token='access token 2',
+            phone=111111111,
+            reference_id=3
+        )
+
+        workflow = Workflow(title='Default')
+        skill = Skill(title='First Skill')
+        group = Group(title='Example Group')
+
+        phase1 = Phase(
+            title='backlog',
+            order=-1,
+            workflow=workflow,
+            skill=skill,
+        )
+        session.add(phase1)
+
+        release = Release(
+            title='My first release',
+            description='A decription for my first release',
+            cutoff='2030-2-20',
+            launch_date='2030-2-20',
+            manager=member2,
+            room_id=0,
+            group=group,
+        )
+
+        project = Project(
+            release=release,
+            workflow=workflow,
+            group=group,
+            manager=member2,
+            title='My first project',
+            description='A decription for my project',
+            room_id=1
+        )
+
+        issue1 = Issue(
+            project=project,
+            title='First issue',
+            description='This is description of first issue',
+            due_date='2020-2-20',
+            kind='feature',
+            days=1,
+            room_id=2
+        )
+        session.add(issue1)
+        session.flush()
+
+        item1 = Item(
+            issue_id=issue1.id,
+            phase_id=phase1.id,
+            member_id=member2.id,
+            status='done',
+        )
+        session.add(item1)
+        session.commit()
+
+    assert item1.response_time == None
+
+    item1.status = 'in-progress'
+    settings.item.response_time = 0.0000000001
+    assert item1.response_time.total_seconds() < 0
+
+    settings.item.response_time = 1
+    assert item1.response_time.total_seconds() > 0
 
