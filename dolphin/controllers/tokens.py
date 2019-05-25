@@ -55,7 +55,6 @@ class TokenController(RestController):
         )
     )
     def create(self):
-        import pudb; pudb.set_trace()  # XXX BREAKPOINT
         email = context.form.get('email')
         password = context.form.get('password')
         if email and password is None:

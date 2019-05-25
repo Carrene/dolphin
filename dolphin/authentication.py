@@ -5,6 +5,7 @@ from restfulpy.authentication import StatefulAuthenticator
 from restfulpy.orm import DBSession
 
 from .models import Member
+from .exceptions import StatusIncorrectEMailOrPassword
 
 
 class Authenticator(StatefulAuthenticator):
@@ -13,7 +14,7 @@ class Authenticator(StatefulAuthenticator):
     def safe_member_lookup(condition):
         member = DBSession.query(Member).filter(condition).one_or_none()
         if member is None:
-            raise HTTPStatus('400 Incorrect Email Or Password')
+            raise StatusIncorrectEMailOrPassword()
 
         return member
 
