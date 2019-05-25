@@ -890,7 +890,7 @@ dailyreport_update_validator = validate(
         max_length=(1024, StatusLimitedCharecterForNote),
     ),
     hours=dict(
-        type_=(int, StatusInvalidHoursType),
+        type_=(float, StatusInvalidHoursType),
         minimum=(1, StatusHoursMustBeGreaterThanZero)
     ),
 )

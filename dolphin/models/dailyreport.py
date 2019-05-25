@@ -2,7 +2,7 @@ from datetime import datetime
 
 from restfulpy.orm import Field, DeclarativeBase, OrderingMixin, \
     FilteringMixin, PaginationMixin, relationship
-from sqlalchemy import Integer, Unicode, ForeignKey, Date
+from sqlalchemy import Integer, Unicode, ForeignKey, Date, Float
 
 
 class Dailyreport(OrderingMixin, FilteringMixin, PaginationMixin, \
@@ -43,11 +43,11 @@ class Dailyreport(OrderingMixin, FilteringMixin, PaginationMixin, \
         readonly=True,
     )
     hours = Field(
-        Integer,
-        python_type=int,
+        Float,
+        python_type=float,
         watermark='Hours spent on the assignment',
         label='Hours',
-        example=2,
+        example=2.5,
         nullable=True,
         not_none=False,
         required=False,
