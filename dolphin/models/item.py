@@ -181,7 +181,6 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             example='Lorem Ipsum',
             message='Lorem Ipsun',
         )
-
         yield MetadataField(
             name='perspective',
             key='perspective',
