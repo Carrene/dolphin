@@ -152,15 +152,15 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     @property
     def perspective(self):
         if len(self.dailyreports) == 0:
-            return 'due'
+            return 'Due'
 
         if self.dailyreports[-1].date < datetime.now().date():
-            return 'over due'
+            return 'Overdue'
 
         if self.dailyreports[-1].note != None:
-            return 'submitted'
+            return 'Submitted'
 
-        return 'due'
+        return 'Due'
 
     def to_dict(self):
         item_dict = super().to_dict()
