@@ -181,7 +181,6 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             if self.response_time else None
 
         item_dict['hoursWorked'] = self.hours_worked
-        item_dict['perspective'] = self.perspective
         return item_dict
 
     @classmethod
@@ -210,5 +209,5 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     @staticmethod
     def _get_hours_from_timedelta( timedelta):
-        return timedelta.seconds // 3600
+        return timedelta.seconds / 3600
 
