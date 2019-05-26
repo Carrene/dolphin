@@ -13,7 +13,7 @@ def test_response_time(db):
     settings.merge(
     '''
         item:
-          response_time: 1
+          response_time: 24
     '''
     )
 
@@ -69,6 +69,17 @@ def test_response_time(db):
             room_id=2
         )
         session.add(issue1)
+
+        issue2 = Issue(
+            project=project,
+            title='Second issue',
+            description='This is description of second issue',
+            due_date='2020-2-20',
+            kind='feature',
+            days=1,
+            room_id=3
+        )
+        session.add(issue1)
         session.flush()
 
         item1 = Item(
@@ -78,7 +89,16 @@ def test_response_time(db):
             status='done',
         )
         session.add(item1)
+
+        item2 = Item(
+            issue_id=issue2.id,
+            phase_id=phase1.id,
+            member_id=member1.id,
+        )
+        session.add(item2)
         session.commit()
+
+    assert item2.response_time.total_seconds() > 0
 
     assert item1.response_time == None
 
