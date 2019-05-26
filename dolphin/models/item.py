@@ -196,6 +196,7 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         item_dict = super().to_dict()
         item_dict['hoursWorked'] = self.hours_worked
         item_dict['perspective'] = self.perspective
+        item_dict['responseTime'] = self.response_time
         return item_dict
 
     @classmethod
@@ -205,6 +206,16 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             name='issue',
             key='issue',
             label='Lorem Ipsun',
+            required=False,
+            readonly=True,
+            watermark='Lorem Ipsum',
+            example='Lorem Ipsum',
+            message='Lorem Ipsun',
+        )
+        yield MetadataField(
+            name='responseTime',
+            key='response_time',
+            label='Response Time',
             required=False,
             readonly=True,
             watermark='Lorem Ipsum',
