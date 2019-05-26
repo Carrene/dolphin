@@ -197,6 +197,7 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             if self.response_time else None
 
         item_dict['hoursWorked'] = self.hours_worked
+        item_dict['perspective'] = self.perspective
         return item_dict
 
     @classmethod
