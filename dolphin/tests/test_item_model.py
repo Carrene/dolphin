@@ -99,7 +99,7 @@ def test_response_time(db):
     settings.merge(
     '''
         item:
-          response_time: 24
+          response_time: 48
     '''
     )
 
