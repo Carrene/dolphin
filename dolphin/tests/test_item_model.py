@@ -165,7 +165,7 @@ def test_response_time(db):
             days=1,
             room_id=3
         )
-        session.add(issue1)
+        session.add(issue2)
         session.flush()
 
         item1 = Item(
