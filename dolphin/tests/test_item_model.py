@@ -179,7 +179,7 @@ def test_response_time(db):
         item2 = Item(
             issue_id=issue2.id,
             phase_id=phase1.id,
-            member_id=member1.id,
+            member_id=member2.id,
         )
         session.add(item2)
         session.commit()
