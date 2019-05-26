@@ -184,13 +184,11 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     @property
     def response_time(self):
-        if self._last_status_change == None:
-            return None
-
-        return (
-            self._last_status_change + \
-            timedelta(hours=settings.item.response_time)
-        ) - datetime.now()
+        if self.status == 'in-progress':
+          return (
+              (self._last_status_change or self.created_at) + \
+              timedelta(hours=settings.item.response_time)
+          ) - datetime.now()
 
     def to_dict(self):
         item_dict = super().to_dict()
