@@ -159,13 +159,16 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         if len(self.dailyreports) == 0:
             return 'Due'
 
-        if self.dailyreports[-1].date < datetime.now().date():
-            return 'Overdue'
+        for dailyreport in self.dailyreports:
+            if dailyreport.note == None \
+                    and dailyreport.date < datetime.now().date():
+                return 'Overdue'
 
-        if self.dailyreports[-1].note != None:
-            return 'Submitted'
+        if self.dailyreports[-1].note == None \
+                and self.dailyreports[-1].date == datetime.now().date():
+            return 'Due'
 
-        return 'Due'
+        return 'Submitted'
 
     def _set_status(self, status):
         if status == 'in-progress':

@@ -66,7 +66,7 @@ def test_item_perspective(db):
         session.add(item)
         session.commit()
 
-        assert item.perspective== 'Due'
+        assert item.perspective == 'Due'
 
         dailyreport1 = Dailyreport(
             date=datetime.strptime('2019-1-2', '%Y-%m-%d').date(),
@@ -77,22 +77,35 @@ def test_item_perspective(db):
         session.add(dailyreport1)
         session.commit()
 
-        assert item.perspective== 'Overdue'
-
         dailyreport2 = Dailyreport(
-            date=datetime.now().date(),
+            date=datetime.strptime('2019-1-3', '%Y-%m-%d').date(),
             hours=3,
             item=item,
         )
         session.add(dailyreport2)
         session.commit()
 
-        assert item.perspective== 'Due'
+        assert item.perspective == 'Overdue'
 
         dailyreport2.note = 'The note for a daily report'
         session.commit()
 
-        assert item.perspective== 'Submitted'
+        assert item.perspective == 'Submitted'
+
+        dailyreport3 = Dailyreport(
+            date=datetime.now().date(),
+            hours=3,
+            item=item,
+        )
+        session.add(dailyreport3)
+        session.commit()
+
+        assert item.perspective == 'Due'
+
+        dailyreport3.note = 'The note for a daily report'
+        session.commit()
+
+        assert item.perspective == 'Submitted'
 
 
 def test_response_time(db):
