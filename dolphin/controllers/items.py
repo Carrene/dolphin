@@ -112,7 +112,15 @@ class ItemDailyreportController(ModelRestController):
         self.item = item
 
     def _create_dailyreport_if_needed(self):
-        if Event.isworkingday(DBSession):
+        today = datetime.strptime(
+            datetime.now().date().isoformat(),
+            '%Y-%m-%d'
+        )
+        if Event.isworkingday(DBSession) \
+                and self.item.start_date is not None \
+                and self.item.end_date is not None \
+                and self.item.start_date <=  today \
+                and today <= self.item.end_date:
             is_dailyreport_exists = DBSession.query(Dailyreport) \
                 .filter(
                     Dailyreport.date == datetime.now().date(),

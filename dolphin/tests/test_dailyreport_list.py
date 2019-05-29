@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from bddrest import when, response, status
 from auditor.context import Context as AuditLogContext
@@ -67,15 +67,18 @@ class TestDailyreport(LocalApplicationTestCase):
         session.add(issue)
         session.flush()
 
+        one_day = timedelta(days=1)
         cls.item = Item(
             issue_id=issue.id,
             phase_id=phase.id,
             member_id=cls.member.id,
+            start_date=datetime.now().date() - 4 * one_day,
+            end_date=datetime.now().date(),
         )
         session.add(cls.item)
 
         dailyreport1 = Dailyreport(
-            date=datetime.strptime('2019-1-2', '%Y-%m-%d').date(),
+            date=datetime.now().date() - 4 * one_day,
             hours=1,
             note='note for dailyreport1',
             item=cls.item,
@@ -83,7 +86,7 @@ class TestDailyreport(LocalApplicationTestCase):
         session.add(dailyreport1)
 
         dailyreport2 = Dailyreport(
-            date=datetime.strptime('2019-1-3', '%Y-%m-%d').date(),
+            date=datetime.now().date() - 3 * one_day,
             hours=2,
             note='note for dailyreport2',
             item=cls.item,
@@ -91,7 +94,7 @@ class TestDailyreport(LocalApplicationTestCase):
         session.add(dailyreport2)
 
         dailyreport3 = Dailyreport(
-            date=datetime.strptime('2019-1-4', '%Y-%m-%d').date(),
+            date=datetime.now().date() - 2 * one_day,
             hours=3,
             note='note for dailyreport3',
             item=cls.item,

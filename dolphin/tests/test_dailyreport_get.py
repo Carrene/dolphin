@@ -72,6 +72,8 @@ class TestDailyreport(LocalApplicationTestCase):
             issue_id=issue.id,
             phase_id=phase.id,
             member_id=cls.member.id,
+            start_date=datetime.now().date(),
+            end_date=datetime.now().date(),
         )
         session.add(cls.item)
 
