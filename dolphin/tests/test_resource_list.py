@@ -23,13 +23,21 @@ class TestResource(LocalApplicationTestCase):
         )
         session.add(cls.phase1)
 
+        phase2 = Phase(
+            title='backend',
+            order=-2,
+            workflow=workflow,
+            skill=skill2
+        )
+        session.add(phase2)
+
         cls.resource1 = Resource(
             title='First Resource',
             email='resource1@example.com',
             access_token='access token 1',
             phone=222222222,
             reference_id=2,
-            skill=skill1
+            skills=[skill1],
         )
         session.add(cls.resource1)
 
@@ -39,7 +47,7 @@ class TestResource(LocalApplicationTestCase):
             access_token='access token 2',
             phone=333333333,
             reference_id=3,
-            skill=skill1
+            skills=[skill1],
         )
         session.add(resource2)
 

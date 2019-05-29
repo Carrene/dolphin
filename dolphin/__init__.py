@@ -11,7 +11,7 @@ from .cli.email import EmailLauncher
 from .controllers.root import Root
 
 
-__version__ = '0.44.2a9'
+__version__ = '0.46.2a9'
 
 
 class Dolphin(Application):
@@ -74,6 +74,14 @@ class Dolphin(Application):
           logos:
             max_length: 50 # KB
             min_length: 1  # KB
+
+      item:
+        response_time: 48 # Hours
+
+      resource:
+        load_thresholds:
+          heavy: 5
+          medium: 3
    '''
 
     def __init__(self, application_name='dolphin', root=Root()):

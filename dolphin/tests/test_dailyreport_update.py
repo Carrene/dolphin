@@ -87,7 +87,7 @@ class TestDailyreport(LocalApplicationTestCase):
     def test_update(self):
         self.login(self.member.email)
         form = dict(
-            hours=4,
+            hours=4.8,
             note='Some note'
         )
 

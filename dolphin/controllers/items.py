@@ -62,21 +62,20 @@ class ItemController(ModelRestController):
         else:
             query = DBSession.query(Item).filter(Item.member_id == member.id)
 
-        active_item_cte = select([func.max(Item.id).label('max_item_id')]) \
-            .group_by(Item.issue_id) \
-            .cte()
-
         if 'zone' in context.query:
+            if context.query['zone'] == 'newlyAssigned':
+                query = query.filter(Item.status != 'in-progress')
+
             if context.query['zone'] == 'needEstimate':
-                query = query.filter(Item.id == active_item_cte.c.max_item_id) \
+                query = query.filter(Item.status == 'in-progress') \
                     .filter(Item.estimated_hours.is_(None))
 
             elif context.query['zone'] == 'upcomingNuggets':
-                query = query.filter(Item.id == active_item_cte.c.max_item_id) \
+                query = query.filter(Item.status == 'in-progress') \
                     .filter(Item.start_date > datetime.now())
 
             elif context.query['zone'] == 'inProcessNuggets':
-                query = query.filter(Item.id == active_item_cte.c.max_item_id) \
+                query = query.filter(Item.status == 'in-progress') \
                     .filter(Item.start_date < datetime.now())
 
         return query

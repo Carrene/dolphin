@@ -1,22 +1,20 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
+from nanohttp import settings
 from restfulpy.orm import Field, DeclarativeBase, relationship
 from restfulpy.orm.metadata import MetadataField
 from restfulpy.orm.mixins import TimestampMixin, OrderingMixin, \
     FilteringMixin, PaginationMixin
 from sqlalchemy import Integer, ForeignKey, UniqueConstraint, DateTime, Enum, \
     String, select, func
-from sqlalchemy.orm import column_property
+from sqlalchemy.orm import column_property, synonym
 
 from .dailyreport import Dailyreport
 
 
 item_statuses = [
-    'to-do',
     'in-progress',
-    'on-hold',
-    'delayed',
-    'complete',
+    'done',
 ]
 
 
@@ -73,10 +71,10 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         not_none=False,
         required=False,
     )
-    status = Field(
+    _status = Field(
         Enum(*item_statuses, name='item_status'),
         python_type=str,
-        default='to-do',
+        default='in-progress',
         label='Status',
         watermark='Choose a status',
         nullable=True,
@@ -128,6 +126,12 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         required=True,
         example='Lorem Ipsum'
     )
+    _last_status_change = Field(
+        DateTime,
+        python_type=datetime,
+        nullable=True,
+        protected=True,
+    )
 
     issue = relationship(
         'Issue',
@@ -137,7 +141,10 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     )
     dailyreports = relationship(
         'Dailyreport',
-        back_populates='item'
+        back_populates='item',
+        cascade='delete',
+        lazy='selectin',
+        order_by='Dailyreport.id',
     )
 
     hours_worked = column_property(
@@ -147,9 +154,53 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     UniqueConstraint(phase_id, issue_id, member_id)
 
+    @property
+    def perspective(self):
+        if len(self.dailyreports) == 0:
+            return 'Due'
+
+        for dailyreport in self.dailyreports:
+            if dailyreport.note == None \
+                    and dailyreport.date < datetime.now().date():
+                return 'Overdue'
+
+        if self.dailyreports[-1].note == None \
+                and self.dailyreports[-1].date == datetime.now().date():
+            return 'Due'
+
+        return 'Submitted'
+
+    def _set_status(self, status):
+        if status == 'in-progress':
+            self._last_status_change = datetime.now()
+
+        self._status = status
+
+    def _get_status(self):
+        return self._status
+
+    status = synonym(
+        '_status',
+        descriptor=property(_get_status, _set_status),
+        info=dict(protected=True)
+    )
+
+    @property
+    def response_time(self):
+        if self.status == 'in-progress':
+          return (
+              (self._last_status_change or self.created_at) + \
+              timedelta(hours=settings.item.response_time)
+          ) - datetime.now()
+
     def to_dict(self):
         item_dict = super().to_dict()
+        item_dict['responseTime'] = \
+            self._get_hours_from_timedelta(self.response_time) \
+            if self.response_time else None
+
         item_dict['hoursWorked'] = self.hours_worked
+        item_dict['perspective'] = self.perspective
         return item_dict
 
     @classmethod
@@ -165,4 +216,30 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             example='Lorem Ipsum',
             message='Lorem Ipsun',
         )
+        yield MetadataField(
+            name='responseTime',
+            key='response_time',
+            label='Response Time',
+            required=False,
+            readonly=True,
+            watermark='Lorem Ipsum',
+            example='Lorem Ipsum',
+            message='Lorem Ipsun',
+        )
+
+        yield MetadataField(
+            name='perspective',
+            key='perspective',
+            label='Perspective',
+            required=False,
+            readonly=True,
+            not_none=True,
+            watermark='Lorem Ipsum',
+            example='Lorem Ipsum',
+            message='Lorem Ipsun',
+        )
+
+    @staticmethod
+    def _get_hours_from_timedelta( timedelta):
+        return timedelta.seconds / 3600
 

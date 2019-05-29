@@ -179,6 +179,14 @@ class TestListGroup(LocalApplicationTestCase):
             estimated_hours=3,
         )
         session.add(cls.item4)
+
+        cls.item5 = Item(
+            issue_id=cls.issue4.id,
+            phase_id=cls.phase2.id,
+            member_id=cls.member1.id,
+            status='done',
+        )
+        session.add(cls.item5)
         session.commit()
 
     def test_list_item(self):
@@ -190,7 +198,7 @@ class TestListGroup(LocalApplicationTestCase):
             'LIST',
         ):
             assert status == 200
-            assert len(response.json) == 3
+            assert len(response.json) == 4
 
             when('Sort by id', query=dict(sort='id'))
             assert status == 200
@@ -200,16 +208,16 @@ class TestListGroup(LocalApplicationTestCase):
 
             when('Reverse sort by id', query=dict(sort='-id'))
             assert status == 200
-            assert response.json[0]['id'] == self.item3.id
-            assert response.json[1]['id'] == self.item2.id
-            assert response.json[2]['id'] == self.item1.id
+            assert response.json[0]['id'] == self.item5.id
+            assert response.json[1]['id'] == self.item3.id
+            assert response.json[2]['id'] == self.item2.id
 
             when('Filter by id', query=dict(id=f'{self.item1.id}'))
             assert len(response.json) == 1
             assert response.json[0]['id'] == self.item1.id
 
             when('Filter by id', query=dict(id=f'!{self.item1.id}'))
-            assert len(response.json) == 2
+            assert len(response.json) == 3
 
             when(
                 'Filter by `needEstimate` zone',
@@ -233,6 +241,13 @@ class TestListGroup(LocalApplicationTestCase):
             assert response.json[0]['id'] == self.item3.id
 
             when(
+                'Filter by `newlyAssigned` zone',
+                query=dict(zone='newlyAssigned')
+            )
+            assert len(response.json) == 1
+            assert response.json[0]['id'] == self.item5.id
+
+            when(
                 'Paginate item',
                query=dict(sort='id', take=1, skip=2)
             )
@@ -242,7 +257,7 @@ class TestListGroup(LocalApplicationTestCase):
                 'Manipulate sorting and pagination',
                 query=dict(sort='-id', take=1, skip=2)
             )
-            assert response.json[0]['id'] == self.item1.id
+            assert response.json[0]['id'] == self.item2.id
 
             when('Request is not authorized', authorization=None)
             assert status == 401
@@ -254,5 +269,5 @@ class TestListGroup(LocalApplicationTestCase):
             'LIST',
         ):
             assert status == 200
-            assert len(response.json) == 4
+            assert len(response.json) == 5
 
