@@ -87,10 +87,10 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     @json(
         prevent_empty_form='708 No Parameter Exists In The Form',
         form_whitelist=(
-            ['title', 'days', 'dueDate', 'kind', 'description', 'status',
+            ['title', 'days', 'kind', 'description', 'status',
              'priority', 'projectId'],
             '707 Invalid field, only following fields are accepted: '
-            'title, days, dueDate, kind, description, status, priority'
+            'title, days, kind, description, status, priority'
         )
     )
     @update_issue_validator
@@ -282,7 +282,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 # issue.modified_at AS issue_modified_at, issue."modifiedBy"
                 # AS "issue_modifiedBy", issue.project_id AS issue_project_id,
                 # issue.room_id AS issue_room_id,
-                # issue.due_date AS issue_due_date, issue.kind AS issue_kind,
+                # issue.kind AS issue_kind,
                 # issue.days AS issue_days, issue.status AS issue_status,
                 # issue.priority AS issue_priority
                 # FROM subscribable JOIN issue ON subscribable.id = issue.id

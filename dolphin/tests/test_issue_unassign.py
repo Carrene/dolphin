@@ -58,7 +58,6 @@ class TestIssue(LocalApplicationTestCase):
             project=project,
             title='First issue',
             description='This is description of first issue',
-            due_date='2020-2-20',
             kind='feature',
             days=1,
             room_id=2
@@ -69,7 +68,6 @@ class TestIssue(LocalApplicationTestCase):
             project=project,
             title='Second issue',
             description='This is description of second issue',
-            due_date='2020-2-20',
             kind='feature',
             days=1,
             room_id=2

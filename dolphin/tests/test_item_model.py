@@ -43,7 +43,6 @@ def test_item_perspective(db):
             project=project,
             title='First issue',
             description='This is description of first issue',
-            due_date=datetime.strptime('2020-2-20', '%Y-%m-%d'),
             kind='feature',
             days=1,
             room_id=2,
@@ -162,7 +161,6 @@ def test_response_time(db):
             project=project,
             title='First issue',
             description='This is description of first issue',
-            due_date='2020-2-20',
             kind='feature',
             days=1,
             room_id=2
@@ -173,7 +171,6 @@ def test_response_time(db):
             project=project,
             title='Second issue',
             description='This is description of second issue',
-            due_date='2020-2-20',
             kind='feature',
             days=1,
             room_id=3
