@@ -220,6 +220,13 @@ class TestListGroup(LocalApplicationTestCase):
             assert len(response.json) == 3
 
             when(
+                'The zone in query string is invalid',
+                query=dict(zone='invalidZone')
+            )
+            assert status == 200
+            assert response.json == []
+
+            when(
                 'Filter by `needEstimate` zone',
                 query=dict(zone='needEstimate')
             )
@@ -234,8 +241,8 @@ class TestListGroup(LocalApplicationTestCase):
             assert response.json[0]['id'] == self.item2.id
 
             when(
-                'Filter by `inProcessNuggets` zone',
-                query=dict(zone='inProcessNuggets')
+                'Filter by `inProgressNuggets` zone',
+                query=dict(zone='inProgressNuggets')
             )
             assert len(response.json) == 1
             assert response.json[0]['id'] == self.item3.id

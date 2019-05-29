@@ -22,6 +22,12 @@ FORM_WHITLELIST_DAILYREPORT = [
     'hours',
     'note',
 ]
+VALID_ZONES = [
+    'newlyAssigned',
+    'needEstimate',
+    'upcomingNuggets',
+    'inProgressNuggets'
+]
 
 
 FORM_WHITELIST_ITEM_STRING = ', '.join(FORM_WHITLELIST_ITEM)
@@ -69,6 +75,9 @@ class ItemController(ModelRestController):
             query = DBSession.query(Item).filter(Item.member_id == member.id)
 
         if 'zone' in context.query:
+            if context.query['zone'] not in VALID_ZONES:
+                return []
+
             if context.query['zone'] == 'newlyAssigned':
                 query = query.filter(Item.status != 'in-progress')
 
@@ -80,7 +89,7 @@ class ItemController(ModelRestController):
                 query = query.filter(Item.status == 'in-progress') \
                     .filter(Item.start_date > datetime.now())
 
-            elif context.query['zone'] == 'inProcessNuggets':
+            elif context.query['zone'] == 'inProgressNuggets':
                 query = query.filter(Item.status == 'in-progress') \
                     .filter(Item.start_date < datetime.now())
 
