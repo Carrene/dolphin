@@ -110,10 +110,10 @@ def test_item_perspective(db):
 
 def test_response_time(db):
     settings.merge(
-    '''
-        item:
-          response_time: 48
-    '''
+        '''
+            item:
+              response_time: 48
+        '''
     )
 
     with AuditLogContext(dict()):

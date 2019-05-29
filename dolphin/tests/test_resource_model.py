@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from nanohttp import settings
 from restfulpy.testing import db
 from auditor.context import Context as AuditLogContext
 
@@ -8,6 +9,15 @@ from dolphin.models import Resource, Group, Workflow, Skill, Phase, Release, \
 
 
 def test_resource_load(db):
+    settings.merge(
+        '''
+          resource:
+            load_thresholds:
+              heavy: 5
+              medium: 3
+        '''
+    )
+
     session = db()
     with AuditLogContext(dict()):
 

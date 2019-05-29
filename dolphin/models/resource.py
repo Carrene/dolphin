@@ -1,3 +1,4 @@
+from nanohttp import settings
 from restfulpy.orm import DeclarativeBase, Field, relationship
 from sqlalchemy import Integer, ForeignKey, select, func, join, case, and_
 from sqlalchemy.orm import column_property
@@ -52,21 +53,33 @@ class Resource(Member):
         if self.load_value is None:
             return None
 
-        if 5 < self.load_value:
+        if settings.resource.load_thresholds.heavy < self.load_value:
             return 'heavy'
 
-        elif 3 <= self.load_value <= 5:
+        elif settings.resource.load_thresholds.medium <= self.load_value \
+                and self.load_value <= settings.resource.load_thresholds.heavy:
             return 'medium'
 
-        elif 3 > self.load_value:
-            return 'light'
+        return 'light'
 
     @load.expression
     def load(cls):
         return case([
             (None == cls.load_value, None),
-            (5 < cls.load_value, 'heavy'),
-            (and_(3 <= cls.load_value,  cls.load_value <= 5), 'medium'),#<= 5
-            (3 > cls.load_value, 'low')
+            (
+                settings.resource.load_thresholds.heavy < cls.load_value,
+                'heavy'
+            ),
+            (
+                and_(
+                    settings.resource.load_thresholds.medium <= cls.load_value,
+                    cls.load_value <= settings.resource.load_thresholds.heavy
+                ),
+                'medium'
+            ),
+            (
+                settings.resource.load_thresholds.medium > cls.load_value,
+                'low'
+            ),
         ])
 
