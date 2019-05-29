@@ -77,6 +77,11 @@ class Dolphin(Application):
 
       item:
         response_time: 48 # Hours
+
+      resource:
+        load_thresholds:
+          heavy: 5
+          medium: 3
    '''
 
     def __init__(self, application_name='dolphin', root=Root()):
