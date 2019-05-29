@@ -75,7 +75,6 @@ class TestIssue(LocalApplicationTestCase):
             project=project,
             title='First issue',
             description='This is description of first issue',
-            due_date='2020-2-20',
             kind='feature',
             days=1,
             room_id=2,
@@ -109,7 +108,6 @@ class TestIssue(LocalApplicationTestCase):
                         "title": "sample title",
                         "priority": "low",
                         "kind": "bug",
-                        "dueDate": "2019-01-24T00:00:00",
                         "status": "on-hold"
                     }
                 )

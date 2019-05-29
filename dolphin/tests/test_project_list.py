@@ -124,7 +124,6 @@ class TestProject(LocalApplicationTestCase):
                 project=cls.project1,
                 title='First issue',
                 description='This is description of first issue',
-                due_date='2030-2-20',
                 kind='feature',
                 days=1,
                 room_id=2
@@ -135,7 +134,6 @@ class TestProject(LocalApplicationTestCase):
                 project=cls.project2,
                 title='Second issue',
                 description='This is description of second issue',
-                due_date='2020-2-20',
                 kind='feature',
                 days=2,
                 room_id=3,
@@ -147,7 +145,6 @@ class TestProject(LocalApplicationTestCase):
                 project=cls.project1,
                 title='Third issue',
                 description='This is description of third issue',
-                due_date='2000-2-20',
                 kind='feature',
                 days=1,
                 room_id=2
