@@ -8,18 +8,24 @@ from sqlalchemy import select, func
 
 from ..models import Item, Dailyreport, Event, Member
 from ..validators import update_item_validator, dailyreport_update_validator, \
-    estimate_item_validator
-from ..exceptions import StatusEndDateMustBeGreaterThanStartDate
+    estimate_item_validator, dailyreport_create_validator
+from ..exceptions import StatusEndDateMustBeGreaterThanStartDate, \
+    StatusInvalidDatePeriod
 
 
-FORM_WHITLELIST = [
+FORM_WHITLELIST_ITEM = [
     'startDate',
     'endDate',
     'estimatedHours',
 ]
+FORM_WHITLELIST_DAILYREPORT = [
+    'hours',
+    'note',
+]
 
 
-FORM_WHITELIST_STRING = ', '.join(FORM_WHITLELIST)
+FORM_WHITELIST_ITEM_STRING = ', '.join(FORM_WHITLELIST_ITEM)
+FORM_WHITELIST_DAILYREPORT_STRING = ', '.join(FORM_WHITLELIST_DAILYREPORT)
 
 
 class ItemController(ModelRestController):
@@ -84,9 +90,9 @@ class ItemController(ModelRestController):
     @json(
         prevent_empty_form='708 Empty Form',
         form_whitelist=(
-            FORM_WHITLELIST,
+            FORM_WHITLELIST_ITEM,
             f'707 Invalid field, only following fields are accepted: '
-            f'{FORM_WHITELIST_STRING}'
+            f'{FORM_WHITELIST_ITEM_STRING}'
         )
     )
     @estimate_item_validator
@@ -175,4 +181,29 @@ class ItemDailyreportController(ModelRestController):
         self._create_dailyreport_if_needed()
         return DBSession.query(Dailyreport) \
             .filter(Dailyreport.item_id == self.item.id)
+
+    @authorize
+    @json(
+        prevent_empty_form='708 Empty Form',
+        form_whitelist=(
+            FORM_WHITLELIST_DAILYREPORT,
+            f'707 Invalid field, only following fields are accepted: '
+            f'{FORM_WHITELIST_DAILYREPORT_STRING}'
+        )
+    )
+    @dailyreport_create_validator
+    @commit
+    def create(self):
+        today = datetime.strptime(datetime.now().date().isoformat(), '%Y-%m-%d')
+        if self.item.end_date < today or today < self.item.start_date:
+            raise StatusInvalidDatePeriod()
+
+        dailyreport = Dailyreport(
+            note=context.form.get('note'),
+            hours=context.form.get('hours'),
+            item_id=self.item.id,
+            date=datetime.now().date(),
+        )
+        DBSession.add(dailyreport)
+        return dailyreport
 
