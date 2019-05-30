@@ -61,7 +61,6 @@ class TestItem(LocalApplicationTestCase):
             project=cls.project,
             title='First issue',
             description='This is description of first issue',
-            due_date=datetime.strptime('2020-2-20', '%Y-%m-%d'),
             kind='feature',
             days=1,
             room_id=2

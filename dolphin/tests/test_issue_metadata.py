@@ -52,12 +52,10 @@ class TestIssue(LocalApplicationTestCase):
             assert fields['status']['default'] is not None
 
             assert fields['dueDate']['label'] is not None
-            assert fields['dueDate']['watermark'] is not None
+            assert fields['dueDate']['key'] is not None
             assert fields['dueDate']['name'] is not None
-            assert fields['dueDate']['notNone'] is not None
             assert fields['dueDate']['required'] is not None
-            assert fields['dueDate']['pattern'] is not None
-            assert fields['dueDate']['example'] is not None
+            assert fields['dueDate']['readonly'] is not None
 
             assert fields['kind']['label'] is not None
             assert fields['kind']['watermark'] is not None

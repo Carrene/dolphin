@@ -4,7 +4,7 @@ from bddrest import status, response, when
 from auditor.context import Context as AuditLogContext
 
 from dolphin.models import Project, Member, Workflow, Issue, Subscription, \
-    Group, Release
+    Group, Release, Phase, Skill, Item
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -34,6 +34,7 @@ class TestProject(LocalApplicationTestCase):
         session.add(member2)
 
         workflow = Workflow(title='Default')
+        skill = Skill(title='First Skill')
         group = Group(title='default')
 
         cls.release1 = Release(
@@ -124,7 +125,6 @@ class TestProject(LocalApplicationTestCase):
                 project=cls.project1,
                 title='First issue',
                 description='This is description of first issue',
-                due_date='2030-2-20',
                 kind='feature',
                 days=1,
                 room_id=2
@@ -135,7 +135,6 @@ class TestProject(LocalApplicationTestCase):
                 project=cls.project2,
                 title='Second issue',
                 description='This is description of second issue',
-                due_date='2020-2-20',
                 kind='feature',
                 days=2,
                 room_id=3,
@@ -147,7 +146,6 @@ class TestProject(LocalApplicationTestCase):
                 project=cls.project1,
                 title='Third issue',
                 description='This is description of third issue',
-                due_date='2000-2-20',
                 kind='feature',
                 days=1,
                 room_id=2
@@ -159,6 +157,60 @@ class TestProject(LocalApplicationTestCase):
                 member_id=member1.id
             )
             session.add(subscription)
+
+            phase1 = Phase(
+                workflow=workflow,
+                title='Backlog',
+                order=1,
+                skill=skill,
+            )
+            session.add(phase1)
+            session.flush()
+
+            phase2 = Phase(
+                workflow=workflow,
+                title='Test',
+                order=2,
+                skill=skill
+            )
+            session.add(phase1)
+            session.flush()
+
+            phase3 = Phase(
+                workflow=workflow,
+                title='Development',
+                order=3,
+                skill=skill
+            )
+            session.add(phase1)
+            session.flush()
+
+            item1 = Item(
+                member_id=member1.id,
+                phase_id=phase1.id,
+                issue_id=issue1.id,
+            )
+            session.add(item1)
+
+            item2 = Item(
+                member_id=member1.id,
+                phase_id=phase2.id,
+                issue_id=issue2.id,
+                start_date='2020-2-2',
+                end_date='2020-2-3',
+                estimated_hours=4,
+            )
+            session.add(item2)
+
+            item3 = Item(
+                member_id=member1.id,
+                phase_id=phase2.id,
+                issue_id=issue1.id,
+                start_date='2019-2-2',
+                end_date='2019-2-3',
+                estimated_hours=4,
+            )
+            session.add(item3)
             session.commit()
 
     def test_list(self):
@@ -202,16 +254,17 @@ class TestProject(LocalApplicationTestCase):
                     'Sorting project by due dates',
                     query=dict(sort='dueDate')
                 )
-                assert response.json[0]['dueDate'] == '2020-02-20T00:00:00'
-                assert response.json[1]['dueDate'] == '2030-02-20T00:00:00'
+                assert response.json[0]['dueDate'] == '2019-02-03T00:00:00'
+                assert response.json[1]['dueDate'] == '2020-02-03T00:00:00'
 
                 when(
                     'Sorting project by due dates',
-                    query=dict(sort='!dueDate')
+                    query=dict(sort='-dueDate')
                 )
-                assert response.json[0]['dueDate'] == '2030-02-20T00:00:00'
-                assert response.json[1]['dueDate'] == '2020-02-20T00:00:00'
-
+                assert response.json[0]['dueDate'] == None
+                assert response.json[1]['dueDate'] == None
+                assert response.json[2]['dueDate'] == '2020-02-03T00:00:00'
+                assert response.json[3]['dueDate'] == '2019-02-03T00:00:00'
                 when(
                     'Sorting project by "isSubscribed" field',
                     query=dict(sort='isSubscribed')
@@ -220,7 +273,7 @@ class TestProject(LocalApplicationTestCase):
 
                 when(
                     'Revers sorting project by "isSubscribed" field',
-                    query=dict(sort='!isSubscribed')
+                    query=dict(sort='-isSubscribed')
                 )
                 assert response.json[0]['isSubscribed'] == True
 
@@ -287,8 +340,8 @@ class TestProject(LocalApplicationTestCase):
                 assert len(response.json) == 4
                 assert response.json[0]['title'] == self.project3.title
                 assert response.json[1]['title'] == self.project2.title
-                assert response.json[2]['title'] == self.project4.title
-                assert response.json[3]['title'] == self.project1.title
+                assert response.json[2]['title'] == self.project1.title
+                assert response.json[3]['title'] == self.project4.title
 
             with self.given(
                 'Filter projects',
@@ -337,9 +390,9 @@ class TestProject(LocalApplicationTestCase):
                     query=dict(boarding='IN(on-time,frozen)')
                 )
                 assert status == 200
-                assert len(response.json) == 2
-                assert response.json[0]['title'] == self.project2.title
-                assert response.json[1]['title'] == self.project4.title
+                assert len(response.json) == 3
+                assert response.json[0]['title'] == self.project1.title
+                assert response.json[1]['title'] == self.project2.title
 
             with self.given(
                 'Project pagination',
