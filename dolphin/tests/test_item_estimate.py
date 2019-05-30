@@ -100,7 +100,7 @@ class TestItem(LocalApplicationTestCase):
         json = dict(
             startDate=datetime.strptime('2019-2-2', '%Y-%m-%d').isoformat(),
             endDate=datetime.strptime('2019-2-3', '%Y-%m-%d').isoformat(),
-            estimatedHours=3,
+            estimatedHours=3.4,
         )
 
         with oauth_mockup_server(), self.given(
