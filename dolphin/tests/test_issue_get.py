@@ -50,7 +50,6 @@ class TestIssue(LocalApplicationTestCase):
             project=cls.project,
             title='First issue',
             description='This is description of first issue',
-            due_date='2020-2-20',
             kind='feature',
             days=1,
             room_id=2
@@ -82,6 +81,7 @@ class TestIssue(LocalApplicationTestCase):
             f'/apiv1/issues/id:{self.issue.id}',
             'GET'
         ):
+            import pudb; pudb.set_trace()  # XXX BREAKPOINT
             assert status == 200
             assert response.json['id'] == self.issue.id
             assert response.json['title'] == self.issue.title

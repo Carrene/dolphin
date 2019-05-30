@@ -85,7 +85,6 @@ class TestIssue(LocalApplicationTestCase):
                 project=cls.project,
                 title='First issue',
                 description='This is description of first issue',
-                due_date='2020-2-20',
                 kind='feature',
                 days=1,
                 room_id=2
@@ -146,7 +145,6 @@ class TestIssue(LocalApplicationTestCase):
                 title='Defined issue',
                 status='in-progress',
                 description='A description for defined issue',
-                dueDate='2200-2-20',
                 kind='feature',
                 days=3,
                 projectId=self.project.id,
@@ -265,21 +263,6 @@ class TestIssue(LocalApplicationTestCase):
                 'Description'
 
             when(
-                'Due date format is wrong',
-                json=given | dict(
-                    dueDate='20-20-20',
-                    title='Another title'
-                )
-            )
-            assert status == '701 Invalid Due Date Format'
-
-            when(
-                'Due date is not in form',
-                json=given - 'dueDate' | dict(title='Another title')
-            )
-            assert status == '711 Due Date Not In Form'
-
-            when(
                 'Kind is not in form',
                 json=given - 'kind' | dict(title='Another title')
             )
@@ -321,7 +304,7 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert status == '707 Invalid field, only following fields are ' \
                 'accepted: title, description, kind, days, status, projectId, ' \
-                'dueDate, priority, relatedIssueId'
+                'priority, relatedIssueId'
 
             when('Request is not authorized', authorization=None)
             assert status == 401

@@ -63,7 +63,6 @@ class TestIssue(LocalApplicationTestCase):
             project=project1,
             title='First issue',
             description='This is description of first issue',
-            due_date='2020-2-20',
             kind='feature',
             days=1,
             room_id=2
@@ -74,7 +73,6 @@ class TestIssue(LocalApplicationTestCase):
             project=project1,
             title='Second issue',
             description='This is description of second issue',
-            due_date='2020-2-20',
             kind='feature',
             days=2,
             room_id=3
@@ -173,15 +171,6 @@ class TestIssue(LocalApplicationTestCase):
                 'Description'
 
             when(
-                'Due date format is wrong',
-                form=given | dict(
-                    dueDate='20-20-20',
-                    title='Another title'
-                )
-            )
-            assert status == '701 Invalid Due Date Format'
-
-            when(
                 'Invalid kind value is in form',
                 form=given | dict(kind='enhancing', title='Another title')
             )
@@ -217,7 +206,7 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert status == \
                 '707 Invalid field, only following fields are accepted: '\
-                'title, days, dueDate, kind, description, status, priority'
+                'title, days, kind, description, status, priority'
 
             when('Request is not authorized', authorization=None)
             assert status == 401

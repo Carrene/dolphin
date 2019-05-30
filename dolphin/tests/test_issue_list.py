@@ -78,7 +78,6 @@ class TestIssue(LocalApplicationTestCase):
                 title='First issue',
                 description='This is description of first issue',
                 status='in-progress',
-                due_date='2020-2-20',
                 kind='feature',
                 days=1,
                 room_id=2,
@@ -99,7 +98,6 @@ class TestIssue(LocalApplicationTestCase):
                 title='Second issue',
                 description='This is description of second issue',
                 status='to-do',
-                due_date='2016-2-20',
                 kind='feature',
                 days=2,
                 room_id=3,
@@ -121,7 +119,6 @@ class TestIssue(LocalApplicationTestCase):
                 title='Third issue',
                 description='This is description of third issue',
                 status='on-hold',
-                due_date='2020-2-20',
                 kind='feature',
                 days=3,
                 room_id=4,
@@ -142,7 +139,6 @@ class TestIssue(LocalApplicationTestCase):
                 title='Fourth issue',
                 description='This is description of fourth issue',
                 status='complete',
-                due_date='2020-2-20',
                 kind='feature',
                 days=3,
                 room_id=4,
@@ -197,6 +193,9 @@ class TestIssue(LocalApplicationTestCase):
                 member_id=member.id,
                 phase_id=cls.phase2.id,
                 issue_id=cls.issue1.id,
+                start_date='2019-2-2',
+                end_date='2019-2-3',
+                estimated_hours=4,
             )
             session.add(item3)
             session.flush()

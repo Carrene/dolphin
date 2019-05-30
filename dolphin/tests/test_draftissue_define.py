@@ -49,7 +49,6 @@ class TestDraftIssue(LocalApplicationTestCase):
             project=project,
             title='First issue',
             description='This is description of first issue',
-            due_date='2020-2-20',
             kind='feature',
             days=1,
             room_id=2
@@ -75,7 +74,7 @@ class TestDraftIssue(LocalApplicationTestCase):
             )
             assert status == '707 Invalid field, only following fields are ' \
                 'accepted: title, description, kind, days, status, projectId,' \
-                ' dueDate, priority, relatedIssueId'
+                ' priority, relatedIssueId'
 
             when('Request is not authorized', authorization=None)
             assert status == 401
