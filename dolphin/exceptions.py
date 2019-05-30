@@ -488,3 +488,15 @@ class StatusInvalidKind(HTTPKnownStatus):
 class StatusInvalidHoursType(HTTPKnownStatus):
     status = '915 Invalid Hours Type'
 
+
+class StatusHoursNotInForm(HTTPKnownStatus):
+    status = '929 Hours Not In Form'
+
+
+class StatusNoteNotInForm(HTTPKnownStatus):
+    status = '930 Note Not In Form'
+
+
+class StatusInvalidDatePeriod(HTTPKnownStatus):
+    status = '664 Invalid Date Period'
+

@@ -871,17 +871,14 @@ event_update_validator = validate(
 
 dailyreport_create_validator = validate(
     note=dict(
+        required=StatusNoteNotInForm,
         max_length=(1024, StatusLimitedCharecterForNote),
     ),
     hours=dict(
-        type_=(int, StatusInvalidHoursType),
+        required=StatusHoursNotInForm,
+        type_=(float, StatusInvalidHoursType),
         minimum=(1, StatusHoursMustBeGreaterThanZero)
     ),
-    itemId=dict(
-        required='732 Item Id Not In Form',
-        not_none='913 Item Id Is Null',
-        callback=item_exists_validator
-    )
 )
 
 
