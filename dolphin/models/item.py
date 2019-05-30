@@ -6,7 +6,7 @@ from restfulpy.orm.metadata import MetadataField
 from restfulpy.orm.mixins import TimestampMixin, OrderingMixin, \
     FilteringMixin, PaginationMixin
 from sqlalchemy import Integer, ForeignKey, UniqueConstraint, DateTime, Enum, \
-    String, select, func
+    String, select, func, Float
 from sqlalchemy.orm import column_property, synonym
 
 from .dailyreport import Dailyreport
@@ -62,8 +62,8 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         readonly=False,
     )
     estimated_hours = Field(
-        Integer,
-        python_type=int,
+        Float,
+        python_type=float,
         label='Estimated Hours',
         watermark='Enter hours you estimate',
         readonly=False,

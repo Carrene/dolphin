@@ -913,7 +913,7 @@ estimate_item_validator = validate(
     ),
     estimatedHours=dict(
         required=StatusEstimatedHoursNotInForm,
-        type_=(int, StatusInvalidEstimatedHoursType),
+        type_=(float, StatusInvalidEstimatedHoursType),
         not_none=StatusEstimatedHoursIsNull,
     )
 )
