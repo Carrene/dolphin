@@ -386,7 +386,6 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         )
 
     def to_dict(self, include_relations=True):
-        import pudb; pudb.set_trace()  # XXX BREAKPOINT
         # The `issue` relationship on Item model is `protected=False`, So the
         # `items` relationship on Issue model must be `protected=True`, So that
         # this causes recursively getting the instances of `issue` and `item`
