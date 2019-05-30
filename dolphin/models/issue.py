@@ -106,7 +106,6 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
     )
     room_id = Field(Integer, readonly=True)
 
-
     kind = Field(
         Enum(*issue_kinds, name='kind'),
         python_type=str,
@@ -199,7 +198,9 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
     )
 
     due_date = column_property(
-        select([func.max(Item.end_date)]).where(Item.issue_id == id)
+        select([func.max(Item.end_date)]) \
+        .where(Item.issue_id == id) \
+        .correlate_except(Item)
     )
 
     is_subscribed = column_property(
@@ -378,7 +379,6 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         )
 
     def to_dict(self, include_relations=True):
-        import pudb; pudb.set_trace()  # XXX BREAKPOINT
         # The `issue` relationship on Item model is `protected=False`, So the
         # `items` relationship on Issue model must be `protected=True`, So that
         # this causes recursively getting the instances of `issue` and `item`
