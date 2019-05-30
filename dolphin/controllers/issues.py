@@ -16,7 +16,7 @@ from ..exceptions import StatusRoomMemberAlreadyExist, \
     StatusIssueBugMustHaveRelatedIssue, StatusIssueNotFound, \
     StatusQueryParameterNotInFormOrQueryString
 from ..models import Issue, Subscription, Phase, Item, Member, Project, \
-    RelatedIssue, Subscribable, IssueTag, Tag
+    RelatedIssue, Subscribable, IssueTag, Tag, PhaseSummaryView
 from ..validators import update_issue_validator, assign_issue_validator, \
     issue_move_validator, unassign_issue_validator, issue_relate_validator, \
     issue_unrelate_validator, search_issue_validator
@@ -67,6 +67,9 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
             elif remaining_paths[1] == 'activities':
                 return ActivityController(issue=issue)(*remaining_paths[2:])
+
+            elif remaining_paths[1] == 'phasessummaries':
+                return IssuePhaseSummaryController(issue=issue)(*remaining_paths[2:])
 
         return super().__call__(*remaining_paths)
 
@@ -784,5 +787,32 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 ) \
                 .filter(Subscription.member_id == context.identity.id)
 
+        return query
+
+
+class IssuePhaseSummaryController(ModelRestController):
+    __model__ = PhaseSummaryView
+
+    def __init__(self, issue=None):
+        self.issue = issue
+
+    @authorize
+    @json(prevent_form=True)
+    @PhaseSummaryView.expose
+    @commit
+    def list(self):
+        item_cte = select([Item]).where(Item.issue_id == self.issue.id).cte()
+        wofklow_id_subquery = DBSession.query(Project.workflow_id) \
+            .join(Issue, Project.id == Issue.project_id) \
+            .filter(Issue.id == self.issue.id) \
+            .subquery()
+
+        query = DBSession.query(PhaseSummaryView) \
+            .join(
+                item_cte,
+                item_cte.c.issue_id == PhaseSummaryView.issue_id,
+                isouter=True
+            ) \
+            .filter(PhaseSummaryView.id.in_(wofklow_id_subquery))
         return query
 
