@@ -370,6 +370,13 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             required=False,
             readonly=True
         )
+        yield MetadataField(
+            name='priorityValue',
+            key='priority_value',
+            label='Priority Value',
+            required=False,
+            readonly=True
+        )
 
     def to_dict(self, include_relations=True):
         # The `issue` relationship on Item model is `protected=False`, So the
