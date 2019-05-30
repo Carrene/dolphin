@@ -50,7 +50,7 @@ class Dailyreport(OrderingMixin, FilteringMixin, PaginationMixin, \
         example=2.5,
         nullable=True,
         not_none=False,
-        required=False,
+        required=True,
     )
     note = Field(
         Unicode,
@@ -60,7 +60,7 @@ class Dailyreport(OrderingMixin, FilteringMixin, PaginationMixin, \
         watermark='Lorem Ipsum',
         not_none=False,
         nullable=True,
-        required=False,
+        required=True,
         python_type=str,
         example='Lorem Ipsum',
     )
