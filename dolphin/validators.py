@@ -434,10 +434,6 @@ draft_issue_finalize_validator = validate(
     description=dict(
         max_length=(8192, StatusMaxLenghtForDescription(8192))
     ),
-    dueDate=dict(
-        pattern=(DATETIME_PATTERN, StatusInvalidDueDateFormat),
-        required=StatusDueDateNotInForm
-    ),
     kind=dict(
         required=StatusKindNotInForm,
         callback=kind_value_validator
@@ -464,9 +460,6 @@ update_issue_validator = validate(
     ),
     description=dict(
         max_length=(8192, StatusMaxLenghtForDescription(8192))
-    ),
-    dueDate=dict(
-        pattern=(DATETIME_PATTERN, StatusInvalidDueDateFormat),
     ),
     kind=dict(
         callback=kind_value_validator
