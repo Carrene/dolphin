@@ -170,7 +170,7 @@ class TestListPhaseSummary(LocalApplicationTestCase):
         session.add(cls.item5)
         session.commit()
 
-    def test_list_item(self):
+    def test_list_phasesummary(self):
         self.login(self.member1.email)
 
         with oauth_mockup_server(), self.given(

@@ -125,11 +125,4 @@ class AbstractPhaseSummaryView(PaginationMixin, OrderingMixin, FilteringMixin,
             readonly=True,
             required=False,
         )
-        yield MetadataField(
-            name='estimatedHours',
-            key='estimated_hours',
-            label='Estimated Hours',
-            readonly=True,
-            required=False,
-        )
 
