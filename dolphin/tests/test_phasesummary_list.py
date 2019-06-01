@@ -197,6 +197,7 @@ class TestListPhaseSummary(LocalApplicationTestCase):
             f'/apiv1/issues/issue_id: {self.issue1.id}/phasessummaries',
             'LIST',
         ):
+            import pudb; pudb.set_trace()  # XXX BREAKPOINT
             assert status == 200
-            assert len(response.json) == 4
+            assert len(response.json) == 1
 

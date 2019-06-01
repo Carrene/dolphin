@@ -801,7 +801,9 @@ class IssuePhaseSummaryController(ModelRestController):
     @PhaseSummaryView.expose
     @commit
     def list(self):
-        item_cte = select([Item]).where(Item.issue_id == self.issue.id).cte()
+        import pudb; pudb.set_trace()  # XXX BREAKPOINT
+        item_cte = select([Item]).where(Item.issue_id == self.issue.id)
+        item_cte_alias = item_cte.alias()
         wofklow_id_subquery = DBSession.query(Project.workflow_id) \
             .join(Issue, Project.id == Issue.project_id) \
             .filter(Issue.id == self.issue.id) \
@@ -809,10 +811,10 @@ class IssuePhaseSummaryController(ModelRestController):
 
         query = DBSession.query(PhaseSummaryView) \
             .join(
-                item_cte,
-                item_cte.c.issue_id == PhaseSummaryView.issue_id,
+                item_cte_alias,
+                item_cte_alias.c.issue_id == PhaseSummaryView.issue_id,
                 isouter=True
             ) \
-            .filter(PhaseSummaryView.id.in_(wofklow_id_subquery))
+            .filter(PhaseSummaryView.workflow_id.in_(wofklow_id_subquery))
         return query
 
