@@ -16,7 +16,7 @@ from ..exceptions import StatusRoomMemberAlreadyExist, \
     StatusIssueBugMustHaveRelatedIssue, StatusIssueNotFound, \
     StatusQueryParameterNotInFormOrQueryString
 from ..models import Issue, Subscription, Phase, Item, Member, Project, \
-    RelatedIssue, Subscribable, IssueTag, Tag
+    RelatedIssue, Subscribable, IssueTag, Tag, AbstractPhaseSummaryView
 from ..validators import update_issue_validator, assign_issue_validator, \
     issue_move_validator, unassign_issue_validator, issue_relate_validator, \
     issue_unrelate_validator, search_issue_validator
@@ -67,6 +67,9 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
             elif remaining_paths[1] == 'activities':
                 return ActivityController(issue=issue)(*remaining_paths[2:])
+
+            elif remaining_paths[1] == 'phasessummaries':
+                return IssuePhaseSummaryController(issue=issue)(*remaining_paths[2:])
 
         return super().__call__(*remaining_paths)
 
@@ -784,5 +787,22 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 ) \
                 .filter(Subscription.member_id == context.identity.id)
 
+        return query
+
+
+class IssuePhaseSummaryController(ModelRestController):
+    __model__ = AbstractPhaseSummaryView
+
+    def __init__(self, issue=None):
+        self.issue = issue
+
+    @authorize
+    @json(prevent_form=True)
+    @AbstractPhaseSummaryView.expose
+    @commit
+    def list(self):
+        phase_summary_view = AbstractPhaseSummaryView \
+            .create_mapped_class(self.issue.id)
+        query = DBSession.query(phase_summary_view)
         return query
 

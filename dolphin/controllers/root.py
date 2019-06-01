@@ -26,6 +26,7 @@ from .eventtype import EventTypeController
 from .event import EventController
 from .dailyreport import DailyreportController
 from .items import ItemController
+from .phasesummary import PhaseSummaryController
 
 
 here = abspath(dirname(__file__))
@@ -55,6 +56,7 @@ class Apiv1(RestController, JsonPatchControllerMixin):
     events = EventController()
     dailyreports = DailyreportController()
     items = ItemController()
+    phasessummaries = PhaseSummaryController()
 
     @json
     def version(self):
