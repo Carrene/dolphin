@@ -32,7 +32,7 @@ class Dailyreport(OrderingMixin, FilteringMixin, PaginationMixin, \
     date = Field(
         Date,
         python_type=datetime.date,
-        label='Date',
+        label='Report Date',
         pattern=r'^(\d{4})-(0[1-9]|1[012]|[1-9])-(0[1-9]|[12]\d{1}|3[01]|[1-9])',
         pattern_description='ISO format like "yyyy-mm-dd" is valid',
         example='2018-02-02',
