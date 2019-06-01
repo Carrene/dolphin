@@ -870,7 +870,7 @@ dailyreport_create_validator = validate(
     hours=dict(
         required=StatusHoursNotInForm,
         type_=(float, StatusInvalidHoursType),
-        minimum=(1, StatusHoursMustBeGreaterThanZero)
+        minimum=(0, StatusHoursMustBePositive)
     ),
 )
 
@@ -881,7 +881,7 @@ dailyreport_update_validator = validate(
     ),
     hours=dict(
         type_=(float, StatusInvalidHoursType),
-        minimum=(1, StatusHoursMustBeGreaterThanZero)
+        minimum=(0, StatusHoursMustBePositive)
     ),
 )
 
