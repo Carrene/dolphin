@@ -269,8 +269,8 @@ class StatusQueryParameterNotInFormOrQueryString(HTTPKnownStatus):
     status = '912 Query Parameter Not In Form Or Query String'
 
 
-class StatusHoursMustBeGreaterThanZero(HTTPKnownStatus):
-    status = '914 Hours Must Be Greater Than 0'
+class StatusHoursMustBePositive(HTTPKnownStatus):
+    status = '914 Hours Must Be Positive'
 
 
 class StatusTypeIdNotInForm(HTTPKnownStatus):

@@ -131,10 +131,10 @@ class TestDailyreport(LocalApplicationTestCase):
             assert status == '915 Invalid Hours Type'
 
             when(
-                'Hours value is less then 1',
-                json=given | dict(hours=0)
+                'Hours value is negative',
+                json=given | dict(hours=-1)
             )
-            assert status == '914 Hours Must Be Greater Than 0'
+            assert status == '914 Hours Must Be Positive'
 
             when('Request is not authorized', authorization=None)
             assert status == 401
