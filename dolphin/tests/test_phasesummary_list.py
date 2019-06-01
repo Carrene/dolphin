@@ -119,41 +119,22 @@ class TestListPhaseSummary(LocalApplicationTestCase):
             room_id=3
         )
         session.add(cls.issue2)
-
-        cls.issue3 = Issue(
-            project=project,
-            title='Third issue',
-            description='This is description of third issue',
-            due_date='2020-2-20',
-            kind='feature',
-            days=1,
-            room_id=4
-        )
-        session.add(cls.issue3)
-
-        cls.issue4 = Issue(
-            project=project,
-            title='Fourth issue',
-            description='This is description of fourth issue',
-            due_date='2020-2-20',
-            kind='feature',
-            days=1,
-            room_id=5
-        )
-        session.add(cls.issue3)
         session.flush()
 
         cls.item1 = Item(
             issue_id=cls.issue1.id,
             phase_id=cls.phase1.id,
             member_id=cls.member1.id,
+            start_date=datetime.strptime('2020-2-2', '%Y-%m-%d'),
+            end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
+            estimated_hours=3,
         )
         session.add(cls.item1)
 
         cls.item2 = Item(
-            issue_id=cls.issue2.id,
-            phase_id=cls.phase3.id,
-            member_id=cls.member1.id,
+            issue_id=cls.issue1.id,
+            phase_id=cls.phase1.id,
+            member_id=cls.member2.id,
             start_date=datetime.strptime('2020-2-2', '%Y-%m-%d'),
             end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
             estimated_hours=3,
@@ -161,7 +142,7 @@ class TestListPhaseSummary(LocalApplicationTestCase):
         session.add(cls.item2)
 
         cls.item3 = Item(
-            issue_id=cls.issue3.id,
+            issue_id=cls.issue1.id,
             phase_id=cls.phase2.id,
             member_id=cls.member1.id,
             start_date=datetime.strptime('2018-2-2', '%Y-%m-%d'),
@@ -171,8 +152,8 @@ class TestListPhaseSummary(LocalApplicationTestCase):
         session.add(cls.item3)
 
         cls.item4 = Item(
-            issue_id=cls.issue4.id,
-            phase_id=cls.phase4.id,
+            issue_id=cls.issue1.id,
+            phase_id=cls.phase2.id,
             member_id=cls.member2.id,
             start_date=datetime.strptime('2018-2-2', '%Y-%m-%d'),
             end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
@@ -181,7 +162,7 @@ class TestListPhaseSummary(LocalApplicationTestCase):
         session.add(cls.item4)
 
         cls.item5 = Item(
-            issue_id=cls.issue4.id,
+            issue_id=cls.issue2.id,
             phase_id=cls.phase2.id,
             member_id=cls.member1.id,
             status='done',
@@ -199,4 +180,27 @@ class TestListPhaseSummary(LocalApplicationTestCase):
         ):
             assert status == 200
             assert len(response.json) == 4
+
+            when('Sorting by phase id', query=dict(sort='id'))
+            assert response.json[0]['id'] < response.json[1]['id']
+
+            when('Reverse sorting by phase id', query=dict(sort='-id'))
+            assert response.json[1]['id'] < response.json[0]['id']
+
+            when(
+                'Filtering by the phase which member has worked on it',
+                query=dict(id=self.phase1.id)
+            )
+            assert len(response.json) == 1
+            assert response.json[0]['id'] == self.phase1.id
+            assert response.json[0]['estimatedHours'] == \
+                self.item1.estimated_hours + self.item2.estimated_hours
+
+            when(
+                'Filtering by the phase which member has not worked on it',
+                query=dict(id=self.phase3.id)
+            )
+            assert len(response.json) == 1
+            assert response.json[0]['id'] == self.phase3.id
+            assert response.json[0]['estimatedHours'] == None
 

@@ -25,7 +25,6 @@ from .files import FileController
 from .phases import PhaseController
 from .tag import TagController
 
-PhaseSummaryView = AbstractPhaseSummaryView.create_mapped_class()
 
 # FIXME: Remove these two redundant lines
 PENDING = -1
@@ -792,16 +791,18 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
 
 class IssuePhaseSummaryController(ModelRestController):
-    __model__ = PhaseSummaryView
+    __model__ = AbstractPhaseSummaryView
 
     def __init__(self, issue=None):
         self.issue = issue
 
     @authorize
     @json(prevent_form=True)
-    @PhaseSummaryView.expose
+    @AbstractPhaseSummaryView.expose
     @commit
     def list(self):
-        query = DBSession.query(PhaseSummaryView)
+        phase_summary_view = AbstractPhaseSummaryView \
+            .create_mapped_class(self.issue.id)
+        query = DBSession.query(phase_summary_view)
         return query
 

@@ -13,8 +13,9 @@ class AbstractPhaseSummaryView(PaginationMixin, OrderingMixin, FilteringMixin,
     __abstract__ = True
     __table_args__ = {'autoload': True}
     __containig_fields__ = {
-        'phase': ('id', 'title', 'workflow_id'),
-        'item': ('issue_id', 'start_date', 'end_date')
+        'phase': ('id', 'title'),
+        'item': ('issue_id', 'start_date', 'end_date', 'estimated_hours'),
+        'dailyreport': ('hours'),
     }
 
     id = Field('id', Integer, primary_key=True)
@@ -22,24 +23,37 @@ class AbstractPhaseSummaryView(PaginationMixin, OrderingMixin, FilteringMixin,
     start_date = Field('start_date', DateTime)
     end_date = Field('end_date', DateTime)
     issue_id = Field('issue_id', Integer)
+    estimated_hours = Field('estimated_hours', Integer)
+    hours = Field('hours_worked', Integer)
 
     @classmethod
-    def create_mapped_class(cls):
-        item_cte = select([Item]).where(Item.issue_id == 3).cte()
+    def create_mapped_class(cls, issue_id):
+        item_cte = select([Item]).where(Item.issue_id == issue_id).cte()
         workflow_id_subquery = DBSession.query(Project.workflow_id) \
             .join(Issue, Project.id == Issue.project_id) \
-            .filter(Issue.id == 3) \
+            .filter(Issue.id == issue_id) \
             .subquery()
 
         query = select([
             item_cte.c.issue_id.label('issue_id'),
             Phase.id,
             Phase.title,
-            func.min(Item.start_date).label('start_date'),
-            func.max(Item.end_date).label('end_date'),
+            func.min(item_cte.c.start_date).label('start_date'),
+            func.max(item_cte.c.end_date).label('end_date'),
+            func.sum(item_cte.c.estimated_hours).label('estimated_hours'),
+            func.sum(Dailyreport.hours).label('hours_worked'),
         ]) \
         .select_from(
-                join(Phase, item_cte, Phase.id == item_cte.c.phase_id, isouter=True)
+                join(
+                    Phase,
+                    item_cte,
+                    Phase.id == item_cte.c.phase_id,
+                    isouter=True
+                ).join(
+                    Dailyreport,
+                    Dailyreport.item_id == item_cte.c.id,
+                    isouter=True
+                )
         ) \
         .where(Phase.workflow_id.in_(workflow_id_subquery)) \
         .group_by(item_cte.c.issue_id) \
@@ -62,7 +76,7 @@ class AbstractPhaseSummaryView(PaginationMixin, OrderingMixin, FilteringMixin,
             composites=composites,
             use_inspection=use_inspection
         ):
-             if c.key not in cls.__containig_fields__['phase']:
+             if c.key not in cls.__containig_fields__['item']:
                  continue
 
              column = getattr(cls, c.key, None)
@@ -77,7 +91,7 @@ class AbstractPhaseSummaryView(PaginationMixin, OrderingMixin, FilteringMixin,
             composites=composites,
             use_inspection=use_inspection
         ):
-             if c.key not in cls.__containig_fields__['item']:
+             if c.key not in cls.__containig_fields__['phase']:
                  continue
 
              column = getattr(cls, c.key, None)
@@ -85,4 +99,37 @@ class AbstractPhaseSummaryView(PaginationMixin, OrderingMixin, FilteringMixin,
                  column.info.update(c.info)
 
              yield column
+
+        for c in Dailyreport.iter_columns(
+            relationships=relationships,
+            synonyms=synonyms,
+            composites=composites,
+            use_inspection=use_inspection
+        ):
+             if c.key not in cls.__containig_fields__['dailyreport']:
+                 continue
+
+             column = getattr(cls, c.key, None)
+             if hasattr(c, 'info'):
+                 column.info.update(c.info)
+
+             yield column
+
+    @classmethod
+    def iter_metadata_fields(cls):
+        yield from super().iter_metadata_fields()
+        yield MetadataField(
+            name='hoursWorked',
+            key='hours_worked',
+            label='Hours Worked',
+            readonly=True,
+            required=False,
+        )
+        yield MetadataField(
+            name='estimatedHours',
+            key='estimated_hours',
+            label='Estimated Hours',
+            readonly=True,
+            required=False,
+        )
 
