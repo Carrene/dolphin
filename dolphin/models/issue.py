@@ -375,7 +375,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             key='priority_value',
             label='Priority Value',
             required=False,
-            readonly=True
+            readonly=True,
         )
 
     def to_dict(self, include_relations=True):
