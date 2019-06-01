@@ -23,5 +23,5 @@ from .eventtype import EventType
 from .dailyreport import Dailyreport
 from .event import Event, event_repeats
 from .admin import Admin
-from .phase_summary import PhaseSummaryView
+from .phase_summary import AbstractPhaseSummaryView
 

@@ -16,7 +16,7 @@ from ..exceptions import StatusRoomMemberAlreadyExist, \
     StatusIssueBugMustHaveRelatedIssue, StatusIssueNotFound, \
     StatusQueryParameterNotInFormOrQueryString
 from ..models import Issue, Subscription, Phase, Item, Member, Project, \
-    RelatedIssue, Subscribable, IssueTag, Tag, PhaseSummaryView
+    RelatedIssue, Subscribable, IssueTag, Tag, AbstractPhaseSummaryView
 from ..validators import update_issue_validator, assign_issue_validator, \
     issue_move_validator, unassign_issue_validator, issue_relate_validator, \
     issue_unrelate_validator, search_issue_validator
@@ -25,6 +25,7 @@ from .files import FileController
 from .phases import PhaseController
 from .tag import TagController
 
+PhaseSummaryView = AbstractPhaseSummaryView.create_mapped_class()
 
 # FIXME: Remove these two redundant lines
 PENDING = -1
@@ -801,20 +802,6 @@ class IssuePhaseSummaryController(ModelRestController):
     @PhaseSummaryView.expose
     @commit
     def list(self):
-        import pudb; pudb.set_trace()  # XXX BREAKPOINT
-        item_cte = select([Item]).where(Item.issue_id == self.issue.id)
-        item_cte_alias = item_cte.alias()
-        wofklow_id_subquery = DBSession.query(Project.workflow_id) \
-            .join(Issue, Project.id == Issue.project_id) \
-            .filter(Issue.id == self.issue.id) \
-            .subquery()
-
-        query = DBSession.query(PhaseSummaryView) \
-            .join(
-                item_cte_alias,
-                item_cte_alias.c.issue_id == PhaseSummaryView.issue_id,
-                isouter=True
-            ) \
-            .filter(PhaseSummaryView.workflow_id.in_(wofklow_id_subquery))
+        query = DBSession.query(PhaseSummaryView)
         return query
 

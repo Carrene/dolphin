@@ -1,53 +1,50 @@
 from datetime import datetime
 
 from restfulpy.orm import Field, PaginationMixin, FilteringMixin, \
-    OrderingMixin, BaseModel, MetadataField
+    OrderingMixin, BaseModel, MetadataField, DBSession
 from sqlalchemy import Integer, Unicode, select, func, join, DateTime, and_
 from sqlalchemy.orm import mapper
 
-from . import Phase, Item, Dailyreport
+from . import Phase, Item, Dailyreport, Project, Issue
 
 
 class AbstractPhaseSummaryView(PaginationMixin, OrderingMixin, FilteringMixin,
                                BaseModel):
     __abstract__ = True
     __table_args__ = {'autoload': True}
-    __containig_fields__ = (
-        'id',
-        'title',
-        'issue_id',
-        'workflow_id',
-        'start_date',
-        'end_date',
-#        'hours',
-    )
+    __containig_fields__ = {
+        'phase': ('id', 'title', 'workflow_id'),
+        'item': ('issue_id', 'start_date', 'end_date')
+    }
 
     id = Field('id', Integer, primary_key=True)
     title = Field('title', Unicode(100))
     start_date = Field('start_date', DateTime)
     end_date = Field('end_date', DateTime)
     issue_id = Field('issue_id', Integer)
-    workflow_id = Field('workflow_id', Integer)
-#    hours = Field('hours', Integer)
 
     @classmethod
     def create_mapped_class(cls):
+        item_cte = select([Item]).where(Item.issue_id == 3).cte()
+        workflow_id_subquery = DBSession.query(Project.workflow_id) \
+            .join(Issue, Project.id == Issue.project_id) \
+            .filter(Issue.id == 3) \
+            .subquery()
+
         query = select([
-            Item.issue_id,
+            item_cte.c.issue_id.label('issue_id'),
             Phase.id,
             Phase.title,
-            Phase.workflow_id,
             func.min(Item.start_date).label('start_date'),
             func.max(Item.end_date).label('end_date'),
-            func.max(Dailyreport.hours).label('hours')
         ]) \
         .select_from(
-                join(Phase, Item, Phase.id == Item.phase_id, isouter=True),
+                join(Phase, item_cte, Phase.id == item_cte.c.phase_id, isouter=True)
         ) \
-        .group_by(Item.issue_id) \
+        .where(Phase.workflow_id.in_(workflow_id_subquery)) \
+        .group_by(item_cte.c.issue_id) \
         .group_by(Phase.id) \
         .group_by(Phase.title) \
-        .group_by(Phase.workflow_id) \
         .cte()
 
         class PhaseSummaryView(cls):
@@ -65,7 +62,7 @@ class AbstractPhaseSummaryView(PaginationMixin, OrderingMixin, FilteringMixin,
             composites=composites,
             use_inspection=use_inspection
         ):
-             if c.key not in cls.__containig_fields__:
+             if c.key not in cls.__containig_fields__['phase']:
                  continue
 
              column = getattr(cls, c.key, None)
@@ -80,7 +77,7 @@ class AbstractPhaseSummaryView(PaginationMixin, OrderingMixin, FilteringMixin,
             composites=composites,
             use_inspection=use_inspection
         ):
-             if c.key not in cls.__containig_fields__:
+             if c.key not in cls.__containig_fields__['item']:
                  continue
 
              column = getattr(cls, c.key, None)
@@ -88,22 +85,4 @@ class AbstractPhaseSummaryView(PaginationMixin, OrderingMixin, FilteringMixin,
                  column.info.update(c.info)
 
              yield column
-
-#        for c in Dailyreport.iter_columns(
-#            relationships=relationships,
-#            synonyms=synonyms,
-#            composites=composites,
-#            use_inspection=use_inspection
-#        ):
-#             if c.key not in cls.__containig_fields__:
-#                 continue
-
-             column = getattr(cls, c.key, None)
-             if hasattr(c, 'info'):
-                 column.info.update(c.info)
-
-             yield column
-
-
-PhaseSummaryView = AbstractPhaseSummaryView.create_mapped_class()
 
