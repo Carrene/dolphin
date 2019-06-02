@@ -68,10 +68,10 @@ class LocalApplicationTestCase(ApplicableTestCase):
         r'^/apiv1/invitations.*': invitation_fields,
     }
     __configuration__ = '''
-            issue:
-              subscription:
-                max_length: 5
-        '''
+        issue:
+          subscription:
+            max_length: 5
+    '''
 
     def login(self, email, organization_id=None):
         session = self.create_session()

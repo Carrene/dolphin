@@ -80,6 +80,12 @@ class Dolphin(Application):
         load_thresholds:
           heavy: 5
           medium: 3
+
+      github:
+        enable: False
+        base_url: https://api.github.com
+        application_token:
+
    '''
 
     def __init__(self, application_name='dolphin', root=Root()):

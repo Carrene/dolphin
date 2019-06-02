@@ -28,6 +28,7 @@ from .activity import ActivityController
 from .files import FileController
 from .phases import PhaseController
 from .tag import TagController
+from ..integration.github import Github
 
 
 # FIXME: Remove these two redundant lines
@@ -913,4 +914,25 @@ class IssueJobController(ModelRestController):
         job.issue_id = self.issue.id
         DBSession.add(job)
         return job
+
+
+class IssueIntegrateGithubController(ModelRestController):
+    __model__ = AbstractPhaseSummaryView
+
+    def __init__(self, issue=None):
+        self.issue = issue
+
+    @authorize
+    @json
+    def transfer(self, id):
+        import pudb; pudb.set_trace()  # XXX BREAKPOINT
+        issue = DBSession.query(Issue).filter(Issue.id == id).one_or_none()
+        parameters = context.form
+        git = Github()
+        for repo in parameters['repositories']:
+            response = git.create_issue(
+                repo,
+                parameters['repositories'][repo]['title'],
+                parameters['repositories'][repo]['body']
+             )
 

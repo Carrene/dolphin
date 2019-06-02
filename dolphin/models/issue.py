@@ -183,6 +183,18 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         not_none=False,
         readonly=True,
     )
+    url = Field(
+        Unicode,
+        python_type=str,
+        label='lorem ipsum',
+        nullable=True,
+        not_none=False,
+        required=False,
+        default='low',
+        watermark='lorem ipsum',
+        example='lorem ipsum',
+    )
+
     attachments = relationship('Attachment', lazy='selectin')
     batch_id = Field(
         Integer,
