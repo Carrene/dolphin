@@ -111,7 +111,10 @@ class TestDailyreport(LocalApplicationTestCase):
             'LIST',
         ):
             assert status == 200
-            assert len(response.json) == 3
+            assert len(response.json) == 4
+            assert session.query(Dailyreport) \
+                .filter(Dailyreport.date == datetime.now().date()) \
+                .one()
 
             when('The request with form parameter', form=dict(param='param'))
             assert status == '709 Form Not Allowed'
