@@ -67,6 +67,7 @@ class ItemController(ModelRestController):
     @Item.expose
     def list(self):
         member = Member.current()
+        is_issue_joined = False
 
         if member.role == 'admin':
             query = DBSession.query(Item)
@@ -92,6 +93,67 @@ class ItemController(ModelRestController):
             elif context.query['zone'] == 'inProgressNuggets':
                 query = query.filter(Item.status == 'in-progress') \
                     .filter(Item.start_date < datetime.now())
+
+        # FILTER
+        if 'issueBoarding' in context.query:
+            value = context.query['issueBoarding']
+            query = query.join(Item, Item.issue_id == Issue.id)
+            query = Item._filter_by_column_value(query, Issue.boarding, value)
+            is_issue_joined = True
+
+        if 'issueKind' in context.query:
+            value = context.query['issueKind']
+            if not is_phase_issue_joined:
+                query = query.join(Item, Item.issue_id == Issue.id)
+                is_issue_joined = True
+
+            query = Item._filter_by_column_value(query, Issue.kind, value)
+
+        if 'projectTitle' in context.query:
+            value = context.query['projectTitle']
+            if not is_phase_issue_joined:
+                query = query.join(Item, Item.issue_id == Issue.id)
+                is_issue_joined = True
+
+            query = query.join(Project, Project.id == Issue.project_id)
+            query = Item._filter_by_column_value(query, Project.title, value)
+
+        # SORT
+        sorting_expression = context.query.get('sort', '').strip()
+        external_columns = ('issueBoarding', 'issueKind', 'projectTitle')
+
+        if sorting_expression:
+
+            sorting_columns = {
+                c[1:] if c.startswith('-') else c:
+                    'desc' if c.startswith('-') else None
+                for c in sorting_expression.split(',')
+                    if c.replace('-', '') in external_columns
+            }
+
+            if 'issueBoarding' in context.query:
+                value = context.query['issueBoarding']
+                query = query.join(Item, Item.issue_id == Issue.id)
+                query = Issue._filter_by_column_value(query, Issue.boarding, value)
+                is_issue_joined = True
+
+#        if 'issueKind' in context.query:
+#            value = context.query['issueKind']
+#            if not is_phase_issue_joined:
+#                query = query.join(Item, Item.issue_id == Issue.id)
+#                is_issue_joined = True
+#
+#            query = Issue._filter_by_column_value(query, Issue.kind, value)
+#
+#        if 'projectTitle' in context.query:
+#            value = context.query['projectTitle']
+#            if not is_phase_issue_joined:
+#                query = query.join(Item, Item.issue_id == Issue.id)
+#                is_issue_joined = True
+#
+#            query = query.join(Project, Project.id == Issue.project_id)
+#            query = Issue._filter_by_column_value(query, Project.title, value)
+
 
         return query
 
