@@ -10,4 +10,3 @@ class PhaseSummaryController(RestController):
             .create_mapped_class(None) \
             .json_metadata()
 
-
