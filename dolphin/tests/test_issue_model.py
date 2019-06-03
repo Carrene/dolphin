@@ -43,7 +43,7 @@ def test_item_perspective(db):
             manager=member,
             title='My first project',
             description='A decription for my project',
-            room_id=1
+            room_id=1,
         )
 
         with Context(dict()):
@@ -83,7 +83,7 @@ def test_item_perspective(db):
                 workflow=workflow,
                 title='Test',
                 order=2,
-                skill=skill
+                skill=skill,
             )
             session.add(phase1)
 
@@ -91,7 +91,7 @@ def test_item_perspective(db):
                 workflow=workflow,
                 title='Development',
                 order=3,
-                skill=skill
+                skill=skill,
             )
             session.add(phase1)
             session.flush()
