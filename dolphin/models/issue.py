@@ -410,15 +410,11 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         issue_dict = super().to_dict()
         issue_dict['boarding'] = self.boarding
         issue_dict['isSubscribed'] = True if self.is_subscribed else False
-        issue_dict['seenAt'] \
-            = self.seen_at.isoformat() if self.seen_at else None
+        issue_dict['seenAt'] = \
+            self.seen_at.isoformat() if self.seen_at else None
         issue_dict['items'] = items_list
-
-        if self.due_date is not None:
-            issue_dict['dueDate'] = self.due_date.isoformat()
-
-        else:
-            issue_dict['dueDate'] = None
+        issue_dict['dueDate'] = \
+            self.due_date.isoformat() if self.due_date else None
 
         if include_relations:
             issue_dict['relations'] = []
