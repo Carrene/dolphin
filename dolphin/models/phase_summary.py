@@ -56,9 +56,11 @@ class AbstractPhaseSummaryView(PaginationMixin, OrderingMixin, FilteringMixin,
                 )
         ) \
         .where(Phase.workflow_id.in_(workflow_id_subquery)) \
+        .where(Phase.order > 0) \
         .group_by(item_cte.c.issue_id) \
         .group_by(Phase.id) \
         .group_by(Phase.title) \
+        .order_by(Phase.order) \
         .cte()
 
         class PhaseSummaryView(cls):
