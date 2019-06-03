@@ -16,7 +16,8 @@ from ..exceptions import StatusRoomMemberAlreadyExist, \
     StatusIssueBugMustHaveRelatedIssue, StatusIssueNotFound, \
     StatusQueryParameterNotInFormOrQueryString
 from ..models import Issue, Subscription, Phase, Item, Member, Project, \
-    RelatedIssue, Subscribable, IssueTag, Tag, AbstractPhaseSummaryView
+    RelatedIssue, Subscribable, IssueTag, Tag, AbstractPhaseSummaryView, \
+    Resource, SkillMember
 from ..validators import update_issue_validator, assign_issue_validator, \
     issue_move_validator, unassign_issue_validator, issue_relate_validator, \
     issue_unrelate_validator, search_issue_validator
@@ -57,7 +58,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             issue = self._get_issue(remaining_paths[0])
 
             if remaining_paths[1] == 'phases':
-                return PhaseController(issue=issue)(*remaining_paths[2:])
+                return IssuePhaseController(issue=issue)(*remaining_paths[2:])
 
             elif remaining_paths[1] == 'tags':
                 return TagController(issue=issue)(*remaining_paths[2:])
@@ -793,7 +794,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 class IssuePhaseSummaryController(ModelRestController):
     __model__ = AbstractPhaseSummaryView
 
-    def __init__(self, issue=None):
+    def __init__(self, issue):
         self.issue = issue
 
     @authorize
@@ -804,5 +805,55 @@ class IssuePhaseSummaryController(ModelRestController):
         phase_summary_view = AbstractPhaseSummaryView \
             .create_mapped_class(self.issue.id)
         query = DBSession.query(phase_summary_view)
+        return query
+
+
+class IssuePhaseController(ModelRestController):
+    __model__ = Phase
+
+    def __init__(self, issue):
+        self.issue = issue
+
+    def __call__(self, *remaining_paths):
+        if len(remaining_paths) > 1:
+            phase = self._get_phase(remaining_paths[0])
+            if remaining_paths[1] == 'resources':
+                return IssuePhaseResourceController(
+                    phase=phase, issue=self.issue
+                )(*remaining_paths[2:])
+
+        return super().__call__(*remaining_paths)
+
+    def _get_phase(self, id):
+        id = int_or_notfound(id)
+
+        phase = DBSession.query(Phase).get(id)
+        if phase is None:
+            raise HTTPNotFound()
+
+        return phase
+
+
+class IssuePhaseResourceController(ModelRestController):
+    __model__ = Resource
+
+    def __init__(self, phase, issue):
+        self.phase = phase
+        self.issue = issue
+
+    @authorize
+    @json(prevent_form='709 Form Not Allowed')
+    @Resource.expose
+    def list(self):
+        item_cte = select([Item]) \
+            .where(Item.issue_id == self.issue.id) \
+            .where(Item.phase_id == self.phase.id) \
+            .cte()
+
+        query = DBSession.query(Resource) \
+            .join(item_cte, item_cte.c.member_id == Resource.id, isouter=True) \
+            .join(SkillMember, SkillMember.member_id == Resource.id) \
+            .join(Phase, Phase.skill_id == SkillMember.skill_id) \
+            .filter(Phase.id == self.phase.id)
         return query
 

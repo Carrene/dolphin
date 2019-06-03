@@ -1,12 +1,17 @@
-from bddrest import when, response, status
+from datetime import datetime
 
-from ..models import Workflow, Phase, Resource, Skill
+from bddrest import when, response, status, given
+from auditor.context import Context as AuditLogContext
+
+from ..models import Workflow, Phase, Resource, Skill, Group, Release,  \
+    Project, Issue, Item
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
 class TestResource(LocalApplicationTestCase):
 
     @classmethod
+    @AuditLogContext(dict())
     def mockup(cls):
         session = cls.create_session()
 
@@ -23,13 +28,29 @@ class TestResource(LocalApplicationTestCase):
         )
         session.add(cls.phase1)
 
-        phase2 = Phase(
-            title='backend',
-            order=-2,
+        cls.phase2 = Phase(
+            title='Design',
+            order=1,
             workflow=workflow,
             skill=skill2
         )
-        session.add(phase2)
+        session.add(cls.phase2)
+
+        cls.phase3 = Phase(
+            title='Development',
+            order=2,
+            workflow=workflow,
+            skill=skill1,
+        )
+        session.add(cls.phase3)
+
+        cls.phase4 = Phase(
+            title='Test',
+            order=3,
+            workflow=workflow,
+            skill=skill2,
+        )
+        session.add(cls.phase4)
 
         cls.resource1 = Resource(
             title='First Resource',
@@ -41,7 +62,7 @@ class TestResource(LocalApplicationTestCase):
         )
         session.add(cls.resource1)
 
-        resource2 = Resource(
+        cls.resource2 = Resource(
             title='Second Resource',
             email='resource2@example.com',
             access_token='access token 2',
@@ -49,9 +70,9 @@ class TestResource(LocalApplicationTestCase):
             reference_id=3,
             skills=[skill1],
         )
-        session.add(resource2)
+        session.add(cls.resource2)
 
-        resource3 = Resource(
+        cls.resource3 = Resource(
             title='Third Resource',
             email='resource3@example.com',
             access_token='access token 3',
@@ -59,7 +80,115 @@ class TestResource(LocalApplicationTestCase):
             reference_id=4,
             skill=skill2
         )
-        session.add(resource3)
+        session.add(cls.resource3)
+
+        group = Group(title='default')
+
+        release = Release(
+            title='My first release',
+            description='A decription for my first release',
+            cutoff='2030-2-20',
+            launch_date='2030-2-20',
+            manager=cls.resource1,
+            room_id=0,
+            group=group,
+        )
+
+        project = Project(
+            release=release,
+            workflow=workflow,
+            group=group,
+            manager=cls.resource2,
+            title='My first project',
+            description='A decription for my project',
+            room_id=1
+        )
+
+        cls.issue1 = Issue(
+            project=project,
+            title='First issue',
+            description='This is description of first issue',
+            kind='feature',
+            days=1,
+            room_id=2
+        )
+        session.add(cls.issue1)
+
+        cls.issue2 = Issue(
+            project=project,
+            title='Second issue',
+            description='This is description of second issue',
+            kind='feature',
+            days=1,
+            room_id=3
+        )
+        session.add(cls.issue2)
+
+        cls.issue3 = Issue(
+            project=project,
+            title='Third issue',
+            description='This is description of third issue',
+            kind='feature',
+            days=1,
+            room_id=4
+        )
+        session.add(cls.issue3)
+
+        cls.issue4 = Issue(
+            project=project,
+            title='Fourth issue',
+            description='This is description of fourth issue',
+            kind='feature',
+            days=1,
+            room_id=5
+        )
+        session.add(cls.issue3)
+        session.flush()
+
+        cls.item1 = Item(
+            issue_id=cls.issue1.id,
+            phase_id=cls.phase1.id,
+            member_id=cls.resource1.id,
+        )
+        session.add(cls.item1)
+
+#        cls.item2 = Item(
+#            issue_id=cls.issue2.id,
+#            phase_id=cls.phase2.id,
+#            member_id=cls.resource2.id,
+#            start_date=datetime.strptime('2020-2-2', '%Y-%m-%d'),
+#            end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
+#            estimated_hours=3,
+#        )
+#        session.add(cls.item2)
+
+#        cls.item3 = Item(
+#            issue_id=cls.issue3.id,
+#            phase_id=cls.phase2.id,
+#            member_id=cls.resource1.id,
+#            start_date=datetime.strptime('2018-2-2', '%Y-%m-%d'),
+#            end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
+#            estimated_hours=3,
+#        )
+#        session.add(cls.item3)
+#
+#        cls.item4 = Item(
+#            issue_id=cls.issue4.id,
+#            phase_id=cls.phase4.id,
+#            member_id=cls.resource2.id,
+#            start_date=datetime.strptime('2018-2-2', '%Y-%m-%d'),
+#            end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
+#            estimated_hours=3,
+#        )
+#        session.add(cls.item4)
+#
+#        cls.item5 = Item(
+#            issue_id=cls.issue4.id,
+#            phase_id=cls.phase2.id,
+#            member_id=cls.resource1.id,
+#            status='done',
+#        )
+#        session.add(cls.item5)
         session.commit()
 
     def test_list(self):
@@ -67,16 +196,23 @@ class TestResource(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
            f'Getting list of resources',
-           f'/apiv1/phases/id:{self.phase1.id}/resources',
+           f'/apiv1/issues/issue_id: {self.issue1.id}/' \
+           f'phases/phase_id: {self.phase1.id}/resources',
            f'LIST',
         ):
             assert status == 200
             assert len(response.json) == 2
 
-            when('Trying to pass with wrong id', url_parameters=dict(id=0))
+            when(
+                'Trying to pass with wrong id',
+                url_parameters=given | dict(issue_id=0)
+            )
             assert status == 404
 
-            when('Type of id is invalid', url_parameters=dict(id='not-integer'))
+            when(
+                'Type of id is invalid',
+                url_parameters=given | dict(issue_id='not-integer')
+            )
             assert status == 404
 
             when('The request with form parameter', form=dict(param='param'))
@@ -96,7 +232,10 @@ class TestResource(LocalApplicationTestCase):
             when('Trying pagination with skip', query=dict(take=1, skip=1))
             assert len(response.json) == 1
 
-            when('Trying filtering response', query=dict(id=1))
+            when(
+                'Trying filtering response',
+                query=dict(id=1)
+            )
             assert response.json[0]['id'] == 1
             assert len(response.json) == 1
 
