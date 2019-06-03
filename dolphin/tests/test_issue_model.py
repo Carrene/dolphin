@@ -5,7 +5,8 @@ from nanohttp import context
 from nanohttp.contexts import Context
 from restfulpy.testing import db
 
-from dolphin.models import Item, Project, Member, Workflow, Group, Release, Skill, Phase, Issue
+from dolphin.models import Item, Project, Member, Workflow, Group, Release,  \
+    Skill, Phase, Issue
 
 
 def test_item_perspective(db):
