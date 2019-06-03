@@ -14,6 +14,7 @@ from ..mixins import ModifiedByMixin
 from .item import Item
 from .member import Member
 from .subscribable import Subscribable, Subscription
+from .phase import Phase
 
 
 class IssueTag(DeclarativeBase):
@@ -197,8 +198,15 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         lazy='selectin',
     )
 
+    _active_phase_order_subquery = select([func.max(Phase.order)]) \
+        .select_from(join(Item, Phase, Item.phase_id == Phase.id)) \
+        .where(Item.issue_id == id) \
+        .correlate_except(Phase)
+
     due_date = column_property(
         select([func.max(Item.end_date)]) \
+        .select_from(join(Item, Phase, Item.phase_id == Phase.id)) \
+        .where(Phase.order == _active_phase_order_subquery) \
         .where(Item.issue_id == id) \
         .correlate_except(Item)
     )
@@ -407,12 +415,13 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             ))
 
         issue_dict = super().to_dict()
-        issue_dict['dueDate'] = self.due_date
         issue_dict['boarding'] = self.boarding
         issue_dict['isSubscribed'] = True if self.is_subscribed else False
-        issue_dict['seenAt'] \
-            = self.seen_at.isoformat() if self.seen_at else None
+        issue_dict['seenAt'] = \
+            self.seen_at.isoformat() if self.seen_at else None
         issue_dict['items'] = items_list
+        issue_dict['dueDate'] = \
+            self.due_date.isoformat() if self.due_date else None
 
         if include_relations:
             issue_dict['relations'] = []
