@@ -198,14 +198,16 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         lazy='selectin',
     )
 
-    _active_phase_subquery = select([Phase.id]) \
+    _active_phase_order_subquery = select([func.max(Phase.order)]) \
         .select_from(join(Item, Phase, Item.phase_id == Phase.id)) \
         .where(Item.issue_id == id) \
-        .group_by
+        .correlate_except(Phase)
 
     due_date = column_property(
         select([func.max(Item.end_date)]) \
-        .where(Item.phase_id.in_(_active_phase_subquery))
+        .select_from(join(Item, Phase, Item.phase_id == Phase.id)) \
+        .where(Phase.order == _active_phase_order_subquery) \
+        .correlate_except(Item)
     )
 
     is_subscribed = column_property(
@@ -406,12 +408,17 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             ))
 
         issue_dict = super().to_dict()
-        issue_dict['dueDate'] = self.due_date
         issue_dict['boarding'] = self.boarding
         issue_dict['isSubscribed'] = True if self.is_subscribed else False
         issue_dict['seenAt'] \
             = self.seen_at.isoformat() if self.seen_at else None
         issue_dict['items'] = items_list
+
+        if self.due_date is not None:
+            issue_dict['dueDate'] = self.due_date.isoformat()
+
+        else:
+            issue_dict['dueDate'] = None
 
         if include_relations:
             issue_dict['relations'] = []
