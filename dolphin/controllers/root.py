@@ -26,7 +26,7 @@ from .eventtype import EventTypeController
 from .event import EventController
 from .dailyreport import DailyreportController
 from .items import ItemController
-from .phasesummary import PhaseSummaryController
+from .phase_summary import PhaseSummaryController
 
 
 here = abspath(dirname(__file__))

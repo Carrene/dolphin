@@ -52,29 +52,29 @@ class TestListPhaseSummary(LocalApplicationTestCase):
         )
         session.add(cls.phase1)
 
-        cls.phase2 = Phase(
-            title='Triage',
-            order=1,
+        cls.phase4 = Phase(
+            title='Test',
+            order=3,
             workflow=workflow,
             skill=skill,
         )
-        session.add(cls.phase2)
+        session.add(cls.phase4)
 
         cls.phase3 = Phase(
             title='Development',
-            order=1,
+            order=2,
             workflow=workflow,
             skill=skill,
         )
         session.add(cls.phase3)
 
-        cls.phase4 = Phase(
-            title='Development',
+        cls.phase2 = Phase(
+            title='Design',
             order=1,
             workflow=workflow,
             skill=skill,
         )
-        session.add(cls.phase4)
+        session.add(cls.phase2)
 
         group = Group(title='default')
 
@@ -179,7 +179,7 @@ class TestListPhaseSummary(LocalApplicationTestCase):
             'LIST',
         ):
             assert status == 200
-            assert len(response.json) == 4
+            assert len(response.json) == 3
 
             when('Sorting by phase id', query=dict(sort='id'))
             assert response.json[0]['id'] < response.json[1]['id']
@@ -189,12 +189,12 @@ class TestListPhaseSummary(LocalApplicationTestCase):
 
             when(
                 'Filtering by the phase which member has worked on it',
-                query=dict(id=self.phase1.id)
+                query=dict(id=self.phase2.id)
             )
             assert len(response.json) == 1
-            assert response.json[0]['id'] == self.phase1.id
+            assert response.json[0]['id'] == self.phase2.id
             assert response.json[0]['estimatedHours'] == \
-                self.item1.estimated_hours + self.item2.estimated_hours
+                self.item3.estimated_hours + self.item4.estimated_hours
 
             when(
                 'Filtering by the phase which member has not worked on it',
