@@ -3,6 +3,7 @@ from datetime import datetime
 from auditor.context import Context as AuditLogContext
 from nanohttp import context
 from nanohttp.contexts import Context
+from restfulpy.testing import db
 
 from dolphin.models import Item, Project, Member, Workflow, Group, Release, Skill, Phase, Issue
 
@@ -57,7 +58,17 @@ def test_item_perspective(db):
                 room_id=2,
             )
             session.add(issue1)
-            session.flush()
+
+            issue2 = Issue(
+                project=project,
+                title='Second issue',
+                description='This is description of second issue',
+                status='to-do',
+                kind='feature',
+                days=2,
+                room_id=3,
+            )
+            session.add(issue2)
 
             phase1 = Phase(
                 workflow=workflow,
@@ -66,7 +77,6 @@ def test_item_perspective(db):
                 skill=skill,
             )
             session.add(phase1)
-            session.flush()
 
             phase2 = Phase(
                 workflow=workflow,
@@ -75,7 +85,6 @@ def test_item_perspective(db):
                 skill=skill
             )
             session.add(phase1)
-            session.flush()
 
             phase3 = Phase(
                 workflow=workflow,
@@ -95,7 +104,6 @@ def test_item_perspective(db):
                 estimated_hours=4,
             )
             session.add(item1)
-            session.flush()
 
             item2 = Item(
                 issue_id=issue1.id,
@@ -106,7 +114,6 @@ def test_item_perspective(db):
                 estimated_hours=4,
             )
             session.add(item2)
-            session.flush()
 
             item3 = Item(
                 issue_id=issue1.id,
@@ -120,4 +127,5 @@ def test_item_perspective(db):
             session.commit()
 
     assert issue1.due_date == item3.end_date
+    assert issue2.due_date == None
 
