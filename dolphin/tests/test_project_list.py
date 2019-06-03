@@ -212,6 +212,7 @@ class TestProject(LocalApplicationTestCase):
             )
             session.add(item3)
             session.commit()
+            issue1.to_dict()
 
     def test_list(self):
         self.login('member1@example.com')

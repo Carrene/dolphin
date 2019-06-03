@@ -207,6 +207,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         select([func.max(Item.end_date)]) \
         .select_from(join(Item, Phase, Item.phase_id == Phase.id)) \
         .where(Phase.order == _active_phase_order_subquery) \
+        .where(Item.issue_id == id) \
         .correlate_except(Item)
     )
 
