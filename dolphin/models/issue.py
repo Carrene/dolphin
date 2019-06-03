@@ -14,6 +14,7 @@ from ..mixins import ModifiedByMixin
 from .item import Item
 from .member import Member
 from .subscribable import Subscribable, Subscription
+from .phase import Phase
 
 
 class IssueTag(DeclarativeBase):
@@ -197,10 +198,14 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         lazy='selectin',
     )
 
+    _active_phase_subquery = select([Phase.id]) \
+        .select_from(join(Item, Phase, Item.phase_id == Phase.id)) \
+        .where(Item.issue_id == id) \
+        .group_by
+
     due_date = column_property(
         select([func.max(Item.end_date)]) \
-        .where(Item.issue_id == id) \
-        .correlate_except(Item)
+        .where(Item.phase_id.in_(_active_phase_subquery))
     )
 
     is_subscribed = column_property(
@@ -386,6 +391,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         )
 
     def to_dict(self, include_relations=True):
+        import pudb; pudb.set_trace()  # XXX BREAKPOINT
         # The `issue` relationship on Item model is `protected=False`, So the
         # `items` relationship on Issue model must be `protected=True`, So that
         # this causes recursively getting the instances of `issue` and `item`
