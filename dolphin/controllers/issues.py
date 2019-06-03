@@ -16,7 +16,7 @@ from ..exceptions import StatusRoomMemberAlreadyExist, \
     StatusIssueBugMustHaveRelatedIssue, StatusIssueNotFound, \
     StatusQueryParameterNotInFormOrQueryString
 from ..models import Issue, Subscription, Phase, Item, Member, Project, \
-    RelatedIssue, Subscribable, IssueTag, Tag, Resource
+    RelatedIssue, Subscribable, IssueTag, Tag, Resource, SkillMember
 from ..validators import update_issue_validator, assign_issue_validator, \
     issue_move_validator, unassign_issue_validator, issue_relate_validator, \
     issue_unrelate_validator, search_issue_validator
@@ -790,27 +790,27 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 class IssuePhaseController(ModelRestController):
     __model__ = Phase
 
-    def __init__(self, phase):
-        self.phase = phase
+    def __init__(self, issue):
+        self.issue = issue
 
     def __call__(self, *remaining_paths):
         if len(remaining_paths) > 1:
-            issue = self._get_issue(remaining_paths[0])
+            phase = self._get_phase(remaining_paths[0])
             if remaining_paths[1] == 'resources':
                 return IssuePhaseResourceController(
-                    phase=self.phase, issue=issue
+                    phase=phase, issue=self.issue
                 )(*remaining_paths[2:])
 
         return super().__call__(*remaining_paths)
 
-    def _get_issue(self, id):
+    def _get_phase(self, id):
         id = int_or_notfound(id)
 
-        issue = DBSession.query(Issue).get(id)
-        if issue is None:
+        phase = DBSession.query(Phase).get(id)
+        if phase is None:
             raise HTTPNotFound()
 
-        return issue
+        return phase
 
 
 class IssuePhaseResourceController(ModelRestController):
@@ -824,7 +824,6 @@ class IssuePhaseResourceController(ModelRestController):
     @json(prevent_form='709 Form Not Allowed')
     @Resource.expose
     def list(self):
-        import pudb; pudb.set_trace()  # XXX BREAKPOINT
         item_cte = select([Item]) \
             .where(Item.issue_id == self.issue.id) \
             .where(Item.phase_id == self.phase.id) \

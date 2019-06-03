@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from bddrest import when, response, status
+from bddrest import when, response, status, given
 from auditor.context import Context as AuditLogContext
 
 from ..models import Workflow, Phase, Resource, Skill, Group, Release,  \
@@ -197,16 +197,22 @@ class TestResource(LocalApplicationTestCase):
         with oauth_mockup_server(), self.given(
            f'Getting list of resources',
            f'/apiv1/issues/issue_id: {self.issue1.id}/' \
-           f'phases/id:{self.phase1.id}/resources',
+           f'phases/phase_id: {self.phase1.id}/resources',
            f'LIST',
         ):
             assert status == 200
             assert len(response.json) == 2
 
-            when('Trying to pass with wrong id', url_parameters=dict(id=0))
+            when(
+                'Trying to pass with wrong id',
+                url_parameters=given | dict(issue_id=0)
+            )
             assert status == 404
 
-            when('Type of id is invalid', url_parameters=dict(id='not-integer'))
+            when(
+                'Type of id is invalid',
+                url_parameters=given | dict(issue_id='not-integer')
+            )
             assert status == 404
 
             when('The request with form parameter', form=dict(param='param'))
@@ -226,7 +232,10 @@ class TestResource(LocalApplicationTestCase):
             when('Trying pagination with skip', query=dict(take=1, skip=1))
             assert len(response.json) == 1
 
-            when('Trying filtering response', query=dict(id=1))
+            when(
+                'Trying filtering response',
+                query=dict(id=1)
+            )
             assert response.json[0]['id'] == 1
             assert len(response.json) == 1
 
