@@ -262,6 +262,8 @@ class TestListGroup(LocalApplicationTestCase):
             )
             assert response.json[0]['id'] == self.item2.id
 
+            when(
+                'Filter by issue title'
             when('Request is not authorized', authorization=None)
             assert status == 401
 

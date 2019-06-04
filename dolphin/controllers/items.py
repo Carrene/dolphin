@@ -98,14 +98,14 @@ class ItemController(ModelRestController):
         # FILTER
         if 'issueBoarding' in context.query:
             value = context.query['issueBoarding']
-            query = query.join(Item, Item.issue_id == Issue.id)
+            query = query.join(Issue, Item.issue_id == Issue.id)
             query = Item._filter_by_column_value(query, Issue.boarding, value)
             is_issue_joined = True
 
         if 'issueKind' in context.query:
             value = context.query['issueKind']
             if not is_issue_joined:
-                query = query.join(Item, Item.issue_id == Issue.id)
+                query = query.join(Issue, Item.issue_id == Issue.id)
                 is_issue_joined = True
 
             query = Item._filter_by_column_value(query, Issue.kind, value)
@@ -113,7 +113,7 @@ class ItemController(ModelRestController):
         if 'projectTitle' in context.query:
             value = context.query['projectTitle']
             if not is_issue_joined:
-                query = query.join(Item, Item.issue_id == Issue.id)
+                query = query.join(Issue, Item.issue_id == Issue.id)
                 is_issue_joined = True
 
             query = query.join(Project, Project.id == Issue.project_id)
@@ -135,28 +135,34 @@ class ItemController(ModelRestController):
             if 'issueBoarding' in context.query:
                 value = context.query['issueBoarding']
                 if not is_issue_joined:
-                    query = query.join(Item, Item.issue_id == Issue.id)
+                    query = query.join(Issue, Item.issue_id == Issue.id)
+                    is_issue_joined = True
 
-                query = Issue._filter_by_column_value(query, Issue.boarding, value)
-                is_issue_joined = True
+                query = Issue._filter_by_column_value(
+                    query,
+                    Issue.boarding,
+                    value
+                )
 
             if 'issueKind' in context.query:
                 value = context.query['issueKind']
                 if not is_issue_joined:
-                    query = query.join(Item, Item.issue_id == Issue.id)
+                    query = query.join(Issue, Item.issue_id == Issue.id)
+                    is_issue_joined = True
 
                 query = Issue._filter_by_column_value(query, Issue.kind, value)
-                is_issue_joined = True
 
             if 'projectTitle' in context.query:
                 value = context.query['projectTitle']
                 if not is_issue_joined:
-                query = query.join(Item, Item.issue_id == Issue.id)
-                    query = query.join(
+                    query = query.join(Issue, Item.issue_id == Issue.id)
+                    is_issue_joined = True
+
+                if not is_project_joined:
+                    query = query.join(Project, Issue.project_id == Project.id)
+                    is_project_joined = True
+
                 query = Issue._filter_by_column_value(query, Project.title, value)
-                is_issue_joined = True
-
-
 
         return query
 
