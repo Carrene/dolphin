@@ -11,7 +11,7 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
     __abstract__ = True
     __table_args__ = {'autoload': True}
     __containig_fields__ = {
-        'resource': ('id', 'title', 'load'),
+        'resource': ('id', 'title'),
         'item': ('start_date', 'end_date', 'estimated_hours'),
     }
 
@@ -42,6 +42,7 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
             item_cte.c.start_date,
             item_cte.c.end_date,
             item_cte.c.estimated_hours,
+            dailyreport_cte.c.hours_worked,
         ]) \
         .select_from(
             join(
@@ -63,13 +64,12 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
             )
         ) \
         .where(Phase.id == phase_id) \
-
-        query_aliased= query.cte()
+        .cte()
 
         class ResourceSummaryView(cls):
             pass
 
-        mapper(ResourceSummaryView, query_aliased.alias())
+        mapper(ResourceSummaryView, query.alias())
         return ResourceSummaryView
 
     @classmethod
@@ -114,5 +114,18 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
             label='Hours Worked',
             readonly=True,
             required=False,
+            protected=False,
         )
+        yield MetadataField(
+            name='load',
+            key='load',
+            label='Load',
+            required=False,
+            readonly=True,
+            protected=False,
+        )
+
+    def to_dict(self):
+        a = super().to_dict()
+        return a
 
