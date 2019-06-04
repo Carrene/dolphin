@@ -13,6 +13,7 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
     __containig_fields__ = {
         'resource': ('id', 'title'),
         'item': ('start_date', 'end_date', 'estimated_hours'),
+        'dailyreport': ('hours')
     }
 
     id = Field('id', Integer, primary_key=True)
@@ -38,7 +39,7 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
         query = select([
             Resource.id,
             Resource.title,
-            Resource.load,
+            Resource.load.label('load'),
             item_cte.c.start_date,
             item_cte.c.end_date,
             item_cte.c.estimated_hours,
@@ -79,16 +80,16 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
             relationships=relationships,
             synonyms=synonyms,
             composites=composites,
-            use_inspection=use_inspection
+            use_inspection=use_inspection,
         ):
-             if c.key not in cls.__containig_fields__['resource']:
+            if c.key not in cls.__containig_fields__['resource']:
                  continue
 
-             column = getattr(cls, c.key, None)
-             if hasattr(c, 'info'):
-                 column.info.update(c.info)
+            column = getattr(cls, c.key, None)
+            if hasattr(c, 'info'):
+                column.info.update(c.info)
 
-             yield column
+            yield column
 
         for c in Item.iter_columns(
             relationships=relationships,
@@ -96,14 +97,29 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
             composites=composites,
             use_inspection=use_inspection
         ):
-             if c.key not in cls.__containig_fields__['item']:
-                 continue
+            if c.key not in cls.__containig_fields__['item']:
+                continue
 
-             column = getattr(cls, c.key, None)
-             if hasattr(c, 'info'):
-                 column.info.update(c.info)
+            column = getattr(cls, c.key, None)
+            if hasattr(c, 'info'):
+                column.info.update(c.info)
 
-             yield column
+            yield column
+
+        for c in Dailyreport.iter_columns(
+            relationships=relationships,
+            synonyms=synonyms,
+            composites=composites,
+            use_inspection=use_inspection
+        ):
+            if c.key not in cls.__containig_fields__['dailyreport']:
+                continue
+
+            column = getattr(cls, c.key, None)
+            if hasattr(c, 'info'):
+                column.info.update(c.info)
+
+            yield column
 
     @classmethod
     def iter_metadata_fields(cls):
@@ -126,6 +142,10 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
         )
 
     def to_dict(self):
-        a = super().to_dict()
-        return a
+        # The `load` key is added manually because the `load` attribute is a
+        # hybrid property on `Resource` model, so that it isn't included in
+        # `Resource.iter_columns` method.
+        phase_summary_dict = super().to_dict()
+        phase_summary_dict['load'] = self.load
+        return phase_summary_dict
 
