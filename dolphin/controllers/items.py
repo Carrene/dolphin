@@ -6,7 +6,7 @@ from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 from sqlalchemy import select, func
 
-from ..models import Item, Dailyreport, Event, Member
+from ..models import Item, Dailyreport, Event, Member, Issue, Project
 from ..validators import update_item_validator, dailyreport_update_validator, \
     estimate_item_validator, dailyreport_create_validator
 from ..exceptions import StatusEndDateMustBeGreaterThanStartDate, \
@@ -110,6 +110,14 @@ class ItemController(ModelRestController):
 
             query = Item._filter_by_column_value(query, Issue.kind, value)
 
+        if 'issueTitle' in context.query:
+            value = context.query['issueTitle']
+            if not is_issue_joined:
+                query = query.join(Issue, Item.issue_id == Issue.id)
+                is_issue_joined = True
+
+            query = Item._filter_by_column_value(query, Issue.title, value)
+
         if 'projectTitle' in context.query:
             value = context.query['projectTitle']
             if not is_issue_joined:
@@ -121,7 +129,12 @@ class ItemController(ModelRestController):
 
         # SORT
         sorting_expression = context.query.get('sort', '').strip()
-        external_columns = ('issueBoarding', 'issueKind', 'projectTitle')
+        external_columns = (
+            'issueBoarding',
+            'issueKind',
+            'issueTitle',
+            'projectTitle'
+        )
 
         if sorting_expression:
 
@@ -138,11 +151,7 @@ class ItemController(ModelRestController):
                     query = query.join(Issue, Item.issue_id == Issue.id)
                     is_issue_joined = True
 
-                query = Issue._filter_by_column_value(
-                    query,
-                    Issue.boarding,
-                    value
-                )
+                query = Issue._sort_by_key_value(query, Issue.boarding, value)
 
             if 'issueKind' in context.query:
                 value = context.query['issueKind']
@@ -150,7 +159,15 @@ class ItemController(ModelRestController):
                     query = query.join(Issue, Item.issue_id == Issue.id)
                     is_issue_joined = True
 
-                query = Issue._filter_by_column_value(query, Issue.kind, value)
+                query = Issue._sort_by_key_value(query, Issue.kind, value)
+
+            if 'issueTitle' in context.query:
+                value = context.query['issueTitle']
+                if not is_issue_joined:
+                    query = query.join(Issue, Item.issue_id == Issue.id)
+                    is_issue_joined = True
+
+                query = Issue._sort_by_key_value(query, Issue.title, value)
 
             if 'projectTitle' in context.query:
                 value = context.query['projectTitle']
@@ -162,7 +179,7 @@ class ItemController(ModelRestController):
                     query = query.join(Project, Issue.project_id == Project.id)
                     is_project_joined = True
 
-                query = Issue._filter_by_column_value(query, Project.title, value)
+                query = Issue._sort_by_key_value(query, Project.title, value)
 
         return query
 
