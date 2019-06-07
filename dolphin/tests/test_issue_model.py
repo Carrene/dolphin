@@ -9,7 +9,7 @@ from dolphin.models import Item, Project, Member, Workflow, Group, Release,  \
     Skill, Phase, Issue
 
 
-def test_item_perspective(db):
+def test_issue_due_date(db):
     session = db()
 
     with AuditLogContext(dict()):
