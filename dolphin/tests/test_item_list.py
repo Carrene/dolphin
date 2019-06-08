@@ -88,18 +88,28 @@ class TestListGroup(LocalApplicationTestCase):
             group=group,
         )
 
-        project = Project(
+        cls.project1 = Project(
             release=release,
             workflow=workflow,
             group=group,
-            manager=cls.member2,
+            manager=cls.member1,
             title='My first project',
             description='A decription for my project',
             room_id=1
         )
 
+        cls.project2 = Project(
+            release=release,
+            workflow=workflow,
+            group=group,
+            manager=cls.member2,
+            title='My second project',
+            description='A decription for my project',
+            room_id=1
+        )
+
         cls.issue1 = Issue(
-            project=project,
+            project=cls.project1,
             title='First issue',
             description='This is description of first issue',
             kind='feature',
@@ -109,27 +119,27 @@ class TestListGroup(LocalApplicationTestCase):
         session.add(cls.issue1)
 
         cls.issue2 = Issue(
-            project=project,
+            project=cls.project2,
             title='Second issue',
             description='This is description of second issue',
-            kind='feature',
+            kind='bug',
             days=1,
             room_id=3
         )
         session.add(cls.issue2)
 
         cls.issue3 = Issue(
-            project=project,
+            project=cls.project1,
             title='Third issue',
             description='This is description of third issue',
-            kind='feature',
+            kind='bug',
             days=1,
             room_id=4
         )
         session.add(cls.issue3)
 
         cls.issue4 = Issue(
-            project=project,
+            project=cls.project2,
             title='Fourth issue',
             description='This is description of fourth issue',
             kind='feature',
@@ -261,6 +271,110 @@ class TestListGroup(LocalApplicationTestCase):
                 query=dict(sort='-id', take=1, skip=2)
             )
             assert response.json[0]['id'] == self.item2.id
+
+            when(
+                'Filter by issue title',
+                query=dict(issueTitle=self.issue1.title)
+            )
+            assert len(response.json) == 1
+            assert response.json[0]['id'] == self.item1.id
+
+            when(
+                'Filter by issue kind',
+                query=dict(issueKind=self.issue1.kind)
+            )
+            assert len(response.json) == 2
+            assert response.json[0]['id'] == self.item1.id
+            assert response.json[1]['id'] == self.item5.id
+
+            when(
+                'Filter by issue boarding',
+                query=dict(issueBoarding=self.issue1.boarding)
+            )
+            assert len(response.json) == 1
+            assert response.json[0]['id'] == self.item1.id
+
+            when(
+                'Filter by project title',
+                query=dict(projectTitle=self.project2.title)
+            )
+            assert len(response.json) == 2
+
+            when(
+                'Sort by issue title',
+                query=dict(sort='issueTitle')
+            )
+            assert len(response.json) == 4
+            assert response.json[0]['id'] == self.item1.id
+            assert response.json[1]['id'] == self.item5.id
+            assert response.json[2]['id'] == self.item2.id
+            assert response.json[3]['id'] == self.item3.id
+
+            when(
+                'Reverse sort by issue title',
+                query=dict(sort='-issueTitle')
+            )
+            assert len(response.json) == 4
+            assert response.json[0]['id'] == self.item3.id
+            assert response.json[1]['id'] == self.item2.id
+            assert response.json[2]['id'] == self.item5.id
+            assert response.json[3]['id'] == self.item1.id
+
+            when(
+                'Sort by issue kind',
+                query=dict(sort='issueKind')
+            )
+            assert len(response.json) == 4
+            assert response.json[0]['id'] == self.item1.id
+            assert response.json[1]['id'] == self.item5.id
+            assert response.json[2]['id'] == self.item2.id
+            assert response.json[3]['id'] == self.item3.id
+
+            when(
+                'Reverse sort by issue kind',
+                query=dict(sort='-issueKind')
+            )
+            assert len(response.json) == 4
+            assert response.json[0]['id'] == self.item2.id
+            assert response.json[1]['id'] == self.item3.id
+            assert response.json[2]['id'] == self.item1.id
+            assert response.json[3]['id'] == self.item5.id
+
+            when(
+                'Sort by issue boarding',
+                query=dict(sort='issueBoarding')
+            )
+            assert len(response.json) == 4
+            assert response.json[0]['id'] == self.item1.id
+            assert response.json[1]['id'] == self.item2.id
+
+            when(
+                'Reverse sort by issue boarding',
+                query=dict(sort='-issueBoarding')
+            )
+            assert len(response.json) == 4
+            assert response.json[0]['id'] == self.item2.id
+            assert response.json[1]['id'] == self.item3.id
+
+            when(
+                'Sort by project title',
+                query=dict(sort='projectTitle')
+            )
+            assert len(response.json) == 4
+            assert response.json[0]['id'] == self.item1.id
+            assert response.json[1]['id'] == self.item3.id
+            assert response.json[2]['id'] == self.item2.id
+            assert response.json[3]['id'] == self.item5.id
+
+            when(
+                'Reverse sort by project title',
+                query=dict(sort='-projectTitle')
+            )
+            assert len(response.json) == 4
+            assert response.json[0]['id'] == self.item2.id
+            assert response.json[1]['id'] == self.item5.id
+            assert response.json[2]['id'] == self.item1.id
+            assert response.json[3]['id'] == self.item3.id
 
             when('Request is not authorized', authorization=None)
             assert status == 401
