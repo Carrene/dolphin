@@ -53,8 +53,8 @@ class TestPhase(LocalApplicationTestCase):
             assert fields['estimatedHours']['required'] is not None
             assert fields['estimatedHours']['notNone'] is not None
 
-            assert fields['hoursWorked']['label'] is not None
-            assert fields['hoursWorked']['name'] is not None
-            assert fields['hoursWorked']['type'] is not None
-            assert fields['hoursWorked']['required'] is not None
+            assert fields['hours']['label'] is not None
+            assert fields['hours']['name'] is not None
+            assert fields['hours']['type'] is not None
+            assert fields['hours']['required'] is not None
 
