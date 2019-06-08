@@ -16,8 +16,8 @@ from ..exceptions import StatusRoomMemberAlreadyExist, \
     StatusIssueBugMustHaveRelatedIssue, StatusIssueNotFound, \
     StatusQueryParameterNotInFormOrQueryString
 from ..models import Issue, Subscription, Phase, Item, Member, Project, \
-    RelatedIssue, Subscribable, IssueTag, Tag, AbstractPhaseSummaryView, \
-    Resource, SkillMember
+    RelatedIssue, Subscribable, IssueTag, Tag, Resource, SkillMember, \
+    AbstractPhaseSummaryView, AbstractResourceSummaryView
 from ..validators import update_issue_validator, assign_issue_validator, \
     issue_move_validator, unassign_issue_validator, issue_relate_validator, \
     issue_unrelate_validator, search_issue_validator
@@ -817,8 +817,8 @@ class IssuePhaseController(ModelRestController):
     def __call__(self, *remaining_paths):
         if len(remaining_paths) > 1:
             phase = self._get_phase(remaining_paths[0])
-            if remaining_paths[1] == 'resources':
-                return IssuePhaseResourceController(
+            if remaining_paths[1] == 'resourcessummaries':
+                return IssuePhaseResourceSummaryController(
                     phase=phase, issue=self.issue
                 )(*remaining_paths[2:])
 
@@ -834,8 +834,8 @@ class IssuePhaseController(ModelRestController):
         return phase
 
 
-class IssuePhaseResourceController(ModelRestController):
-    __model__ = Resource
+class IssuePhaseResourceSummaryController(ModelRestController):
+    __model__ = AbstractResourceSummaryView
 
     def __init__(self, phase, issue):
         self.phase = phase
@@ -843,17 +843,10 @@ class IssuePhaseResourceController(ModelRestController):
 
     @authorize
     @json(prevent_form='709 Form Not Allowed')
-    @Resource.expose
+    @AbstractResourceSummaryView.expose
     def list(self):
-        item_cte = select([Item]) \
-            .where(Item.issue_id == self.issue.id) \
-            .where(Item.phase_id == self.phase.id) \
-            .cte()
-
-        query = DBSession.query(Resource) \
-            .join(item_cte, item_cte.c.member_id == Resource.id, isouter=True) \
-            .join(SkillMember, SkillMember.member_id == Resource.id) \
-            .join(Phase, Phase.skill_id == SkillMember.skill_id) \
-            .filter(Phase.id == self.phase.id)
+        phase_summary_view = AbstractResourceSummaryView \
+            .create_mapped_class(issue_id=self.issue.id, phase_id=self.phase.id)
+        query = DBSession.query(phase_summary_view)
         return query
 
