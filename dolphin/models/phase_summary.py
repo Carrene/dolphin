@@ -142,8 +142,8 @@ class AbstractPhaseSummaryView(PaginationMixin, OrderingMixin, FilteringMixin,
             required=False,
         )
         yield MetadataField(
-            name='hoursWorked',
-            key='hours_worked',
+            name='hours',
+            key='hours',
             label='Hours Worked',
             readonly=True,
             required=False,
