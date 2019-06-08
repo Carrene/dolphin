@@ -140,6 +140,30 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
             readonly=True,
             protected=False,
         )
+        yield MetadataField(
+            name='startDate',
+            key='start_date',
+            label='Start',
+            required=False,
+            readonly=True,
+            protected=False,
+        )
+        yield MetadataField(
+            name='endDate',
+            key='end_date',
+            label='Target',
+            required=False,
+            readonly=True,
+            protected=False,
+        )
+        yield MetadataField(
+            name='title',
+            key='title',
+            label='Resource',
+            required=False,
+            readonly=True,
+            protected=False,
+        )
 
     def to_dict(self):
         # The `load` key is added manually because the `load` attribute is a
