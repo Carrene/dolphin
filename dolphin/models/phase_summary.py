@@ -121,8 +121,8 @@ class AbstractPhaseSummaryView(PaginationMixin, OrderingMixin, FilteringMixin,
     def iter_metadata_fields(cls):
         yield from super().iter_metadata_fields()
         yield MetadataField(
-            name='hoursWorked',
-            key='hours_worked',
+            name='hours',
+            key='hours',
             label='Hours Worked',
             readonly=True,
             required=False,
