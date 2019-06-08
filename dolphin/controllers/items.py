@@ -145,32 +145,40 @@ class ItemController(ModelRestController):
                     if c.replace('-', '') in external_columns
             }
 
-            if 'issueBoarding' in context.query:
-                value = context.query['issueBoarding']
+            if 'issueBoarding' in sorting_expression:
                 if not is_issue_joined:
                     query = query.join(Issue, Item.issue_id == Issue.id)
                     is_issue_joined = True
 
-                query = Issue._sort_by_key_value(query, Issue.boarding, value)
+                query = Issue._sort_by_key_value(
+                    query,
+                    column=Issue.boarding,
+                    descending=sorting_columns['issueBoarding']
+                )
 
-            if 'issueKind' in context.query:
-                value = context.query['issueKind']
+            if 'issueKind' in sorting_expression:
                 if not is_issue_joined:
                     query = query.join(Issue, Item.issue_id == Issue.id)
                     is_issue_joined = True
 
-                query = Issue._sort_by_key_value(query, Issue.kind, value)
+                query = Issue._sort_by_key_value(
+                    query,
+                    column=Issue.kind,
+                    descending=sorting_columns['issueKind']
+                )
 
-            if 'issueTitle' in context.query:
-                value = context.query['issueTitle']
+            if 'issueTitle' in sorting_expression:
                 if not is_issue_joined:
                     query = query.join(Issue, Item.issue_id == Issue.id)
                     is_issue_joined = True
 
-                query = Issue._sort_by_key_value(query, Issue.title, value)
+                query = Issue._sort_by_key_value(
+                    query,
+                    column=Issue.title,
+                    descending=sorting_columns['issueTitle']
+                )
 
-            if 'projectTitle' in context.query:
-                value = context.query['projectTitle']
+            if 'projectTitle' in sorting_expression:
                 if not is_issue_joined:
                     query = query.join(Issue, Item.issue_id == Issue.id)
                     is_issue_joined = True
@@ -179,7 +187,11 @@ class ItemController(ModelRestController):
                     query = query.join(Project, Issue.project_id == Project.id)
                     is_project_joined = True
 
-                query = Issue._sort_by_key_value(query, Project.title, value)
+                query = Issue._sort_by_key_value(
+                    query,
+                    column=Project.title,
+                    descending=sorting_columns['projectTitle']
+                )
 
         return query
 
