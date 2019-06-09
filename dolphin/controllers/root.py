@@ -67,12 +67,7 @@ class Apiv1(RestController, JsonPatchControllerMixin):
         return dict(version=dolphin.__version__)
 
 
-class Ghv3(RestController, JsonPatchControllerMixin):
-    github = GithubController()
-
-
 class Root(RootController):
     apiv1 = Apiv1()
-    ghv3 = Ghv3()
     assets = Static(attachment_storage)
 
