@@ -26,6 +26,7 @@ from .eventtype import EventTypeController
 from .event import EventController
 from .dailyreport import DailyreportController
 from .items import ItemController
+from .githubs import GithubController
 
 
 here = abspath(dirname(__file__))
@@ -61,7 +62,12 @@ class Apiv1(RestController, JsonPatchControllerMixin):
         return dict(version=dolphin.__version__)
 
 
+class Ghv3(RestController):
+    githubs = GithubController()
+
+
 class Root(RootController):
     apiv1 = Apiv1()
+    ghv3 = Ghv3()
     assets = Static(attachment_storage)
 
