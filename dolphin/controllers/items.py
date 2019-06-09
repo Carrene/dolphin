@@ -70,6 +70,17 @@ class ItemController(ModelRestController):
         is_issue_joined = False
         is_project_joined = False
 
+        lead_phase_order_subquery = select([func.max(Phase.order)]) \
+            .where(Phase.item_id == cls.id) \
+            .correlate_except(Phase)
+
+        lead_phase = column_property(
+            select([Phase.id])
+            .where(Phase.item_id == cls.id)
+            .where(Phase.order == _lead_phase_order_subquery)
+            .correlate_except(Phase)
+        )
+
         if member.role == 'admin':
             query = DBSession.query(Item)
 
@@ -81,7 +92,8 @@ class ItemController(ModelRestController):
                 return []
 
             if context.query['zone'] == 'newlyAssigned':
-                query = query.filter(Item.status != 'in-progress')
+                query = query.join(Phase, Phase.id == Item.phase_id) \
+                    .filter(Phase.order != lead_phase_order_subquery)
 
             if context.query['zone'] == 'needEstimate':
                 query = query.filter(Item.status == 'in-progress') \
