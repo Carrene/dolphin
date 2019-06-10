@@ -235,7 +235,13 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             )
 
         # SORT
-        external_columns = ('phaseId', 'tagId', 'tagTitle', 'phaseTitle')
+        external_columns = (
+            'phaseId',
+            'tagId',
+            'tagTitle',
+            'phaseTitle',
+            'projectManagerId'
+        )
 
         if sorting_expression:
 
@@ -363,6 +369,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 query = Issue._sort_by_key_value(
                     query,
                     column=Project.manager_id,
+                    descending=sorting_columns['projectManagerId']
                 )
 
         if 'unread' in context.query:
@@ -822,7 +829,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 class IssuePhaseSummaryController(ModelRestController):
     __model__ = AbstractPhaseSummaryView
 
-    def __init__(self, issue=None):
+    def __init__(self, issue):
         self.issue = issue
 
     @authorize
