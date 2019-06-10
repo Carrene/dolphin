@@ -500,3 +500,15 @@ class StatusNoteNotInForm(HTTPKnownStatus):
 class StatusInvalidDatePeriod(HTTPKnownStatus):
     status = '664 Invalid Date Period'
 
+
+class StatusDailyReportAlreadyExist(HTTPKnownStatus):
+    status = '665 Daily Report Already Exist'
+
+
+class StatusInvalidDateFormat(HTTPKnownStatus):
+    status = '932 Invalid Date Format'
+
+
+class StatusDateNotInForm(HTTPKnownStatus):
+    status = '931 Date Not In Form'
+

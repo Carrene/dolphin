@@ -115,7 +115,7 @@ class TestDailyreport(LocalApplicationTestCase):
                 json=given | dict(parameter='invalid parameter')
             )
             assert status == '707 Invalid field, only following fields are ' \
-                'accepted: hours, note'
+                'accepted: hours, note, date'
 
             when(
                 'Note length is less than limit',

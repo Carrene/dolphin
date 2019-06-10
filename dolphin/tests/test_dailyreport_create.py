@@ -81,7 +81,7 @@ class TestDailyreport(LocalApplicationTestCase):
             phase_id=phase1.id,
             member_id=cls.member.id,
             start_date=datetime.now().date(),
-            end_date=datetime.now().date(),
+            end_date=datetime.now().date() + timedelta(days=1),
         )
         session.add(cls.item1)
 
@@ -100,6 +100,7 @@ class TestDailyreport(LocalApplicationTestCase):
         form = dict(
             hours=4.8,
             note='Some note',
+            date=datetime.now().isoformat()
         )
 
         with oauth_mockup_server(), self.given(
@@ -124,13 +125,19 @@ class TestDailyreport(LocalApplicationTestCase):
 
             when( 'Invalid parameter is in form',json=given | dict(a='a'))
             assert status == '707 Invalid field, only following fields are ' \
-                'accepted: hours, note'
+                'accepted: hours, note, date'
 
             when('Note not in form', json=given - 'note')
             assert status == '930 Note Not In Form'
 
             when('Hours not in form', json=given - 'hours')
             assert status == '929 Hours Not In Form'
+
+            when('Date not in form', json=given - 'date')
+            assert status == '931 Date Not In Form'
+
+            when('Date format is wrong', json=given | dict(date='30-20-20'))
+            assert status == '932 Invalid Date Format'
 
             when(
                 'Note length is less than limit',

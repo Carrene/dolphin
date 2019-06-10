@@ -872,6 +872,10 @@ dailyreport_create_validator = validate(
         type_=(float, StatusInvalidHoursType),
         minimum=(0, StatusHoursMustBePositive)
     ),
+    date=dict(
+        required=StatusDateNotInForm,
+        pattern=(DATETIME_PATTERN, StatusInvalidDateFormat),
+    ),
 )
 
 
@@ -882,6 +886,9 @@ dailyreport_update_validator = validate(
     hours=dict(
         type_=(float, StatusInvalidHoursType),
         minimum=(0, StatusHoursMustBePositive)
+    ),
+    date=dict(
+        type_=(DATETIME_PATTERN, StatusInvalidDateFormat),
     ),
 )
 
