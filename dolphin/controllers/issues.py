@@ -2,7 +2,9 @@ import re
 from datetime import datetime
 
 from auditor import context as AuditLogContext
-from nanohttp import HTTPStatus, json, context, HTTPNotFound, HTTPUnauthorized, int_or_notfound, validate, HTTPNoContent, action
+from nanohttp import HTTPStatus, json, context, HTTPNotFound, \
+    HTTPUnauthorized, int_or_notfound, settings, validate, HTTPNoContent, \
+    action
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import DBSession, commit

@@ -27,8 +27,8 @@ class TestIssue(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             access_token='access token 1',
-            phone=123406789,
-            reference_id=2
+            phone=123456789,
+            reference_id=1
         )
         session.add(member)
 
@@ -36,8 +36,8 @@ class TestIssue(LocalApplicationTestCase):
             title='Secend Member',
             email='member2.example.com',
             access_token='access roken 2',
-            phone=123456789,
-            reference_id=1
+            phone=103456789,
+            reference_id=2
         )
         session.add(member2)
 
