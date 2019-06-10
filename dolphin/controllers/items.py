@@ -4,9 +4,9 @@ from nanohttp import json, context, HTTPNotFound, int_or_notfound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
-from sqlalchemy import select, func
+from sqlalchemy import select, func, join
 
-from ..models import Item, Dailyreport, Event, Member, Issue, Project
+from ..models import Item, Dailyreport, Event, Member, Issue, Project, Phase
 from ..validators import update_item_validator, dailyreport_update_validator, \
     estimate_item_validator, dailyreport_create_validator
 from ..exceptions import StatusEndDateMustBeGreaterThanStartDate, \
@@ -70,6 +70,12 @@ class ItemController(ModelRestController):
         is_issue_joined = False
         is_project_joined = False
 
+        lead_phase_subquery = select([Phase.id]) \
+            .select_from(join(Item, Phase, Item.phase_id == Phase.id)) \
+            .where(Item.estimated_hours.is_(None)) \
+            .order_by(Phase.order) \
+            .limit(1)
+
         if member.role == 'admin':
             query = DBSession.query(Item)
 
@@ -81,18 +87,23 @@ class ItemController(ModelRestController):
                 return []
 
             if context.query['zone'] == 'newlyAssigned':
-                query = query.filter(Item.status != 'in-progress')
+                query = query \
+                    .filter(Item.phase_id.notin_(lead_phase_subquery)) \
+                    .filter(Item.estimated_hours.is_(None))
 
             if context.query['zone'] == 'needEstimate':
-                query = query.filter(Item.status == 'in-progress') \
+                query = query \
+                    .filter(Item.phase_id.in_(lead_phase_subquery)) \
                     .filter(Item.estimated_hours.is_(None))
 
             elif context.query['zone'] == 'upcomingNuggets':
-                query = query.filter(Item.status == 'in-progress') \
+                query = query \
+                    .filter(Item.estimated_hours.isnot(None)) \
                     .filter(Item.start_date > datetime.now())
 
             elif context.query['zone'] == 'inProgressNuggets':
-                query = query.filter(Item.status == 'in-progress') \
+                query = query \
+                    .filter(Item.estimated_hours.isnot(None)) \
                     .filter(Item.start_date < datetime.now())
 
         # FILTER
