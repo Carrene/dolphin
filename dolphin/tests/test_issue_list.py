@@ -27,10 +27,19 @@ class TestIssue(LocalApplicationTestCase):
             title='First Member',
             email='member1@example.com',
             access_token='access token 1',
+            phone=123406789,
+            reference_id=2
+        )
+        session.add(member)
+
+        member2 = Member(
+            title='Secend Member',
+            email='member2.example.com',
+            access_token='access roken 2',
             phone=123456789,
             reference_id=1
         )
-        session.add(member)
+        session.add(member2)
 
         cls.tag1 = Tag(
             title='First tag',
@@ -69,6 +78,18 @@ class TestIssue(LocalApplicationTestCase):
             description='A decription for my project',
             room_id=1
         )
+
+        cls.project2 = Project(
+            release=release,
+            workflow=workflow,
+            group=group,
+            manager=member2,
+            title='My secend project',
+            description='A decription for my project',
+            room_id=1
+        )
+        session.add(cls.project2)
+        session.flush()
 
         with Context(dict()):
             context.identity = member
@@ -135,7 +156,7 @@ class TestIssue(LocalApplicationTestCase):
             session.add(subscription_issue3)
 
             cls.issue4 = Issue(
-                project=cls.project,
+                project=cls.project2,
                 title='Fourth issue',
                 description='This is description of fourth issue',
                 status='complete',
@@ -319,6 +340,15 @@ class TestIssue(LocalApplicationTestCase):
             assert len(response.json) == 1
 
             when(
+                'Filtering and sorting the issue by porject manager id',
+                query=dict(
+                    projectManagerId=self.project2.manager_id,
+                    sort='projectManagerId'
+                )
+            )
+            assert len(response.json) == 1
+
+            when(
                 'Filtering the issues by phase title and phase id',
                 query=dict(
                     phaseTitle=self.phase3.title,
@@ -365,6 +395,14 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert len(response.json) == 1
 
+            when(
+                'Filter by manager id',
+                query=dict(
+                    projectManagerId=self.project.manager_id
+                )
+            )
+            assert len(response.json) == 3
+
             when('Sort by phase id', query=dict(sort='phaseId'))
             assert status == 200
             assert len(response.json) == 4
@@ -396,6 +434,17 @@ class TestIssue(LocalApplicationTestCase):
             assert response.json[1]['id'] == self.issue2.id
             assert response.json[2]['id'] == self.issue4.id
             assert response.json[3]['id'] == self.issue1.id
+
+            when(
+                'sort by project manager id',
+                query=dict(sort='projectManagerId')
+            )
+            assert status == 200
+            assert len(response.json) == 4
+            assert response.json[0]['id'] == self.issue1.id
+            assert response.json[1]['id'] == self.issue2.id
+            assert response.json[2]['id'] == self.issue3.id
+            assert response.json[3]['id'] == self.issue4.id
 
             when('Sort by tag id and title', query=dict(sort='tagId,title'))
             assert status == 200

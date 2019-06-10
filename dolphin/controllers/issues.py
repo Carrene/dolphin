@@ -2,9 +2,7 @@ import re
 from datetime import datetime
 
 from auditor import context as AuditLogContext
-from nanohttp import HTTPStatus, json, context, HTTPNotFound, \
-    HTTPUnauthorized, int_or_notfound, settings, validate, HTTPNoContent, \
-    action
+from nanohttp import HTTPStatus, json, context, HTTPNotFound, HTTPUnauthorized, int_or_notfound, validate, HTTPNoContent, action
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import DBSession, commit
@@ -143,6 +141,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         sorting_expression = context.query.get('sort', '').strip()
         is_issue_tag_joined = False
         is_issue_item_joined = False
+        is_issue_project_joined = False
         needed_cte = bool(
             'phaseId' in sorting_expression or \
             'phaseTitle' in sorting_expression or \
@@ -217,6 +216,21 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 is_issue_tag_joined = True
 
             query = Issue._filter_by_column_value(query, Tag.title, value)
+
+        if 'projectManagerId' in context.query:
+            value = context.query['projectManagerId']
+            if not is_issue_project_joined:
+                query = query.join(
+                    Project,
+                    Project.id == Issue.project_id
+                )
+                is_issue_project_joined = True
+
+            query = Issue._filter_by_column_value(
+                query,
+                Project.manager_id,
+                value
+            )
 
         # SORT
         external_columns = ('phaseId', 'tagId', 'tagTitle', 'phaseTitle')
@@ -335,6 +349,18 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                     query,
                     column=Tag.title,
                     descending=sorting_columns['tagTitle']
+                )
+
+            if 'projectManagerId' in sorting_expression:
+                if not is_issue_project_joined:
+                    query = query.join(
+                        Project,
+                        Project.id == Issue.project_id
+                    )
+
+                query = Issue._sort_by_key_value(
+                    query,
+                    column=Project.manager_id,
                 )
 
         if 'unread' in context.query:
