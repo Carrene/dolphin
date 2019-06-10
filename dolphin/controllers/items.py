@@ -21,6 +21,7 @@ FORM_WHITLELIST_ITEM = [
 FORM_WHITLELIST_DAILYREPORT = [
     'hours',
     'note',
+    'date',
 ]
 VALID_ZONES = [
     'newlyAssigned',
@@ -278,8 +279,9 @@ class ItemDailyreportController(ModelRestController):
     @json(
         prevent_empty_form='708 Empty Form',
         form_whitelist=(
-            ['hours', 'note'],
-            '707 Invalid field, only following fields are accepted: hours, note'
+            FORM_WHITLELIST_DAILYREPORT,
+            f'707 Invalid field, only following fields are accepted: '
+            f'{FORM_WHITELIST_DAILYREPORT_STRING}'
         )
     )
     @dailyreport_update_validator
@@ -314,15 +316,18 @@ class ItemDailyreportController(ModelRestController):
     @dailyreport_create_validator
     @commit
     def create(self):
-        today = datetime.strptime(datetime.now().date().isoformat(), '%Y-%m-%d')
-        if self.item.end_date < today or today < self.item.start_date:
+        date = datetime.strptime(
+            context.form.get('date'),
+            '%Y-%m-%dT%H:%M:%S.%f'
+        )
+        if self.item.end_date < date or date < self.item.start_date:
             raise StatusInvalidDatePeriod()
 
         dailyreport = Dailyreport(
             note=context.form.get('note'),
             hours=context.form.get('hours'),
             item_id=self.item.id,
-            date=datetime.now().date(),
+            date=date,
         )
         DBSession.add(dailyreport)
         return dailyreport
