@@ -441,7 +441,7 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert status == 200
             assert len(response.json) == 4
-            assert response.json[3]['id'] == self.issue4.id
+            assert response.json[3]['id'] > response.json[2]['id']
 
             when(
                 'Reverse sort by product manager id',
@@ -449,7 +449,7 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert status == 200
             assert len(response.json) == 4
-            assert response.json[0]['id'] == self.issue4.id
+            assert response.json[0]['id'] > response.json[1]['id']
 
             when('Sort by tag id and title', query=dict(sort='tagId,title'))
             assert status == 200
