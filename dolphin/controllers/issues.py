@@ -58,7 +58,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             issue = self._get_issue(remaining_paths[0])
 
             if remaining_paths[1] == 'phases':
-                return IssuePhaseController(issue=issue)(*remaining_paths[2:])
+                return PhaseController(issue=issue)(*remaining_paths[2:])
 
             elif remaining_paths[1] == 'tags':
                 return TagController(issue=issue)(*remaining_paths[2:])
@@ -68,9 +68,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
             elif remaining_paths[1] == 'activities':
                 return ActivityController(issue=issue)(*remaining_paths[2:])
-
-            elif remaining_paths[1] == 'phasessummaries':
-                return IssuePhaseSummaryController(issue=issue)(*remaining_paths[2:])
 
         return super().__call__(*remaining_paths)
 
@@ -235,13 +232,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             )
 
         # SORT
-        external_columns = (
-            'phaseId',
-            'tagId',
-            'tagTitle',
-            'phaseTitle',
-            'projectManagerId'
-        )
+        external_columns = ('phaseId', 'tagId', 'tagTitle', 'phaseTitle')
 
         if sorting_expression:
 
@@ -369,7 +360,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 query = Issue._sort_by_key_value(
                     query,
                     column=Project.manager_id,
-                    descending=sorting_columns['projectManagerId']
                 )
 
         if 'unread' in context.query:
