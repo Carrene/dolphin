@@ -118,16 +118,9 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         protected=True
     )
 
-    phases = relationship(
-        'Phase',
+    item = relationship(
+        'Item',
         back_populates='members',
-        secondary='item',
-        protected=True
-    )
-    issues = relationship(
-        'Issue',
-        back_populates='members',
-        secondary='item',
         protected=True
     )
     organizations = relationship(

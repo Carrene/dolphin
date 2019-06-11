@@ -81,16 +81,10 @@ class Phase(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
         back_populates='phases',
         protected=True
     )
-    issues = relationship(
-        'Issue',
-        secondary='item',
+    issue_phases = relationship(
+        'IssuePhase',
         lazy='selectin',
-        protected=True
-    )
-    members = relationship(
-        'Member',
-        secondary='item',
-        lazy='selectin',
+        back_populates='phase',
         protected=True
     )
     skill = relationship(

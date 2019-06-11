@@ -93,27 +93,16 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         python_type=str,
         example='Lorem Ipsum'
     )
-    phase_id = Field(
+    issue_phase_id = Field(
         Integer,
-        ForeignKey('phase.id'),
+        ForeignKey('issue_phase.id'),
         python_type=int,
         nullable=False,
-        watermark='Choose a phase',
-        label='Phase',
+        watermark='Lorem Ipsum',
+        label='Lorem Ipsum',
         not_none=True,
         required=True,
-        example='Lorem Ipsum'
-    )
-    issue_id = Field(
-        Integer,
-        ForeignKey('issue.id'),
-        python_type=int,
-        nullable=False,
-        watermark='Choose an issue',
-        label='Issue',
-        not_none=True,
-        required=True,
-        example='Lorem Ipsum'
+        example='Lorem Ipsum',
     )
     member_id = Field(
         Integer,
@@ -133,9 +122,9 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         protected=True,
     )
 
-    issue = relationship(
-        'Issue',
-        foreign_keys=issue_id,
+    issue_phase = relationship(
+        'IssuePhase',
+        foreign_keys=issue_phase_id,
         back_populates='items',
         protected=False,
     )
@@ -151,8 +140,6 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         select([func.sum(Dailyreport.hours)])
         .where(Dailyreport.item_id == id)
     )
-
-    UniqueConstraint(phase_id, issue_id, member_id)
 
     @property
     def perspective(self):
@@ -206,16 +193,6 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     @classmethod
     def iter_metadata_fields(cls):
         yield from super().iter_metadata_fields()
-        yield MetadataField(
-            name='issue',
-            key='issue',
-            label='Lorem Ipsun',
-            required=False,
-            readonly=True,
-            watermark='Lorem Ipsum',
-            example='Lorem Ipsum',
-            message='Lorem Ipsun',
-        )
         yield MetadataField(
             name='responseTime',
             key='response_time',

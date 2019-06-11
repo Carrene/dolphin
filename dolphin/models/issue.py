@@ -39,12 +39,11 @@ class RelatedIssue(DeclarativeBase):
     related_issue_id = Field(Integer, ForeignKey('issue.id'), primary_key=True)
 
 
-issue_statuses = [
-    'to-do',
-    'in-progress',
+issue_stages = [
+    'triage',
+    'backlog',
+    'working',
     'on-hold',
-    'complete',
-    'done',
 ]
 
 
@@ -128,15 +127,13 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         not_none=False,
         required=False
     )
-    status = Field(
-        Enum(*issue_statuses, name='issues_status'),
+    stage = Field(
+        Enum(*issue_stages, name='issues_stages'),
         python_type=str,
-        label='Status',
-        watermark='Choose a status',
+        label='Stage',
         not_none=True,
         required=False,
-        default='to-do',
-        example='lorem ipsum',
+        protected=True,
     )
     priority = Field(
         Enum(*issue_priorities, name='priority'),
@@ -184,10 +181,10 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         protected=True,
     )
 
-    items = relationship(
-        'Item',
+    issue_phases = relationship(
+        'IssuePhase',
+        back_populates='issue',
         protected=True,
-        order_by=Item.created_at,
     )
 
     relations = relationship(
@@ -247,10 +244,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
 
     @hybrid_property
     def boarding_value(self):
-        if self.status == 'on-hold':
-            return Boarding.frozen[0]
-
-        elif self.due_date == None:
+        if self.due_date == None:
             return Boarding.frozen[0]
 
         elif self.due_date < datetime.now():
@@ -261,7 +255,6 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
     @boarding_value.expression
     def boarding_value(cls):
         return case([
-            (cls.status == 'on-hold', Boarding.frozen[0]),
             (cls.due_date == None, Boarding.frozen[0]),
             (cls.due_date < datetime.now(), Boarding.delayed[0]),
             (cls.due_date > datetime.now(), Boarding.ontime[0])
@@ -269,10 +262,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
 
     @hybrid_property
     def boarding(self):
-        if self.status == 'on-hold':
-            return Boarding.frozen[1]
-
-        elif self.due_date == None:
+        if self.due_date == None:
             return Boarding.frozen[1]
 
         elif self.due_date < datetime.now():
@@ -283,7 +273,6 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
     @boarding.expression
     def boarding(cls):
         return case([
-            (cls.status == 'on-hold', Boarding.frozen[1]),
             (cls.due_date == None, Boarding.frozen[1]),
             (cls.due_date < datetime.now(), Boarding.delayed[1]),
             (cls.due_date > datetime.now(), Boarding.ontime[1])
