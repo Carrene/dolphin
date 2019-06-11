@@ -804,6 +804,8 @@ class IssuePhaseSummaryController(ModelRestController):
     def list(self):
         phase_summary_view = AbstractPhaseSummaryView \
             .create_mapped_class(self.issue.id)
+        query = DBSession.query(phase_summary_view)
+        return query
 
 
 class IssuePhaseController(ModelRestController):
