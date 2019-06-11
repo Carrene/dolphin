@@ -97,9 +97,6 @@ class TestDailyreport(LocalApplicationTestCase):
         ):
             assert status == 200
             assert response.json['id'] == self.dailyreport.id
-            assert session.query(Dailyreport) \
-                .filter(Dailyreport.date == datetime.now().date()) \
-                .one()
 
             when(
                 'The item in not found',

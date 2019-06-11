@@ -238,37 +238,11 @@ class ItemDailyreportController(ModelRestController):
     def __init__(self, item):
         self.item = item
 
-    def _create_dailyreport_if_needed(self):
-        today = datetime.strptime(
-            datetime.now().date().isoformat(),
-            '%Y-%m-%d'
-        )
-        if Event.isworkingday(DBSession) \
-                and self.item.start_date is not None \
-                and self.item.end_date is not None \
-                and self.item.start_date <=  today \
-                and today <= self.item.end_date:
-            is_dailyreport_exists = DBSession.query(Dailyreport) \
-                .filter(
-                    Dailyreport.date == datetime.now().date(),
-                    Dailyreport.item_id == self.item.id
-                ) \
-                .one_or_none()
-
-            if not is_dailyreport_exists:
-                dailyreport = Dailyreport(
-                    date=datetime.now().date(),
-                    item_id=self.item.id,
-                )
-                DBSession.add(dailyreport)
-                return dailyreport
-
     @authorize
     @json(prevent_form='709 Form Not Allowed')
     @commit
     def get(self, id):
         id = int_or_notfound(id)
-        self._create_dailyreport_if_needed()
         dailyreport = DBSession.query(Dailyreport).get(id)
         if dailyreport is None:
             raise HTTPNotFound()
@@ -300,7 +274,6 @@ class ItemDailyreportController(ModelRestController):
     @Dailyreport.expose
     @commit
     def list(self):
-        self._create_dailyreport_if_needed()
         return DBSession.query(Dailyreport) \
             .filter(Dailyreport.item_id == self.item.id)
 
