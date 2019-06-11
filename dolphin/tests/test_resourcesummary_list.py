@@ -17,7 +17,6 @@ class TestListPhaseSummary(LocalApplicationTestCase):
 
         workflow = Workflow(title='Default')
         skill1 = Skill(title='First Skill')
-
         skill2 = Skill(title='Second Skill')
 
         cls.phase1 = Phase(

@@ -824,7 +824,6 @@ class IssuePhaseController(ModelRestController):
 
     def _get_phase(self, id):
         id = int_or_notfound(id)
-
         phase = DBSession.query(Phase).get(id)
         if phase is None:
             raise HTTPNotFound()
@@ -845,7 +844,6 @@ class IssuePhaseResourceSummaryController(ModelRestController):
     def list(self):
         phase_summary_view = AbstractResourceSummaryView \
             .create_mapped_class(issue_id=self.issue.id, phase_id=self.phase.id)
->>>>>>> Add resource summary view model
         query = DBSession.query(phase_summary_view)
         return query
 
