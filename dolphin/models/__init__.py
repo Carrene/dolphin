@@ -24,4 +24,5 @@ from .dailyreport import Dailyreport
 from .event import Event, event_repeats
 from .admin import Admin
 from .phase_summary import AbstractPhaseSummaryView
+from .resource_summary import AbstractResourceSummaryView
 
