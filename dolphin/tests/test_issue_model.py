@@ -6,7 +6,7 @@ from nanohttp.contexts import Context
 from restfulpy.testing import db
 
 from dolphin.models import Item, Project, Member, Workflow, Group, Release,  \
-    Skill, Phase, Issue
+    Skill, Phase, Issue, IssuePhase
 
 
 def test_issue_due_date(db):
@@ -53,8 +53,6 @@ def test_issue_due_date(db):
                 project=project,
                 title='First issue',
                 description='This is description of first issue',
-                status='in-progress',
-                kind='feature',
                 days=1,
                 room_id=2,
             )
@@ -64,7 +62,6 @@ def test_issue_due_date(db):
                 project=project,
                 title='Second issue',
                 description='This is description of second issue',
-                status='to-do',
                 kind='feature',
                 days=2,
                 room_id=3,
@@ -96,9 +93,27 @@ def test_issue_due_date(db):
             session.add(phase1)
             session.flush()
 
-            item1 = Item(
+            issue_phase1 = IssuePhase(
                 issue_id=issue1.id,
                 phase_id=phase1.id,
+            )
+            session.add(issue_phase1)
+
+            issue_phase2 = IssuePhase(
+                issue_id=issue1.id,
+                phase_id=phase2.id,
+            )
+            session.add(issue_phase2)
+
+            issue_phase3 = IssuePhase(
+                issue_id=issue1.id,
+                phase_id=phase3.id,
+            )
+            session.add(issue_phase3)
+            session.flush()
+
+            item1 = Item(
+                issue_phase_id=issue_phase1.id,
                 member_id=member.id,
                 start_date=datetime.strptime('2020-2-2', '%Y-%m-%d'),
                 end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
@@ -107,8 +122,7 @@ def test_issue_due_date(db):
             session.add(item1)
 
             item2 = Item(
-                issue_id=issue1.id,
-                phase_id=phase2.id,
+                issue_phase_id=issue_phase2.id,
                 member_id=member.id,
                 start_date=datetime.strptime('2020-2-2', '%Y-%m-%d'),
                 end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
@@ -117,8 +131,7 @@ def test_issue_due_date(db):
             session.add(item2)
 
             item3 = Item(
-                issue_id=issue1.id,
-                phase_id=phase3.id,
+                issue_phase_id=issue_phase3.id,
                 member_id=member.id,
                 start_date=datetime.strptime('2019-2-2', '%Y-%m-%d'),
                 end_date=datetime.strptime('2019-2-3', '%Y-%m-%d'),
@@ -127,6 +140,6 @@ def test_issue_due_date(db):
             session.add(item3)
             session.commit()
 
-    assert issue1.due_date == item3.end_date
+    assert issue1.due_date == item2.end_date
     assert issue2.due_date == None
 

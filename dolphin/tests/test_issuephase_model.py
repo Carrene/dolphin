@@ -18,16 +18,10 @@ def test_issue_phase(db):
             phone=123456789,
             reference_id=2,
         )
-        session.add(member1)
 
         workflow = Workflow(title='Default')
-        session.add(workflow)
-
         skill = Skill(title='First Skill')
-        session.add(skill)
-
         group = Group(title='default')
-        session.add(group)
 
         release = Release(
             title='My first release',
@@ -38,7 +32,6 @@ def test_issue_phase(db):
             room_id=0,
             group=group,
         )
-        session.add(release)
 
         project = Project(
             release=release,
@@ -49,7 +42,6 @@ def test_issue_phase(db):
             description='A decription for my project',
             room_id=1,
         )
-        session.add(project)
 
         issue1 = Issue(
             project=project,
@@ -80,9 +72,14 @@ def test_issue_phase(db):
         item = Item(
             issue_phase_id=issue_phase.id,
             member_id=member1.id,
+            start_date=datetime.strptime('2019-1-2', '%Y-%m-%d'),
+            end_date=datetime.strptime('2019-2-2', '%Y-%m-%d'),
+            estimated_hours=5,
         )
         session.add(item)
-        session.commit()
+        session.flush()
+
+        assert issue_phase.status == 'to-do'
 
         dailyreport1 = Dailyreport(
             date=datetime.strptime('2019-1-2', '%Y-%m-%d').date(),
@@ -93,13 +90,20 @@ def test_issue_phase(db):
         session.add(dailyreport1)
         session.commit()
 
-        assert issue_phase.status == 'to-do'
+        session = db()
+        issue_phase = session.query(IssuePhase).get(issue_phase.id)
+
+        assert issue_phase.status == 'in-progress'
 
         dailyreport2 = Dailyreport(
             date=datetime.strptime('2019-1-3', '%Y-%m-%d').date(),
             hours=3,
-            item=item,
+            item_id=item.id,
         )
         session.add(dailyreport2)
         session.commit()
+
+        session = db()
+        issue_phase = session.query(IssuePhase).get(issue_phase.id)
+        assert issue_phase.status == 'complete'
 

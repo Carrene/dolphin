@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from auditor import observe
 from nanohttp import context
 from restfulpy.orm import Field, DeclarativeBase, relationship, \
@@ -10,6 +12,8 @@ from sqlalchemy.orm import column_property
 
 from ..mixins import ModifiedByMixin
 from .member import Member
+from .item import Item
+from .issue_phase import IssuePhase
 from .subscribable import Subscribable, Subscription
 
 
@@ -155,13 +159,6 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         back_populates='issues',
         protected=False
     )
-#    members = relationship(
-#        'Member',
-#        secondary='item',
-#        back_populates='issues',
-#        lazy='selectin',
-#        protected=True,
-#    )
     draft_issue = relationship(
         'DraftIssue',
         back_populates='issue',
@@ -184,18 +181,14 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         secondaryjoin=id == RelatedIssue.related_issue_id,
         lazy='selectin',
     )
-#    _active_phase_order_subquery = select([func.max(Phase.order)]) \
-#        .select_from(join(Item, Phase, Item.phase_id == Phase.id)) \
-#        .where(Item.issue_id == id) \
-#        .correlate_except(Phase)
-#
-#    due_date = column_property(
-#        select([func.max(Item.end_date)]) \
-#        .select_from(join(Item, Phase, Item.phase_id == Phase.id)) \
-#        .where(Phase.order == _active_phase_order_subquery) \
-#        .where(Item.issue_id == id) \
-#        .correlate_except(Item)
-#    )
+    due_date = column_property(
+        select([func.max(Item.end_date)]) \
+        .select_from(
+            join(IssuePhase, Item, IssuePhase.id == Item.issue_phase_id)
+        ) \
+        .where(IssuePhase.issue_id == id) \
+        .correlate_except(Item)
+    )
     is_subscribed = column_property(
         select([func.count(Subscription.member_id)])
         .select_from(
@@ -228,42 +221,42 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         .correlate_except(Subscription),
         deferred=True
     )
-#    @hybrid_property
-#    def boarding_value(self):
-#        if self.due_date == None:
-#            return Boarding.frozen[0]
-#
-#        elif self.due_date < datetime.now():
-#            return Boarding.delayed[0]
-#
-#        return Boarding.ontime[0]
-#
-#    @boarding_value.expression
-#    def boarding_value(cls):
-#        return case([
-#            (cls.due_date == None, Boarding.frozen[0]),
-#            (cls.due_date < datetime.now(), Boarding.delayed[0]),
-#            (cls.due_date > datetime.now(), Boarding.ontime[0])
-#        ])
-#
-#    @hybrid_property
-#    def boarding(self):
-#        if self.due_date == None:
-#            return Boarding.frozen[1]
-#
-#        elif self.due_date < datetime.now():
-#            return Boarding.delayed[1]
-#
-#        return Boarding.ontime[1]
-#
-#    @boarding.expression
-#    def boarding(cls):
-#        return case([
-#            (cls.due_date == None, Boarding.frozen[1]),
-#            (cls.due_date < datetime.now(), Boarding.delayed[1]),
-#            (cls.due_date > datetime.now(), Boarding.ontime[1])
-#        ])
-#
+    @hybrid_property
+    def boarding_value(self):
+        if self.due_date == None:
+            return Boarding.frozen[0]
+
+        elif self.due_date < datetime.now():
+            return Boarding.delayed[0]
+
+        return Boarding.ontime[0]
+
+    @boarding_value.expression
+    def boarding_value(cls):
+        return case([
+            (cls.due_date == None, Boarding.frozen[0]),
+            (cls.due_date < datetime.now(), Boarding.delayed[0]),
+            (cls.due_date > datetime.now(), Boarding.ontime[0])
+        ])
+
+    @hybrid_property
+    def boarding(self):
+        if self.due_date == None:
+            return Boarding.frozen[1]
+
+        elif self.due_date < datetime.now():
+            return Boarding.delayed[1]
+
+        return Boarding.ontime[1]
+
+    @boarding.expression
+    def boarding(cls):
+        return case([
+            (cls.due_date == None, Boarding.frozen[1]),
+            (cls.due_date < datetime.now(), Boarding.delayed[1]),
+            (cls.due_date > datetime.now(), Boarding.ontime[1])
+        ])
+
     @hybrid_property
     def priority_value(self):
         return getattr(Priority, self.priority)[0]
@@ -388,9 +381,9 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         issue_dict['seenAt'] = \
             self.seen_at.isoformat() if self.seen_at else None
         issue_dict['items'] = items_list
-#        issue_dict['dueDate'] = \
-#            self.due_date.isoformat() if self.due_date else None
-#
+        issue_dict['dueDate'] = \
+            self.due_date.isoformat() if self.due_date else None
+
         if include_relations:
             issue_dict['relations'] = []
             for x in self.relations:

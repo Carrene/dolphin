@@ -1,5 +1,10 @@
 from restfulpy.orm import Field, DeclarativeBase, relationship
-from sqlalchemy import Integer, ForeignKey, Enum
+from sqlalchemy import Integer, ForeignKey, Enum, join, select, func, case
+from sqlalchemy.orm import column_property
+from sqlalchemy.sql.expression import any_
+
+from .item import Item
+from .dailyreport import Dailyreport
 
 
 issue_phase_statuses = [
@@ -22,18 +27,6 @@ class IssuePhase(DeclarativeBase):
         minimum=1,
         example=1,
         protected=False,
-    )
-    status = Field(
-        Enum(*issue_phase_statuses, name='issue_phase_status'),
-        python_type=str,
-        label='Status',
-        protected=True,
-        not_none=True,
-        required=False,
-        default='to-do',
-        example='Lorem ipsum',
-        message='Lorem ipsum',
-        watermark='Lorem ipsum',
     )
     phase_id = Field(
         Integer,
@@ -73,5 +66,17 @@ class IssuePhase(DeclarativeBase):
         foreign_keys=phase_id,
         back_populates='issue_phases',
         protected=False,
+    )
+
+    status = column_property(
+        select([
+            case([
+                (Item.estimated_hours <= (select([func.sum(Dailyreport.hours)]).group_by(Dailyreport.hours)), 'complete'),
+                (any_(select([Dailyreport.id])) == 1, 'in-progress'),
+            ],
+            else_='to-do'
+            )
+        ])
+        .correlate_except(Item),
     )
 
