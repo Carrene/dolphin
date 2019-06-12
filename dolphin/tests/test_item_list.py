@@ -293,7 +293,7 @@ class TestListGroup(LocalApplicationTestCase):
                 'Filter by issue boarding',
                 query=dict(issueBoarding=self.issue1.boarding)
             )
-            assert len(response.json) == 2
+            assert len(response.json) == 3
 
             when(
                 'Filter by project title',
@@ -347,7 +347,7 @@ class TestListGroup(LocalApplicationTestCase):
             )
             assert len(response.json) == 4
             assert response.json[0]['id'] == self.item2.id
-            assert response.json[1]['id'] == self.item4.id
+            assert response.json[1]['id'] == self.item3.id
 
             when(
                 'Reverse sort by issue boarding',
