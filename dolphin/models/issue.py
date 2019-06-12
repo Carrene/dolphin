@@ -221,6 +221,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         .correlate_except(Subscription),
         deferred=True
     )
+
     @hybrid_property
     def boarding_value(self):
         if self.due_date == None:
