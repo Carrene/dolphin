@@ -367,12 +367,18 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         # this causes recursively getting the instances of `issue` and `item`
         # model. But there is some field from Item model that is needed in Issue
         # which are appended to Issue.to_dict return value manually.
-        items_list = []
-        for item in self.items:
-            items_list.append(dict(
-                memberId=item.member_id,
-                phaseId=item.phase_id,
-                createdAt=item.created_at,
+        issue_phases_list = []
+        for issue_phase in self.issue_phases:
+            items_list = []
+            for item in issue_phase.items:
+                items_list.append(dict(
+                    createdAt=item.created_at,
+                    memberId=item.member_id,
+                ))
+
+            issue_phases_list.append(dict(
+                phaseId=item.issue_phase.phase_id,
+                items=items_list,
             ))
 
         issue_dict = super().to_dict()

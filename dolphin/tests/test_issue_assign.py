@@ -141,6 +141,7 @@ class TestIssue(LocalApplicationTestCase):
                 'Member id is not in form',
                 form=Remove('memberId'),
             )
+            import pudb; pudb.set_trace()  # XXX BREAKPOINT
             assert len(response.json['items']) == 2
 
             when(

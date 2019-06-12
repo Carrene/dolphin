@@ -17,7 +17,7 @@ from ..exceptions import StatusRoomMemberAlreadyExist, \
     StatusQueryParameterNotInFormOrQueryString
 from ..models import Issue, Subscription, Phase, Item, Member, Project, \
     RelatedIssue, Subscribable, IssueTag, Tag, Resource, SkillMember, \
-    AbstractResourceSummaryView, AbstractPhaseSummaryView
+    AbstractResourceSummaryView, AbstractPhaseSummaryView, IssuePhase
 from ..validators import update_issue_validator, assign_issue_validator, \
     issue_move_validator, unassign_issue_validator, issue_relate_validator, \
     issue_unrelate_validator, search_issue_validator
@@ -457,6 +457,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     def assign(self, id):
         form = context.form
         id = int_or_notfound(id)
+        import pudb; pudb.set_trace()  # XXX BREAKPOINT
 
         issue = DBSession.query(Issue).get(id)
         if not issue:
@@ -467,19 +468,31 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         phase = DBSession.query(Phase).get(form['phaseId'])
 
+        phase_issue = DBSession.query(IssuePhase). \
+            filter(
+                IssuePhase.issue_id == id,
+                IssuePhase.phase_id == phase.id
+            ).one_or_none()
+
+        if phase_issue is None:
+            phase_issue = IssuePhase(
+                issue_id = id,
+                phase_id = phase.id
+            )
+            DBSession.add(phase_issue)
+            DBSession.flush()
+
         if DBSession.query(Item) \
                 .filter(
-                    Item.phase_id == phase.id,
+                    Item.issue_phase_id == phase_issue.id,
                     Item.member_id == member.id,
-                    Item.issue_id == issue.id
                 ) \
                 .one_or_none():
             raise HTTPStatus('602 Already Assigned')
 
         item = Item(
-            phase_id=phase.id,
             member_id=member.id,
-            issue_id=issue.id
+            issue_phase_id=phase_issue.id
         )
         DBSession.add(item)
 
