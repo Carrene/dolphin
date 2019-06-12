@@ -12,12 +12,6 @@ from sqlalchemy.orm import column_property, synonym
 from .dailyreport import Dailyreport
 
 
-item_statuses = [
-    'in-progress',
-    'done',
-]
-
-
 class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
            DeclarativeBase):
     __tablename__ = 'item'
@@ -71,16 +65,6 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         not_none=False,
         required=False,
     )
-    _status = Field(
-        Enum(*item_statuses, name='item_status'),
-        python_type=str,
-        default='in-progress',
-        label='Status',
-        watermark='Choose a status',
-        nullable=True,
-        required=False,
-        example='Lorem Ipsum'
-    )
     description = Field(
         String,
         min_length=1,
@@ -114,12 +98,6 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         not_none=True,
         required=True,
         example='Lorem Ipsum'
-    )
-    _last_status_change = Field(
-        DateTime,
-        python_type=datetime,
-        nullable=True,
-        protected=True,
     )
     issue_phase = relationship(
         'IssuePhase',
@@ -161,26 +139,10 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
         return 'Submitted'
 
-    def _set_status(self, status):
-        if status == 'in-progress':
-            self._last_status_change = datetime.now()
-
-        self._status = status
-
-    def _get_status(self):
-        return self._status
-
-    status = synonym(
-        '_status',
-        descriptor=property(_get_status, _set_status),
-        info=dict(protected=True)
-    )
-
     @property
     def response_time(self):
-        if self.status == 'in-progress':
           return (
-              (self._last_status_change or self.created_at) + \
+              self.created_at + \
               timedelta(hours=settings.item.response_time)
           ) - datetime.now()
 

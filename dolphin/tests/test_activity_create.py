@@ -4,7 +4,7 @@ from bddrest import status, response, when, Update
 from auditor.context import Context as AuditLogContext
 
 from dolphin.models import Member, Skill, Phase, Release, \
-    Project, Issue, Item
+    Project, Issue, Item, IssuePhase
 from dolphin.tests.helpers import create_group, LocalApplicationTestCase, \
     oauth_mockup_server, create_workflow
 
@@ -22,14 +22,6 @@ class TestActivity(LocalApplicationTestCase):
             access_token='access token 1',
             phone=123456789,
             reference_id=1
-        )
-
-        member2 = Member(
-            title='Second Member',
-            email='member2@example.com',
-            access_token='access token 2',
-            phone=1234567890,
-            reference_id=2
         )
 
         workflow = create_workflow()
@@ -94,27 +86,37 @@ class TestActivity(LocalApplicationTestCase):
         session.add(cls.issue2)
         session.flush()
 
-        old_item = Item(
+        issue_phase1 = IssuePhase(
             issue_id=cls.issue1.id,
             phase_id=phase2.id,
+        )
+        session.add(issue_phase1)
+        session.flush()
+
+        old_item = Item(
+            issue_phase_id=issue_phase1.id,
             member_id=cls.member.id,
         )
         session.add(old_item)
 
-        cls.item = Item(
+        issue_phase2 = IssuePhase(
             issue_id=cls.issue1.id,
             phase_id=cls.phase1.id,
+        )
+        session.add(issue_phase2)
+        session.flush()
+
+        cls.item = Item(
+            issue_phase_id=issue_phase2.id,
             member_id=cls.member.id,
         )
         session.add(cls.item)
 
-        cls.item_for_someone_else = Item(
+        issue_phase3 = IssuePhase(
             issue_id=cls.issue2.id,
             phase_id=cls.phase1.id,
-            member_id=member2.id,
         )
-        session.add(cls.item)
-
+        session.add(issue_phase3)
         session.commit()
 
     def test_create(self):

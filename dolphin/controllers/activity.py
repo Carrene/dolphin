@@ -7,7 +7,7 @@ from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from sqlalchemy import and_
 
-from ..models import Activity, Member, Item
+from ..models import Activity, Member, Item, IssuePhase
 
 
 class ActivityController(ModelRestController):
@@ -30,12 +30,9 @@ class ActivityController(ModelRestController):
         member = Member.current()
 
         item = DBSession.query(Item) \
-            .filter(
-                and_(
-                    Item.member_id == member.id,
-                    Item.issue_id == self.issue.id
-                )
-            ) \
+            .join(IssuePhase, IssuePhase.id == Item.issue_phase_id) \
+            .filter(Item.member_id == member.id) \
+            .filter(IssuePhase.issue_id == self.issue.id) \
             .order_by(Item.created_at.desc()) \
             .first()
 

@@ -53,7 +53,7 @@ class IssuePhase(DeclarativeBase):
     items = relationship(
         'Item',
         back_populates='issue_phase',
-        protected=False,
+        protected=True,
     )
     issue = relationship(
         'Issue',
@@ -71,12 +71,13 @@ class IssuePhase(DeclarativeBase):
     status = column_property(
         select([
             case([
-                (Item.estimated_hours <= (select([func.sum(Dailyreport.hours)]).group_by(Dailyreport.hours)), 'complete'),
+                (Item.estimated_hours <= (select([func.sum(Dailyreport.hours)]).group_by(Dailyreport.item_id)), 'complete'),
                 (any_(select([Dailyreport.id])) == 1, 'in-progress'),
             ],
             else_='to-do'
-            )
+            ).label('status')
         ])
+        .where(Item.issue_phase_id == id)
         .correlate_except(Item),
     )
 
