@@ -18,9 +18,17 @@ def test_issue_phase(db):
             phone=123456789,
             reference_id=2,
         )
+        session.add(member1)
+
         workflow = Workflow(title='Default')
+        session.add(workflow)
+
         skill = Skill(title='First Skill')
+        session.add(skill)
+
         group = Group(title='default')
+        session.add(group)
+
         release = Release(
             title='My first release',
             description='A decription for my first release',
@@ -30,6 +38,8 @@ def test_issue_phase(db):
             room_id=0,
             group=group,
         )
+        session.add(release)
+
         project = Project(
             release=release,
             workflow=workflow,
@@ -39,6 +49,8 @@ def test_issue_phase(db):
             description='A decription for my project',
             room_id=1,
         )
+        session.add(project)
+
         issue1 = Issue(
             project=project,
             title='First issue',
@@ -48,6 +60,7 @@ def test_issue_phase(db):
             room_id=2,
         )
         session.add(issue1)
+
         phase1 = Phase(
             title='backlog',
             order=-1,
@@ -80,36 +93,13 @@ def test_issue_phase(db):
         session.add(dailyreport1)
         session.commit()
 
-    assert issue_phase.status == 'in-progress'
+        assert issue_phase.status == 'to-do'
 
-#        dailyreport2 = Dailyreport(
-#            date=datetime.strptime('2019-1-3', '%Y-%m-%d').date(),
-#            hours=3,
-#            item=item,
-#        )
-#        session.add(dailyreport2)
-#        session.commit()
-#
-#        assert item.perspective == 'Overdue'
-#
-#        dailyreport2.note = 'The note for a daily report'
-#        session.commit()
-#
-#        assert item.perspective == 'Submitted'
-#
-#        dailyreport3 = Dailyreport(
-#            date=datetime.now().date(),
-#            hours=3,
-#            item=item,
-#        )
-#        session.add(dailyreport3)
-#        session.commit()
-#
-#        assert item.perspective == 'Due'
-#
-#        dailyreport3.note = 'The note for a daily report'
-#        session.commit()
-#
-#        assert item.perspective == 'Submitted'
-
+        dailyreport2 = Dailyreport(
+            date=datetime.strptime('2019-1-3', '%Y-%m-%d').date(),
+            hours=3,
+            item=item,
+        )
+        session.add(dailyreport2)
+        session.commit()
 

@@ -5,8 +5,8 @@ from nanohttp import context
 from restfulpy.orm import DeclarativeBase, Field, relationship, DBSession, \
     SoftDeleteMixin, ModifiedMixin, FilteringMixin, PaginationMixin, \
     OrderingMixin
-from restfulpy.principal import JwtRefreshToken
 from restfulpy.orm.metadata import MetadataField
+from restfulpy.principal import JwtRefreshToken
 from sqlalchemy import Integer, String, Unicode, BigInteger, select, bindparam
 from sqlalchemy.orm import column_property
 
@@ -118,9 +118,9 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         protected=True
     )
 
-    item = relationship(
+    items = relationship(
         'Item',
-        back_populates='members',
+        back_populates='member',
         protected=True
     )
     organizations = relationship(

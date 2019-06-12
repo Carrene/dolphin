@@ -1,15 +1,5 @@
-from datetime import datetime, timedelta
-
-from nanohttp import settings
 from restfulpy.orm import Field, DeclarativeBase, relationship
-from restfulpy.orm.metadata import MetadataField
-from restfulpy.orm.mixins import TimestampMixin, OrderingMixin, \
-    FilteringMixin, PaginationMixin
-from sqlalchemy import Integer, ForeignKey, UniqueConstraint, DateTime, Enum, \
-    String, select, func
-from sqlalchemy.orm import column_property, synonym
-
-from .dailyreport import Dailyreport
+from sqlalchemy import Integer, ForeignKey, Enum
 
 
 issue_phase_statuses = [
@@ -32,6 +22,18 @@ class IssuePhase(DeclarativeBase):
         minimum=1,
         example=1,
         protected=False,
+    )
+    status = Field(
+        Enum(*issue_phase_statuses, name='issue_phase_status'),
+        python_type=str,
+        label='Status',
+        protected=True,
+        not_none=True,
+        required=False,
+        default='to-do',
+        example='Lorem ipsum',
+        message='Lorem ipsum',
+        watermark='Lorem ipsum',
     )
     phase_id = Field(
         Integer,

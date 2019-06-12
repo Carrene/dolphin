@@ -5,8 +5,8 @@ from restfulpy.orm import Field, DeclarativeBase, relationship
 from restfulpy.orm.metadata import MetadataField
 from restfulpy.orm.mixins import TimestampMixin, OrderingMixin, \
     FilteringMixin, PaginationMixin
-from sqlalchemy import Integer, ForeignKey, UniqueConstraint, DateTime, Enum, \
-    String, select, func
+from sqlalchemy import Integer, ForeignKey, DateTime, Enum, String, select, \
+    func
 from sqlalchemy.orm import column_property, synonym
 
 from .dailyreport import Dailyreport
@@ -121,12 +121,17 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         nullable=True,
         protected=True,
     )
-
     issue_phase = relationship(
         'IssuePhase',
         foreign_keys=issue_phase_id,
         back_populates='items',
         protected=False,
+    )
+    member = relationship(
+        'Member',
+        foreign_keys=member_id,
+        back_populates='items',
+        protected=True,
     )
     dailyreports = relationship(
         'Dailyreport',
@@ -135,7 +140,6 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         lazy='selectin',
         order_by='Dailyreport.id',
     )
-
     hours_worked = column_property(
         select([func.sum(Dailyreport.hours)])
         .where(Dailyreport.item_id == id)
