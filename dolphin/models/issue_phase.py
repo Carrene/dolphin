@@ -1,5 +1,6 @@
 from restfulpy.orm import Field, DeclarativeBase, relationship
-from sqlalchemy import Integer, ForeignKey, Enum, join, select, func, case
+from sqlalchemy import Integer, ForeignKey, Enum, join, select, func, case, \
+    text
 from sqlalchemy.orm import column_property
 from sqlalchemy.sql.expression import any_
 
@@ -81,6 +82,6 @@ class IssuePhase(DeclarativeBase):
             ).label('status')
         ])
         .where(Item.issue_phase_id == id)
-        .correlate_except(Item),
+        .group_by(text('status'))
     )
 

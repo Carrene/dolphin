@@ -5,7 +5,7 @@ from restfulpy.testing import db
 from auditor.context import Context as AuditLogContext
 
 from dolphin.models import Resource, Group, Workflow, Skill, Phase, Release, \
-    Project, Issue, Item
+    Project, Issue, Item, IssuePhase
 
 
 def test_resource_load(db):
@@ -126,16 +126,28 @@ def test_resource_load(db):
         session.flush()
 
         # Resource 1 assignments
-        item1 = Item(
+        issue_phase1 = IssuePhase(
             issue_id=issue1.id,
             phase_id=phase1.id,
+        )
+        session.add(issue_phase1)
+        session.flush()
+
+        item1 = Item(
+            issue_phase_id=issue_phase1.id,
             member_id=resource1.id,
         )
         session.add(item1)
 
-        item2 = Item(
+        issue_phase2 = IssuePhase(
             issue_id=issue2.id,
             phase_id=phase1.id,
+        )
+        session.add(issue_phase2)
+        session.flush()
+
+        item2 = Item(
+            issue_phase_id=issue_phase2.id,
             member_id=resource1.id,
             start_date=datetime.strptime('2020-2-2', '%Y-%m-%d'),
             end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
@@ -143,9 +155,15 @@ def test_resource_load(db):
         )
         session.add(item2)
 
-        item3 = Item(
+        issue_phase3 = IssuePhase(
             issue_id=issue3.id,
             phase_id=phase1.id,
+        )
+        session.add(issue_phase3)
+        session.flush()
+
+        item3 = Item(
+            issue_phase_id=issue_phase3.id,
             member_id=resource1.id,
             start_date=datetime.strptime('2018-2-2', '%Y-%m-%d'),
             end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
@@ -154,9 +172,15 @@ def test_resource_load(db):
         session.add(item3)
 
         # Resource 2 assignments
-        item4 = Item(
+        issue_phase4 = IssuePhase(
             issue_id=issue1.id,
             phase_id=phase1.id,
+        )
+        session.add(issue_phase4)
+        session.flush()
+
+        item4 = Item(
+            issue_phase_id=issue_phase4.id,
             member_id=resource2.id,
             start_date=datetime.strptime('2018-2-2', '%Y-%m-%d'),
             end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
@@ -164,9 +188,15 @@ def test_resource_load(db):
         )
         session.add(item4)
 
-        item5 = Item(
+        issue_phase5 = IssuePhase(
             issue_id=issue2.id,
             phase_id=phase1.id,
+        )
+        session.add(issue_phase5)
+        session.flush()
+
+        item5 = Item(
+            issue_phase_id=issue_phase5.id,
             member_id=resource2.id,
             start_date=datetime.strptime('2018-2-2', '%Y-%m-%d'),
             end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
@@ -175,9 +205,15 @@ def test_resource_load(db):
         session.add(item5)
 
         # Resource 3 assignments
-        item6 = Item(
+        issue_phase6 = IssuePhase(
             issue_id=issue2.id,
             phase_id=phase1.id,
+        )
+        session.add(issue_phase6)
+        session.flush()
+
+        item6 = Item(
+            issue_phase_id=issue_phase6.id,
             member_id=resource3.id,
             start_date=datetime.strptime('2018-2-2', '%Y-%m-%d'),
             end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),

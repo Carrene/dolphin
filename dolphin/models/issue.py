@@ -239,7 +239,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
     status = column_property(
         select([IssuePhase.status])
         .where(IssuePhase.phase_id == lead_phase.expression)
-        .where(IssuePhase.issue_id == id)
+        .where(IssuePhase.issue_id == id),
     )
 
     @hybrid_property
