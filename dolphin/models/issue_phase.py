@@ -71,7 +71,10 @@ class IssuePhase(DeclarativeBase):
     status = column_property(
         select([
             case([
-                (Item.estimated_hours <= (select([func.sum(Dailyreport.hours)]).group_by(Dailyreport.item_id)), 'complete'),
+                (Item.estimated_hours <= (
+                    select([func.sum(Dailyreport.hours)])
+                    .group_by(Dailyreport.item_id)
+                ), 'complete'),
                 (any_(select([Dailyreport.id])) == 1, 'in-progress'),
             ],
             else_='to-do'

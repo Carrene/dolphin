@@ -236,6 +236,12 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         .limit(1)
     )
 
+    status = column_property(
+        select([IssuePhase.status])
+        .where(IssuePhase.phase_id == lead_phase.expression)
+        .where(IssuePhase.issue_id == id)
+    )
+
     @hybrid_property
     def boarding_value(self):
         if self.due_date == None:
