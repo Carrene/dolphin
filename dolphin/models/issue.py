@@ -13,6 +13,7 @@ from sqlalchemy.orm import column_property
 from ..mixins import ModifiedByMixin
 from .member import Member
 from .item import Item
+from .phase import Phase
 from .issue_phase import IssuePhase
 from .subscribable import Subscribable, Subscription
 
@@ -220,6 +221,19 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         .where(Subscription.one_shot.is_(None))
         .correlate_except(Subscription),
         deferred=True
+    )
+
+    _not_estimated_phases = select([Item.issue_phase_id]) \
+        .where(Item.estimated_hours.is_(None)) \
+        .group_by(Item.issue_phase_id)
+
+    lead_phase = column_property(
+        select([IssuePhase.phase_id])
+        .select_from(join(IssuePhase, Phase, IssuePhase.phase_id == Phase.id))
+        .where(IssuePhase.id.notin_(_not_estimated_phases))
+        .where(IssuePhase.issue_id == id)
+        .order_by(Phase.order.desc())
+        .limit(1)
     )
 
     @hybrid_property

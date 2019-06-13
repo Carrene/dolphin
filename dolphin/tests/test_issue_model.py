@@ -146,6 +146,7 @@ from dolphin.models import Item, Project, Member, Workflow, Group, Release,  \
 
 def test_issue_lead_phase(db):
     session = db()
+    session.expire_on_commit = True
 
     with AuditLogContext(dict()):
         member = Member(
@@ -276,9 +277,6 @@ def test_issue_lead_phase(db):
             item3 = Item(
                 issue_phase_id=issue_phase2.id,
                 member_id=member2.id,
-                start_date=datetime.strptime('2019-2-2', '%Y-%m-%d'),
-                end_date=datetime.strptime('2019-2-3', '%Y-%m-%d'),
-                estimated_hours=4,
             )
             session.add(item3)
 
@@ -289,6 +287,9 @@ def test_issue_lead_phase(db):
             session.add(item4)
             session.commit()
 
-        import pudb; pudb.set_trace()  # XXX BREAKPOINT
+        assert issue1.lead_phase == phase1.id
+
+        item3.estimated_hours = 4
+        session.commit()
         assert issue1.lead_phase == phase2.id
 
