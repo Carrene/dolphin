@@ -269,8 +269,8 @@ class TestProject(LocalApplicationTestCase):
                     'Sorting project by due dates',
                     query=dict(sort='dueDate')
                 )
-                assert response.json[0]['dueDate'] == '2019-02-03T00:00:00'
-                assert response.json[1]['dueDate'] == '2020-02-03T00:00:00'
+                assert response.json[0]['dueDate'] == '2020-02-03T00:00:00'
+                assert response.json[1]['dueDate'] == None
 
                 when(
                     'Sorting project by due dates',
@@ -278,8 +278,8 @@ class TestProject(LocalApplicationTestCase):
                 )
                 assert response.json[0]['dueDate'] == None
                 assert response.json[1]['dueDate'] == None
-                assert response.json[2]['dueDate'] == '2020-02-03T00:00:00'
-                assert response.json[3]['dueDate'] == '2019-02-03T00:00:00'
+                assert response.json[2]['dueDate'] == None
+                assert response.json[3]['dueDate'] == '2020-02-03T00:00:00'
                 when(
                     'Sorting project by "isSubscribed" field',
                     query=dict(sort='isSubscribed')

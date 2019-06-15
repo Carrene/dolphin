@@ -4,6 +4,7 @@ from sqlalchemy import Integer, Unicode, select, join, DateTime, func
 from sqlalchemy.orm import mapper
 
 from . import Phase, Item, Resource, Dailyreport, SkillMember
+from .issue_phase import IssuePhase
 
 
 class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
@@ -27,8 +28,15 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
     @classmethod
     def create_mapped_class(cls, issue_id, phase_id):
         item_cte = select([Item]) \
-            .where(Item.issue_id == issue_id) \
-            .where(Item.phase_id == phase_id) \
+            .select_from(
+                join(
+                    Item,
+                    IssuePhase,
+                    IssuePhase.id == Item.issue_phase_id
+                )
+            ) \
+            .where(IssuePhase.issue_id == issue_id) \
+            .where(IssuePhase.phase_id == phase_id) \
             .cte()
 
         dailyreport_cte = select([

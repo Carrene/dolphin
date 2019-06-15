@@ -73,7 +73,7 @@ class TestDraftIssue(LocalApplicationTestCase):
                 form=dict(a='a'),
             )
             assert status == '707 Invalid field, only following fields are ' \
-                'accepted: title, description, kind, days, status, projectId,' \
+                'accepted: title, description, kind, days, stage, projectId,' \
                 ' priority, relatedIssueId'
 
             when('Request is not authorized', authorization=None)

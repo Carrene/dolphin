@@ -4,7 +4,7 @@ from bddrest import status, response, when, given
 from auditor.context import Context as AuditLogContext
 
 from dolphin.models import Member, Group, Workflow, Skill, Phase, Release, \
-    Project, Issue, Item, Admin
+    Project, Issue, Item, Admin, IssuePhase
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -121,9 +121,13 @@ class TestListPhaseSummary(LocalApplicationTestCase):
         session.add(cls.issue2)
         session.flush()
 
-        cls.item1 = Item(
+        issue_phase1 = IssuePhase(
             issue_id=cls.issue1.id,
             phase_id=cls.phase1.id,
+        )
+
+        cls.item1 = Item(
+            issue_phase=issue_phase1,
             member_id=cls.member1.id,
             start_date=datetime.strptime('2020-2-2', '%Y-%m-%d'),
             end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
@@ -131,9 +135,13 @@ class TestListPhaseSummary(LocalApplicationTestCase):
         )
         session.add(cls.item1)
 
-        cls.item2 = Item(
+        issue_phase2 = IssuePhase(
             issue_id=cls.issue1.id,
             phase_id=cls.phase1.id,
+        )
+
+        cls.item2 = Item(
+            issue_phase=issue_phase1,
             member_id=cls.member2.id,
             start_date=datetime.strptime('2020-2-2', '%Y-%m-%d'),
             end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
@@ -141,9 +149,13 @@ class TestListPhaseSummary(LocalApplicationTestCase):
         )
         session.add(cls.item2)
 
-        cls.item3 = Item(
+        issue_phase3 = IssuePhase(
             issue_id=cls.issue1.id,
             phase_id=cls.phase2.id,
+        )
+
+        cls.item3 = Item(
+            issue_phase=issue_phase3,
             member_id=cls.member1.id,
             start_date=datetime.strptime('2018-2-2', '%Y-%m-%d'),
             end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
@@ -151,9 +163,13 @@ class TestListPhaseSummary(LocalApplicationTestCase):
         )
         session.add(cls.item3)
 
-        cls.item4 = Item(
+        issue_phase4 = IssuePhase(
             issue_id=cls.issue1.id,
             phase_id=cls.phase2.id,
+        )
+
+        cls.item4 = Item(
+            issue_phase=issue_phase3,
             member_id=cls.member2.id,
             start_date=datetime.strptime('2018-2-2', '%Y-%m-%d'),
             end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
@@ -161,11 +177,14 @@ class TestListPhaseSummary(LocalApplicationTestCase):
         )
         session.add(cls.item4)
 
-        cls.item5 = Item(
+        issue_phase5 = IssuePhase(
             issue_id=cls.issue2.id,
             phase_id=cls.phase2.id,
+        )
+
+        cls.item5 = Item(
+            issue_phase=issue_phase5,
             member_id=cls.member1.id,
-            status='done',
         )
         session.add(cls.item5)
         session.commit()

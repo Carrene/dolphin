@@ -181,6 +181,12 @@ class StatusInvalidStagesValue(HTTPKnownStatus):
             f'"{", ".join(stages_values)}" will be accepted'
 
 
+class StatusInvalidStatusValue(HTTPKnownStatus):
+    def __init__(self, statuses_values):
+        self.status = f'705 Invalid status value, only one of ' \
+            f'"{", ".join(statuses_values)}" will be accepted'
+
+
 class StatusProjectNotFound(HTTPKnownStatus):
     status = '601 Project Not Found'
 
