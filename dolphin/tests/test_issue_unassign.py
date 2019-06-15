@@ -1,8 +1,10 @@
 from auditor.context import Context as AuditLogContext
 from bddrest import status, when, response, Update, Remove
+from nanohttp import context
+from nanohttp.contexts import Context
 
 from dolphin.models import Issue, Project, Member, Phase, Group, Workflow, \
-    Item, Release, Skill
+    Item, Release, Skill, IssuePhase
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -54,34 +56,41 @@ class TestIssue(LocalApplicationTestCase):
             room_id=1
         )
 
-        cls.issue1 = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(cls.issue1)
+        with Context(dict()):
+            context.identity = cls.member
 
-        cls.issue2 = Issue(
-            project=project,
-            title='Second issue',
-            description='This is description of second issue',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(cls.issue2)
-        session.flush()
+            cls.issue1 = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(cls.issue1)
 
-        item = Item(
-            issue_id=cls.issue1.id,
-            phase_id=cls.phase1.id,
-            member_id=cls.member.id,
-        )
-        session.add(item)
-        session.commit()
+            cls.issue2 = Issue(
+                project=project,
+                title='Second issue',
+                description='This is description of second issue',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(cls.issue2)
+            session.flush()
+
+            issue_phase1 = IssuePhase(
+                issue=cls.issue1,
+                phase=cls.phase1,
+            )
+
+            item = Item(
+                issue_phase=issue_phase1,
+                member_id=cls.member.id,
+            )
+            session.add(item)
+            session.commit()
 
     def test_unassign(self):
         self.login(self.member.email)

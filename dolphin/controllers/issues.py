@@ -33,7 +33,7 @@ UNKNOWN_ASSIGNEE = -1
 
 
 FORM_WHITELIST = [
-    'status',
+    'stage',
     'description',
     'phaseId',
     'memberId',
@@ -91,7 +91,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     @json(
         prevent_empty_form='708 No Parameter Exists In The Form',
         form_whitelist=(
-            ['title', 'days', 'kind', 'description', 'status',
+            ['title', 'days', 'kind', 'description', 'stage',
              'priority', 'projectId'],
             '707 Invalid field, only following fields are accepted: '
             'title, days, kind, description, status, priority'
@@ -457,7 +457,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     def assign(self, id):
         form = context.form
         id = int_or_notfound(id)
-        import pudb; pudb.set_trace()  # XXX BREAKPOINT
 
         issue = DBSession.query(Issue).get(id)
         if not issue:
@@ -523,11 +522,19 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         if issue is None:
             raise HTTPNotFound()
 
+        issue_phase = DBSession.query(IssuePhase) \
+            .filter(
+                IssuePhase.issue_id == id,
+                IssuePhase.phase_id == context.form.get('phaseId')
+            ) \
+            .one_or_none()
+        if issue_phase is None:
+            raise HTTPStatus('636 Not Assigned Yet')
+
         item = DBSession.query(Item) \
             .filter(
-                Item.issue_id == id,
+                Item.issue_phase_id == issue_phase.id,
                 Item.member_id == context.form.get('memberId'),
-                Item.phase_id == context.form.get('phaseId'),
             ) \
             .one_or_none()
         if not item:

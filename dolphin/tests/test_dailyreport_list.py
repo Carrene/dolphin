@@ -4,7 +4,7 @@ from bddrest import when, response, status
 from auditor.context import Context as AuditLogContext
 
 from dolphin.models import Member, Dailyreport, Workflow, Skill, Group, Phase, \
-    Release, Project, Issue, Item
+    Release, Project, Issue, Item, IssuePhase
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -64,20 +64,24 @@ class TestDailyreport(LocalApplicationTestCase):
             room_id=2
         )
         session.add(issue)
-        session.flush()
+
+        issue_phase1 = IssuePhase(
+            issue=issue,
+            phase=phase,
+        )
+        session.add(issue_phase1)
 
         one_day = timedelta(days=1)
         cls.item = Item(
-            issue_id=issue.id,
-            phase_id=phase.id,
-            member_id=cls.member.id,
-            start_date=datetime.now().date() - 4 * one_day,
+            issue_phase=issue_phase1,
+            member=cls.member,
+            start_date=datetime.now().date() - 4 * timedelta(days=1),
             end_date=datetime.now().date(),
         )
         session.add(cls.item)
 
         dailyreport1 = Dailyreport(
-            date=datetime.now().date() - 4 * one_day,
+            date=datetime.now().date() - 4 * timedelta(days=1),
             hours=1,
             note='note for dailyreport1',
             item=cls.item,
@@ -85,7 +89,7 @@ class TestDailyreport(LocalApplicationTestCase):
         session.add(dailyreport1)
 
         dailyreport2 = Dailyreport(
-            date=datetime.now().date() - 3 * one_day,
+            date=datetime.now().date() - 3 * timedelta(days=1),
             hours=2,
             note='note for dailyreport2',
             item=cls.item,
@@ -93,7 +97,7 @@ class TestDailyreport(LocalApplicationTestCase):
         session.add(dailyreport2)
 
         dailyreport3 = Dailyreport(
-            date=datetime.now().date() - 2 * one_day,
+            date=datetime.now().date() - 2 * timedelta(days=1),
             hours=3,
             note='note for dailyreport3',
             item=cls.item,

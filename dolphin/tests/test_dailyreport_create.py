@@ -4,7 +4,7 @@ from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when, given
 
 from dolphin.models import Member, Workflow, Skill, Group, Phase, Release, \
-    Project, Issue, Item
+    Project, Issue, Item, IssuePhase
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -74,21 +74,30 @@ class TestDailyreport(LocalApplicationTestCase):
             room_id=2
         )
         session.add(issue)
-        session.flush()
+
+        issue_phase1 = IssuePhase(
+            issue=issue,
+            phase=phase1,
+        )
+        session.add(issue_phase1)
+
+        issue_phase2 = IssuePhase(
+            issue=issue,
+            phase=phase2,
+        )
+        session.add(issue_phase2)
 
         cls.item1 = Item(
-            issue_id=issue.id,
-            phase_id=phase1.id,
-            member_id=cls.member.id,
+            issue_phase=issue_phase1,
+            member=cls.member,
             start_date=datetime.now().date(),
             end_date=datetime.now().date() + timedelta(days=1),
         )
         session.add(cls.item1)
 
         cls.item2 = Item(
-            issue_id=issue.id,
-            phase_id=phase2.id,
-            member_id=cls.member.id,
+            issue_phase=issue_phase2,
+            member=cls.member,
             start_date=datetime.now().date() - timedelta(days=1),
             end_date=datetime.now().date() - timedelta(days=1),
         )

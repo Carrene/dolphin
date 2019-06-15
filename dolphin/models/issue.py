@@ -135,6 +135,8 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         not_none=True,
         required=False,
         protected=True,
+        watermark='lorem ipsum',
+        message='lorem ipsum',
     )
     priority = Field(
         Enum(*issue_priorities, name='priority'),
@@ -389,18 +391,18 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         # model. But there is some field from Item model that is needed in Issue
         # which are appended to Issue.to_dict return value manually.
         issue_phases_list = []
+        items_list = []
         for issue_phase in self.issue_phases:
-            items_list = []
             for item in issue_phase.items:
                 items_list.append(dict(
                     createdAt=item.created_at,
                     memberId=item.member_id,
                 ))
 
-            issue_phases_list.append(dict(
-                phaseId=item.issue_phase.phase_id,
-                items=items_list,
-            ))
+                issue_phases_list.append(dict(
+                    phaseId=item.issue_phase.phase_id,
+                    items=items_list,
+                ))
 
         issue_dict = super().to_dict()
         issue_dict['boarding'] = self.boarding

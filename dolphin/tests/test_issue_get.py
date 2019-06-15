@@ -1,8 +1,10 @@
+from nanohttp import context
+from nanohttp.contexts import Context
 from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when
 
 from dolphin.models import Issue, Member, Workflow, Group, Project, Release, \
-    Skill, Phase, Item
+    Skill, Phase, Item, IssuePhase
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -46,32 +48,39 @@ class TestIssue(LocalApplicationTestCase):
             room_id=1
         )
 
-        cls.issue = Issue(
-            project=cls.project,
-            title='First issue',
-            description='This is description of first issue',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(cls.issue)
+        with Context(dict()):
+            context.identity = member
 
-        cls.phase = Phase(
-            workflow=workflow,
-            title='Backlog',
-            order=1,
-            skill=skill,
-        )
-        session.add(cls.phase)
-        session.flush()
+            cls.issue = Issue(
+                project=cls.project,
+                title='First issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(cls.issue)
 
-        cls.item = Item(
-            member_id=member.id,
-            phase_id=cls.phase.id,
-            issue_id=cls.issue.id,
-        )
-        session.add(cls.item)
-        session.commit()
+            cls.phase = Phase(
+                workflow=workflow,
+                title='Backlog',
+                order=1,
+                skill=skill,
+            )
+            session.add(cls.phase)
+            session.flush()
+
+            issue_phase1 = IssuePhase(
+                issue=cls.issue,
+                phase=cls.phase,
+            )
+
+            cls.item = Item(
+                issue_phase=issue_phase1,
+                member_id=member.id,
+            )
+            session.add(cls.item)
+            session.commit()
 
     def test_get(self):
         self.login('member1@example.com')
@@ -85,7 +94,6 @@ class TestIssue(LocalApplicationTestCase):
             assert response.json['id'] == self.issue.id
             assert response.json['title'] == self.issue.title
             assert response.json['project']['id'] == self.project.id
-            assert response.json['items'][0]['phaseId'] == self.phase.id
 
             when(
                 'Intended project with string type not found',

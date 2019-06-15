@@ -154,6 +154,7 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
         item_dict['hoursWorked'] = self.hours_worked
         item_dict['perspective'] = self.perspective
+        item_dict['issue'] = self.issue_phase.issue.to_dict()
         return item_dict
 
     @classmethod
@@ -181,6 +182,19 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             example='Lorem Ipsum',
             message='Lorem Ipsun',
         )
+
+        yield MetadataField(
+            name='issue',
+            key='issue',
+            label='Issue',
+            required=False,
+            readonly=True,
+            not_none=True,
+            watermark='Lorem Ipsum',
+            example='Lorem Ipsum',
+            message='Lorem Ipsun',
+        )
+
 
     @staticmethod
     def _get_hours_from_timedelta( timedelta):

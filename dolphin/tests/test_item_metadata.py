@@ -26,21 +26,13 @@ class TestItem(LocalApplicationTestCase):
             assert fields['id']['protected'] is not None
             assert fields['id']['primaryKey'] is not None
 
-            assert fields['phaseId']['label'] is not None
-            assert fields['phaseId']['name'] is not None
-            assert fields['phaseId']['type'] is not None
-            assert fields['phaseId']['required'] is not None
-            assert fields['phaseId']['watermark'] is not None
-            assert fields['phaseId']['notNone'] is not None
-            assert fields['phaseId']['watermark'] is not None
-
-            assert fields['issueId']['label'] is not None
-            assert fields['issueId']['name'] is not None
-            assert fields['issueId']['type'] is not None
-            assert fields['issueId']['required'] is not None
-            assert fields['issueId']['watermark'] is not None
-            assert fields['issueId']['notNone'] is not None
-            assert fields['issueId']['watermark'] is not None
+            assert fields['issuePhaseId']['label'] is not None
+            assert fields['issuePhaseId']['name'] is not None
+            assert fields['issuePhaseId']['type'] is not None
+            assert fields['issuePhaseId']['required'] is not None
+            assert fields['issuePhaseId']['watermark'] is not None
+            assert fields['issuePhaseId']['notNone'] is not None
+            assert fields['issuePhaseId']['watermark'] is not None
 
             assert fields['memberId']['label'] is not None
             assert fields['memberId']['name'] is not None

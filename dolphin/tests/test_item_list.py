@@ -1,10 +1,12 @@
 from datetime import datetime
 
 from bddrest import status, response, when, given
+from nanohttp import context
+from nanohttp.contexts import Context
 from auditor.context import Context as AuditLogContext
 
 from dolphin.models import Member, Group, Workflow, Skill, Phase, Release, \
-    Project, Issue, Item, Admin
+    Project, Issue, Item, Admin, IssuePhase
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -117,88 +119,111 @@ class TestListGroup(LocalApplicationTestCase):
             room_id=1
         )
 
-        cls.issue1 = Issue(
-            project=cls.project1,
-            title='First issue',
-            description='This is description of first issue',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(cls.issue1)
+        with Context(dict()):
+            context.identity = cls.admin
 
-        cls.issue2 = Issue(
-            project=cls.project2,
-            title='Second issue',
-            description='This is description of second issue',
-            kind='bug',
-            days=1,
-            room_id=3
-        )
-        session.add(cls.issue2)
+            cls.issue1 = Issue(
+                project=cls.project1,
+                title='First issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(cls.issue1)
 
-        cls.issue3 = Issue(
-            project=cls.project1,
-            title='Third issue',
-            description='This is description of third issue',
-            kind='bug',
-            days=1,
-            room_id=4
-        )
-        session.add(cls.issue3)
+            cls.issue2 = Issue(
+                project=cls.project2,
+                title='Second issue',
+                description='This is description of second issue',
+                kind='bug',
+                days=1,
+                room_id=3
+            )
+            session.add(cls.issue2)
 
-        cls.issue4 = Issue(
-            project=cls.project2,
-            title='Fourth issue',
-            description='This is description of fourth issue',
-            kind='feature',
-            days=1,
-            room_id=5
-        )
-        session.add(cls.issue3)
-        session.flush()
+            cls.issue3 = Issue(
+                project=cls.project1,
+                title='Third issue',
+                description='This is description of third issue',
+                kind='bug',
+                days=1,
+                room_id=4
+            )
+            session.add(cls.issue3)
 
-        cls.item1 = Item(
-            issue_id=cls.issue1.id,
-            phase_id=cls.phase1.id,
-            member_id=cls.member1.id,
-            start_date=datetime.strptime('2020-2-2', '%Y-%m-%d'),
-            end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
-            estimated_hours=3,
-        )
-        session.add(cls.item1)
+            cls.issue4 = Issue(
+                project=cls.project2,
+                title='Fourth issue',
+                description='This is description of fourth issue',
+                kind='feature',
+                days=1,
+                room_id=5
+            )
+            session.add(cls.issue3)
+            session.flush()
 
-        cls.item2 = Item(
-            issue_id=cls.issue2.id,
-            phase_id=cls.phase1.id,
-            member_id=cls.member1.id,
-            start_date=datetime.strptime('2019-2-2', '%Y-%m-%d'),
-            end_date=datetime.strptime('2019-2-3', '%Y-%m-%d'),
-            estimated_hours=3,
-        )
-        session.add(cls.item2)
+            issue_phase1 = IssuePhase(
+                issue=cls.issue1,
+                phase=cls.phase1,
+            )
 
-        cls.item3 = Item(
-            issue_id=cls.issue1.id,
-            phase_id=cls.phase2.id,
-            member_id=cls.member1.id,
-        )
-        session.add(cls.item3)
+            cls.item1 = Item(
+                issue_phase=issue_phase1,
+                member_id=cls.member1.id,
+                start_date=datetime.strptime('2020-2-2', '%Y-%m-%d'),
+                end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
+                estimated_hours=3,
+            )
+            session.add(cls.item1)
 
-        cls.item4 = Item(
-            issue_id=cls.issue3.id,
-            phase_id=cls.phase3.id,
-            member_id=cls.member1.id,
-        )
-        session.add(cls.item4)
+            issue_phase2 = IssuePhase(
+                issue=cls.issue2,
+                phase=cls.phase1,
+            )
 
-        cls.item5 = Item(
-            issue_id=cls.issue4.id,
-            phase_id=cls.phase2.id,
-            member_id=cls.member2.id,
-        )
-        session.add(cls.item5)
-        session.commit()
+            cls.item2 = Item(
+                issue_phase=issue_phase2,
+                member_id=cls.member1.id,
+                start_date=datetime.strptime('2019-2-2', '%Y-%m-%d'),
+                end_date=datetime.strptime('2019-2-3', '%Y-%m-%d'),
+                estimated_hours=3,
+            )
+            session.add(cls.item2)
+
+            issue_phase3 = IssuePhase(
+                issue=cls.issue1,
+                phase=cls.phase2,
+            )
+
+            cls.item3 = Item(
+                issue_phase=issue_phase3,
+                member_id=cls.member1.id,
+            )
+            session.add(cls.item3)
+
+            issue_phase4 = IssuePhase(
+                issue=cls.issue3,
+                phase=cls.phase3,
+            )
+
+            cls.item4 = Item(
+                issue_phase=issue_phase4,
+                member_id=cls.member1.id,
+            )
+            session.add(cls.item4)
+
+            issue_phase5 = IssuePhase(
+                issue=cls.issue4,
+                phase=cls.phase2,
+            )
+
+            cls.item5 = Item(
+                issue_phase=issue_phase5,
+                member_id=cls.member2.id,
+            )
+            session.add(cls.item5)
+            session.commit()
 
     def test_list_item(self):
         self.login(self.member1.email)
