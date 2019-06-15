@@ -5,7 +5,7 @@ from restfulpy.testing import db
 from auditor.context import Context as AuditLogContext
 
 from dolphin.models import Item, Project, Member, Workflow, Group, Release, \
-    Skill, Phase, Issue, Dailyreport
+    Skill, Phase, Issue, Dailyreport, IssuePhase
 
 
 def test_item_perspective(db):
@@ -57,9 +57,13 @@ def test_item_perspective(db):
         session.add(phase1)
         session.flush()
 
-        item = Item(
+        issue_phase1 = IssuePhase(
             issue_id=issue1.id,
             phase_id=phase1.id,
+        )
+
+        item = Item(
+            issue_phase=issue_phase1,
             member_id=member1.id,
         )
         session.add(item)
@@ -178,17 +182,24 @@ def test_response_time(db):
         session.add(issue2)
         session.flush()
 
-        item1 = Item(
+        issue_phase1 = IssuePhase(
             issue_id=issue1.id,
             phase_id=phase1.id,
+        )
+
+        item1 = Item(
+            issue_phase=issue_phase1,
             member_id=member2.id,
-            status='done',
         )
         session.add(item1)
 
-        item2 = Item(
+        issue_phase2 = IssuePhase(
             issue_id=issue2.id,
             phase_id=phase1.id,
+        )
+
+        item2 = Item(
+            issue_phase=issue_phase2,
             member_id=member2.id,
         )
         session.add(item2)

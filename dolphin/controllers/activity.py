@@ -78,10 +78,16 @@ class ActivityController(ModelRestController):
     @Activity.expose
     def list(self):
         member = Member.current()
+        issue_phase = DBSession.query(IssuePhase) \
+            .filter(
+                IssuePhase.issue_id == self.issue.id,
+            ) \
+            .one_or_none()
+
         return DBSession.query(Activity) \
             .join(Item, Item.id == Activity.item_id) \
             .filter(
-                Item.issue_id == self.issue.id,
+                Item.issue_phase_id == issue_phase.id,
                 Item.member_id == member.id
             )
 
