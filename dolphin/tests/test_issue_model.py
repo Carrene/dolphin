@@ -377,7 +377,7 @@ def test_issue_status(db):
         session.add(dailyreport1)
         session.commit()
 
-        assert issue_phase.status == 'in-progress'
+        assert issue1.status == 'in-progress'
 
         dailyreport2 = Dailyreport(
             date=datetime.strptime('2019-1-3', '%Y-%m-%d').date(),
@@ -387,5 +387,5 @@ def test_issue_status(db):
         session.add(dailyreport2)
         session.commit()
 
-        assert issue_phase.status == 'complete'
+        assert issue1.status == 'complete'
 
