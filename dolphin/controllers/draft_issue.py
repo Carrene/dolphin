@@ -20,7 +20,7 @@ FORM_WHITELIST = [
     'description',
     'kind',
     'days',
-    'status',
+    'stage',
     'projectId',
     'priority',
     'relatedIssueId',

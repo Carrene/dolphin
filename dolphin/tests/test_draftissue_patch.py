@@ -107,7 +107,7 @@ class TestIssue(LocalApplicationTestCase):
                 op='finalize',
                 value={
                     'title': 'Defined issue',
-                    'status': 'in-progress',
+                    'stage': 'on-hold',
                     'description': 'A description for defined issue',
                     'kind': 'feature',
                     'days': 3,

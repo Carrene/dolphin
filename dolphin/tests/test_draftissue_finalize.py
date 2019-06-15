@@ -143,7 +143,7 @@ class TestIssue(LocalApplicationTestCase):
             f'FINALIZE',
             json=dict(
                 title='Defined issue',
-                status='in-progress',
+                stage='on-hold',
                 description='A description for defined issue',
                 kind='feature',
                 days=3,
@@ -165,8 +165,8 @@ class TestIssue(LocalApplicationTestCase):
             assert isinstance(logs[1], RequestLogEntry)
 
             when(
-                'Status is null',
-                json=given | dict(status=None, title='new title')
+                'Stage is null',
+                json=given | dict(stage=None, title='new title')
             )
             assert status == 200
 
@@ -292,18 +292,18 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Invalid status value is in form',
-                json=given | dict(status='progressing') | \
+                json=given | dict(stage='progressing') | \
                     dict(title='Another title')
             )
-            assert status == '705 Invalid status value, only one of "to-do, ' \
-                'in-progress, on-hold, complete, done" will be accepted'
+            assert status == '705 Invalid stage value, only one of "triage, ' \
+                'backlog, working, on-hold" will be accepted'
 
             when(
                 'Trying to pass with invalid form parameters',
                 json=Update(a=1)
             )
             assert status == '707 Invalid field, only following fields are ' \
-                'accepted: title, description, kind, days, status, projectId, ' \
+                'accepted: title, description, kind, days, stage, projectId, ' \
                 'priority, relatedIssueId'
 
             when('Request is not authorized', authorization=None)

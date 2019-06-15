@@ -287,11 +287,11 @@ def test_issue_lead_phase(db):
             session.add(item4)
             session.commit()
 
-        assert issue1.lead_phase == phase1.id
+        assert issue1.phase_id == phase1.id
 
         item3.estimated_hours = 4
         session.commit()
-        assert issue1.lead_phase == phase2.id
+        assert issue1.phase_id == phase2.id
 
 def test_issue_status(db):
     session = db()
