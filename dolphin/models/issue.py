@@ -134,7 +134,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         default='triage',
         not_none=True,
         required=False,
-        protected=True,
+        protected=False,
         watermark='lorem ipsum',
         message='lorem ipsum',
     )
@@ -229,7 +229,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         .where(Item.estimated_hours.is_(None)) \
         .group_by(Item.issue_phase_id)
 
-    lead_phase = column_property(
+    phase_id = column_property(
         select([IssuePhase.phase_id])
         .select_from(join(IssuePhase, Phase, IssuePhase.phase_id == Phase.id))
         .where(IssuePhase.id.notin_(_not_estimated_phases))
@@ -240,8 +240,9 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
 
     status = column_property(
         select([IssuePhase.status])
-        .where(IssuePhase.phase_id == lead_phase.expression)
-        .where(IssuePhase.issue_id == id),
+        .where(IssuePhase.phase_id == phase_id.expression)
+        .where(IssuePhase.issue_id == id)
+        .correlate_except(IssuePhase),
     )
 
     @hybrid_property
