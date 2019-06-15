@@ -150,28 +150,10 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             'phaseTitle' in context.query
         )
 
-#        if needed_cte:
-#            issue_phase_cte = select([
-#                IssuePhase.issue_id.label('issue_phase_issue_id'),
-#                func.max(Item.id).label('max_issue_phase_id'),
-#            ]) \
-#                .select_from(
-#                    join(
-#                        Issue,
-#                        IssuePhase,
-#                        Issue.id == IssuePhase.issue_id,
-#                        isouter=True
-#                    )
-#                ) \
-#                .group_by(IssuePhase.issue_id) \
-#                .cte()
-
         # FILTER
         if 'phaseId' in context.query:
             value = context.query['phaseId']
 
-#            query = query.join(IssuePhase, IssuePhase.issue_id == Issue.id)
-##            query = query.join(issue_phase_cte, issue_phase_cte.c.max_issue_phase_id == IssuePhase.id)
             query = Issue._filter_by_column_value(
                 query,
                 Issue.phase_id,
@@ -182,22 +164,16 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 query = query.union(triage)
 
             del context.query['phaseId']
-#            is_issue_issue_phase_joined = True
 
         if 'phaseTitle' in context.query:
             value = context.query['phaseTitle']
             if not is_issue_issue_phase_joined:
-#                query = query.join(
-#                    issue_phase_cte,
-#                    issue_phase_cte.c.issue_phase_issue_id == Issue.id,
-#                )
                 query = query.join(
                     Phase,
                     Phase.id == Issue.phase_id,
                 )
                 is_issue_issue_phase_joined = True
 
-#            query = query.join(Phase, Phase.id == IssuePhase.phase_id)
             query = Issue._filter_by_column_value(query, Phase.title, value)
 
         if 'tagId' in context.query:
@@ -235,39 +211,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                     if c.replace('-', '') in external_columns
             }
 
-#            if 'phaseId' in sorting_expression:
-#                if not is_issue_issue_phase_joined:
-#                    query = query.join(
-#                        issue_phase_cte,
-#                        issue_phase_cte.c.issue_phase_issue_id == Issue.id,
-#                        isouter=True
-#                    )
-#                    query = query.join(
-#                        IssuePhase,
-#                        IssuePhase.id == issue_phase_cte.c.max_issue_phase_id,
-#                        isouter=True
-#                    )
-#                    is_issue_issue_phase_joined = True
-#
-#                query = Issue._sort_by_key_value(
-#                    query,
-#                    column=IssuePhase.phase_id,
-#                    descending=sorting_columns['phaseId']
-#                )
-
             if 'phaseTitle' in sorting_expression:
-
-#                if not is_issue_issue_phase_joined:
-#                    query = query.join(
-#                        issue_phase_cte,
-#                        issue_phase_cte.c.issue_phase_issue_id == Issue.id,
-#                        isouter=True
-#                    )
-#                    query = query.join(
-#                        IssuePhase,
-#                        IssuePhase.id == issue_phase_cte.c.max_issue_id_id,
-#                        isouter=True
-#                    )
 
                 if not 'phaseTitle' in context.query:
                     query = query.join(
