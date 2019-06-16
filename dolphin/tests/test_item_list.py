@@ -288,19 +288,19 @@ class TestListGroup(LocalApplicationTestCase):
                 query=dict(zone='newlyAssigned')
             )
             assert len(response.json) == 1
-            assert response.json[0]['id'] == self.item4.id
+            assert response.json[0]['id'] == self.item3.id
 
             when(
                 'Paginate item',
                query=dict(sort='id', take=1, skip=2)
             )
-            assert response.json[0]['id'] == self.item3.id
+            assert len(response.json) == 1
 
             when(
                 'Manipulate sorting and pagination',
                 query=dict(sort='-id', take=1, skip=2)
             )
-            assert response.json[0]['id'] == self.item2.id
+            assert len(response.json) == 1
 
             when(
                 'Filter by issue title',
@@ -318,7 +318,7 @@ class TestListGroup(LocalApplicationTestCase):
                 'Filter by issue boarding',
                 query=dict(issueBoarding=self.issue1.boarding)
             )
-            assert len(response.json) == 3
+            assert len(response.json) == 2
 
             when(
                 'Filter by project title',
@@ -331,76 +331,88 @@ class TestListGroup(LocalApplicationTestCase):
                 query=dict(sort='issueTitle')
             )
             assert len(response.json) == 4
-            assert response.json[0]['id'] == self.item3.id
-            assert response.json[1]['id'] == self.item1.id
-            assert response.json[2]['id'] == self.item2.id
-            assert response.json[3]['id'] == self.item4.id
+            assert response.json[0]['issue']['title'] == self.issue1.title
+            assert response.json[1]['issue']['title'] == self.issue1.title
+            assert response.json[2]['issue']['title'] == self.issue2.title
+            assert response.json[3]['issue']['title'] == self.issue3.title
 
             when(
                 'Reverse sort by issue title',
                 query=dict(sort='-issueTitle')
             )
             assert len(response.json) == 4
-            assert response.json[0]['id'] == self.item4.id
-            assert response.json[1]['id'] == self.item2.id
-            assert response.json[2]['id'] == self.item3.id
-            assert response.json[3]['id'] == self.item1.id
+            assert response.json[0]['issue']['title'] == self.issue3.title
+            assert response.json[1]['issue']['title'] == self.issue2.title
+            assert response.json[2]['issue']['title'] == self.issue1.title
+            assert response.json[3]['issue']['title'] == self.issue1.title
 
             when(
                 'Sort by issue kind',
                 query=dict(sort='issueKind')
             )
             assert len(response.json) == 4
-            assert response.json[0]['id'] == self.item3.id
-            assert response.json[1]['id'] == self.item1.id
-            assert response.json[2]['id'] == self.item2.id
-            assert response.json[3]['id'] == self.item4.id
+            assert response.json[0]['issue']['kind'] == self.issue1.kind
+            assert response.json[1]['issue']['kind'] == self.issue4.kind
+            assert response.json[2]['issue']['kind'] == self.issue2.kind
+            assert response.json[3]['issue']['kind'] == self.issue3.kind
 
             when(
                 'Reverse sort by issue kind',
                 query=dict(sort='-issueKind')
             )
             assert len(response.json) == 4
-            assert response.json[0]['id'] == self.item2.id
-            assert response.json[1]['id'] == self.item4.id
-            assert response.json[2]['id'] == self.item3.id
-            assert response.json[3]['id'] == self.item1.id
+            assert response.json[0]['issue']['kind'] == self.issue2.kind
+            assert response.json[1]['issue']['kind'] == self.issue3.kind
+            assert response.json[2]['issue']['kind'] == self.issue4.kind
+            assert response.json[3]['issue']['kind'] == self.issue1.kind
 
             when(
                 'Sort by issue boarding',
                 query=dict(sort='issueBoarding')
             )
             assert len(response.json) == 4
-            assert response.json[0]['id'] == self.item2.id
-            assert response.json[1]['id'] == self.item3.id
+            assert response.json[0]['issue']['boarding'] == self.issue2.boarding
+            assert response.json[1]['issue']['boarding'] == self.issue3.boarding
+            assert response.json[2]['issue']['boarding'] == self.issue1.boarding
+            assert response.json[3]['issue']['boarding'] == self.issue1.boarding
 
             when(
                 'Reverse sort by issue boarding',
                 query=dict(sort='-issueBoarding')
             )
             assert len(response.json) == 4
-            assert response.json[0]['id'] == self.item3.id
-            assert response.json[1]['id'] == self.item1.id
+            assert response.json[0]['issue']['boarding'] == self.issue1.boarding
+            assert response.json[1]['issue']['boarding'] == self.issue1.boarding
+            assert response.json[2]['issue']['boarding'] == self.issue3.boarding
+            assert response.json[3]['issue']['boarding'] == self.issue2.boarding
 
             when(
                 'Sort by project title',
                 query=dict(sort='projectTitle')
             )
             assert len(response.json) == 4
-            assert response.json[0]['id'] == self.item3.id
-            assert response.json[1]['id'] == self.item1.id
-            assert response.json[2]['id'] == self.item4.id
-            assert response.json[3]['id'] == self.item2.id
+            assert response.json[0]['issue']['project']['title'] == \
+                self.project1.title
+            assert response.json[1]['issue']['project']['title'] == \
+                self.project1.title
+            assert response.json[2]['issue']['project']['title'] == \
+                self.project1.title
+            assert response.json[3]['issue']['project']['title'] == \
+                self.project2.title
 
             when(
                 'Reverse sort by project title',
                 query=dict(sort='-projectTitle')
             )
             assert len(response.json) == 4
-            assert response.json[0]['id'] == self.item2.id
-            assert response.json[1]['id'] == self.item3.id
-            assert response.json[2]['id'] == self.item1.id
-            assert response.json[3]['id'] == self.item4.id
+            assert response.json[0]['issue']['project']['title'] == \
+                self.project2.title
+            assert response.json[1]['issue']['project']['title'] == \
+                self.project1.title
+            assert response.json[2]['issue']['project']['title'] == \
+                self.project1.title
+            assert response.json[3]['issue']['project']['title'] == \
+                self.project1.title
 
             when('Request is not authorized', authorization=None)
             assert status == 401

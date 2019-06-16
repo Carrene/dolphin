@@ -6,7 +6,8 @@ from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 from sqlalchemy import select, func, join
 
-from ..models import Item, Dailyreport, Event, Member, Issue, Project, Phase
+from ..models import Item, Dailyreport, Event, Member, Issue, Project, Phase, \
+    IssuePhase
 from ..validators import update_item_validator, dailyreport_update_validator, \
     estimate_item_validator, dailyreport_create_validator
 from ..exceptions import StatusEndDateMustBeGreaterThanStartDate, \
@@ -68,33 +69,28 @@ class ItemController(ModelRestController):
     @Item.expose
     def list(self):
         member = Member.current()
-        is_issue_joined = False
-        is_project_joined = False
-
-        lead_phase_subquery = select([Phase.id]) \
-            .select_from(join(Item, Phase, Item.phase_id == Phase.id)) \
-            .where(Item.estimated_hours.is_(None)) \
-            .order_by(Phase.order) \
-            .limit(1)
-
         if member.role == 'admin':
             query = DBSession.query(Item)
 
         else:
             query = DBSession.query(Item).filter(Item.member_id == member.id)
 
+        query = query.join(IssuePhase, IssuePhase.id == Item.issue_phase_id) \
+            .join(Issue, Issue.id == IssuePhase.issue_id)
+
+        query = query.join(Project, Project.id == Issue.project_id)
         if 'zone' in context.query:
             if context.query['zone'] not in VALID_ZONES:
                 return []
 
             if context.query['zone'] == 'newlyAssigned':
                 query = query \
-                    .filter(Item.phase_id.notin_(lead_phase_subquery)) \
+                    .filter(IssuePhase.phase_id != Issue.phase_id) \
                     .filter(Item.estimated_hours.is_(None))
 
             if context.query['zone'] == 'needEstimate':
                 query = query \
-                    .filter(Item.phase_id.in_(lead_phase_subquery)) \
+                    .filter(IssuePhase.phase_id != Issue.phase_id) \
                     .filter(Item.estimated_hours.is_(None))
 
             elif context.query['zone'] == 'upcomingNuggets':
@@ -107,39 +103,24 @@ class ItemController(ModelRestController):
                     .filter(Item.estimated_hours.isnot(None)) \
                     .filter(Item.start_date < datetime.now())
 
-        # FILTER
+#        # FILTER
         if 'issueBoarding' in context.query:
             value = context.query['issueBoarding']
-            query = query.join(Issue, Item.issue_id == Issue.id)
             query = Item._filter_by_column_value(query, Issue.boarding, value)
-            is_issue_joined = True
 
         if 'issueKind' in context.query:
             value = context.query['issueKind']
-            if not is_issue_joined:
-                query = query.join(Issue, Item.issue_id == Issue.id)
-                is_issue_joined = True
-
             query = Item._filter_by_column_value(query, Issue.kind, value)
 
         if 'issueTitle' in context.query:
             value = context.query['issueTitle']
-            if not is_issue_joined:
-                query = query.join(Issue, Item.issue_id == Issue.id)
-                is_issue_joined = True
-
             query = Item._filter_by_column_value(query, Issue.title, value)
 
         if 'projectTitle' in context.query:
             value = context.query['projectTitle']
-            if not is_issue_joined:
-                query = query.join(Issue, Item.issue_id == Issue.id)
-                is_issue_joined = True
-
-            query = query.join(Project, Project.id == Issue.project_id)
             query = Item._filter_by_column_value(query, Project.title, value)
 
-        # SORT
+#        # SORT
         sorting_expression = context.query.get('sort', '').strip()
         external_columns = (
             'issueBoarding',
@@ -158,10 +139,6 @@ class ItemController(ModelRestController):
             }
 
             if 'issueBoarding' in sorting_expression:
-                if not is_issue_joined:
-                    query = query.join(Issue, Item.issue_id == Issue.id)
-                    is_issue_joined = True
-
                 query = Issue._sort_by_key_value(
                     query,
                     column=Issue.boarding,
@@ -169,10 +146,6 @@ class ItemController(ModelRestController):
                 )
 
             if 'issueKind' in sorting_expression:
-                if not is_issue_joined:
-                    query = query.join(Issue, Item.issue_id == Issue.id)
-                    is_issue_joined = True
-
                 query = Issue._sort_by_key_value(
                     query,
                     column=Issue.kind,
@@ -180,10 +153,6 @@ class ItemController(ModelRestController):
                 )
 
             if 'issueTitle' in sorting_expression:
-                if not is_issue_joined:
-                    query = query.join(Issue, Item.issue_id == Issue.id)
-                    is_issue_joined = True
-
                 query = Issue._sort_by_key_value(
                     query,
                     column=Issue.title,
@@ -191,14 +160,6 @@ class ItemController(ModelRestController):
                 )
 
             if 'projectTitle' in sorting_expression:
-                if not is_issue_joined:
-                    query = query.join(Issue, Item.issue_id == Issue.id)
-                    is_issue_joined = True
-
-                if not is_project_joined:
-                    query = query.join(Project, Issue.project_id == Project.id)
-                    is_project_joined = True
-
                 query = Issue._sort_by_key_value(
                     query,
                     column=Project.title,
