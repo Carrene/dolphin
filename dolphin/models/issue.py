@@ -128,7 +128,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         required=False
     )
     stage = Field(
-        Enum(*issue_stages, name='issues_stages'),
+        Enum(*issue_stages, name='issues_stage'),
         python_type=str,
         label='Stage',
         default='triage',
