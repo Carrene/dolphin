@@ -5,6 +5,8 @@ from sqlalchemy import Integer, String, Unicode
 from restfulpy.orm.metadata import MetadataField
 from sqlalchemy import Integer, String
 
+from .phase import Phase
+
 
 class Workflow(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
                SoftDeleteMixin, DeclarativeBase):
@@ -53,6 +55,7 @@ class Workflow(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         'Phase',
         back_populates='workflow',
         protected=False,
+        order_by=Phase.order,
     )
 
     projects = relationship(

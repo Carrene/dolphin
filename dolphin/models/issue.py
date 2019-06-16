@@ -6,7 +6,7 @@ from restfulpy.orm import Field, DeclarativeBase, relationship, \
     OrderingMixin, FilteringMixin, PaginationMixin
 from restfulpy.orm.metadata import MetadataField
 from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
-    case, join
+    case, join, Boolean
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import column_property
 
@@ -148,6 +148,17 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         default='low',
         watermark='lorem ipsum',
         example='lorem ipsum',
+    )
+    is_done = Field(
+        Boolean,
+        python_type=bool,
+        label='Lorem Ipsum',
+        message='Lorem Ipsum',
+        watermark='Lorem Ipsum',
+        readonly=False,
+        nullable=True,
+        not_none=False,
+        required=False,
     )
     attachments = relationship('Attachment', lazy='selectin')
     tags = relationship(

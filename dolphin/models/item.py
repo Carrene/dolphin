@@ -6,7 +6,7 @@ from restfulpy.orm.metadata import MetadataField
 from restfulpy.orm.mixins import TimestampMixin, OrderingMixin, \
     FilteringMixin, PaginationMixin
 from sqlalchemy import Integer, ForeignKey, DateTime, Enum, String, select, \
-    func
+    func, Boolean
 from sqlalchemy.orm import column_property, synonym
 
 from .dailyreport import Dailyreport
@@ -194,7 +194,6 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             example='Lorem Ipsum',
             message='Lorem Ipsun',
         )
-
 
     @staticmethod
     def _get_hours_from_timedelta( timedelta):
