@@ -100,7 +100,7 @@ class TestDailyreport(LocalApplicationTestCase):
         form = dict(
             hours=4.8,
             note='Some note',
-            date=datetime.now().isoformat()
+            date='2019-06-16',
         )
 
         with oauth_mockup_server(), self.given(
@@ -114,6 +114,12 @@ class TestDailyreport(LocalApplicationTestCase):
             assert response.json['hours'] == form['hours']
             assert response.json['note'] == form['note']
 
+            when(
+                'Date format is wrong',
+                json=given | dict(date='2019-06-16T10:57:12.355570')
+            )
+            assert status == 200
+
             when('Trying to pass without form parameters', json={})
             assert status == '708 Empty Form'
 
@@ -123,7 +129,7 @@ class TestDailyreport(LocalApplicationTestCase):
             )
             assert status == 404
 
-            when( 'Invalid parameter is in form',json=given | dict(a='a'))
+            when('Invalid parameter is in form',json=given | dict(a='a'))
             assert status == '707 Invalid field, only following fields are ' \
                 'accepted: hours, note, date'
 
@@ -137,7 +143,7 @@ class TestDailyreport(LocalApplicationTestCase):
             assert status == '931 Date Not In Form'
 
             when('Date format is wrong', json=given | dict(date='30-20-20'))
-            assert status == '932 Invalid Date Format'
+            assert status == 400
 
             when(
                 'Note length is less than limit',

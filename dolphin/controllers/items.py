@@ -289,10 +289,7 @@ class ItemDailyreportController(ModelRestController):
     @dailyreport_create_validator
     @commit
     def create(self):
-        date = datetime.strptime(
-            context.form.get('date'),
-            '%Y-%m-%dT%H:%M:%S.%f'
-        )
+        date = context.form.get('date')
         if self.item.end_date < date or date < self.item.start_date:
             raise StatusInvalidDatePeriod()
 
