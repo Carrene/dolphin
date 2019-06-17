@@ -216,7 +216,6 @@ depends_on = None
 
 
 def upgrade():
-    import pudb; pudb.set_trace()  # XXX BREAKPOINT
     bind = op.get_bind()
     session = orm.Session(bind=bind)
 
@@ -243,7 +242,10 @@ def upgrade():
     op.add_column('item', sa.Column('issue_phase_id', sa.Integer(), nullable=True))
     old_items = session.query(OldItem).all()
     for item in old_items:
-        try:
+        issue_phase = session.query(IssuePhase) \
+            .filter(IssuePhase.issue_id == item.issue_id, IssuePhase.phase_id == item.phase_id) \
+            .one_or_none()
+        if issue_phase is None:
             issue_phase = IssuePhase(
                 issue_id=item.issue_id,
                 phase_id=item.phase_id,
@@ -251,18 +253,10 @@ def upgrade():
             session.add(issue_phase)
             session.commit()
 
-        except:
-            issue_phase = session.query(IssuePhase) \
-                .filter(
-                    IssuePhase.issue_id == item.issue_id,
-                    IssuePhase.phase_id == item.phase_id
-                ) \
-                .one_or_none()
         new_item = session.query(Item).get(item.id)
         new_item.issue_phase_id = issue_phase.id
         session.commit()
 
-    import pudb; pudb.set_trace()  # XXX BREAKPOINT
     op.drop_constraint('item_phase_id_issue_id_member_id_key', 'item', type_='unique')
     op.drop_constraint('item_issue_id_fkey', 'item', type_='foreignkey')
     op.drop_constraint('item_phase_id_fkey', 'item', type_='foreignkey')
