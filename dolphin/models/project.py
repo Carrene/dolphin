@@ -160,9 +160,9 @@ class Project(ModifiedByMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             join(Subscription, Member, Subscription.member_id == Member.id)
         )
         .where(Subscription.subscribable_id == id)
-        .where(Member.reference_id == bindparam(
-                'reference_id',
-                callable_=lambda: context.identity.reference_id
+        .where(Member.id == bindparam(
+                'id',
+                callable_=lambda: context.identity.reference.id
             )
         )
         .correlate_except(Subscription),

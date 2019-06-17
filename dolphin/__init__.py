@@ -74,6 +74,14 @@ class Dolphin(Application):
           logos:
             max_length: 50 # KB
             min_length: 1  # KB
+        applications:
+          icons:
+            max_length: 50 # KB
+            min_length: 1  # KB
+        members:
+          avatars:
+            max_length: 50 # KB
+            min_length: 1  # KB
 
       item:
         response_time: 48 # Hours
@@ -82,6 +90,66 @@ class Dolphin(Application):
         load_thresholds:
           heavy: 5
           medium: 3
+
+      reset_password:
+        secret: !!binary xxSN/uarj5SpcEphAHhmsab8Ql2Og/2IcieNfQ3PysI=
+        max_age: 3600  # seconds
+        algorithm: HS256
+        callback_url: http://localhost:8083
+
+      registration:
+        secret: !!binary xxSN/uarj5SpcEphAHhmsab8Ql2Og/2IcieNfQ3PysI=
+        max_age: 86400  # seconds
+        algorithm: HS256
+        callback_url: http://localhost:8083
+
+      authorization_code:
+        secret: !!binary T8xNMJCFl4xgBSW3NaDv6/D+48ssBWZTQbqqDlnl0gU=
+        max_age: 86400  # seconds
+        algorithm: HS256
+
+      access_token:
+        secret: !!binary dKcWy4fQTpgjjAhS6SbapQUvtxPhiO23GguaV9U1y7k=
+        max_age: 2592000  # seconds
+        algorithm: HS256
+
+      smtp:
+        host: smtp.gmail.com
+        username: cas@carrene.com
+        password: <password>
+        local_hostname: carrene.com
+
+      sms:
+        provider: panda.sms.ConsoleSmsProvider
+        cm:
+          sender: cas@Carrene
+          refrence: Carrene
+          token: <token>
+          url: https://gw.cmtelecom.com/v1.0/message
+        kavenegar:
+          apiKey: <key>
+
+      phone:
+        activation_token:
+          secret: !!binary dKcWy4fQTpgjjAhS6SbapQUvtxPhiO23GguaV9U1y7k=
+          max_age: 360  # seconds
+          algorithm: HS256
+        activation_code:
+          length: 6
+          hash_algorithm: SHA-1
+          time_interval: 59 # seconds
+          challenge_limit: 40
+          seed: !!python/bytes 8QYEd+yEh4fcZ5aAVqrlXBWuToeXTyOeHFun8OzOL48=
+          window: 4
+        jwt:
+          max_age: 86400
+
+      organization_invitation:
+        secret: !!binary dKcWy4fQTpgjjAhS6SbapQUvtxPhiO23GguaV9U1y7k=
+        max_age: 2592000  # seconds
+        algorithm: HS256
+        callback_url: http://localhost:8083
+
    '''
 
     def __init__(self, application_name='dolphin', root=Root()):

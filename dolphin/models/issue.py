@@ -229,10 +229,10 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             join(Subscription, Member, Subscription.member_id == Member.id)
         )
         .where(Subscription.subscribable_id == id)
-        .where(Member.reference_id == bindparam(
-            'reference_id',
+        .where(Member.id == bindparam(
+            'id',
             callable_=lambda:
-                context.identity.reference_id if context.identity else None
+                context.identity.id if context.identity else None
             )
         )
         .where(Subscription.one_shot.is_(None))
@@ -245,10 +245,10 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             join(Subscription, Member, Subscription.member_id == Member.id)
         )
         .where(Subscription.subscribable_id == id)
-        .where(Member.reference_id == bindparam(
-            'reference_id',
+        .where(Member.id == bindparam(
+            'id',
             callable_=lambda:
-                context.identity.reference_id if context.identity else None
+                context.identity.id if context.identity else None
             )
         )
         .where(Subscription.one_shot.is_(None))

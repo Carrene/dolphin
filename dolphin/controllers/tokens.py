@@ -5,7 +5,7 @@ from sqlalchemy import exists, and_
 
 from ..backends import CASClient, ChatClient
 from ..models import Member, Invitation, OrganizationMember
-from ..validators import token_obtain_validator
+from ..validators import token_obtain_validator, email_validator
 
 
 class TokenController(RestController):
@@ -38,6 +38,24 @@ class TokenController(RestController):
         )
         DBSession.add(organization_member)
         return organization_id
+
+    @json(prevent_empty_form=True)
+    @email_validator
+    def create(self):
+        email = context.form.get('email')
+        password = context.form.get('password')
+        organization_id = context.form.get('organizationId')
+
+        if email is None or password is None or organization_id is None:
+            raise HTTPIncorrectEmailOrPassword()
+
+        principal = context.application.__authenticator__.\
+            login((email, password, organization_id))
+
+        if principal is None:
+            raise HTTPIncorrectEmailOrPassword()
+
+        return dict(token=principal.dump())
 
     @authorize
     @json

@@ -10,7 +10,10 @@ from .models import *
 from .models.organization import roles
 
 
+USER_TITLE_PATTERN = re.compile(r'^[a-zA-Z][\w\ ]{5,19}$')
 TITLE_PATTERN = re.compile(r'^(?!\s).*[^\s]$')
+NAME_PATTERN = re.compile(r'^[a-zA-Z]{1}[a-z-A-Z ,.\'-]{2,19}$')
+USER_PASSWORD_PATTERN = re.compile(r'(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).+')
 DATETIME_PATTERN = re.compile(
     r'^(\d{4})-(0[1-9]|1[012]|[1-9])-(0[1-9]|[12]\d{1}|3[01]|[1-9])' \
     r'(T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z)?)?$'
@@ -303,6 +306,46 @@ def item_exists_validator(item_id, container, field):
         raise HTTPStatus('660 Item Not Found')
 
     return item_id
+
+
+email_validator = validate(
+    email=dict(
+        required='722 Email Not In Form',
+        pattern=(USER_EMAIL_PATTERN, '701 Invalid Email Format')
+    )
+)
+
+
+member_update_validator = validate(
+    name=dict(
+        pattern=(NAME_PATTERN, '716 Invalid Name Format'),
+        not_none='732 Name Is Null',
+        max_length=(20, '733 At Most 20 Characters Are Valid For Name'),
+    ),
+)
+
+
+member_register_validator = validate(
+    ownershipToken=dict(
+        required='727 Token Not In Form',
+    ),
+    title=dict(
+        required='718 Title Not In Form',
+        pattern=(USER_TITLE_PATTERN, '705 Invalid Title Format'),
+    ),
+    name=dict(
+        required='731 Name Not In Form',
+        not_none='732 Name Is Null',
+        max_length=(20, '733 At Most 20 Characters Are Valid For Name'),
+        pattern=(NAME_PATTERN, '716 Invalid Name Format'),
+    ),
+    password=dict(
+        required='728 Password Not In Form',
+        min_length=(6,'702 Invalid Password Length'),
+        max_length=(20,'702 Invalid Password Length'),
+        pattern=(USER_PASSWORD_PATTERN, '703 Password Not Complex Enough'),
+    ),
+)
 
 
 release_validator = validate(

@@ -1,4 +1,7 @@
 from .member import Member
+from .application import Application
+from .messaging import RegisterEmail, ResetPasswordEmail, \
+    OrganizationInvitationEmail
 from .subscribable import Subscribable, Subscription
 from .project import Project, project_statuses
 from .release import Release, release_statuses
