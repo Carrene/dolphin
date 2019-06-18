@@ -4,6 +4,7 @@ from auditor.context import Context as AuditLogContext
 from nanohttp import context
 from nanohttp.contexts import Context
 from restfulpy.testing import db
+from sqlalchemy.orm import aliased
 
 from dolphin.models import Item, Project, Member, Workflow, Group, Release,  \
     Skill, Phase, Issue, IssuePhase, Dailyreport

@@ -1,5 +1,6 @@
 import re
 from datetime import datetime
+import json
 
 from auditor import context as AuditLogContext
 from nanohttp import HTTPStatus, json, context, HTTPNotFound, \
@@ -141,6 +142,18 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     def list(self):
         query = DBSession.query(Issue)
         sorting_expression = context.query.get('sort', '').strip()
+        is_sort_by_status = False
+        if 'status' in sorting_expression:
+            is_sort_by_status = True
+            sorting_expression = sorting_expression.replace('status', '')
+            context.query['sort'] = sorting_expression
+
+        is_filter_by_status = False
+        if context.query.get('status') is not None:
+            is_filter_by_status = True
+            status = context.query['status']
+            del context.query['status']
+
         is_issue_tag_joined = False
         is_issue_issue_phase_joined = False
         needed_cte = bool(
@@ -274,7 +287,19 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 ) \
                 .filter(Subscription.member_id == context.identity.id)
 
-        return query
+        issues = Issue.dump_query(query)
+
+        if is_sort_by_status:
+            issues = query.all()
+            issues = [i.to_dict() for i in issues]
+            issues = list(sorted(issues, key=lambda h: h['status']))
+
+        if is_filter_by_status:
+            for issue in issues:
+                if issue['status'] != status:
+                    issues.remove(issue)
+
+        return issues
 
     @authorize
     @json(prevent_form='709 Form Not Allowed')

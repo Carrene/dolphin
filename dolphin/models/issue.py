@@ -6,7 +6,7 @@ from restfulpy.orm import Field, DeclarativeBase, relationship, \
     OrderingMixin, FilteringMixin, PaginationMixin
 from restfulpy.orm.metadata import MetadataField
 from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
-    case, join, Boolean
+    case, join, Boolean, and_
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import column_property
 
@@ -78,7 +78,10 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             Subscribable):
 
     __tablename__ = 'issue'
-    __mapper_args__ = {'polymorphic_identity': __tablename__}
+    __mapper_args__ = {
+        'polymorphic_identity': __tablename__,
+        'with_polymorphic': '*',
+    }
 
     _boarding = ['on-time', 'delayed']
 
@@ -249,12 +252,20 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         .limit(1)
     )
 
-#    status = column_property(
-#        select([IssuePhase.status])
-#        .where(IssuePhase.phase_id == phase_id.expression)
-#        .where(IssuePhase.issue_id == id)
-#        .correlate_except(IssuePhase),
-#    )
+    @hybrid_property
+    def status(self):
+        for issue_phase in self.issue_phases:
+            if issue_phase.phase_id == self.phase_id \
+                    and issue_phase.issue_id == self.id:
+                return issue_phase.status
+
+    @status.expression
+    def status(cls):
+        return (
+            select([IssuePhase.status])
+            .where(IssuePhase.phase_id == cls.phase_id.expression)
+            .where(IssuePhase.issue_id == cls.id)
+        ).alias()
 
     @hybrid_property
     def boarding_value(self):

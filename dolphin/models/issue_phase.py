@@ -3,6 +3,7 @@ from sqlalchemy import Integer, ForeignKey, Enum, join, select, func, case, \
     text
 from sqlalchemy.orm import column_property
 from sqlalchemy.sql.expression import any_, all_, and_
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from .item import Item
 from .dailyreport import Dailyreport
@@ -60,43 +61,60 @@ class IssuePhase(DeclarativeBase):
         'Issue',
         foreign_keys=issue_id,
         back_populates='issue_phases',
-        protected=False,
+        protected=True,
     )
     phase = relationship(
         'Phase',
         foreign_keys=phase_id,
         back_populates='issue_phases',
-        protected=False,
+        protected=True,
     )
 
-    status = column_property(
-        case([
-#            (
-#                all_(
-#                    select([Item.status.expression])
-#                    .where(and_(
-#                        Item.status.expression == 'complete',
-#                        Item.issue_phase_id == id
-#                    ))
-#                    .group_by(Item.issue_phase_id)
-#                ) == 'complete',
-#                'complete'
-#            ),
+    @hybrid_property
+    def status(self):
+        complete_count = 0
+        for item in self.items:
+            if item.status == 'in-progress':
+                return 'in-progress'
+
+            if item.status == 'complete':
+                complete_count = complete_count + 1
+
+        if len(self.items) == complete_count:
+            return 'complete'
+
+        return 'to-do'
+
+    @status.expression
+    def status(cls):
+        return case([
             (
-                any_(
-                    select([Item.status])
+                func.count(
+                    Item.__table__.select(Item.id)
                     .where(and_(
-                        Item.status == 'in-progress',
-                        Item.issue_phase_id == id
+                        Item.status == 'to-do',
+                        Item.issue_phase_id == cls.id
                     ))
-                    .group_by(Item.issue_phase_id)
-                    .group_by(Item.estimated_hours)
-                ) == '1',
-                'in-progress'
+                ) == \
+                func.count(
+                    Item.__table__.select(Item.id)
+                    .where(Item.issue_phase_id == cls.id)
+                ),
+                'to-do'
             ),
-        ],
-        else_='to-do'
-        ).label('status'),
-    deferred=True
-    )
+            (
+                func.count(
+                    Item.__table__.select(Item.id)
+                    .where(and_(
+                        Item.status == 'complete',
+                        Item.issue_phase_id == cls.id
+                    ))
+                ) == \
+                func.count(
+                    Item.__table__.select(Item.id)
+                    .where(Item.issue_phase_id == cls.id)
+                ),
+                'complete'
+            ),
+        ], else_='in-progress')
 

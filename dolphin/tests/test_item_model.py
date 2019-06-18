@@ -188,7 +188,6 @@ def test_item_hours_worked(db):
         session.add(item2)
         session.commit()
 
-        import pudb; pudb.set_trace()  # XXX BREAKPOINT
         assert item1.hours_worked == None
         assert item2.hours_worked == None
 

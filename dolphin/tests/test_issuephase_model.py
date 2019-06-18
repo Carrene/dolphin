@@ -1,6 +1,5 @@
 from datetime import datetime
 
-from nanohttp import settings
 from restfulpy.testing import db
 from auditor.context import Context as AuditLogContext
 
@@ -11,6 +10,8 @@ from dolphin.models import Item, Project, Member, Workflow, Group, Release, \
 def test_issue_phase(db):
     with AuditLogContext(dict()):
         session = db()
+        session.expire_on_commit = True
+
         member1 = Member(
             title='First Member',
             email='member1@example.com',
@@ -140,10 +141,8 @@ def test_issue_phase(db):
             estimated_hours=5,
         )
         session.add(item1)
-        session.flush()
+        session.commit()
 
-
-        import pudb; pudb.set_trace()  # XXX BREAKPOINT
         assert issue_phase1.status == 'to-do'
 
         dailyreport1 = Dailyreport(
@@ -155,20 +154,33 @@ def test_issue_phase(db):
         session.add(dailyreport1)
         session.commit()
 
-        session = db()
-        issue_phase1 = session.query(IssuePhase).get(issue_phase1.id)
-
         assert issue_phase1.status == 'in-progress'
 
         dailyreport2 = Dailyreport(
             date=datetime.strptime('2019-1-3', '%Y-%m-%d').date(),
             hours=3,
-            item_id=item.id,
+            item_id=item1.id,
         )
         session.add(dailyreport2)
         session.commit()
 
-        session = db()
-        issue_phase = session.query(IssuePhase).get(issue_phase.id)
-        assert issue_phase.status == 'complete'
+        assert issue_phase1.status == 'to-do'
+
+        dailyreport3 = Dailyreport(
+            date=datetime.strptime('2019-1-2', '%Y-%m-%d').date(),
+            hours=7,
+            note='The note for a daily report',
+            item=item2,
+        )
+        session.add(dailyreport3)
+
+        dailyreport4 = Dailyreport(
+            date=datetime.strptime('2019-1-3', '%Y-%m-%d').date(),
+            hours=5,
+            item_id=item2.id,
+        )
+        session.add(dailyreport4)
+        session.commit()
+
+        assert issue_phase1.status == 'complete'
 

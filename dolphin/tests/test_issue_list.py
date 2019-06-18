@@ -281,11 +281,15 @@ class TestIssue(LocalApplicationTestCase):
             assert response.json[2]['title'] == self.issue2.title
             assert response.json[3]['title'] == self.issue3.title
 
-            when('Sort issues by status', query=dict(sort='status'))
-            assert response.json[0]['status'] == self.issue2.status
-            assert response.json[1]['status'] == self.issue1.status
-            assert response.json[2]['status'] == self.issue3.status
-            assert response.json[3]['status'] == self.issue4.status
+#            when('Sort issues by status', query=dict(sort='status'))
+#            assert response.json[0]['status'] == self.issue2.status
+#            assert response.json[1]['status'] == self.issue1.status
+#            assert response.json[2]['status'] == self.issue3.status
+#            assert response.json[3]['status'] == self.issue4.status
+#
+            when('Filter by status', query=dict(status='to-do'))
+            assert status == 200
+            assert len(response.json) == 2
 
             when(
                 'Reverse sorting titles by alphabet',
