@@ -6,7 +6,7 @@ from restfulpy.orm.metadata import MetadataField
 from restfulpy.orm.mixins import TimestampMixin, OrderingMixin, \
     FilteringMixin, PaginationMixin
 from sqlalchemy import Integer, ForeignKey, DateTime, Enum, String, select, \
-    func, Boolean
+    func, Boolean, case, any_, text
 from sqlalchemy.orm import column_property, synonym
 
 from .dailyreport import Dailyreport
@@ -121,6 +121,28 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     hours_worked = column_property(
         select([func.sum(Dailyreport.hours)])
         .where(Dailyreport.item_id == id)
+        .group_by(Dailyreport.item_id)
+    )
+    status = column_property(
+        case([
+            (
+                estimated_hours <= select([func.sum(Dailyreport.hours)])
+                .where(Dailyreport.item_id == id)
+                .group_by(Dailyreport.item_id),
+                'complete'
+            ),
+            (
+                any_(
+                    select([Dailyreport.item_id])
+                    .where(Dailyreport.item_id == id)
+                    .group_by(Dailyreport.item_id)
+                ) == 1,
+                'in-progress'
+            ),
+        ],
+        else_='to-do'
+        ).label('status'),
+        deferred=True
     )
 
     @property

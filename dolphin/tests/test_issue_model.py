@@ -293,6 +293,7 @@ def test_issue_lead_phase(db):
         session.commit()
         assert issue1.phase_id == phase2.id
 
+
 def test_issue_status(db):
     session = db()
     session.expire_on_commit = True

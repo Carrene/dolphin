@@ -249,12 +249,12 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         .limit(1)
     )
 
-    status = column_property(
-        select([IssuePhase.status])
-        .where(IssuePhase.phase_id == phase_id.expression)
-        .where(IssuePhase.issue_id == id)
-        .correlate_except(IssuePhase),
-    )
+#    status = column_property(
+#        select([IssuePhase.status])
+#        .where(IssuePhase.phase_id == phase_id.expression)
+#        .where(IssuePhase.issue_id == id)
+#        .correlate_except(IssuePhase),
+#    )
 
     @hybrid_property
     def boarding_value(self):

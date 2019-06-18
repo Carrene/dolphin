@@ -2,7 +2,7 @@ from restfulpy.orm import Field, DeclarativeBase, relationship
 from sqlalchemy import Integer, ForeignKey, Enum, join, select, func, case, \
     text
 from sqlalchemy.orm import column_property
-from sqlalchemy.sql.expression import any_
+from sqlalchemy.sql.expression import any_, all_, and_
 
 from .item import Item
 from .dailyreport import Dailyreport
@@ -70,18 +70,33 @@ class IssuePhase(DeclarativeBase):
     )
 
     status = column_property(
-        select([
-            case([
-                (Item.estimated_hours <= (
-                    select([func.sum(Dailyreport.hours)])
-                    .group_by(Dailyreport.item_id)
-                ), 'complete'),
-                (any_(select([Dailyreport.id])) == 1, 'in-progress'),
-            ],
-            else_='to-do'
-            ).label('status')
-        ])
-        .where(Item.issue_phase_id == id)
-        .group_by(text('status'))
+        case([
+#            (
+#                all_(
+#                    select([Item.status.expression])
+#                    .where(and_(
+#                        Item.status.expression == 'complete',
+#                        Item.issue_phase_id == id
+#                    ))
+#                    .group_by(Item.issue_phase_id)
+#                ) == 'complete',
+#                'complete'
+#            ),
+            (
+                any_(
+                    select([Item.status])
+                    .where(and_(
+                        Item.status == 'in-progress',
+                        Item.issue_phase_id == id
+                    ))
+                    .group_by(Item.issue_phase_id)
+                    .group_by(Item.estimated_hours)
+                ) == '1',
+                'in-progress'
+            ),
+        ],
+        else_='to-do'
+        ).label('status'),
+    deferred=True
     )
 
