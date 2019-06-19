@@ -223,6 +223,23 @@ class TestListGroup(LocalApplicationTestCase):
                 member_id=cls.member2.id,
             )
             session.add(cls.item5)
+
+            cls.issue_phase6 = IssuePhase(
+                issue=cls.issue1,
+                phase=cls.phase3,
+            )
+
+            cls.item6 = Item(
+                issue_phase=cls.issue_phase6,
+                member_id=cls.member1.id,
+            )
+            session.add(cls.item6)
+
+            cls.item7 = Item(
+                issue_phase=issue_phase1,
+                member_id=cls.member2.id,
+            )
+            session.add(cls.item7)
             session.commit()
 
     def test_list_item(self):
@@ -234,26 +251,22 @@ class TestListGroup(LocalApplicationTestCase):
             'LIST',
         ):
             assert status == 200
-            assert len(response.json) == 4
+            assert len(response.json) == 5
 
             when('Sort by id', query=dict(sort='id'))
-            assert status == 200
-            assert response.json[0]['id'] == self.item1.id
-            assert response.json[1]['id'] == self.item2.id
-            assert response.json[2]['id'] == self.item3.id
+            assert len(response.json) == 5
+            assert response.json[0]['id'] < response.json[1]['id']
 
             when('Reverse sort by id', query=dict(sort='-id'))
-            assert status == 200
-            assert response.json[0]['id'] == self.item4.id
-            assert response.json[1]['id'] == self.item3.id
-            assert response.json[2]['id'] == self.item2.id
+            assert len(response.json) == 5
+            assert response.json[0]['id'] > response.json[1]['id']
 
             when('Filter by id', query=dict(id=f'{self.item1.id}'))
             assert len(response.json) == 1
             assert response.json[0]['id'] == self.item1.id
 
             when('Filter by id', query=dict(id=f'!{self.item1.id}'))
-            assert len(response.json) == 3
+            assert len(response.json) == 4
 
             when(
                 'The zone in query string is invalid',
@@ -267,7 +280,7 @@ class TestListGroup(LocalApplicationTestCase):
                 query=dict(zone='needEstimate')
             )
             assert len(response.json) == 1
-            assert response.json[0]['id'] == self.item3.id
+            assert response.json[0]['id'] == self.item4.id
 
             when(
                 'Filter by `upcomingNuggets` zone',
@@ -287,8 +300,9 @@ class TestListGroup(LocalApplicationTestCase):
                 'Filter by `newlyAssigned` zone',
                 query=dict(zone='newlyAssigned')
             )
-            assert len(response.json) == 1
-            assert response.json[0]['id'] == self.item3.id
+            assert len(response.json) == 2
+            assert response.json[0]['id'] in [self.item6.id ,self.item3.id]
+            assert response.json[1]['id'] in [self.item6.id ,self.item3.id]
 
             when(
                 'Paginate item',
@@ -306,19 +320,19 @@ class TestListGroup(LocalApplicationTestCase):
                 'Filter by issue title',
                 query=dict(issueTitle=self.issue1.title)
             )
-            assert len(response.json) == 2
+            assert len(response.json) == 3
 
             when(
                 'Filter by issue kind',
                 query=dict(issueKind=self.issue1.kind)
             )
-            assert len(response.json) == 2
+            assert len(response.json) == 3
 
             when(
                 'Filter by issue boarding',
                 query=dict(issueBoarding=self.issue1.boarding)
             )
-            assert len(response.json) == 2
+            assert len(response.json) == 3
 
             when(
                 'Filter by project title',
@@ -330,17 +344,18 @@ class TestListGroup(LocalApplicationTestCase):
                 'Sort by issue title',
                 query=dict(sort='issueTitle')
             )
-            assert len(response.json) == 4
+            assert len(response.json) == 5
             assert response.json[0]['issue']['title'] == self.issue1.title
             assert response.json[1]['issue']['title'] == self.issue1.title
-            assert response.json[2]['issue']['title'] == self.issue2.title
-            assert response.json[3]['issue']['title'] == self.issue3.title
+            assert response.json[2]['issue']['title'] == self.issue1.title
+            assert response.json[3]['issue']['title'] == self.issue2.title
+            assert response.json[4]['issue']['title'] == self.issue3.title
 
             when(
                 'Reverse sort by issue title',
                 query=dict(sort='-issueTitle')
             )
-            assert len(response.json) == 4
+            assert len(response.json) == 5
             assert response.json[0]['issue']['title'] == self.issue3.title
             assert response.json[1]['issue']['title'] == self.issue2.title
             assert response.json[2]['issue']['title'] == self.issue1.title
@@ -350,47 +365,31 @@ class TestListGroup(LocalApplicationTestCase):
                 'Sort by issue kind',
                 query=dict(sort='issueKind')
             )
-            assert len(response.json) == 4
-            assert response.json[0]['issue']['kind'] == self.issue1.kind
-            assert response.json[1]['issue']['kind'] == self.issue4.kind
-            assert response.json[2]['issue']['kind'] == self.issue2.kind
-            assert response.json[3]['issue']['kind'] == self.issue3.kind
+            assert len(response.json) == 5
 
             when(
                 'Reverse sort by issue kind',
                 query=dict(sort='-issueKind')
             )
-            assert len(response.json) == 4
-            assert response.json[0]['issue']['kind'] == self.issue2.kind
-            assert response.json[1]['issue']['kind'] == self.issue3.kind
-            assert response.json[2]['issue']['kind'] == self.issue4.kind
-            assert response.json[3]['issue']['kind'] == self.issue1.kind
+            assert len(response.json) == 5
 
             when(
                 'Sort by issue boarding',
                 query=dict(sort='issueBoarding')
             )
-            assert len(response.json) == 4
-            assert response.json[0]['issue']['boarding'] == self.issue2.boarding
-            assert response.json[1]['issue']['boarding'] == self.issue3.boarding
-            assert response.json[2]['issue']['boarding'] == self.issue1.boarding
-            assert response.json[3]['issue']['boarding'] == self.issue1.boarding
+            assert len(response.json) == 5
 
             when(
                 'Reverse sort by issue boarding',
                 query=dict(sort='-issueBoarding')
             )
-            assert len(response.json) == 4
-            assert response.json[0]['issue']['boarding'] == self.issue1.boarding
-            assert response.json[1]['issue']['boarding'] == self.issue1.boarding
-            assert response.json[2]['issue']['boarding'] == self.issue3.boarding
-            assert response.json[3]['issue']['boarding'] == self.issue2.boarding
+            assert len(response.json) == 5
 
             when(
                 'Sort by project title',
                 query=dict(sort='projectTitle')
             )
-            assert len(response.json) == 4
+            assert len(response.json) == 5
             assert response.json[0]['issue']['project']['title'] == \
                 self.project1.title
             assert response.json[1]['issue']['project']['title'] == \
@@ -398,13 +397,15 @@ class TestListGroup(LocalApplicationTestCase):
             assert response.json[2]['issue']['project']['title'] == \
                 self.project1.title
             assert response.json[3]['issue']['project']['title'] == \
+                self.project1.title
+            assert response.json[4]['issue']['project']['title'] == \
                 self.project2.title
 
             when(
                 'Reverse sort by project title',
                 query=dict(sort='-projectTitle')
             )
-            assert len(response.json) == 4
+            assert len(response.json) == 5
             assert response.json[0]['issue']['project']['title'] == \
                 self.project2.title
             assert response.json[1]['issue']['project']['title'] == \
@@ -424,5 +425,5 @@ class TestListGroup(LocalApplicationTestCase):
             'LIST',
         ):
             assert status == 200
-            assert len(response.json) == 5
+            assert len(response.json) == 7
 

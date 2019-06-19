@@ -85,12 +85,16 @@ class ItemController(ModelRestController):
 
             if context.query['zone'] == 'newlyAssigned':
                 query = query \
-                    .filter(IssuePhase.phase_id != Issue.phase_id) \
+                    .filter(
+                        IssuePhase.phase_id != Issue._need_estimated_phase_id
+                    ) \
                     .filter(Item.estimated_hours.is_(None))
 
             if context.query['zone'] == 'needEstimate':
                 query = query \
-                    .filter(IssuePhase.phase_id != Issue.phase_id) \
+                    .filter(
+                        IssuePhase.phase_id == Issue._need_estimated_phase_id
+                    ) \
                     .filter(Item.estimated_hours.is_(None))
 
             elif context.query['zone'] == 'upcomingNuggets':

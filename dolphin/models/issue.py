@@ -6,7 +6,7 @@ from restfulpy.orm import Field, DeclarativeBase, relationship, \
     OrderingMixin, FilteringMixin, PaginationMixin
 from restfulpy.orm.metadata import MetadataField
 from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
-    case, join, Boolean, and_
+    case, join, Boolean, and_, any_
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import column_property
 
@@ -250,6 +250,19 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         .where(IssuePhase.issue_id == id)
         .order_by(Phase.order.desc())
         .limit(1)
+    )
+
+    _need_estimated_phase_id = column_property(
+        select([IssuePhase.phase_id])
+        .select_from(
+            join(IssuePhase, Phase, IssuePhase.phase_id == Phase.id)
+            .join(Item, IssuePhase.id == Item.issue_phase_id)
+        )
+        .where(IssuePhase.issue_id == id)
+        .where(Item.estimated_hours.is_(None))
+        .order_by(Phase.order)
+        .limit(1)
+        .as_scalar()
     )
 
     @property
