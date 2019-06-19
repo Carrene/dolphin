@@ -138,7 +138,6 @@ class TestProject(LocalApplicationTestCase):
                 kind='feature',
                 days=2,
                 room_id=3,
-                status='in-progress',
             )
             session.add(issue2)
 
