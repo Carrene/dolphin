@@ -1,6 +1,6 @@
+git+git://github.com/Carrene/restfulpy.git@release/2
 coverage
 coveralls
 pytest-cov
 git+https://github.com/Carrene/wsgi-auditor.git
-git+git://github.com/Carrene/restfulpy.git@release/2
 -r requirements-private.txt

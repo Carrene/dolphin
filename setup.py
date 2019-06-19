@@ -12,7 +12,7 @@ with open(join(dirname(__file__), 'dolphin', '__init__.py')) as v_file:
 
 dependencies = [
     'sqlalchemy_media >= 0.17.1',
-    'restfulpy >= 2.7.6',
+#    'restfulpy >= 2.7.6',
 #    'cas-common',
 
     # Deployment
