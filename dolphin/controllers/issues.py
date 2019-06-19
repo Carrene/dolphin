@@ -150,8 +150,10 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         is_filter_by_status = False
         if context.query.get('status') is not None:
-            is_filter_by_status = True
             status = context.query['status']
+            is_filter_by_status = True
+            is_multi_filter = re.search(r'in\(.*\)', status.lower())
+            status = status[3:-1].split(',') if is_multi_filter else [status]
             del context.query['status']
 
         is_issue_tag_joined = False
@@ -296,7 +298,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         if is_filter_by_status:
             for issue in issues:
-                if issue['status'] != status:
+                if issue['status'] not in status:
                     issues.remove(issue)
 
         return issues

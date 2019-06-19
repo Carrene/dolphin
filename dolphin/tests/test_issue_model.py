@@ -341,6 +341,9 @@ def test_issue_status(db):
             room_id=2,
         )
         session.add(issue1)
+        session.commit()
+
+        assert issue1.status == 'to-do'
 
         phase1 = Phase(
             title='backlog',

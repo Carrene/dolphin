@@ -252,20 +252,16 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         .limit(1)
     )
 
-    @hybrid_property
+    @property
     def status(self):
+        status = 'to-do'
         for issue_phase in self.issue_phases:
             if issue_phase.phase_id == self.phase_id \
                     and issue_phase.issue_id == self.id:
-                return issue_phase.status
+                status = issue_phase.status
+                break
 
-    @status.expression
-    def status(cls):
-        return (
-            select([IssuePhase.status])
-            .where(IssuePhase.phase_id == cls.phase_id.expression)
-            .where(IssuePhase.issue_id == cls.id)
-        ).alias()
+        return status
 
     @hybrid_property
     def boarding_value(self):
@@ -428,6 +424,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
                 ))
 
         issue_dict = super().to_dict()
+        issue_dict['status'] = self.status
         issue_dict['boarding'] = self.boarding
         issue_dict['isSubscribed'] = True if self.is_subscribed else False
         issue_dict['seenAt'] = \
