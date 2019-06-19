@@ -413,6 +413,19 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             example='Lorem Ipsum',
             message='Lorem Ipsum',
         )
+        yield MetadataField(
+            name='items',
+            key='items',
+            label='Items',
+            required=False,
+            not_none=False,
+            readonly=True,
+            watermark='Lorem Ipsum',
+            example='Lorem Ipsum',
+            message='Lorem Ipsum',
+        )
+
+
 
     def to_dict(self, include_relations=True):
         # The `issue` relationship on Item model is `protected=False`, So the
