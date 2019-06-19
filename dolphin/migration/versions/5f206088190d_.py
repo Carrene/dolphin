@@ -30,7 +30,7 @@ item_statuses = [
 class OldItem(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
            DeclarativeBase):
     __tablename__ = 'old_item'
-#    __table_args__ = {'extend_existing': True}
+    __table_args__ = {'extend_existing': True}
 
     id = Field(
         Integer,
