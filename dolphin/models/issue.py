@@ -402,6 +402,17 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             required=False,
             readonly=True
         )
+        yield MetadataField(
+            name='status',
+            key='status',
+            label='Status',
+            required=False,
+            not_none=False,
+            readonly=True,
+            watermark='Lorem Ipsum',
+            example='Lorem Ipsum',
+            message='Lorem Ipsum',
+        )
 
     def to_dict(self, include_relations=True):
         # The `issue` relationship on Item model is `protected=False`, So the
@@ -409,18 +420,13 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         # this causes recursively getting the instances of `issue` and `item`
         # model. But there is some field from Item model that is needed in Issue
         # which are appended to Issue.to_dict return value manually.
-        issue_phases_list = []
         items_list = []
         for issue_phase in self.issue_phases:
             for item in issue_phase.items:
                 items_list.append(dict(
-                    createdAt=item.created_at,
                     memberId=item.member_id,
-                ))
-
-                issue_phases_list.append(dict(
-                    phaseId=item.issue_phase.phase_id,
-                    items=items_list,
+                    createdAt=item.created_at,
+                    phaseId=issue_phase.phase_id,
                 ))
 
         issue_dict = super().to_dict()

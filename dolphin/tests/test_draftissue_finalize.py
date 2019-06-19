@@ -303,8 +303,8 @@ class TestIssue(LocalApplicationTestCase):
                 json=Update(a=1)
             )
             assert status == '707 Invalid field, only following fields are ' \
-                'accepted: title, description, kind, days, stage, projectId, ' \
-                'priority, relatedIssueId'
+                'accepted: title, description, kind, days, stage, isDone, ' \
+                'projectId, priority, relatedIssueId'
 
             when('Request is not authorized', authorization=None)
             assert status == 401

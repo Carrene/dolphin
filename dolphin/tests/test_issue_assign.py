@@ -106,7 +106,8 @@ class TestIssue(LocalApplicationTestCase):
                 form=given | dict(parameter='invalid parameter')
             )
             assert status == '707 Invalid field, only following fields are ' \
-                'accepted: stage, description, phaseId, memberId'
+                'accepted: stage, isDone, description, phaseId, memberId, ' \
+                'projectId, title, days, priority, kind'
 
             when(
                 'Stage value is wron',

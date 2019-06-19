@@ -35,9 +35,15 @@ UNKNOWN_ASSIGNEE = -1
 
 FORM_WHITELIST = [
     'stage',
+    'isDone',
     'description',
     'phaseId',
     'memberId',
+    'projectId',
+    'title',
+    'days',
+    'priority',
+    'kind',
 ]
 
 
@@ -92,10 +98,9 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     @json(
         prevent_empty_form='708 No Parameter Exists In The Form',
         form_whitelist=(
-            ['title', 'days', 'kind', 'description', 'stage',
-             'priority', 'projectId'],
-            '707 Invalid field, only following fields are accepted: '
-            'title, days, kind, description, status, priority'
+            FORM_WHITELIST,
+            f'707 Invalid field, only following fields are accepted: '
+            f'{FORM_WHITELIST_STRING}'
         )
     )
     @update_issue_validator
@@ -291,6 +296,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         issues = Issue.dump_query(query)
 
+        # TODO: Filtering and sorting by the status must be handle by sql query
         if is_sort_by_status:
             issues = query.all()
             issues = [i.to_dict() for i in issues]

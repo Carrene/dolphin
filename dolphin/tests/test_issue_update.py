@@ -204,9 +204,9 @@ class TestIssue(LocalApplicationTestCase):
                 form=given + dict(invalid_param='External parameter') | \
                     dict(title='Another title')
             )
-            assert status == \
-                '707 Invalid field, only following fields are accepted: '\
-                'title, days, kind, description, status, priority'
+            assert status == '707 Invalid field, only following fields are ' \
+                'accepted: stage, isDone, description, phaseId, memberId, ' \
+                'projectId, title, days, priority, kind'
 
             when('Request is not authorized', authorization=None)
             assert status == 401
