@@ -5,20 +5,14 @@ Revises: 936c432ce331
 Create Date: 2019-06-16 13:00:31.184805
 
 """
-from datetime import datetime, timedelta
-
 import sqlalchemy as sa
 from alembic import op
-from nanohttp import settings
 from restfulpy.orm import Field, DeclarativeBase
-from restfulpy.orm.mixins import TimestampMixin, OrderingMixin, \
-    FilteringMixin, PaginationMixin
 from sqlalchemy import orm, Integer, ForeignKey, DateTime, String
 from sqlalchemy.dialects import postgresql
-from sqlalchemy.orm import synonym
 
-from dolphin.models.item import Item
 from dolphin.models.issue_phase import IssuePhase
+from dolphin.models.item import Item
 
 
 item_statuses = [
@@ -36,8 +30,7 @@ depends_on = None
 
 def upgrade():
 
-    class OldItem(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
-               DeclarativeBase):
+    class OldItem(DeclarativeBase):
         __tablename__ = 'old_item'
 
         id = Field(
@@ -87,12 +80,8 @@ def upgrade():
     op.execute(
         "CREATE TYPE issue_stage AS ENUM ('triage', 'backlog', 'working', 'on-hold');"
     )
-    op.execute(
-        "ALTER TABLE issue ADD stage issue_stage;"
-    )
-    op.execute(
-        "UPDATE issue SET stage = 'triage';"
-    )
+    op.execute("ALTER TABLE issue ADD stage issue_stage;")
+    op.execute("UPDATE issue SET stage = 'triage';")
     op.add_column('issue', sa.Column('is_done', sa.Boolean(), nullable=True))
     op.drop_column('issue', 'status')
 
@@ -138,6 +127,8 @@ def upgrade():
     op.drop_column('item', 'phase_id')
     op.drop_column('item', '_status')
     op.drop_column('item', 'issue_id')
+
+    op.execute("DROP TABLE IF EXISTS old_item;")
     # ### end Alembic commands ###
 
 
