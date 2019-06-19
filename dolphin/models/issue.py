@@ -425,8 +425,6 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             message='Lorem Ipsum',
         )
 
-
-
     def to_dict(self, include_relations=True):
         # The `issue` relationship on Item model is `protected=False`, So the
         # `items` relationship on Issue model must be `protected=True`, So that
