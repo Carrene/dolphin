@@ -107,7 +107,6 @@ def date_value_validator(date, project, field):
     return date
 
 
-
 def issue_not_exists_validator(title, project, field):
     form = context.form
     project = DBSession.query(Project) \
