@@ -216,7 +216,7 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             message='Lorem Ipsun',
         )
         yield MetadataField(
-            name='phaseIdd',
+            name='phaseId',
             key='phase_id',
             label='PhaseId',
             required=False,
