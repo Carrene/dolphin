@@ -94,6 +94,7 @@ class TestIssue(LocalApplicationTestCase):
             assert response.json['id'] == self.issue.id
             assert response.json['title'] == self.issue.title
             assert response.json['project']['id'] == self.project.id
+            assert response.json['stage'] == 'triage'
 
             when(
                 'Intended project with string type not found',
