@@ -129,6 +129,13 @@ class TestIssue(LocalApplicationTestCase):
             assert status == 404
 
             when(
+                'Stage chenged',
+                form=given | dict(stage='working')
+            )
+            assert status == 200
+            assert response.json['stage'] == 'working'
+
+            when(
                 'Intended issue with integer type not found',
                 url_parameters=dict(id=100),
                 form=given | dict(title='Another issue')
