@@ -15,12 +15,6 @@ from dolphin.models.issue_phase import IssuePhase
 from dolphin.models.item import Item
 
 
-item_statuses = [
-    'in-progress',
-    'done',
-]
-
-
 # revision identifiers, used by Alembic.
 revision = '5f206088190d'
 down_revision = '936c432ce331'
@@ -84,7 +78,6 @@ def upgrade():
     op.execute("UPDATE issue SET stage = 'triage';")
     op.add_column('issue', sa.Column('is_done', sa.Boolean(), nullable=True))
     op.drop_column('issue', 'status')
-
 
     op.add_column(
         'item',

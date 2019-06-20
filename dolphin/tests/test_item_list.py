@@ -1,9 +1,9 @@
 from datetime import datetime
 
-from bddrest import status, response, when, given
+from auditor.context import Context as AuditLogContext
+from bddrest import status, response, when
 from nanohttp import context
 from nanohttp.contexts import Context
-from auditor.context import Context as AuditLogContext
 
 from dolphin.models import Member, Group, Workflow, Skill, Phase, Release, \
     Project, Issue, Item, Admin, IssuePhase
@@ -368,6 +368,7 @@ class TestListGroup(LocalApplicationTestCase):
             assert response.json[1]['issue']['title'] == self.issue2.title
             assert response.json[2]['issue']['title'] == self.issue1.title
             assert response.json[3]['issue']['title'] == self.issue1.title
+            assert response.json[4]['issue']['title'] == self.issue1.title
 
             when(
                 'Sort by issue kind',
@@ -421,6 +422,8 @@ class TestListGroup(LocalApplicationTestCase):
             assert response.json[2]['issue']['project']['title'] == \
                 self.project1.title
             assert response.json[3]['issue']['project']['title'] == \
+                self.project1.title
+            assert response.json[4]['issue']['project']['title'] == \
                 self.project1.title
 
             when('Request is not authorized', authorization=None)
