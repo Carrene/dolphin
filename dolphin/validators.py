@@ -126,12 +126,12 @@ def kind_value_validator(kind, project, field):
     return form['kind']
 
 
-def issue_status_value_validator(status, project, field):
+def issue_stage_value_validator(stage, project, field):
     form = context.form
-    if 'status' in form and form['status'] not in issue_statuses:
-        raise StatusInvalidStatusValue(statuses_values=issue_statuses)
+    if 'stage' in form and form['stage'] not in issue_stages:
+        raise StatusInvalidStagesValue(stages_values=issue_stages)
 
-    return form['status']
+    return form['stage']
 
 
 def issue_priority_value_validator(priority, project, field):
@@ -438,8 +438,8 @@ draft_issue_finalize_validator = validate(
         required=StatusKindNotInForm,
         callback=kind_value_validator
     ),
-    status=dict(
-        callback=issue_status_value_validator
+    stage=dict(
+        callback=issue_stage_value_validator
     ),
     days=dict(
         type_=(int, StatusInvalidDaysType),
@@ -464,8 +464,8 @@ update_issue_validator = validate(
     kind=dict(
         callback=kind_value_validator
     ),
-    status=dict(
-        callback=issue_status_value_validator
+    stage=dict(
+        callback=issue_stage_value_validator
     ),
     days=dict(
         type_=(int, StatusInvalidDaysType),
@@ -495,8 +495,8 @@ assign_issue_validator = validate(
         type_=(int, StatusInvalidPhaseIdType),
         callback=phase_exists_validator
     ),
-    status=dict(
-        callback=item_status_value_validator
+    stage=dict(
+        callback=issue_stage_value_validator
     ),
     description=dict(
         max_length=(

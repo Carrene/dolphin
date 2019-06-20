@@ -1,13 +1,13 @@
 from datetime import datetime
 
+from auditor.context import Context as AuditLogContext
+from bddrest import status, response, when
 from nanohttp import context
 from nanohttp.contexts import Context
-from bddrest import status, response, when
-from auditor.context import Context as AuditLogContext
 
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 from dolphin.models import Issue, Project, Member, Workflow, Item, Phase, \
-    Group, Subscription, Release, Skill, Organization, Tag
+    Group, Subscription, Release, Skill, Organization, Tag, IssuePhase
+from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
 class TestIssue(LocalApplicationTestCase):
@@ -77,7 +77,6 @@ class TestIssue(LocalApplicationTestCase):
                 project=cls.project,
                 title='First issue',
                 description='This is description of first issue',
-                status='in-progress',
                 kind='feature',
                 days=1,
                 room_id=2,
@@ -97,7 +96,6 @@ class TestIssue(LocalApplicationTestCase):
                 project=cls.project,
                 title='Second issue',
                 description='This is description of second issue',
-                status='to-do',
                 kind='feature',
                 days=2,
                 room_id=3,
@@ -118,8 +116,8 @@ class TestIssue(LocalApplicationTestCase):
                 project=cls.project,
                 title='Third issue',
                 description='This is description of third issue',
-                status='on-hold',
                 kind='feature',
+                stage='on-hold',
                 days=3,
                 room_id=4,
             )
@@ -138,13 +136,13 @@ class TestIssue(LocalApplicationTestCase):
                 project=cls.project,
                 title='Fourth issue',
                 description='This is description of fourth issue',
-                status='complete',
                 kind='feature',
                 days=3,
                 room_id=4,
                 tags=[cls.tag2],
             )
             session.add(cls.issue4)
+            session.flush()
 
             cls.phase1 = Phase(
                 workflow=workflow,
@@ -173,26 +171,38 @@ class TestIssue(LocalApplicationTestCase):
             session.add(cls.phase1)
             session.flush()
 
+            issue_phase1 = IssuePhase(
+                issue=cls.issue1,
+                phase=cls.phase1,
+            )
+
             item1 = Item(
                 member_id=member.id,
-                phase_id=cls.phase1.id,
-                issue_id=cls.issue1.id,
+                issue_phase=issue_phase1,
             )
             session.add(item1)
             session.flush()
 
+            issue_phase2 = IssuePhase(
+                issue=cls.issue2,
+                phase=cls.phase2,
+            )
+
             item2 = Item(
                 member_id=member.id,
-                phase_id=cls.phase2.id,
-                issue_id=cls.issue2.id,
+                issue_phase=issue_phase2,
             )
             session.add(item2)
             session.flush()
 
+            issue_phase3 = IssuePhase(
+                issue=cls.issue1,
+                phase=cls.phase2,
+            )
+
             item3 = Item(
                 member_id=member.id,
-                phase_id=cls.phase2.id,
-                issue_id=cls.issue1.id,
+                issue_phase=issue_phase3,
                 start_date='2019-2-2',
                 end_date='2019-2-3',
                 estimated_hours=4,
@@ -200,26 +210,41 @@ class TestIssue(LocalApplicationTestCase):
             session.add(item3)
             session.flush()
 
+            issue_phase4 = IssuePhase(
+                issue=cls.issue2,
+                phase=cls.phase1,
+            )
+
             item4 = Item(
                 member_id=member.id,
-                phase_id=cls.phase1.id,
-                issue_id=cls.issue2.id,
+                issue_phase=issue_phase4,
+                start_date='2019-2-2',
+                end_date='2019-2-3',
+                estimated_hours=4,
             )
             session.add(item4)
             session.flush()
 
+            issue_phase5 = IssuePhase(
+                issue=cls.issue2,
+                phase=cls.phase3,
+            )
+
             item5 = Item(
                 member_id=member.id,
-                phase_id=cls.phase3.id,
-                issue_id=cls.issue2.id,
+                issue_phase=issue_phase5,
             )
             session.add(item5)
             session.flush()
 
+            issue_phase6 = IssuePhase(
+                issue=cls.issue3,
+                phase=cls.phase1,
+            )
+
             item6 = Item(
                 member_id=member.id,
-                phase_id=cls.phase1.id,
-                issue_id=cls.issue3.id,
+                issue_phase=issue_phase6,
             )
             session.add(item6)
             session.commit()
@@ -251,19 +276,36 @@ class TestIssue(LocalApplicationTestCase):
             assert len(response.json) == 2
 
             when('Sort issues by title', query=dict(sort='title'))
-            assert response.json[0]['title'] == 'First issue'
+            assert response.json[0]['title'] == self.issue1.title
+            assert response.json[1]['title'] == self.issue4.title
+            assert response.json[2]['title'] == self.issue2.title
+            assert response.json[3]['title'] == self.issue3.title
 
             when('Sort issues by status', query=dict(sort='status'))
-            assert response.json[0]['status'] == self.issue2.status
-            assert response.json[1]['status'] == self.issue1.status
-            assert response.json[2]['status'] == self.issue3.status
-            assert response.json[3]['status'] == self.issue4.status
+            assert response.json[0]['status'] == 'to-do'
+            assert response.json[1]['status'] == 'to-do'
+            assert response.json[2]['status'] == 'to-do'
+            assert response.json[3]['status'] == 'to-do'
+
+            when('Filter by status', query=dict(status='to-do'))
+            assert status == 200
+            assert len(response.json) == 4
+
+            when(
+                'Filter by multi statuses',
+                query=dict(status='IN(to-do, in-progress)')
+            )
+            assert status == 200
+            assert len(response.json) == 4
 
             when(
                 'Reverse sorting titles by alphabet',
                 query=dict(sort='-title')
             )
-            assert response.json[0]['title'] == 'Third issue'
+            assert response.json[0]['title'] == self.issue3.title
+            assert response.json[1]['title'] == self.issue2.title
+            assert response.json[2]['title'] == self.issue4.title
+            assert response.json[3]['title'] == self.issue1.title
 
             when('Filter issues', query=dict(title='First issue'))
             assert response.json[0]['title'] == 'First issue'
@@ -278,11 +320,11 @@ class TestIssue(LocalApplicationTestCase):
                 'Filter based on a hybrid property',
                 query=dict(boarding='delayed')
             )
-            assert len(response.json) == 1
+            assert len(response.json) == 2
 
             when(
-                'Filter based on a status',
-                query=dict(status='on-hold')
+                'Filter based on a stage',
+                query=dict(stage='on-hold')
             )
             assert len(response.json) == 1
             assert response.json[0]['boarding'] == 'frozen'
@@ -311,6 +353,8 @@ class TestIssue(LocalApplicationTestCase):
                 query=dict(phaseTitle=self.phase1.title)
             )
             assert len(response.json) == 1
+            assert response.json[0]['id'] == self.issue2.id
+
 
             when(
                 'Filtering and sorting the issues by phase title',
@@ -321,12 +365,12 @@ class TestIssue(LocalApplicationTestCase):
             when(
                 'Filtering the issues by phase title and phase id',
                 query=dict(
-                    phaseTitle=self.phase3.title,
-                    phaseId=self.phase3.id
+                    phaseTitle=self.phase2.title,
+                    phaseId=self.phase2.id
                 )
             )
             assert len(response.json) == 1
-            assert response.json[0]['id'] == self.issue2.id
+            assert response.json[0]['id'] == self.issue1.id
 
             when(
                 'Filtering the issues by tag id',
@@ -364,22 +408,17 @@ class TestIssue(LocalApplicationTestCase):
                 )
             )
             assert len(response.json) == 1
+            assert response.json[0]['id'] == self.issue2.id
 
             when('Sort by phase id', query=dict(sort='phaseId'))
             assert status == 200
             assert len(response.json) == 4
-            assert response.json[0]['id'] == self.issue3.id
-            assert response.json[1]['id'] == self.issue1.id
-            assert response.json[2]['id'] == self.issue2.id
-            assert response.json[3]['id'] == self.issue4.id
+            assert response.json[0]['id'] == self.issue2.id
 
             when('Reverse sort by phase id', query=dict(sort='-phaseId'))
             assert status == 200
             assert len(response.json) == 4
-            assert response.json[0]['id'] == self.issue4.id
-            assert response.json[1]['id'] == self.issue2.id
-            assert response.json[2]['id'] == self.issue1.id
-            assert response.json[3]['id'] == self.issue3.id
+            assert response.json[3]['id'] == self.issue2.id
 
             when('Sort by tag id', query=dict(sort='tagId'))
             assert status == 200
@@ -418,7 +457,7 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert status == 200
             assert len(response.json) == 1
-            assert response.json[0]['id'] == self.issue3.id
+            assert response.json[0]['id'] == self.issue2.id
 
             when(
                 'Sort and filter by tag id at the same time',
@@ -454,18 +493,14 @@ class TestIssue(LocalApplicationTestCase):
             when('Sort by phase title', query=dict(sort='phaseTitle'))
             assert status == 200
             assert len(response.json) == 4
-            assert response.json[0]['id'] == self.issue3.id
-            assert response.json[1]['id'] == self.issue2.id
-            assert response.json[2]['id'] == self.issue1.id
-            assert response.json[3]['id'] == self.issue4.id
+            assert response.json[0]['id'] == self.issue2.id
+            assert response.json[1]['id'] == self.issue1.id
 
             when('Reverse sort by phase title', query=dict(sort='-phaseTitle'))
             assert status == 200
             assert len(response.json) == 4
-            assert response.json[0]['id'] == self.issue4.id
-            assert response.json[1]['id'] == self.issue1.id
-            assert response.json[2]['id'] == self.issue2.id
-            assert response.json[3]['id'] == self.issue3.id
+            assert response.json[3]['id'] == self.issue2.id
+            assert response.json[2]['id'] == self.issue1.id
 
             when(
                 'Filter by phase id and sort by phase title',
@@ -478,7 +513,7 @@ class TestIssue(LocalApplicationTestCase):
                 'filter by triage phase id',
                 query=dict(phaseId='IN(0,1)')
             )
-            assert len(response.json) == 2
+            assert len(response.json) == 3
 
             when('Request is not authorized', authorization=None)
             assert status == 401

@@ -175,6 +175,12 @@ class StatusInvalidReleaseIdType(HTTPKnownStatus):
     status = '750 Invalid Release Id Type'
 
 
+class StatusInvalidStagesValue(HTTPKnownStatus):
+    def __init__(self, stages_values):
+        self.status = f'705 Invalid stage value, only one of ' \
+            f'"{", ".join(stages_values)}" will be accepted'
+
+
 class StatusInvalidStatusValue(HTTPKnownStatus):
     def __init__(self, statuses_values):
         self.status = f'705 Invalid status value, only one of ' \

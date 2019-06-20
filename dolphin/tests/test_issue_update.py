@@ -1,6 +1,6 @@
 from auditor import MiddleWare
-from auditor.logentry import ChangeAttributeLogEntry
 from auditor.context import Context as AuditLogContext
+from auditor.logentry import ChangeAttributeLogEntry
 from bddrest import status, when, given, response, Update
 from nanohttp import context
 from nanohttp.contexts import Context
@@ -178,13 +178,13 @@ class TestIssue(LocalApplicationTestCase):
                 'bug" will be accepted'
 
             when(
-                'Invalid status value is in form',
-                form=given + dict(status='progressing') | \
+                'Invalid stage value is in form',
+                form=given + dict(stage='progressing') | \
                     dict(title='Another title')
             )
-            assert status == '705 Invalid status value, only one of "to-do, ' \
-                'in-progress, on-hold, complete, done" will be accepted'
-            assert status.text.startswith('Invalid status')
+            assert status == '705 Invalid stage value, only one of "triage, ' \
+                'backlog, working, on-hold" will be accepted'
+            assert status.text.startswith('Invalid stage')
 
             when(
                 'Invalid priority value is in form',
@@ -204,9 +204,9 @@ class TestIssue(LocalApplicationTestCase):
                 form=given + dict(invalid_param='External parameter') | \
                     dict(title='Another title')
             )
-            assert status == \
-                '707 Invalid field, only following fields are accepted: '\
-                'title, days, kind, description, status, priority'
+            assert status == '707 Invalid field, only following fields are ' \
+                'accepted: stage, isDone, description, phaseId, memberId, ' \
+                'projectId, title, days, priority, kind'
 
             when('Request is not authorized', authorization=None)
             assert status == 401

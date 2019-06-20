@@ -1,17 +1,17 @@
 from auditor import observe
 from nanohttp import context
 from restfulpy.orm import Field, relationship, SoftDeleteMixin, \
-    ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin
+    OrderingMixin, FilteringMixin, PaginationMixin
 from restfulpy.orm.metadata import MetadataField
 from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
     join, case
 from sqlalchemy.orm import column_property
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from .issue import Issue, Boarding
-from .subscribable import Subscribable, Subscription
-from .member import Member
 from ..mixins import ModifiedByMixin
+from .issue import Issue, Boarding
+from .member import Member
+from .subscribable import Subscribable, Subscription
 
 
 project_statuses = [

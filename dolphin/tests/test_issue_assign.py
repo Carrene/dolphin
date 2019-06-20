@@ -89,7 +89,7 @@ class TestIssue(LocalApplicationTestCase):
             memberId=self.member2.id,
             phaseId=1,
             description='A description for item',
-            status='in-progress'
+            stage='triage'
         )
 
         with oauth_mockup_server(), self.given(
@@ -106,14 +106,15 @@ class TestIssue(LocalApplicationTestCase):
                 form=given | dict(parameter='invalid parameter')
             )
             assert status == '707 Invalid field, only following fields are ' \
-                'accepted: status, description, phaseId, memberId'
+                'accepted: stage, isDone, description, phaseId, memberId, ' \
+                'projectId, title, days, priority, kind'
 
             when(
-                'Status value is wrong',
-                form=given | dict(status='invalid value')
+                'Stage value is wron',
+                form=given | dict(stage='invalid value')
             )
             assert status == 705
-            assert status.text.startswith('Invalid status value')
+            assert status.text.startswith('Invalid stage value')
 
             when(
                 'Description is more than limit',

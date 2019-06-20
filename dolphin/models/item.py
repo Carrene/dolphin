@@ -5,17 +5,11 @@ from restfulpy.orm import Field, DeclarativeBase, relationship
 from restfulpy.orm.metadata import MetadataField
 from restfulpy.orm.mixins import TimestampMixin, OrderingMixin, \
     FilteringMixin, PaginationMixin
-from sqlalchemy import Integer, ForeignKey, UniqueConstraint, DateTime, Enum, \
-    String, select, func
+from sqlalchemy import Integer, ForeignKey, DateTime, Enum, String, select, \
+    func, Boolean, case, any_, text
 from sqlalchemy.orm import column_property, synonym
 
 from .dailyreport import Dailyreport
-
-
-item_statuses = [
-    'in-progress',
-    'done',
-]
 
 
 class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
@@ -71,16 +65,6 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         not_none=False,
         required=False,
     )
-    _status = Field(
-        Enum(*item_statuses, name='item_status'),
-        python_type=str,
-        default='in-progress',
-        label='Status',
-        watermark='Choose a status',
-        nullable=True,
-        required=False,
-        example='Lorem Ipsum'
-    )
     description = Field(
         String,
         min_length=1,
@@ -93,27 +77,16 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         python_type=str,
         example='Lorem Ipsum'
     )
-    phase_id = Field(
+    issue_phase_id = Field(
         Integer,
-        ForeignKey('phase.id'),
+        ForeignKey('issue_phase.id'),
         python_type=int,
         nullable=False,
-        watermark='Choose a phase',
-        label='Phase',
+        watermark='Lorem Ipsum',
+        label='Lorem Ipsum',
         not_none=True,
         required=True,
-        example='Lorem Ipsum'
-    )
-    issue_id = Field(
-        Integer,
-        ForeignKey('issue.id'),
-        python_type=int,
-        nullable=False,
-        watermark='Choose an issue',
-        label='Issue',
-        not_none=True,
-        required=True,
-        example='Lorem Ipsum'
+        example='Lorem Ipsum',
     )
     member_id = Field(
         Integer,
@@ -126,18 +99,17 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         required=True,
         example='Lorem Ipsum'
     )
-    _last_status_change = Field(
-        DateTime,
-        python_type=datetime,
-        nullable=True,
-        protected=True,
-    )
-
-    issue = relationship(
-        'Issue',
-        foreign_keys=issue_id,
+    issue_phase = relationship(
+        'IssuePhase',
+        foreign_keys=issue_phase_id,
         back_populates='items',
         protected=False,
+    )
+    member = relationship(
+        'Member',
+        foreign_keys=member_id,
+        back_populates='items',
+        protected=True,
     )
     dailyreports = relationship(
         'Dailyreport',
@@ -146,13 +118,32 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         lazy='selectin',
         order_by='Dailyreport.id',
     )
-
     hours_worked = column_property(
         select([func.sum(Dailyreport.hours)])
         .where(Dailyreport.item_id == id)
+        .group_by(Dailyreport.item_id)
     )
-
-    UniqueConstraint(phase_id, issue_id, member_id)
+    status = column_property(
+        case([
+            (
+                estimated_hours <= select([func.sum(Dailyreport.hours)])
+                .where(Dailyreport.item_id == id)
+                .group_by(Dailyreport.item_id),
+                'complete'
+            ),
+            (
+                any_(
+                    select([Dailyreport.item_id])
+                    .where(Dailyreport.item_id == id)
+                    .group_by(Dailyreport.item_id)
+                ) == 1,
+                'in-progress'
+            ),
+        ],
+        else_='to-do'
+        ).label('status'),
+        deferred=True
+    )
 
     @property
     def perspective(self):
@@ -170,26 +161,10 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
         return 'Submitted'
 
-    def _set_status(self, status):
-        if status == 'in-progress':
-            self._last_status_change = datetime.now()
-
-        self._status = status
-
-    def _get_status(self):
-        return self._status
-
-    status = synonym(
-        '_status',
-        descriptor=property(_get_status, _set_status),
-        info=dict(protected=True)
-    )
-
     @property
     def response_time(self):
-        if self.status == 'in-progress':
           return (
-              (self._last_status_change or self.created_at) + \
+              self.created_at + \
               timedelta(hours=settings.item.response_time)
           ) - datetime.now()
 
@@ -201,21 +176,13 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
         item_dict['hoursWorked'] = self.hours_worked
         item_dict['perspective'] = self.perspective
+        item_dict['issue'] = self.issue_phase.issue.to_dict()
+        item_dict['phaseId'] = self.issue_phase.phase_id
         return item_dict
 
     @classmethod
     def iter_metadata_fields(cls):
         yield from super().iter_metadata_fields()
-        yield MetadataField(
-            name='issue',
-            key='issue',
-            label='Lorem Ipsun',
-            required=False,
-            readonly=True,
-            watermark='Lorem Ipsum',
-            example='Lorem Ipsum',
-            message='Lorem Ipsun',
-        )
         yield MetadataField(
             name='responseTime',
             key='response_time',
@@ -226,11 +193,32 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             example='Lorem Ipsum',
             message='Lorem Ipsun',
         )
-
         yield MetadataField(
             name='perspective',
             key='perspective',
             label='Perspective',
+            required=False,
+            readonly=True,
+            not_none=True,
+            watermark='Lorem Ipsum',
+            example='Lorem Ipsum',
+            message='Lorem Ipsun',
+        )
+        yield MetadataField(
+            name='issue',
+            key='issue',
+            label='Issue',
+            required=False,
+            readonly=True,
+            not_none=True,
+            watermark='Lorem Ipsum',
+            example='Lorem Ipsum',
+            message='Lorem Ipsun',
+        )
+        yield MetadataField(
+            name='phaseId',
+            key='phase_id',
+            label='PhaseId',
             required=False,
             readonly=True,
             not_none=True,

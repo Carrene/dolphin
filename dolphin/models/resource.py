@@ -7,6 +7,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from .member import Member
 from .issue import Issue
 from .item import Item
+from .issue_phase import IssuePhase
 
 
 class TeamResource(DeclarativeBase):
@@ -27,7 +28,6 @@ class Resource(Member):
         nullable=True,
         not_none=False,
     )
-
     teams = relationship(
         'Team',
         secondary='resourceteam',
@@ -43,7 +43,8 @@ class Resource(Member):
     load_value = column_property(
         select([func.sum(Issue.priority_value)]) \
         .select_from(
-            join(Item, Issue, Item.issue_id == Issue.id),
+            join(IssuePhase, Issue, IssuePhase.issue_id == Issue.id)
+            .join(Item, Item.issue_phase_id == IssuePhase.id),
         ) \
         .where(Item.member_id == Member.id)
     )

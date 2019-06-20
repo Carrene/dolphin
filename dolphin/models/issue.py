@@ -6,15 +6,16 @@ from restfulpy.orm import Field, DeclarativeBase, relationship, \
     OrderingMixin, FilteringMixin, PaginationMixin
 from restfulpy.orm.metadata import MetadataField
 from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
-    DateTime, case, join
+    case, join, Boolean, and_, any_
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import column_property
 
 from ..mixins import ModifiedByMixin
-from .item import Item
 from .member import Member
-from .subscribable import Subscribable, Subscription
+from .item import Item
 from .phase import Phase
+from .issue_phase import IssuePhase
+from .subscribable import Subscribable, Subscription
 
 
 class IssueTag(DeclarativeBase):
@@ -39,12 +40,11 @@ class RelatedIssue(DeclarativeBase):
     related_issue_id = Field(Integer, ForeignKey('issue.id'), primary_key=True)
 
 
-issue_statuses = [
-    'to-do',
-    'in-progress',
+issue_stages = [
+    'triage',
+    'backlog',
+    'working',
     'on-hold',
-    'complete',
-    'done',
 ]
 
 
@@ -106,7 +106,6 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         example='Lorem Ipsum'
     )
     room_id = Field(Integer, readonly=True)
-
     kind = Field(
         Enum(*issue_kinds, name='kind'),
         python_type=str,
@@ -128,15 +127,16 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         not_none=False,
         required=False
     )
-    status = Field(
-        Enum(*issue_statuses, name='issues_status'),
+    stage = Field(
+        Enum(*issue_stages, name='issues_stage'),
         python_type=str,
-        label='Status',
-        watermark='Choose a status',
+        label='Stage',
+        default='triage',
         not_none=True,
         required=False,
-        default='to-do',
-        example='lorem ipsum',
+        protected=False,
+        watermark='lorem ipsum',
+        message='lorem ipsum',
     )
     priority = Field(
         Enum(*issue_priorities, name='priority'),
@@ -149,9 +149,18 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         watermark='lorem ipsum',
         example='lorem ipsum',
     )
-
+    is_done = Field(
+        Boolean,
+        python_type=bool,
+        label='Lorem Ipsum',
+        message='Lorem Ipsum',
+        watermark='Lorem Ipsum',
+        readonly=False,
+        nullable=True,
+        not_none=False,
+        required=False,
+    )
     attachments = relationship('Attachment', lazy='selectin')
-
     tags = relationship(
         'Tag',
         secondary='issue_tag',
@@ -164,32 +173,21 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         back_populates='issues',
         protected=False
     )
-    members = relationship(
-        'Member',
-        secondary='item',
-        back_populates='issues',
-        lazy='selectin',
-        protected=True,
-    )
-
     draft_issue = relationship(
         'DraftIssue',
         back_populates='issue',
         protected=True,
     )
-
     draft_issues = relationship(
         'DraftIssue',
         back_populates='related_issues',
         protected=True,
     )
-
-    items = relationship(
-        'Item',
+    issue_phases = relationship(
+        'IssuePhase',
+        back_populates='issue',
         protected=True,
-        order_by=Item.created_at,
     )
-
     relations = relationship(
         'Issue',
         secondary='related_issue',
@@ -197,20 +195,14 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         secondaryjoin=id == RelatedIssue.related_issue_id,
         lazy='selectin',
     )
-
-    _active_phase_order_subquery = select([func.max(Phase.order)]) \
-        .select_from(join(Item, Phase, Item.phase_id == Phase.id)) \
-        .where(Item.issue_id == id) \
-        .correlate_except(Phase)
-
     due_date = column_property(
         select([func.max(Item.end_date)]) \
-        .select_from(join(Item, Phase, Item.phase_id == Phase.id)) \
-        .where(Phase.order == _active_phase_order_subquery) \
-        .where(Item.issue_id == id) \
+        .select_from(
+            join(IssuePhase, Item, IssuePhase.id == Item.issue_phase_id)
+        ) \
+        .where(IssuePhase.issue_id == id) \
         .correlate_except(Item)
     )
-
     is_subscribed = column_property(
         select([func.count(Subscription.member_id)])
         .select_from(
@@ -227,7 +219,6 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         .correlate_except(Subscription),
         deferred=True
     )
-
     seen_at = column_property(
         select([Subscription.seen_at])
         .select_from(
@@ -245,12 +236,44 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         deferred=True
     )
 
+    _not_estimated_phases = select([Item.issue_phase_id]) \
+        .where(Item.estimated_hours.is_(None)) \
+        .group_by(Item.issue_phase_id)
+
+    phase_id = column_property(
+        select([IssuePhase.phase_id])
+        .select_from(join(IssuePhase, Phase, IssuePhase.phase_id == Phase.id))
+        .where(IssuePhase.id.notin_(_not_estimated_phases))
+        .where(IssuePhase.issue_id == id)
+        .order_by(Phase.order.desc())
+        .limit(1)
+    )
+
+    _need_estimated_phase_id = select([IssuePhase.phase_id]) \
+        .select_from(
+            join(IssuePhase, Phase, IssuePhase.phase_id == Phase.id)
+            .join(Item, IssuePhase.id == Item.issue_phase_id)
+        ) \
+        .where(IssuePhase.issue_id == id) \
+        .where(Item.estimated_hours.is_(None)) \
+        .order_by(Phase.order) \
+        .limit(1) \
+        .as_scalar()
+
+    @property
+    def status(self):
+        status = 'to-do'
+        for issue_phase in self.issue_phases:
+            if issue_phase.phase_id == self.phase_id \
+                    and issue_phase.issue_id == self.id:
+                status = issue_phase.status
+                break
+
+        return status
+
     @hybrid_property
     def boarding_value(self):
-        if self.status == 'on-hold':
-            return Boarding.frozen[0]
-
-        elif self.due_date == None:
+        if self.due_date == None:
             return Boarding.frozen[0]
 
         elif self.due_date < datetime.now():
@@ -261,7 +284,6 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
     @boarding_value.expression
     def boarding_value(cls):
         return case([
-            (cls.status == 'on-hold', Boarding.frozen[0]),
             (cls.due_date == None, Boarding.frozen[0]),
             (cls.due_date < datetime.now(), Boarding.delayed[0]),
             (cls.due_date > datetime.now(), Boarding.ontime[0])
@@ -269,10 +291,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
 
     @hybrid_property
     def boarding(self):
-        if self.status == 'on-hold':
-            return Boarding.frozen[1]
-
-        elif self.due_date == None:
+        if self.due_date == None:
             return Boarding.frozen[1]
 
         elif self.due_date < datetime.now():
@@ -283,7 +302,6 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
     @boarding.expression
     def boarding(cls):
         return case([
-            (cls.status == 'on-hold', Boarding.frozen[1]),
             (cls.due_date == None, Boarding.frozen[1]),
             (cls.due_date < datetime.now(), Boarding.delayed[1]),
             (cls.due_date > datetime.now(), Boarding.ontime[1])
@@ -392,6 +410,28 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             required=False,
             readonly=True
         )
+        yield MetadataField(
+            name='status',
+            key='status',
+            label='Status',
+            required=False,
+            not_none=False,
+            readonly=True,
+            watermark='Lorem Ipsum',
+            example='Lorem Ipsum',
+            message='Lorem Ipsum',
+        )
+        yield MetadataField(
+            name='items',
+            key='items',
+            label='Items',
+            required=False,
+            not_none=False,
+            readonly=True,
+            watermark='Lorem Ipsum',
+            example='Lorem Ipsum',
+            message='Lorem Ipsum',
+        )
 
     def to_dict(self, include_relations=True):
         # The `issue` relationship on Item model is `protected=False`, So the
@@ -400,14 +440,16 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         # model. But there is some field from Item model that is needed in Issue
         # which are appended to Issue.to_dict return value manually.
         items_list = []
-        for item in self.items:
-            items_list.append(dict(
-                memberId=item.member_id,
-                phaseId=item.phase_id,
-                createdAt=item.created_at,
-            ))
+        for issue_phase in self.issue_phases:
+            for item in issue_phase.items:
+                items_list.append(dict(
+                    memberId=item.member_id,
+                    createdAt=item.created_at,
+                    phaseId=issue_phase.phase_id,
+                ))
 
         issue_dict = super().to_dict()
+        issue_dict['status'] = self.status
         issue_dict['boarding'] = self.boarding
         issue_dict['isSubscribed'] = True if self.is_subscribed else False
         issue_dict['seenAt'] = \

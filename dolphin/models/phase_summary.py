@@ -6,6 +6,7 @@ from sqlalchemy import Integer, Unicode, select, func, join, DateTime, and_
 from sqlalchemy.orm import mapper
 
 from . import Phase, Item, Dailyreport, Project, Issue
+from .issue_phase import IssuePhase
 
 
 class AbstractPhaseSummaryView(PaginationMixin, OrderingMixin, FilteringMixin,
@@ -28,7 +29,14 @@ class AbstractPhaseSummaryView(PaginationMixin, OrderingMixin, FilteringMixin,
 
     @classmethod
     def create_mapped_class(cls, issue_id):
-        item_cte = select([Item]).where(Item.issue_id == issue_id).cte()
+        item_cte = select([Item, IssuePhase.issue_id, IssuePhase.phase_id]) \
+            .select_from(join(
+                Item,
+                IssuePhase,
+                Item.issue_phase_id == IssuePhase.id
+            )) \
+            .where(IssuePhase.issue_id == issue_id) \
+            .cte()
         workflow_id_subquery = DBSession.query(Project.workflow_id) \
             .join(Issue, Project.id == Issue.project_id) \
             .filter(Issue.id == issue_id) \
@@ -73,6 +81,21 @@ class AbstractPhaseSummaryView(PaginationMixin, OrderingMixin, FilteringMixin,
     def iter_columns(cls, relationships=False, synonyms=False, composites=False,
                      use_inspection=False, hybrids=False):
         for c in Item.iter_columns(
+            relationships=relationships,
+            synonyms=synonyms,
+            composites=composites,
+            use_inspection=use_inspection
+        ):
+             if c.key not in cls.__containig_fields__['item']:
+                 continue
+
+             column = getattr(cls, c.key, None)
+             if hasattr(c, 'info'):
+                 column.info.update(c.info)
+
+             yield column
+
+        for c in IssuePhase.iter_columns(
             relationships=relationships,
             synonyms=synonyms,
             composites=composites,

@@ -105,10 +105,10 @@ class TestIssue(LocalApplicationTestCase):
                     op='UPDATE',
                     path=f'{self.issue.id}',
                     value={
-                        "title": "sample title",
-                        "priority": "low",
-                        "kind": "bug",
-                        "status": "on-hold"
+                        'title': 'sample title',
+                        'priority': 'low',
+                        'kind': 'bug',
+                        'stage': 'on-hold',
                     }
                 )
             ]

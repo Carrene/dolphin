@@ -4,7 +4,7 @@ from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when
 
 from dolphin.models import Project, Member, Workflow, Group, Release, Skill, \
-    Phase, Issue, Item
+    Phase, Issue, Item, IssuePhase
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -25,17 +25,16 @@ class TestItem(LocalApplicationTestCase):
 
         workflow = Workflow(title='Default')
         session.add(workflow)
-
         skill = Skill(title='First Skill')
-        phase1 = Phase(
+        group = Group(title='default')
+
+        cls.phase1 = Phase(
             title='backlog',
             order=-1,
             workflow=workflow,
             skill=skill,
         )
-        session.add(phase1)
-
-        group = Group(title='default')
+        session.add(cls.phase1)
 
         release = Release(
             title='My first release',
@@ -66,12 +65,15 @@ class TestItem(LocalApplicationTestCase):
             room_id=2
         )
         session.add(cls.issue1)
-        session.flush()
+
+        issue_phase1 = IssuePhase(
+            issue=cls.issue1,
+            phase=cls.phase1,
+        )
 
         cls.item = Item(
-            issue_id=cls.issue1.id,
-            phase_id=phase1.id,
-            member_id=cls.member1.id,
+            issue_phase=issue_phase1,
+            member=cls.member1,
         )
         session.add(cls.item)
         session.commit()
@@ -87,6 +89,8 @@ class TestItem(LocalApplicationTestCase):
             assert status == 200
             assert response.json['id'] == self.item.id
             assert response.json['perspective'] == 'Due'
+            assert 'issue' in response.json
+            assert response.json['phaseId'] == self.phase1.id
 
             issue = response.json['issue']
             assert issue['title'] == self.issue1.title

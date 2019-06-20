@@ -1,5 +1,6 @@
 import re
 from datetime import datetime
+import json
 
 from auditor import context as AuditLogContext
 from nanohttp import HTTPStatus, json, context, HTTPNotFound, \
@@ -17,7 +18,7 @@ from ..exceptions import StatusRoomMemberAlreadyExist, \
     StatusQueryParameterNotInFormOrQueryString
 from ..models import Issue, Subscription, Phase, Item, Member, Project, \
     RelatedIssue, Subscribable, IssueTag, Tag, Resource, SkillMember, \
-    AbstractResourceSummaryView, AbstractPhaseSummaryView
+    AbstractResourceSummaryView, AbstractPhaseSummaryView, IssuePhase
 from ..validators import update_issue_validator, assign_issue_validator, \
     issue_move_validator, unassign_issue_validator, issue_relate_validator, \
     issue_unrelate_validator, search_issue_validator
@@ -33,10 +34,16 @@ UNKNOWN_ASSIGNEE = -1
 
 
 FORM_WHITELIST = [
-    'status',
+    'stage',
+    'isDone',
     'description',
     'phaseId',
     'memberId',
+    'projectId',
+    'title',
+    'days',
+    'priority',
+    'kind',
 ]
 
 
@@ -91,10 +98,9 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     @json(
         prevent_empty_form='708 No Parameter Exists In The Form',
         form_whitelist=(
-            ['title', 'days', 'kind', 'description', 'status',
-             'priority', 'projectId'],
-            '707 Invalid field, only following fields are accepted: '
-            'title, days, kind, description, status, priority'
+            FORM_WHITELIST,
+            f'707 Invalid field, only following fields are accepted: '
+            f'{FORM_WHITELIST_STRING}'
         )
     )
     @update_issue_validator
@@ -141,8 +147,22 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     def list(self):
         query = DBSession.query(Issue)
         sorting_expression = context.query.get('sort', '').strip()
+        is_sort_by_status = False
+        if 'status' in sorting_expression:
+            is_sort_by_status = True
+            sorting_expression = sorting_expression.replace('status', '')
+            context.query['sort'] = sorting_expression
+
+        is_filter_by_status = False
+        if context.query.get('status') is not None:
+            status = context.query['status']
+            is_filter_by_status = True
+            is_multi_filter = re.search(r'in\(.*\)', status.lower())
+            status = status[3:-1].split(',') if is_multi_filter else [status]
+            del context.query['status']
+
         is_issue_tag_joined = False
-        is_issue_item_joined = False
+        is_issue_issue_phase_joined = False
         needed_cte = bool(
             'phaseId' in sorting_expression or \
             'phaseTitle' in sorting_expression or \
@@ -150,49 +170,30 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             'phaseTitle' in context.query
         )
 
-        if needed_cte:
-            item_cte = select([
-                Item.issue_id.label('item_issue_id'),
-                func.max(Item.id).label('max_item_id'),
-            ]) \
-                .select_from(
-                    join(Issue, Item, Issue.id == Item.issue_id, isouter=True)
-                ) \
-                .group_by(Item.issue_id) \
-                .cte()
-
         # FILTER
         if 'phaseId' in context.query:
             value = context.query['phaseId']
-            query = query.join(Item, Item.issue_id == Issue.id)
-            query = query.join(item_cte, item_cte.c.max_item_id == Item.id)
+
             query = Issue._filter_by_column_value(
                 query,
-                Item.phase_id,
+                Issue.phase_id,
                 value
             )
             if TRIAGE_PHASE_ID_PATTERN.search(value):
-                triage = DBSession.query(Issue) \
-                    .outerjoin(Item, Item.issue_id == Issue.id) \
-                    .filter(Item.id == None)
+                triage = DBSession.query(Issue).filter(Issue.phase_id == None)
                 query = query.union(triage)
 
-            is_issue_item_joined = True
+            del context.query['phaseId']
 
         if 'phaseTitle' in context.query:
             value = context.query['phaseTitle']
-            if not is_issue_item_joined:
+            if not is_issue_issue_phase_joined:
                 query = query.join(
-                    item_cte,
-                    item_cte.c.item_issue_id == Issue.id,
+                    Phase,
+                    Phase.id == Issue.phase_id,
                 )
-                query = query.join(
-                    Item,
-                    Item.id == item_cte.c.max_item_id,
-                )
-                is_issue_item_joined = True
+                is_issue_issue_phase_joined = True
 
-            query = query.join(Phase, Phase.id == Item.phase_id)
             query = Issue._filter_by_column_value(query, Phase.title, value)
 
         if 'tagId' in context.query:
@@ -219,7 +220,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             query = Issue._filter_by_column_value(query, Tag.title, value)
 
         # SORT
-        external_columns = ('phaseId', 'tagId', 'tagTitle', 'phaseTitle')
+        external_columns = ('tagId', 'tagTitle', 'phaseTitle')
 
         if sorting_expression:
 
@@ -230,69 +231,14 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                     if c.replace('-', '') in external_columns
             }
 
-            if 'phaseId' in sorting_expression:
-                if not is_issue_item_joined:
-                    query = query.join(
-                        item_cte,
-                        item_cte.c.item_issue_id == Issue.id,
-                        isouter=True
-                    )
-                    query = query.join(
-                        Item,
-                        Item.id == item_cte.c.max_item_id,
-                        isouter=True
-                    )
-                    is_issue_item_joined = True
-
-                query = Issue._sort_by_key_value(
-                    query,
-                    column=Item.phase_id,
-                    descending=sorting_columns['phaseId']
-                )
-
             if 'phaseTitle' in sorting_expression:
-
-                if not is_issue_item_joined:
-                    query = query.join(
-                        item_cte,
-                        item_cte.c.item_issue_id == Issue.id,
-                        isouter=True
-                    )
-                    query = query.join(
-                        Item,
-                        Item.id == item_cte.c.max_item_id,
-                        isouter=True
-                    )
 
                 if not 'phaseTitle' in context.query:
                     query = query.join(
                         Phase,
-                        Phase.id == Item.phase_id,
+                        Phase.id == Issue.phase_id,
                         isouter=True
                     )
-
-                # THE RESULT QUERY:
-                # WITH anon_1 AS
-                # (SELECT item.issue_id AS item_issue_id, max(item.id)
-                # AS max_item_id
-                # FROM subscribable JOIN issue ON subscribable.id = issue.id
-                # LEFT OUTER JOIN item ON issue.id = item.issue_id
-                # GROUP BY item.issue_id)
-                # SELECT subscribable.created_at AS subscribable_created_at,
-                # subscribable.type_ AS subscribable_type_,
-                # issue.id AS issue_id, subscribable.id AS subscribable_id,
-                # subscribable.title AS subscribable_title,
-                # subscribable.description AS subscribable_description,
-                # issue.modified_at AS issue_modified_at, issue."modifiedBy"
-                # AS "issue_modifiedBy", issue.project_id AS issue_project_id,
-                # issue.room_id AS issue_room_id,
-                # issue.kind AS issue_kind,
-                # issue.days AS issue_days, issue.status AS issue_status,
-                # issue.priority AS issue_priority
-                # FROM subscribable JOIN issue ON subscribable.id = issue.id
-                # LEFT OUTER JOIN anon_1 ON anon_1.item_issue_id = issue.id
-                # LEFT OUTER JOIN item ON item.id = anon_1.max_item_id
-                # LEFT OUTER JOIN phase ON phase.id = item.phase_id
 
                 query = Issue._sort_by_key_value(
                     query,
@@ -348,7 +294,20 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 ) \
                 .filter(Subscription.member_id == context.identity.id)
 
-        return query
+        issues = Issue.dump_query(query)
+
+        # TODO: Filtering and sorting by the status must be handle by sql query
+        if is_sort_by_status:
+            issues = query.all()
+            issues = [i.to_dict() for i in issues]
+            issues = list(sorted(issues, key=lambda h: h['status']))
+
+        if is_filter_by_status:
+            for issue in issues:
+                if issue['status'] not in status:
+                    issues.remove(issue)
+
+        return issues
 
     @authorize
     @json(prevent_form='709 Form Not Allowed')
@@ -467,19 +426,31 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         phase = DBSession.query(Phase).get(form['phaseId'])
 
+        phase_issue = DBSession.query(IssuePhase). \
+            filter(
+                IssuePhase.issue_id == id,
+                IssuePhase.phase_id == phase.id
+            ).one_or_none()
+
+        if phase_issue is None:
+            phase_issue = IssuePhase(
+                issue_id = id,
+                phase_id = phase.id
+            )
+            DBSession.add(phase_issue)
+            DBSession.flush()
+
         if DBSession.query(Item) \
                 .filter(
-                    Item.phase_id == phase.id,
+                    Item.issue_phase_id == phase_issue.id,
                     Item.member_id == member.id,
-                    Item.issue_id == issue.id
                 ) \
                 .one_or_none():
             raise HTTPStatus('602 Already Assigned')
 
         item = Item(
-            phase_id=phase.id,
             member_id=member.id,
-            issue_id=issue.id
+            issue_phase_id=phase_issue.id
         )
         DBSession.add(item)
 
@@ -510,11 +481,19 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         if issue is None:
             raise HTTPNotFound()
 
+        issue_phase = DBSession.query(IssuePhase) \
+            .filter(
+                IssuePhase.issue_id == id,
+                IssuePhase.phase_id == context.form.get('phaseId')
+            ) \
+            .one_or_none()
+        if issue_phase is None:
+            raise HTTPStatus('636 Not Assigned Yet')
+
         item = DBSession.query(Item) \
             .filter(
-                Item.issue_id == id,
+                Item.issue_phase_id == issue_phase.id,
                 Item.member_id == context.form.get('memberId'),
-                Item.phase_id == context.form.get('phaseId'),
             ) \
             .one_or_none()
         if not item:
