@@ -25,14 +25,8 @@ class TestPhase(LocalApplicationTestCase):
             assert fields['id']['protected'] is not None
             assert fields['id']['primaryKey'] is not None
 
-            assert fields['title']['maxLength'] is not None
-            assert fields['title']['minLength'] is not None
-            assert fields['title']['label'] is not None
-            assert fields['title']['watermark'] is not None
-            assert fields['title']['pattern'] is not None
-            assert fields['title']['example'] is not None
             assert fields['title']['name'] is not None
-            assert fields['title']['notNone'] is not None
+            assert fields['title']['label'] is not None
             assert fields['title']['required'] is not None
 
             assert fields['issueId']['label'] is not None
@@ -47,13 +41,11 @@ class TestPhase(LocalApplicationTestCase):
             assert fields['startDate']['name'] is not None
             assert fields['startDate']['type'] is not None
             assert fields['startDate']['required'] is not None
-            assert fields['startDate']['notNone'] is not None
 
             assert fields['endDate']['label'] is not None
             assert fields['endDate']['name'] is not None
             assert fields['endDate']['type'] is not None
             assert fields['endDate']['required'] is not None
-            assert fields['endDate']['notNone'] is not None
 
             assert fields['estimatedHours']['label'] is not None
             assert fields['estimatedHours']['name'] is not None
