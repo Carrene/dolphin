@@ -96,7 +96,8 @@ class TestDailyreport(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             f'Updating a dailyreport',
-            f'/apiv1/items/item_id: {self.item.id}/dailyreports/id: {self.dailyreport.id}',
+            f'/apiv1/items/item_id: {self.item.id}'
+                f'/dailyreports/id: {self.dailyreport.id}',
             f'UPDATE',
             json=form,
         ):
@@ -104,6 +105,9 @@ class TestDailyreport(LocalApplicationTestCase):
             assert response.json['id'] is not None
             assert response.json['hours'] == form['hours']
             assert response.json['note'] == form['note']
+
+            when('Date format is wrong', json=given | dict(date='30-20-20'))
+            assert status == 400
 
             when('Trying to pass without form parameters', json={})
             assert status == '708 Empty Form'
