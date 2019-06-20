@@ -40,7 +40,7 @@ class Dailyreport(OrderingMixin, FilteringMixin, PaginationMixin, \
         nullable=False,
         not_none=True,
         required=False,
-        readonly=True,
+        readonly=False,
     )
     hours = Field(
         Float,
