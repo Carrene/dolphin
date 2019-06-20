@@ -1,7 +1,9 @@
 import re
 
-from nanohttp import validate, HTTPStatus, context, int_or_notfound
+from nanohttp import validate, HTTPStatus, context, int_or_notfound, \
+    HTTPBadRequest
 from restfulpy.orm import DBSession
+from restfulpy.datetimehelpers import parse_datetime
 
 from .exceptions import *
 from .models import *
@@ -93,6 +95,17 @@ def project_status_value_validator(status, project, field):
     if 'status' in form and form['status'] not in project_statuses:
         raise StatusInvalidStatusValue(statuses_values=project_statuses)
     return form['status']
+
+
+def date_value_validator(date, project, field):
+    try:
+        date = parse_datetime(date)
+
+    except ValueError:
+        raise HTTPBadRequest()
+
+    return date
+
 
 
 def issue_not_exists_validator(title, project, field):
@@ -874,7 +887,7 @@ dailyreport_create_validator = validate(
     ),
     date=dict(
         required=StatusDateNotInForm,
-        pattern=(DATETIME_PATTERN, StatusInvalidDateFormat),
+        callback=date_value_validator,
     ),
 )
 
@@ -888,7 +901,7 @@ dailyreport_update_validator = validate(
         minimum=(0, StatusHoursMustBePositive)
     ),
     date=dict(
-        type_=(DATETIME_PATTERN, StatusInvalidDateFormat),
+        callback=date_value_validator,
     ),
 )
 
