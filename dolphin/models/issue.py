@@ -78,10 +78,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             Subscribable):
 
     __tablename__ = 'issue'
-    __mapper_args__ = {
-        'polymorphic_identity': __tablename__,
-        'with_polymorphic': '*',
-    }
+    __mapper_args__ = {'polymorphic_identity': __tablename__}
 
     _boarding = ['on-time', 'delayed']
 

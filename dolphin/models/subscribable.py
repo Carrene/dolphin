@@ -32,8 +32,7 @@ class Subscribable(TimestampMixin, DeclarativeBase):
     type_ = Field(String(50), readonly=True)
     __mapper_args__ = {
         'polymorphic_on': type_,
-        'with_polymorphic': '*',
-        'polymorphic_identity': __tablename__,
+        'polymorphic_identity': __tablename__
     }
 
     id = Field(

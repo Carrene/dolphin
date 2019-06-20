@@ -107,7 +107,7 @@ class ItemController(ModelRestController):
                     .filter(Item.estimated_hours.isnot(None)) \
                     .filter(Item.start_date < datetime.now())
 
-#        # FILTER
+        # FILTER
         if 'issueBoarding' in context.query:
             value = context.query['issueBoarding']
             query = Item._filter_by_column_value(query, Issue.boarding, value)
@@ -124,7 +124,7 @@ class ItemController(ModelRestController):
             value = context.query['projectTitle']
             query = Item._filter_by_column_value(query, Project.title, value)
 
-#        # SORT
+        # SORT
         sorting_expression = context.query.get('sort', '').strip()
         external_columns = (
             'issueBoarding',

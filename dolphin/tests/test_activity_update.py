@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
-from bddrest import status, response, when, Update
 from auditor.context import Context as AuditLogContext
+from bddrest import status, response, when, Update
 
 from dolphin.models import Member, Skill, Phase, Release, \
     Project, Issue, Item, Activity, IssuePhase
@@ -128,7 +128,6 @@ class TestActivity(LocalApplicationTestCase):
         session.add(issue_phase3)
         session.flush()
 
-
         cls.item_for_someone_else = Item(
             issue_phase_id=issue_phase3.id,
             member_id=member2.id,
@@ -144,7 +143,6 @@ class TestActivity(LocalApplicationTestCase):
             item=cls.item_for_someone_else,
         )
         session.add(cls.activity_for_someone_else)
-
         session.commit()
 
     def test_update(self):

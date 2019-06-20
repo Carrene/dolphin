@@ -71,7 +71,6 @@ def test_issue_phase(db):
         )
         session.add(issue2)
 
-
         phase1 = Phase(
             title='des',
             order=-1,
