@@ -256,10 +256,16 @@ class TestListGroup(LocalApplicationTestCase):
             when('Sort by id', query=dict(sort='id'))
             assert len(response.json) == 5
             assert response.json[0]['id'] < response.json[1]['id']
+            assert response.json[1]['id'] < response.json[2]['id']
+            assert response.json[2]['id'] < response.json[3]['id']
+            assert response.json[3]['id'] < response.json[4]['id']
 
             when('Reverse sort by id', query=dict(sort='-id'))
             assert len(response.json) == 5
             assert response.json[0]['id'] > response.json[1]['id']
+            assert response.json[1]['id'] > response.json[2]['id']
+            assert response.json[2]['id'] > response.json[3]['id']
+            assert response.json[3]['id'] > response.json[4]['id']
 
             when('Filter by id', query=dict(id=f'{self.item1.id}'))
             assert len(response.json) == 1
@@ -267,6 +273,8 @@ class TestListGroup(LocalApplicationTestCase):
 
             when('Filter by id', query=dict(id=f'!{self.item1.id}'))
             assert len(response.json) == 4
+            for item in response.json:
+                assert item['id'] != self.item1.id
 
             when(
                 'The zone in query string is invalid',

@@ -28,13 +28,13 @@ class TestItem(LocalApplicationTestCase):
         skill = Skill(title='First Skill')
         group = Group(title='default')
 
-        phase1 = Phase(
+        cls.phase1 = Phase(
             title='backlog',
             order=-1,
             workflow=workflow,
             skill=skill,
         )
-        session.add(phase1)
+        session.add(cls.phase1)
 
         release = Release(
             title='My first release',
@@ -68,7 +68,7 @@ class TestItem(LocalApplicationTestCase):
 
         issue_phase1 = IssuePhase(
             issue=cls.issue1,
-            phase=phase1,
+            phase=cls.phase1,
         )
 
         cls.item = Item(
@@ -89,6 +89,8 @@ class TestItem(LocalApplicationTestCase):
             assert status == 200
             assert response.json['id'] == self.item.id
             assert response.json['perspective'] == 'Due'
+            assert 'issue' in response.json
+            assert response.json['phaseId'] == self.phase1.id
 
             issue = response.json['issue']
             assert issue['title'] == self.issue1.title

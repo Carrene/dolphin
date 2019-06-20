@@ -177,6 +177,7 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         item_dict['hoursWorked'] = self.hours_worked
         item_dict['perspective'] = self.perspective
         item_dict['issue'] = self.issue_phase.issue.to_dict()
+        item_dict['phaseId'] = self.issue_phase.phase_id
         return item_dict
 
     @classmethod
@@ -192,7 +193,6 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             example='Lorem Ipsum',
             message='Lorem Ipsun',
         )
-
         yield MetadataField(
             name='perspective',
             key='perspective',
@@ -204,11 +204,21 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             example='Lorem Ipsum',
             message='Lorem Ipsun',
         )
-
         yield MetadataField(
             name='issue',
             key='issue',
             label='Issue',
+            required=False,
+            readonly=True,
+            not_none=True,
+            watermark='Lorem Ipsum',
+            example='Lorem Ipsum',
+            message='Lorem Ipsun',
+        )
+        yield MetadataField(
+            name='phaseIdd',
+            key='phase_id',
+            label='PhaseId',
             required=False,
             readonly=True,
             not_none=True,
