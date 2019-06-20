@@ -149,6 +149,13 @@ class TestIssue(LocalApplicationTestCase):
             assert status == 200
 
             when(
+                'Isdown changed',
+                form=given | dict(isDone=False)
+            )
+            assert status == 200
+            assert response.json['isDone'] == False
+
+            when(
                 'Title is repetitive',
                 form=given | dict(title='First issue')
             )
