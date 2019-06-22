@@ -194,6 +194,10 @@ class ItemController(ModelRestController):
         if item.start_date > item.end_date:
             raise StatusEndDateMustBeGreaterThanStartDate()
 
+        DBSession.flush()
+        if item.issue_phase.issue.phase_id is not None:
+            item.issue_phase.issue.stage = 'working'
+
         return item
 
 

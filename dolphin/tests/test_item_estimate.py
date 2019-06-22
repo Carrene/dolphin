@@ -13,7 +13,7 @@ class TestItem(LocalApplicationTestCase):
     @classmethod
     @AuditLogContext(dict())
     def mockup(cls):
-        session = cls.create_session()
+        session = cls.create_session(expire_on_commit=True)
 
         cls.member1 = Member(
             title='First Member',
@@ -24,9 +24,9 @@ class TestItem(LocalApplicationTestCase):
         )
 
         workflow = Workflow(title='Default')
-        session.add(workflow)
-
         skill = Skill(title='First Skill')
+        group = Group(title='default')
+
         phase1 = Phase(
             title='backlog',
             order=-1,
@@ -35,7 +35,13 @@ class TestItem(LocalApplicationTestCase):
         )
         session.add(phase1)
 
-        group = Group(title='default')
+        phase2 = Phase(
+            title='backlog',
+            order=12,
+            workflow=workflow,
+            skill=skill,
+        )
+        session.add(phase2)
 
         release = Release(
             title='My first release',
@@ -57,7 +63,7 @@ class TestItem(LocalApplicationTestCase):
             room_id=2
         )
 
-        issue1 = Issue(
+        cls.issue1 = Issue(
             project=project,
             title='First issue',
             description='This is description of first issue',
@@ -65,9 +71,9 @@ class TestItem(LocalApplicationTestCase):
             days=1,
             room_id=3
         )
-        session.add(issue1)
+        session.add(cls.issue1)
 
-        issue2 = Issue(
+        cls.issue2 = Issue(
             project=project,
             title='Second issue',
             description='This is description of second issue',
@@ -75,10 +81,10 @@ class TestItem(LocalApplicationTestCase):
             days=1,
             room_id=4
         )
-        session.add(issue2)
+        session.add(cls.issue2)
 
         issue_phase1 = IssuePhase(
-            issue=issue1,
+            issue=cls.issue1,
             phase=phase1,
         )
 
@@ -89,8 +95,8 @@ class TestItem(LocalApplicationTestCase):
         session.add(cls.item1)
 
         issue_phase2 = IssuePhase(
-            issue=issue2,
-            phase=phase1,
+            issue=cls.issue2,
+            phase=phase2,
         )
 
         cls.item2 = Item(
@@ -119,6 +125,8 @@ class TestItem(LocalApplicationTestCase):
             assert response.json['estimatedHours'] == json['estimatedHours']
             assert response.json['startDate'] == json['startDate']
             assert response.json['endDate'] == json['endDate']
+            assert self.issue1.stage == 'working'
+            assert self.issue2.stage == 'triage'
 
             when(
                 'Intended item with string type not found',
