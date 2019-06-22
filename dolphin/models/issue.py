@@ -7,6 +7,7 @@ from restfulpy.orm import Field, DeclarativeBase, relationship, \
 from restfulpy.orm.metadata import MetadataField
 from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
     case, join, Boolean, and_, any_
+from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import column_property
 
@@ -58,6 +59,12 @@ issue_priorities = [
     'low',
     'normal',
     'high',
+]
+
+
+issue_origins = [
+    'new',
+    'backlog',
 ]
 
 
@@ -126,6 +133,17 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         nullable=False,
         not_none=False,
         required=False
+    )
+    origin = Field(
+        Enum(*issue_origins, name='issues_origin'),
+        python_type=str,
+        label='Origin',
+        default='new',
+        not_none=True,
+        required=False,
+        protected=False,
+        watermark='lorem ipsum',
+        message='lorem ipsum',
     )
     stage = Field(
         Enum(*issue_stages, name='issues_stage'),
@@ -475,3 +493,8 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
     def get_room_title(self):
         return f'{self.title.lower()}-{self.project_id}'
 
+
+@listens_for(Issue.stage, 'set')
+def handle_change_stage(target, value, oldvalue, initiator):
+    if value == 'backlog':
+        target.origin = 'backlog'
