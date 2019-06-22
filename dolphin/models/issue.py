@@ -498,3 +498,4 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
 def handle_change_stage(target, value, oldvalue, initiator):
     if value == 'backlog':
         target.origin = 'backlog'
+
