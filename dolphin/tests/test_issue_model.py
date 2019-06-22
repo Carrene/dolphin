@@ -394,3 +394,51 @@ def test_issue_status(db):
 
         assert issue1.status == 'complete'
 
+
+def test_issue_origin(db):
+    session = db()
+    session.expire_on_commit = True
+
+    with AuditLogContext(dict()):
+        member1 = Member(
+            title='First Member',
+            email='member1@example.com',
+            access_token='access token 1',
+            reference_id=2,
+        )
+
+        workflow = Workflow(title='Default')
+        skill = Skill(title='First Skill')
+        group = Group(title='default')
+
+        release = Release(
+            title='My first release',
+            cutoff='2030-2-20',
+            launch_date='2030-2-20',
+            manager=member1,
+            room_id=0,
+            group=group,
+        )
+
+        project = Project(
+            release=release,
+            workflow=workflow,
+            group=group,
+            manager=member1,
+            title='My first project',
+            room_id=1,
+        )
+
+        issue1 = Issue(
+            project=project,
+            title='First issue',
+            days=1,
+            room_id=2,
+        )
+        session.add(issue1)
+        session.commit()
+
+        assert issue1.origin == 'new'
+        issue1.stage = 'backlog'
+        assert issue1.origin == 'backlog'
+
