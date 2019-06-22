@@ -1,4 +1,3 @@
-git+git://github.com/Carrene/restfulpy.git@release/2
 coverage
 coveralls
 pytest-cov
