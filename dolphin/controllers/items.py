@@ -68,17 +68,10 @@ class ItemController(ModelRestController):
     @json(prevent_form='709 Form Not Allowed')
     @Item.expose
     def list(self):
-        member = Member.current()
-        if member.role == 'admin':
-            query = DBSession.query(Item)
-
-        else:
-            query = DBSession.query(Item).filter(Item.member_id == member.id)
-
-        query = query.join(IssuePhase, IssuePhase.id == Item.issue_phase_id) \
-            .join(Issue, Issue.id == IssuePhase.issue_id)
-
-        query = query.join(Project, Project.id == Issue.project_id)
+        query = DBSession.query(Item) \
+            .join(IssuePhase, IssuePhase.id == Item.issue_phase_id) \
+            .join(Issue, Issue.id == IssuePhase.issue_id) \
+            .join(Project, Project.id == Issue.project_id)
         if 'zone' in context.query:
             if context.query['zone'] not in VALID_ZONES:
                 return []
