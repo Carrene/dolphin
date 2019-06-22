@@ -4,10 +4,10 @@ from os import path
 from auditor import MiddleWare
 from nanohttp import RegexRouteController, json, settings, context, HTTPStatus
 from restfulpy.application import Application
-from restfulpy.mockup import mockup_http_server
 from restfulpy.orm.metadata import FieldInfo
 from restfulpy.testing import ApplicableTestCase, db
 
+from .mockup import mockup_http_server
 from dolphin import Dolphin
 from dolphin.authentication import Authenticator
 from dolphin.models import Member, Project, Release, Issue, Item, \

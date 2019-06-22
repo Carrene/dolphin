@@ -2,12 +2,9 @@ import json
 
 import requests
 from nanohttp import settings, HTTPForbidden, HTTPUnauthorized, context
-from restfulpy.logging_ import get_logger
+from restfulpy import logger
 
 from .exceptions import *
-
-
-logger = get_logger('backends')
 
 
 class CASClient:
@@ -132,11 +129,11 @@ class ChatClient:
                 raise StatusChatRoomNotFound()
 
             if response.status_code != 200:
-                logger.exception(response.content.decode())
+                logger.error(response.content.decode())
                 raise StatusChatInternallError()
 
         except requests.RequestException as e: # pragma: no cover
-            logger.exception(e)
+            logger.error(e)
             raise StatusChatInternallError()
 
         else:
@@ -191,11 +188,11 @@ class ChatClient:
                 raise StatusRoomMemberAlreadyExist()
 
             if response.status_code != 200:
-                logger.exception(response.content.decode())
+                logger.error(response.content.decode())
                 raise StatusChatInternallError()
 
         except requests.RequestException as e: # pragma: no cover
-            logger.exception(e)
+            logger.error(e)
             raise StatusChatInternallError()
 
         else:
@@ -240,11 +237,11 @@ class ChatClient:
                 raise StatusRoomMemberAlreadyExist()
 
             if response.status_code != 200:
-                logger.exception(response.content.decode())
+                logger.error(response.content.decode())
                 raise StatusChatInternallError()
 
         except requests.RequestException as e: # pragma: no cover
-            logger.exception(e)
+            logger.error(e)
             raise StatusChatInternallError()
 
         else:
@@ -276,11 +273,11 @@ class ChatClient:
                 raise StatusChatServerNotAvailable()
 
             if response.status_code != 200:
-                logger.exception(response.content.decode())
+                logger.error(response.content.decode())
                 raise StatusChatInternallError()
 
         except requests.RequestException as e: # pragma: no cover
-            logger.exception(e)
+            logger.error(e)
             raise StatusChatInternallError()
 
         else:
@@ -316,13 +313,13 @@ class ChatClient:
                 raise StatusChatServerNotAvailable()
 
             if response.status_code != 200:
-                logger.exception(response.content.decode())
+                logger.error(response.content.decode())
                 raise StatusChatInternallError()
 
             member = json.loads(response.text)
             return member
 
         except requests.RequestException as e: # pragma: no cover
-            logger.exception(e)
+            logger.error(e)
             raise StatusChatInternallError()
 

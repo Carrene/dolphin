@@ -83,12 +83,11 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
 
     @classmethod
     def iter_columns(cls, relationships=False, synonyms=False, composites=False,
-                     use_inspection=False, hybrids=False):
+                     hybrids=False):
         for c in Resource.iter_columns(
             relationships=relationships,
             synonyms=synonyms,
             composites=composites,
-            use_inspection=use_inspection,
         ):
             if c.key not in cls.__containig_fields__['resource']:
                  continue
@@ -103,7 +102,6 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
             relationships=relationships,
             synonyms=synonyms,
             composites=composites,
-            use_inspection=use_inspection
         ):
             if c.key not in cls.__containig_fields__['item']:
                 continue
@@ -118,7 +116,6 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
             relationships=relationships,
             synonyms=synonyms,
             composites=composites,
-            use_inspection=use_inspection
         ):
             if c.key not in cls.__containig_fields__['dailyreport']:
                 continue

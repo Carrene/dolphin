@@ -79,12 +79,11 @@ class AbstractPhaseSummaryView(PaginationMixin, OrderingMixin, FilteringMixin,
 
     @classmethod
     def iter_columns(cls, relationships=False, synonyms=False, composites=False,
-                     use_inspection=False, hybrids=False):
+                     hybrids=False):
         for c in Item.iter_columns(
             relationships=relationships,
             synonyms=synonyms,
             composites=composites,
-            use_inspection=use_inspection
         ):
              if c.key not in cls.__containig_fields__['item']:
                  continue
@@ -99,7 +98,6 @@ class AbstractPhaseSummaryView(PaginationMixin, OrderingMixin, FilteringMixin,
             relationships=relationships,
             synonyms=synonyms,
             composites=composites,
-            use_inspection=use_inspection
         ):
              if c.key not in cls.__containig_fields__['item']:
                  continue
@@ -114,7 +112,6 @@ class AbstractPhaseSummaryView(PaginationMixin, OrderingMixin, FilteringMixin,
             relationships=relationships,
             synonyms=synonyms,
             composites=composites,
-            use_inspection=use_inspection
         ):
              if c.key not in cls.__containig_fields__['phase']:
                  continue
@@ -129,7 +126,6 @@ class AbstractPhaseSummaryView(PaginationMixin, OrderingMixin, FilteringMixin,
             relationships=relationships,
             synonyms=synonyms,
             composites=composites,
-            use_inspection=use_inspection
         ):
              if c.key not in cls.__containig_fields__['dailyreport']:
                  continue
