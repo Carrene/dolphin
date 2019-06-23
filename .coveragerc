@@ -1,3 +1,4 @@
 [run]
 omit =
     dolphin/migration/*
+	dolphin/tests/mockup.py

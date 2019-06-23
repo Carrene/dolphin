@@ -1,4 +1,6 @@
+pytest >= 4.6.3, < 5
 coverage
+git+git://github.com/Carrene/restfulpy.git@master
 coveralls
 pytest-cov
 git+https://github.com/Carrene/wsgi-auditor.git

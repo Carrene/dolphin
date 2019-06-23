@@ -1,49 +1,47 @@
 from nanohttp import settings
-from restfulpy.cli import Launcher, RequireSubCommand
+from easycli import SubCommand, Argument
 
 from ..models import OrganizationInvitationEmail
 from ..tokens import OrganizationInvitationToken
 
 
-class SendEmailLauncher(Launcher):  # pragma: no cover
-
-    @classmethod
-    def create_parser(cls, subparsers):
-        parser = subparsers.add_parser('send', help='Sends an email.')
-        parser.add_argument(
+class SendEmailLauncher(SubCommand):  # pragma: no cover
+    __help__ = 'Sends an email.'
+    __command__ = 'send'
+    __arguments__ = [
+        Argument(
             '-e',
             '--email',
             required=True,
             help='Invitation email'
-        )
-        parser.add_argument(
+        ),
+        Argument(
             '-o',
             '--organization_id',
             required=True,
             help='Organization id'
-        )
-        parser.add_argument(
+        ),
+        Argument(
             '-i',
             '--inviter_id',
             required=True,
             help='By member'
-        )
-        parser.add_argument(
+        ),
+        Argument(
             '-r',
             '--role',
             required=True,
             help='role'
-        )
-        parser.add_argument(
+        ),
+        Argument(
             '-u',
             '--redirect_uri',
             required=True,
             help='Redirect uri'
-        )
+        ),
+    ]
 
-        return parser
-
-    def launch(self):
+    def __call__(self, args):
         token = OrganizationInvitationToken(dict(
             email=self.args.email,
             organizationId=self.args.organization_id,
@@ -68,15 +66,10 @@ class SendEmailLauncher(Launcher):  # pragma: no cover
         email.do_({})
 
 
-class EmailLauncher(Launcher, RequireSubCommand):  # pragma: no cover
-
-    @classmethod
-    def create_parser(cls, subparsers):
-        parser = subparsers.add_parser('email', help="Manage emails")
-        user_subparsers = parser.add_subparsers(
-            title="Email managements",
-            dest="email_command"
-        )
-        SendEmailLauncher.register(user_subparsers)
-        return parser
+class EmailLauncher(SubCommand):  # pragma: no cover
+    __help__ = 'Manage emails.'
+    __command__ = 'email'
+    __arguments__ = [
+        SendEmailLauncher,
+    ]
 
