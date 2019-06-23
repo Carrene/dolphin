@@ -10,15 +10,13 @@ with open(join(dirname(__file__), 'dolphin', '__init__.py')) as v_file:
         match(v_file.read()).group(1)
 
 
+# TODO: Must be change dependency when the restfulpy release.
 dependencies = [
     'sqlalchemy_media >= 0.17.1',
-    # TODO
 #    'restfulpy >= 3.0.0',
-#    'cas-common',
 
     # Deployment
     'gunicorn',
-
 ]
 
 
