@@ -1,4 +1,5 @@
 coverage
+git+git://github.com/Carrene/restfulpy.git@master
 coveralls
 pytest-cov
 git+https://github.com/Carrene/wsgi-auditor.git

@@ -1,4 +1,3 @@
-git+git://github.com/Carrene/restfulpy.git@master
 -r requirements-ci.txt
 pytest-pudb
 sqlalchemy-schemadisplay
