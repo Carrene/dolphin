@@ -95,7 +95,7 @@ class TestIssue(LocalApplicationTestCase):
             assert fields['phaseId']['required'] is not None
             assert fields['phaseId']['message'] is not None
             assert fields['phaseId']['readonly'] is not None
-            assert fields['origin']['example'] is not None
+            assert fields['phaseId']['example'] is not None
 
             assert fields['tagId']['label'] is not None
             assert fields['tagId']['watermark'] is not None
