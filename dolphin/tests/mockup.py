@@ -20,6 +20,7 @@ def mockup_http_server(app=None, handler_class=WSGIRequestHandler,
     if app:
         assert isinstance(server, WSGIServer)
         server.set_app(app)
+
     thread = threading.Thread(
         target=server.serve_forever,
         name='sa-media test server.',
@@ -57,6 +58,7 @@ def mockup_http_static_server(content: bytes = b'Simple file content.',
             buffer.seek(0)
             try:
                 copy_stream(buffer, self.wfile)
+
             except ConnectionResetError:
                 pass
 
@@ -64,8 +66,10 @@ def mockup_http_static_server(content: bytes = b'Simple file content.',
             self.send_response(HTTPStatus.OK)
             if isinstance(content, bytes):
                 self.serve_text()
+
             elif isinstance(content, str):
                 self.serve_static_file(content)
+
             else:
                 self.send_header('Content-Type', content_type)
                 self.serve_stream(content)
@@ -102,6 +106,7 @@ class MockupMessenger(Messenger):
         if attachments:
             for attachment in attachments:
                 assert hasattr(attachment, 'name')
+
         self.last_message = {
             'to': to,
             'body': body,
