@@ -1,16 +1,13 @@
-import asyncore
 import contextlib
 import io
-import smtpd
 import threading
-from mimetypes import guess_type
 from http.server import BaseHTTPRequestHandler, HTTPStatus, HTTPServer
+from mimetypes import guess_type
 from wsgiref.simple_server import WSGIServer, WSGIRequestHandler
 
-from restfulpy import datetimehelpers
+from restfulpy.application import Application
 from restfulpy.messaging import Messenger
 from restfulpy.utils import copy_stream
-from restfulpy.application import Application
 
 
 SERVER_LOCK = threading.Event()
@@ -81,27 +78,6 @@ def mockup_http_static_server(content: bytes = b'Simple file content.',
     )
 
 
-class MockupSMTPServer(smtpd.SMTPServer):
-
-    def __init__(self, bind):
-        super().__init__(bind, None, decode_data=False)
-        self.server_address = self.socket.getsockname()[:2]
-        SERVER_LOCK.set()
-
-    def process_message(*args, **kwargs):
-        pass
-
-
-@contextlib.contextmanager
-def mockup_smtp_server(bind=('localhost', 0)):
-    server = MockupSMTPServer(bind)
-    thread = threading.Thread(target=asyncore.loop, daemon=True)
-    thread.start()
-    SERVER_LOCK.wait()
-    yield server, server.server_address
-    asyncore.close_all()
-
-
 class MockupMessenger(Messenger):
     _last_message = None
 
@@ -133,19 +109,6 @@ class MockupMessenger(Messenger):
         }
 
 
-@contextlib.contextmanager
-def mockup_localtimezone(timezone):
-    backup = datetimehelpers.localtimezone
-    if callable(timezone):
-        datetimehelpers.localtimezone = timezone
-    else:
-        datetimehelpers.localtimezone = lambda: timezone
-
-    yield
-
-    datetimehelpers.localtimezone = backup
-
-
 class MockupApplication(Application):
     __configuration__ = '''
      db:
@@ -153,5 +116,4 @@ class MockupApplication(Application):
        test_url: postgresql://postgres:postgres@localhost/restfulpy_test
        administrative_url: postgresql://postgres:postgres@localhost/postgres
     '''
-
 
