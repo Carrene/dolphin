@@ -1,5 +1,7 @@
 from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when, Update
+from nanohttp import context
+from nanohttp.contexts import Context
 
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
 from dolphin.models import Member, Tag, DraftIssue, Issue, Organization, \
@@ -50,53 +52,56 @@ class TestTag(LocalApplicationTestCase):
         )
         session.add(cls.tag2)
 
-        cls.draft_issue = DraftIssue()
-        session.add(cls.draft_issue)
+        with Context(dict()):
+            context.identity = cls.member1
 
-        release = Release(
-            title='My first release',
-            description='A decription for my first release',
-            cutoff='2030-2-20',
-            launch_date='2030-2-20',
-            manager=cls.member1,
-            room_id=0,
-            group=group,
-        )
+            cls.draft_issue = DraftIssue()
+            session.add(cls.draft_issue)
 
-        project = Project(
-            release=release,
-            workflow=workflow,
-            group=group,
-            manager=cls.member1,
-            title='My first project',
-            description='A decription for my project',
-            room_id=1
-        )
-        session.add(project)
+            release = Release(
+                title='My first release',
+                description='A decription for my first release',
+                cutoff='2030-2-20',
+                launch_date='2030-2-20',
+                manager=cls.member1,
+                room_id=0,
+                group=group,
+            )
 
-        cls.issue = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(cls.issue)
+            project = Project(
+                release=release,
+                workflow=workflow,
+                group=group,
+                manager=cls.member1,
+                title='My first project',
+                description='A decription for my project',
+                room_id=1
+            )
+            session.add(project)
 
-        session.flush()
-        draft_issue_tag = DraftIssueTag(
-            draft_issue_id=cls.draft_issue.id,
-            tag_id=cls.tag1.id
-        )
-        session.add(draft_issue_tag)
+            cls.issue = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(cls.issue)
 
-        issue_tag = IssueTag(
-            issue_id=cls.issue.id,
-            tag_id=cls.tag1.id,
-        )
-        session.add(issue_tag)
-        session.commit()
+            session.flush()
+            draft_issue_tag = DraftIssueTag(
+                draft_issue_id=cls.draft_issue.id,
+                tag_id=cls.tag1.id
+            )
+            session.add(draft_issue_tag)
+
+            issue_tag = IssueTag(
+                issue_id=cls.issue.id,
+                tag_id=cls.tag1.id,
+            )
+            session.add(issue_tag)
+            session.commit()
 
     def test_remove_tag_to_draft_issue(self):
         self.login(self.member1.email)

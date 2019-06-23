@@ -1,5 +1,7 @@
 from auditor.context import Context as AuditLogContext
-from bddrest import status, response, when, Update
+from bddrest import status, response, when
+from nanohttp import context
+from nanohttp.contexts import Context
 
 from dolphin.models import Issue, Member, Workflow, Group, Project, Release, \
     RelatedIssue
@@ -45,43 +47,46 @@ class TestIssue(LocalApplicationTestCase):
             room_id=1
         )
 
-        cls.issue1 = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(cls.issue1)
+        with Context(dict()):
+            context.identity = cls.member
 
-        cls.issue2 = Issue(
-            project=project,
-            title='Second issue',
-            description='This is description of first issue',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(cls.issue2)
+            cls.issue1 = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(cls.issue1)
 
-        cls.issue3 = Issue(
-            project=project,
-            title='Third issue',
-            description='This is description of first issue',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(cls.issue3)
-        session.flush()
+            cls.issue2 = Issue(
+                project=project,
+                title='Second issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(cls.issue2)
 
-        related_issue = RelatedIssue(
-            issue_id=cls.issue1.id,
-            related_issue_id=cls.issue3.id
-        )
-        session.add(related_issue)
-        session.commit()
+            cls.issue3 = Issue(
+                project=project,
+                title='Third issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(cls.issue3)
+            session.flush()
+
+            related_issue = RelatedIssue(
+                issue_id=cls.issue1.id,
+                related_issue_id=cls.issue3.id
+            )
+            session.add(related_issue)
+            session.commit()
 
     def test_relate(self):
         self.login(self.member.email)

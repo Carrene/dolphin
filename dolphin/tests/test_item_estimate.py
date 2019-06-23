@@ -2,6 +2,8 @@ from datetime import datetime
 
 from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when, given
+from nanohttp import context
+from nanohttp.contexts import Context
 
 from dolphin.models import Project, Member, Workflow, Group, Release, Skill, \
     Phase, Issue, Item, IssuePhase
@@ -63,48 +65,51 @@ class TestItem(LocalApplicationTestCase):
             room_id=2
         )
 
-        cls.issue1 = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            kind='feature',
-            days=1,
-            room_id=3
-        )
-        session.add(cls.issue1)
+        with Context(dict()):
+            context.identity = cls.member1
 
-        cls.issue2 = Issue(
-            project=project,
-            title='Second issue',
-            description='This is description of second issue',
-            kind='feature',
-            days=1,
-            room_id=4
-        )
-        session.add(cls.issue2)
+            cls.issue1 = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=3
+            )
+            session.add(cls.issue1)
 
-        issue_phase1 = IssuePhase(
-            issue=cls.issue1,
-            phase=phase1,
-        )
+            cls.issue2 = Issue(
+                project=project,
+                title='Second issue',
+                description='This is description of second issue',
+                kind='feature',
+                days=1,
+                room_id=4
+            )
+            session.add(cls.issue2)
 
-        cls.item1 = Item(
-            issue_phase=issue_phase1,
-            member=cls.member1,
-        )
-        session.add(cls.item1)
+            issue_phase1 = IssuePhase(
+                issue=cls.issue1,
+                phase=phase1,
+            )
 
-        issue_phase2 = IssuePhase(
-            issue=cls.issue2,
-            phase=phase2,
-        )
+            cls.item1 = Item(
+                issue_phase=issue_phase1,
+                member=cls.member1,
+            )
+            session.add(cls.item1)
 
-        cls.item2 = Item(
-            issue_phase=issue_phase2,
-            member=cls.member1,
-        )
-        session.add(cls.item2)
-        session.commit()
+            issue_phase2 = IssuePhase(
+                issue=cls.issue2,
+                phase=phase2,
+            )
+
+            cls.item2 = Item(
+                issue_phase=issue_phase2,
+                member=cls.member1,
+            )
+            session.add(cls.item2)
+            session.commit()
 
     def test_estimate(self):
         self.login(self.member1.email)

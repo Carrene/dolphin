@@ -1,6 +1,8 @@
 from datetime import datetime
 
 from nanohttp import settings
+from nanohttp import context
+from nanohttp.contexts import Context
 from restfulpy.testing import db
 from auditor.context import Context as AuditLogContext
 
@@ -39,76 +41,80 @@ def test_item_perspective(db):
             description='A decription for my project',
             room_id=1,
         )
-        issue1 = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            kind='feature',
-            days=1,
-            room_id=2,
-        )
-        session.add(issue1)
-        phase1 = Phase(
-            title='backlog',
-            order=-1,
-            workflow=workflow,
-            skill=skill,
-        )
-        session.add(phase1)
-        session.flush()
 
-        issue_phase1 = IssuePhase(
-            issue_id=issue1.id,
-            phase_id=phase1.id,
-        )
+        with Context(dict()):
+            context.identity = member1
 
-        item = Item(
-            issue_phase=issue_phase1,
-            member_id=member1.id,
-        )
-        session.add(item)
-        session.commit()
+            issue1 = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=2,
+            )
+            session.add(issue1)
+            phase1 = Phase(
+                title='backlog',
+                order=-1,
+                workflow=workflow,
+                skill=skill,
+            )
+            session.add(phase1)
+            session.flush()
 
-        assert item.perspective == 'Due'
+            issue_phase1 = IssuePhase(
+                issue_id=issue1.id,
+                phase_id=phase1.id,
+            )
 
-        dailyreport1 = Dailyreport(
-            date=datetime.strptime('2019-1-2', '%Y-%m-%d').date(),
-            hours=3,
-            note='The note for a daily report',
-            item=item,
-        )
-        session.add(dailyreport1)
-        session.commit()
+            item = Item(
+                issue_phase=issue_phase1,
+                member_id=member1.id,
+            )
+            session.add(item)
+            session.commit()
 
-        dailyreport2 = Dailyreport(
-            date=datetime.strptime('2019-1-3', '%Y-%m-%d').date(),
-            hours=3,
-            item=item,
-        )
-        session.add(dailyreport2)
-        session.commit()
+            assert item.perspective == 'Due'
 
-        assert item.perspective == 'Overdue'
+            dailyreport1 = Dailyreport(
+                date=datetime.strptime('2019-1-2', '%Y-%m-%d').date(),
+                hours=3,
+                note='The note for a daily report',
+                item=item,
+            )
+            session.add(dailyreport1)
+            session.commit()
 
-        dailyreport2.note = 'The note for a daily report'
-        session.commit()
+            dailyreport2 = Dailyreport(
+                date=datetime.strptime('2019-1-3', '%Y-%m-%d').date(),
+                hours=3,
+                item=item,
+            )
+            session.add(dailyreport2)
+            session.commit()
 
-        assert item.perspective == 'Submitted'
+            assert item.perspective == 'Overdue'
 
-        dailyreport3 = Dailyreport(
-            date=datetime.now().date(),
-            hours=3,
-            item=item,
-        )
-        session.add(dailyreport3)
-        session.commit()
+            dailyreport2.note = 'The note for a daily report'
+            session.commit()
 
-        assert item.perspective == 'Due'
+            assert item.perspective == 'Submitted'
 
-        dailyreport3.note = 'The note for a daily report'
-        session.commit()
+            dailyreport3 = Dailyreport(
+                date=datetime.now().date(),
+                hours=3,
+                item=item,
+            )
+            session.add(dailyreport3)
+            session.commit()
 
-        assert item.perspective == 'Submitted'
+            assert item.perspective == 'Due'
+
+            dailyreport3.note = 'The note for a daily report'
+            session.commit()
+
+            assert item.perspective == 'Submitted'
 
 
 def test_item_hours_worked(db):
@@ -149,70 +155,74 @@ def test_item_hours_worked(db):
             description='A decription for my project',
             room_id=1,
         )
-        issue1 = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            kind='feature',
-            days=1,
-            room_id=2,
-        )
-        session.add(issue1)
-        phase1 = Phase(
-            title='backlog',
-            order=-1,
-            workflow=workflow,
-            skill=skill,
-        )
-        session.add(phase1)
-        session.flush()
 
-        issue_phase1 = IssuePhase(
-            issue_id=issue1.id,
-            phase_id=phase1.id,
-        )
+        with Context(dict()):
+            context.identity = member1
 
-        item1 = Item(
-            issue_phase=issue_phase1,
-            member_id=member1.id,
-            estimated_hours=4
-        )
-        session.add(item1)
-        session.commit()
+            issue1 = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=2,
+            )
+            session.add(issue1)
+            phase1 = Phase(
+                title='backlog',
+                order=-1,
+                workflow=workflow,
+                skill=skill,
+            )
+            session.add(phase1)
+            session.flush()
 
-        item2 = Item(
-            issue_phase=issue_phase1,
-            member_id=member2.id,
-            estimated_hours=4
-        )
-        session.add(item2)
-        session.commit()
+            issue_phase1 = IssuePhase(
+                issue_id=issue1.id,
+                phase_id=phase1.id,
+            )
 
-        assert item1.hours_worked == None
-        assert item2.hours_worked == None
+            item1 = Item(
+                issue_phase=issue_phase1,
+                member_id=member1.id,
+                estimated_hours=4
+            )
+            session.add(item1)
+            session.commit()
 
-        dailyreport1 = Dailyreport(
-            date=datetime.strptime('2019-1-2', '%Y-%m-%d').date(),
-            hours=3,
-            note='The note for a daily report',
-            item=item1,
-        )
-        session.add(dailyreport1)
-        session.commit()
+            item2 = Item(
+                issue_phase=issue_phase1,
+                member_id=member2.id,
+                estimated_hours=4
+            )
+            session.add(item2)
+            session.commit()
 
-        assert item1.hours_worked == 3
-        assert item2.hours_worked == None
+            assert item1.hours_worked == None
+            assert item2.hours_worked == None
 
-        dailyreport2 = Dailyreport(
-            date=datetime.strptime('2019-1-3', '%Y-%m-%d').date(),
-            hours=3,
-            item=item1,
-        )
-        session.add(dailyreport2)
-        session.commit()
+            dailyreport1 = Dailyreport(
+                date=datetime.strptime('2019-1-2', '%Y-%m-%d').date(),
+                hours=3,
+                note='The note for a daily report',
+                item=item1,
+            )
+            session.add(dailyreport1)
+            session.commit()
 
-        assert item1.hours_worked == 6
-        assert item2.hours_worked == None
+            assert item1.hours_worked == 3
+            assert item2.hours_worked == None
+
+            dailyreport2 = Dailyreport(
+                date=datetime.strptime('2019-1-3', '%Y-%m-%d').date(),
+                hours=3,
+                item=item1,
+            )
+            session.add(dailyreport2)
+            session.commit()
+
+            assert item1.hours_worked == 6
+            assert item2.hours_worked == None
 
 
 def test_item_status(db):
@@ -253,67 +263,71 @@ def test_item_status(db):
             description='A decription for my project',
             room_id=1,
         )
-        issue1 = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            kind='feature',
-            days=1,
-            room_id=2,
-        )
-        session.add(issue1)
-        phase1 = Phase(
-            title='backlog',
-            order=-1,
-            workflow=workflow,
-            skill=skill,
-        )
-        session.add(phase1)
-        session.flush()
 
-        issue_phase1 = IssuePhase(
-            issue_id=issue1.id,
-            phase_id=phase1.id,
-        )
+        with Context(dict()):
+            context.identity = member1
 
-        item1 = Item(
-            issue_phase=issue_phase1,
-            member_id=member1.id,
-            estimated_hours=4
-        )
-        session.add(item1)
-        session.commit()
+            issue1 = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=2,
+            )
+            session.add(issue1)
+            phase1 = Phase(
+                title='backlog',
+                order=-1,
+                workflow=workflow,
+                skill=skill,
+            )
+            session.add(phase1)
+            session.flush()
 
-        item2 = Item(
-            issue_phase=issue_phase1,
-            member_id=member2.id,
-            estimated_hours=4
-        )
-        session.add(item2)
-        session.commit()
+            issue_phase1 = IssuePhase(
+                issue_id=issue1.id,
+                phase_id=phase1.id,
+            )
 
-        assert item1.status == 'to-do'
+            item1 = Item(
+                issue_phase=issue_phase1,
+                member_id=member1.id,
+                estimated_hours=4
+            )
+            session.add(item1)
+            session.commit()
 
-        dailyreport1 = Dailyreport(
-            date=datetime.strptime('2019-1-2', '%Y-%m-%d').date(),
-            hours=3,
-            note='The note for a daily report',
-            item=item1,
-        )
-        session.add(dailyreport1)
-        session.commit()
+            item2 = Item(
+                issue_phase=issue_phase1,
+                member_id=member2.id,
+                estimated_hours=4
+            )
+            session.add(item2)
+            session.commit()
 
-        assert item1.status == 'in-progress'
+            assert item1.status == 'to-do'
 
-        dailyreport2 = Dailyreport(
-            date=datetime.strptime('2019-1-3', '%Y-%m-%d').date(),
-            hours=3,
-            item=item1,
-        )
-        session.add(dailyreport2)
-        session.commit()
+            dailyreport1 = Dailyreport(
+                date=datetime.strptime('2019-1-2', '%Y-%m-%d').date(),
+                hours=3,
+                note='The note for a daily report',
+                item=item1,
+            )
+            session.add(dailyreport1)
+            session.commit()
 
-        assert item1.status == 'complete'
+            assert item1.status == 'in-progress'
+
+            dailyreport2 = Dailyreport(
+                date=datetime.strptime('2019-1-3', '%Y-%m-%d').date(),
+                hours=3,
+                item=item1,
+            )
+            session.add(dailyreport2)
+            session.commit()
+
+            assert item1.status == 'complete'
 
 
 def test_response_time(db):
@@ -366,51 +380,54 @@ def test_response_time(db):
             room_id=1
         )
 
-        issue1 = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(issue1)
+        with Context(dict()):
+            context.identity = member2
 
-        issue2 = Issue(
-            project=project,
-            title='Second issue',
-            description='This is description of second issue',
-            kind='feature',
-            days=1,
-            room_id=3
-        )
-        session.add(issue2)
-        session.flush()
+            issue1 = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(issue1)
 
-        issue_phase1 = IssuePhase(
-            issue_id=issue1.id,
-            phase_id=phase1.id,
-        )
+            issue2 = Issue(
+                project=project,
+                title='Second issue',
+                description='This is description of second issue',
+                kind='feature',
+                days=1,
+                room_id=3
+            )
+            session.add(issue2)
+            session.flush()
 
-        item1 = Item(
-            issue_phase=issue_phase1,
-            member_id=member2.id,
-        )
-        session.add(item1)
+            issue_phase1 = IssuePhase(
+                issue_id=issue1.id,
+                phase_id=phase1.id,
+            )
 
-        issue_phase2 = IssuePhase(
-            issue_id=issue2.id,
-            phase_id=phase1.id,
-        )
+            item1 = Item(
+                issue_phase=issue_phase1,
+                member_id=member2.id,
+            )
+            session.add(item1)
 
-        item2 = Item(
-            issue_phase=issue_phase2,
-            member_id=member2.id,
-        )
-        session.add(item2)
-        session.commit()
+            issue_phase2 = IssuePhase(
+                issue_id=issue2.id,
+                phase_id=phase1.id,
+            )
 
-    assert item2.response_time.total_seconds() > 0
+            item2 = Item(
+                issue_phase=issue_phase2,
+                member_id=member2.id,
+            )
+            session.add(item2)
+            session.commit()
+
+        assert item2.response_time.total_seconds() > 0
 
 #    assert item1.response_time == None
 

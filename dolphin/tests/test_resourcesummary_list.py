@@ -2,6 +2,8 @@ from datetime import datetime, timedelta
 
 from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when, given
+from nanohttp.contexts import Context
+from nanohttp import context
 
 from dolphin.models import Resource, Group, Workflow, Skill, Phase, Release, \
     Project, Issue, Item, Dailyreport, IssuePhase
@@ -103,78 +105,81 @@ class TestListPhaseSummary(LocalApplicationTestCase):
             room_id=1
         )
 
-        cls.issue1 = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(cls.issue1)
+        with Context(dict()):
+            context.identity = cls.resource1
 
-        cls.issue2 = Issue(
-            project=project,
-            title='Second issue',
-            description='This is description of second issue',
-            kind='feature',
-            days=1,
-            room_id=3
-        )
-        session.add(cls.issue2)
+            cls.issue1 = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(cls.issue1)
 
-        cls.issue3 = Issue(
-            project=project,
-            title='Third issue',
-            description='This is description of third issue',
-            kind='feature',
-            days=1,
-            room_id=4
-        )
-        session.add(cls.issue3)
+            cls.issue2 = Issue(
+                project=project,
+                title='Second issue',
+                description='This is description of second issue',
+                kind='feature',
+                days=1,
+                room_id=3
+            )
+            session.add(cls.issue2)
 
-        cls.issue4 = Issue(
-            project=project,
-            title='Fourth issue',
-            description='This is description of fourth issue',
-            kind='feature',
-            days=1,
-            room_id=5
-        )
-        session.add(cls.issue3)
-        session.flush()
+            cls.issue3 = Issue(
+                project=project,
+                title='Third issue',
+                description='This is description of third issue',
+                kind='feature',
+                days=1,
+                room_id=4
+            )
+            session.add(cls.issue3)
 
-        issue_phase1 = IssuePhase(
-            phase_id=cls.phase1.id,
-            issue_id=cls.issue1.id,
-        )
+            cls.issue4 = Issue(
+                project=project,
+                title='Fourth issue',
+                description='This is description of fourth issue',
+                kind='feature',
+                days=1,
+                room_id=5
+            )
+            session.add(cls.issue3)
+            session.flush()
 
-        cls.item1 = Item(
-            issue_phase=issue_phase1,
-            member_id=cls.resource1.id,
-            start_date=datetime.strptime('2020-2-2', '%Y-%m-%d'),
-            end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
-            estimated_hours=3,
-        )
-        session.add(cls.item1)
+            issue_phase1 = IssuePhase(
+                phase_id=cls.phase1.id,
+                issue_id=cls.issue1.id,
+            )
 
-        one_day = timedelta(days=1)
-        dailyreport1 = Dailyreport(
-            date=datetime.now().date() - 4 * one_day,
-            hours=1,
-            note='note for dailyreport1',
-            item=cls.item1,
-        )
-        session.add(dailyreport1)
+            cls.item1 = Item(
+                issue_phase=issue_phase1,
+                member_id=cls.resource1.id,
+                start_date=datetime.strptime('2020-2-2', '%Y-%m-%d'),
+                end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
+                estimated_hours=3,
+            )
+            session.add(cls.item1)
 
-        dailyreport2 = Dailyreport(
-            date=datetime.now().date() - 3 * one_day,
-            hours=2,
-            note='note for dailyreport2',
-            item=cls.item1,
-        )
-        session.add(dailyreport2)
-        session.commit()
+            one_day = timedelta(days=1)
+            dailyreport1 = Dailyreport(
+                date=datetime.now().date() - 4 * one_day,
+                hours=1,
+                note='note for dailyreport1',
+                item=cls.item1,
+            )
+            session.add(dailyreport1)
+
+            dailyreport2 = Dailyreport(
+                date=datetime.now().date() - 3 * one_day,
+                hours=2,
+                note='note for dailyreport2',
+                item=cls.item1,
+            )
+            session.add(dailyreport2)
+            session.commit()
 
     def test_list(self):
         self.login(self.resource1.email)

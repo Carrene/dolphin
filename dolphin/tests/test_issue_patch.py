@@ -1,5 +1,7 @@
 from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when
+from nanohttp import context
+from nanohttp.contexts import Context
 
 from dolphin.models import Issue, Project, Member, Workflow, Phase, Tag, \
     Organization, Group, Release, Skill
@@ -71,17 +73,21 @@ class TestIssue(LocalApplicationTestCase):
             description='A decription for my project',
             room_id=1
         )
-        cls.issue = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            kind='feature',
-            days=1,
-            room_id=2,
-            tags=[cls.tag1]
-        )
-        session.add(cls.issue)
-        session.commit()
+
+        with Context(dict()):
+            context.identity = cls.member
+
+            cls.issue = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=2,
+                tags=[cls.tag1]
+            )
+            session.add(cls.issue)
+            session.commit()
 
     def test_patch(self):
         self.login(self.member.email)

@@ -1,5 +1,7 @@
 from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when, Update
+from nanohttp import context
+from nanohttp.contexts import Context
 
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
 from dolphin.models import Member, Tag, DraftIssue, Issue, Organization, \
@@ -76,29 +78,32 @@ class TestTag(LocalApplicationTestCase):
         )
         session.add(project)
 
-        cls.issue = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(cls.issue)
+        with Context(dict()):
+            context.identity = cls.member1
 
-        session.flush()
-        draft_issue_tag = DraftIssueTag(
-            draft_issue_id=cls.draft_issue.id,
-            tag_id=cls.tag2.id
-        )
-        session.add(draft_issue_tag)
+            cls.issue = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(cls.issue)
 
-        issue_tag = IssueTag(
-            issue_id=cls.issue.id,
-            tag_id=cls.tag2.id,
-        )
-        session.add(issue_tag)
-        session.commit()
+            session.flush()
+            draft_issue_tag = DraftIssueTag(
+                draft_issue_id=cls.draft_issue.id,
+                tag_id=cls.tag2.id
+            )
+            session.add(draft_issue_tag)
+
+            issue_tag = IssueTag(
+                issue_id=cls.issue.id,
+                tag_id=cls.tag2.id,
+            )
+            session.add(issue_tag)
+            session.commit()
 
     def test_add_tag_to_draft_issue(self):
         self.login(self.member1.email)

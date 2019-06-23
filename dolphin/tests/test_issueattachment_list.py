@@ -3,6 +3,8 @@ from os.path import join, dirname, abspath
 from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when
 from sqlalchemy_media import StoreManager
+from nanohttp import context
+from nanohttp.contexts import Context
 
 from dolphin.models import Project, Member, Attachment, Workflow, Group, \
     Release, Issue
@@ -64,28 +66,31 @@ class TestProject(LocalApplicationTestCase):
 
             attachment3.soft_delete()
 
-            cls.issue1 = Issue(
-                project=project,
-                title='First issue',
-                description='This is description of first issue',
-                kind='feature',
-                days=1,
-                room_id=2,
-                attachments=[attachment1, attachment2, attachment3]
-            )
-            session.add(cls.issue1)
+            with Context(dict()):
+                context.identity = member1
 
-            cls.issue2 = Issue(
-                project=project,
-                title='Second issue',
-                description='This is description of second issue',
-                kind='feature',
-                days=2,
-                room_id=3,
-                attachments=[attachment4]
-            )
-            session.add(cls.issue2)
-            session.commit()
+                cls.issue1 = Issue(
+                    project=project,
+                    title='First issue',
+                    description='This is description of first issue',
+                    kind='feature',
+                    days=1,
+                    room_id=2,
+                    attachments=[attachment1, attachment2, attachment3]
+                )
+                session.add(cls.issue1)
+
+                cls.issue2 = Issue(
+                    project=project,
+                    title='Second issue',
+                    description='This is description of second issue',
+                    kind='feature',
+                    days=2,
+                    room_id=3,
+                    attachments=[attachment4]
+                )
+                session.add(cls.issue2)
+                session.commit()
 
     def test_delete_attachment(self):
         self.login('member1@example.com')

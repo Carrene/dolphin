@@ -2,6 +2,8 @@ from datetime import datetime
 
 from auditor.context import Context as AuditLogContext
 from bddrest import status, when, Remove, Update
+from nanohttp import context
+from nanohttp.contexts import Context
 
 from dolphin.models import Issue, Project, Member, Workflow, Group, \
     Subscription, Release
@@ -56,33 +58,36 @@ class TestSentMessegeWebhook(LocalApplicationTestCase):
             room_id=1
         )
 
-        cls.issue1 = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(cls.issue1)
-        session.flush()
+        with Context(dict()):
+            context.identity = cls.member1
 
-        cls.subscription_issue1 = Subscription(
-            subscribable_id=cls.issue1.id,
-            member_id=cls.member1.id,
-            seen_at=datetime.utcnow()
-        )
-        session.add(cls.subscription_issue1)
+            cls.issue1 = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(cls.issue1)
+            session.flush()
 
-        cls.subscription_issue2 = Subscription(
-            subscribable_id=cls.issue1.id,
-            member_id=cls.member2.id,
-            seen_at=datetime.utcnow()
-        )
-        session.add(cls.subscription_issue2)
+            cls.subscription_issue1 = Subscription(
+                subscribable_id=cls.issue1.id,
+                member_id=cls.member1.id,
+                seen_at=datetime.utcnow()
+            )
+            session.add(cls.subscription_issue1)
 
-        session.commit()
-        session.expunge_all()
+            cls.subscription_issue2 = Subscription(
+                subscribable_id=cls.issue1.id,
+                member_id=cls.member2.id,
+                seen_at=datetime.utcnow()
+            )
+            session.add(cls.subscription_issue2)
+
+            session.commit()
+            session.expunge_all()
 
     def test_sent_messege_webhook(self):
 

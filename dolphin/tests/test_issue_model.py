@@ -332,67 +332,70 @@ def test_issue_status(db):
             room_id=1,
         )
 
-        issue1 = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            kind='feature',
-            days=1,
-            room_id=2,
-        )
-        session.add(issue1)
-        session.commit()
+        with Context(dict()):
+            context.identity = member1
 
-        assert issue1.status == 'to-do'
+            issue1 = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=2,
+            )
+            session.add(issue1)
+            session.commit()
 
-        phase1 = Phase(
-            title='backlog',
-            order=-1,
-            workflow=workflow,
-            skill=skill,
-        )
-        session.add(phase1)
-        session.flush()
+            assert issue1.status == 'to-do'
 
-        issue_phase = IssuePhase(
-            issue_id=issue1.id,
-            phase_id=phase1.id,
-        )
-        session.add(issue_phase)
-        session.flush()
+            phase1 = Phase(
+                title='backlog',
+                order=-1,
+                workflow=workflow,
+                skill=skill,
+            )
+            session.add(phase1)
+            session.flush()
 
-        item = Item(
-            issue_phase_id=issue_phase.id,
-            member_id=member1.id,
-            start_date=datetime.strptime('2019-1-2', '%Y-%m-%d'),
-            end_date=datetime.strptime('2019-2-2', '%Y-%m-%d'),
-            estimated_hours=5,
-        )
-        session.add(item)
-        session.commit()
+            issue_phase = IssuePhase(
+                issue_id=issue1.id,
+                phase_id=phase1.id,
+            )
+            session.add(issue_phase)
+            session.flush()
 
-        assert issue1.status == 'to-do'
+            item = Item(
+                issue_phase_id=issue_phase.id,
+                member_id=member1.id,
+                start_date=datetime.strptime('2019-1-2', '%Y-%m-%d'),
+                end_date=datetime.strptime('2019-2-2', '%Y-%m-%d'),
+                estimated_hours=5,
+            )
+            session.add(item)
+            session.commit()
 
-        dailyreport1 = Dailyreport(
-            date=datetime.strptime('2019-1-2', '%Y-%m-%d').date(),
-            hours=3,
-            note='The note for a daily report',
-            item=item,
-        )
-        session.add(dailyreport1)
-        session.commit()
+            assert issue1.status == 'to-do'
 
-        assert issue1.status == 'in-progress'
+            dailyreport1 = Dailyreport(
+                date=datetime.strptime('2019-1-2', '%Y-%m-%d').date(),
+                hours=3,
+                note='The note for a daily report',
+                item=item,
+            )
+            session.add(dailyreport1)
+            session.commit()
 
-        dailyreport2 = Dailyreport(
-            date=datetime.strptime('2019-1-3', '%Y-%m-%d').date(),
-            hours=3,
-            item_id=item.id,
-        )
-        session.add(dailyreport2)
-        session.commit()
+            assert issue1.status == 'in-progress'
 
-        assert issue1.status == 'complete'
+            dailyreport2 = Dailyreport(
+                date=datetime.strptime('2019-1-3', '%Y-%m-%d').date(),
+                hours=3,
+                item_id=item.id,
+            )
+            session.add(dailyreport2)
+            session.commit()
+
+            assert issue1.status == 'complete'
 
 
 def test_issue_origin(db):
@@ -429,16 +432,19 @@ def test_issue_origin(db):
             room_id=1,
         )
 
-        issue1 = Issue(
-            project=project,
-            title='First issue',
-            days=1,
-            room_id=2,
-        )
-        session.add(issue1)
-        session.commit()
+        with Context(dict()):
+            context.identity = member1
 
-        assert issue1.origin == 'new'
-        issue1.stage = 'backlog'
-        assert issue1.origin == 'backlog'
+            issue1 = Issue(
+                project=project,
+                title='First issue',
+                days=1,
+                room_id=2,
+            )
+            session.add(issue1)
+            session.commit()
+
+            assert issue1.origin == 'new'
+            issue1.stage = 'backlog'
+            assert issue1.origin == 'backlog'
 

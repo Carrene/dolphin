@@ -1,6 +1,7 @@
 from datetime import datetime
 
-from nanohttp import settings
+from nanohttp import settings, context
+from nanohttp.contexts import Context
 from restfulpy.testing import db
 from auditor.context import Context as AuditLogContext
 
@@ -91,139 +92,142 @@ def test_resource_load(db):
             room_id=1
         )
 
-        issue1 = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            kind='feature',
-            days=1,
-            room_id=2,
-            priority='low',
-        )
-        session.add(issue1)
+        with Context(dict()):
+            context.identity = resource1
 
-        issue2 = Issue(
-            project=project,
-            title='Second issue',
-            description='This is description of second issue',
-            kind='feature',
-            days=1,
-            room_id=3,
-            priority='normal',
-        )
-        session.add(issue2)
+            issue1 = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=2,
+                priority='low',
+            )
+            session.add(issue1)
 
-        issue3 = Issue(
-            project=project,
-            title='Third issue',
-            description='This is description of third issue',
-            kind='feature',
-            days=1,
-            room_id=4,
-            priority='high',
-        )
-        session.add(issue3)
-        session.flush()
+            issue2 = Issue(
+                project=project,
+                title='Second issue',
+                description='This is description of second issue',
+                kind='feature',
+                days=1,
+                room_id=3,
+                priority='normal',
+            )
+            session.add(issue2)
 
-        # Resource 1 assignments
-        issue_phase1 = IssuePhase(
-            issue_id=issue1.id,
-            phase_id=phase1.id,
-        )
-        session.add(issue_phase1)
-        session.flush()
+            issue3 = Issue(
+                project=project,
+                title='Third issue',
+                description='This is description of third issue',
+                kind='feature',
+                days=1,
+                room_id=4,
+                priority='high',
+            )
+            session.add(issue3)
+            session.flush()
 
-        item1 = Item(
-            issue_phase_id=issue_phase1.id,
-            member_id=resource1.id,
-        )
-        session.add(item1)
+            # Resource 1 assignments
+            issue_phase1 = IssuePhase(
+                issue_id=issue1.id,
+                phase_id=phase1.id,
+            )
+            session.add(issue_phase1)
+            session.flush()
 
-        issue_phase2 = IssuePhase(
-            issue_id=issue2.id,
-            phase_id=phase1.id,
-        )
-        session.add(issue_phase2)
-        session.flush()
+            item1 = Item(
+                issue_phase_id=issue_phase1.id,
+                member_id=resource1.id,
+            )
+            session.add(item1)
 
-        item2 = Item(
-            issue_phase_id=issue_phase2.id,
-            member_id=resource1.id,
-            start_date=datetime.strptime('2020-2-2', '%Y-%m-%d'),
-            end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
-            estimated_hours=3,
-        )
-        session.add(item2)
+            issue_phase2 = IssuePhase(
+                issue_id=issue2.id,
+                phase_id=phase1.id,
+            )
+            session.add(issue_phase2)
+            session.flush()
 
-        issue_phase3 = IssuePhase(
-            issue_id=issue3.id,
-            phase_id=phase1.id,
-        )
-        session.add(issue_phase3)
-        session.flush()
+            item2 = Item(
+                issue_phase_id=issue_phase2.id,
+                member_id=resource1.id,
+                start_date=datetime.strptime('2020-2-2', '%Y-%m-%d'),
+                end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
+                estimated_hours=3,
+            )
+            session.add(item2)
 
-        item3 = Item(
-            issue_phase_id=issue_phase3.id,
-            member_id=resource1.id,
-            start_date=datetime.strptime('2018-2-2', '%Y-%m-%d'),
-            end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
-            estimated_hours=3,
-        )
-        session.add(item3)
+            issue_phase3 = IssuePhase(
+                issue_id=issue3.id,
+                phase_id=phase1.id,
+            )
+            session.add(issue_phase3)
+            session.flush()
 
-        # Resource 2 assignments
-        issue_phase4 = IssuePhase(
-            issue_id=issue1.id,
-            phase_id=phase1.id,
-        )
-        session.add(issue_phase4)
-        session.flush()
+            item3 = Item(
+                issue_phase_id=issue_phase3.id,
+                member_id=resource1.id,
+                start_date=datetime.strptime('2018-2-2', '%Y-%m-%d'),
+                end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
+                estimated_hours=3,
+            )
+            session.add(item3)
 
-        item4 = Item(
-            issue_phase_id=issue_phase4.id,
-            member_id=resource2.id,
-            start_date=datetime.strptime('2018-2-2', '%Y-%m-%d'),
-            end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
-            estimated_hours=3,
-        )
-        session.add(item4)
+            # Resource 2 assignments
+            issue_phase4 = IssuePhase(
+                issue_id=issue1.id,
+                phase_id=phase1.id,
+            )
+            session.add(issue_phase4)
+            session.flush()
 
-        issue_phase5 = IssuePhase(
-            issue_id=issue2.id,
-            phase_id=phase1.id,
-        )
-        session.add(issue_phase5)
-        session.flush()
+            item4 = Item(
+                issue_phase_id=issue_phase4.id,
+                member_id=resource2.id,
+                start_date=datetime.strptime('2018-2-2', '%Y-%m-%d'),
+                end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
+                estimated_hours=3,
+            )
+            session.add(item4)
 
-        item5 = Item(
-            issue_phase_id=issue_phase5.id,
-            member_id=resource2.id,
-            start_date=datetime.strptime('2018-2-2', '%Y-%m-%d'),
-            end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
-            estimated_hours=3,
-        )
-        session.add(item5)
+            issue_phase5 = IssuePhase(
+                issue_id=issue2.id,
+                phase_id=phase1.id,
+            )
+            session.add(issue_phase5)
+            session.flush()
 
-        # Resource 3 assignments
-        issue_phase6 = IssuePhase(
-            issue_id=issue2.id,
-            phase_id=phase1.id,
-        )
-        session.add(issue_phase6)
-        session.flush()
+            item5 = Item(
+                issue_phase_id=issue_phase5.id,
+                member_id=resource2.id,
+                start_date=datetime.strptime('2018-2-2', '%Y-%m-%d'),
+                end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
+                estimated_hours=3,
+            )
+            session.add(item5)
 
-        item6 = Item(
-            issue_phase_id=issue_phase6.id,
-            member_id=resource3.id,
-            start_date=datetime.strptime('2018-2-2', '%Y-%m-%d'),
-            end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
-            estimated_hours=3,
-        )
-        session.add(item6)
-        session.commit()
+            # Resource 3 assignments
+            issue_phase6 = IssuePhase(
+                issue_id=issue2.id,
+                phase_id=phase1.id,
+            )
+            session.add(issue_phase6)
+            session.flush()
 
-    assert resource1.load == 'heavy'
-    assert resource2.load == 'medium'
-    assert resource3.load == 'light'
-    assert resource4.load == None
+            item6 = Item(
+                issue_phase_id=issue_phase6.id,
+                member_id=resource3.id,
+                start_date=datetime.strptime('2018-2-2', '%Y-%m-%d'),
+                end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
+                estimated_hours=3,
+            )
+            session.add(item6)
+            session.commit()
+
+        assert resource1.load == 'heavy'
+        assert resource2.load == 'medium'
+        assert resource3.load == 'light'
+        assert resource4.load == None
 

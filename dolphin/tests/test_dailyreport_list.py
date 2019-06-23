@@ -2,6 +2,8 @@ from datetime import datetime, timedelta
 
 from bddrest import when, response, status
 from auditor.context import Context as AuditLogContext
+from nanohttp import context
+from nanohttp.contexts import Context
 
 from dolphin.models import Member, Dailyreport, Workflow, Skill, Group, Phase, \
     Release, Project, Issue, Item, IssuePhase
@@ -55,55 +57,58 @@ class TestDailyreport(LocalApplicationTestCase):
             room_id=1
         )
 
-        issue = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(issue)
+        with Context(dict()):
+            context.identity = cls.member
 
-        issue_phase1 = IssuePhase(
-            issue=issue,
-            phase=phase,
-        )
-        session.add(issue_phase1)
+            issue = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(issue)
 
-        one_day = timedelta(days=1)
-        cls.item = Item(
-            issue_phase=issue_phase1,
-            member=cls.member,
-            start_date=datetime.now().date() - 4 * timedelta(days=1),
-            end_date=datetime.now().date(),
-        )
-        session.add(cls.item)
+            issue_phase1 = IssuePhase(
+                issue=issue,
+                phase=phase,
+            )
+            session.add(issue_phase1)
 
-        dailyreport1 = Dailyreport(
-            date=datetime.now().date() - 4 * timedelta(days=1),
-            hours=1,
-            note='note for dailyreport1',
-            item=cls.item,
-        )
-        session.add(dailyreport1)
+            one_day = timedelta(days=1)
+            cls.item = Item(
+                issue_phase=issue_phase1,
+                member=cls.member,
+                start_date=datetime.now().date() - 4 * timedelta(days=1),
+                end_date=datetime.now().date(),
+            )
+            session.add(cls.item)
 
-        dailyreport2 = Dailyreport(
-            date=datetime.now().date() - 3 * timedelta(days=1),
-            hours=2,
-            note='note for dailyreport2',
-            item=cls.item,
-        )
-        session.add(dailyreport2)
+            dailyreport1 = Dailyreport(
+                date=datetime.now().date() - 4 * timedelta(days=1),
+                hours=1,
+                note='note for dailyreport1',
+                item=cls.item,
+            )
+            session.add(dailyreport1)
 
-        dailyreport3 = Dailyreport(
-            date=datetime.now().date() - 2 * timedelta(days=1),
-            hours=3,
-            note='note for dailyreport3',
-            item=cls.item,
-        )
-        session.add(dailyreport3)
-        session.commit()
+            dailyreport2 = Dailyreport(
+                date=datetime.now().date() - 3 * timedelta(days=1),
+                hours=2,
+                note='note for dailyreport2',
+                item=cls.item,
+            )
+            session.add(dailyreport2)
+
+            dailyreport3 = Dailyreport(
+                date=datetime.now().date() - 2 * timedelta(days=1),
+                hours=3,
+                note='note for dailyreport3',
+                item=cls.item,
+            )
+            session.add(dailyreport3)
+            session.commit()
 
     def test_list(self):
         self.login(self.member.email)

@@ -2,6 +2,8 @@ from datetime import datetime, timedelta
 
 from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when, given
+from nanohttp import context
+from nanohttp.contexts import Context
 
 from dolphin.models import Member, Workflow, Skill, Group, Phase, Release, \
     Project, Issue, Item, IssuePhase
@@ -64,45 +66,48 @@ class TestDailyreport(LocalApplicationTestCase):
             room_id=1
         )
 
-        issue = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            due_date='2020-2-20',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(issue)
+        with Context(dict()):
+            context.identity = cls.member
 
-        issue_phase1 = IssuePhase(
-            issue=issue,
-            phase=phase1,
-        )
-        session.add(issue_phase1)
+            issue = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                due_date='2020-2-20',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(issue)
 
-        issue_phase2 = IssuePhase(
-            issue=issue,
-            phase=phase2,
-        )
-        session.add(issue_phase2)
+            issue_phase1 = IssuePhase(
+                issue=issue,
+                phase=phase1,
+            )
+            session.add(issue_phase1)
 
-        cls.item1 = Item(
-            issue_phase=issue_phase1,
-            member=cls.member,
-            start_date='2019-06-16',
-            end_date='2019-06-17',
-        )
-        session.add(cls.item1)
+            issue_phase2 = IssuePhase(
+                issue=issue,
+                phase=phase2,
+            )
+            session.add(issue_phase2)
 
-        cls.item2 = Item(
-            issue_phase=issue_phase2,
-            member=cls.member,
-            start_date=datetime.now().date() - timedelta(days=1),
-            end_date=datetime.now().date() - timedelta(days=1),
-        )
-        session.add(cls.item2)
-        session.commit()
+            cls.item1 = Item(
+                issue_phase=issue_phase1,
+                member=cls.member,
+                start_date='2019-06-16',
+                end_date='2019-06-17',
+            )
+            session.add(cls.item1)
+
+            cls.item2 = Item(
+                issue_phase=issue_phase2,
+                member=cls.member,
+                start_date=datetime.now().date() - timedelta(days=1),
+                end_date=datetime.now().date() - timedelta(days=1),
+            )
+            session.add(cls.item2)
+            session.commit()
 
     def test_create(self):
         self.login(self.member.email)
