@@ -3,6 +3,8 @@ from os.path import join, dirname, abspath
 
 from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when, Update, Remove
+from nanohttp import context
+from nanohttp.contexts import Context
 
 from dolphin.models import Project, Member, Workflow, Group, Release, Issue
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
@@ -52,16 +54,19 @@ class TestIssue(LocalApplicationTestCase):
         )
         session.add(cls.project)
 
-        cls.issue = Issue(
-            project=cls.project,
-            title='First issue',
-            description='This is description of first issue',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(cls.issue)
-        session.commit()
+        with Context(dict()):
+            context.identity = member1
+
+            cls.issue = Issue(
+                project=cls.project,
+                title='First issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(cls.issue)
+            session.commit()
 
     def test_add_attachment(self):
         self.login('member1@example.com')

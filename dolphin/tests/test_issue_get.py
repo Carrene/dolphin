@@ -15,14 +15,14 @@ class TestIssue(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        member = Member(
+        cls.member = Member(
             title='First Member',
             email='member1@example.com',
             access_token='access token 1',
             phone=123456789,
             reference_id=2
         )
-        session.add(member)
+        session.add(cls.member)
 
         workflow = Workflow(title='default')
         skill = Skill(title='First Skill')
@@ -33,7 +33,7 @@ class TestIssue(LocalApplicationTestCase):
             description='A decription for my first release',
             cutoff='2030-2-20',
             launch_date='2030-2-20',
-            manager=member,
+            manager=cls.member,
             room_id=0,
             group=group,
         )
@@ -42,14 +42,14 @@ class TestIssue(LocalApplicationTestCase):
             release=release,
             workflow=workflow,
             group=group,
-            manager=member,
+            manager=cls.member,
             title='My first project',
             description='A decription for my project',
             room_id=1
         )
 
         with Context(dict()):
-            context.identity = member
+            context.identity = cls.member
 
             cls.issue = Issue(
                 project=cls.project,
@@ -77,13 +77,13 @@ class TestIssue(LocalApplicationTestCase):
 
             cls.item = Item(
                 issue_phase=issue_phase1,
-                member_id=member.id,
+                member_id=cls.member.id,
             )
             session.add(cls.item)
             session.commit()
 
     def test_get(self):
-        self.login('member1@example.com')
+        self.login(self.member.email)
 
         with oauth_mockup_server(), self.given(
             'Getting a issue',
@@ -97,6 +97,7 @@ class TestIssue(LocalApplicationTestCase):
             assert response.json['stage'] == 'triage'
             assert response.json['isDone'] is None
             assert response.json['origin'] == 'new'
+            assert response.json['createdBy'] == self.member.reference_id
 
             when(
                 'Intended project with string type not found',

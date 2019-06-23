@@ -2,6 +2,8 @@ from datetime import datetime
 
 from bddrest import status, response, when, given
 from auditor.context import Context as AuditLogContext
+from nanohttp import context
+from nanohttp.contexts import Context
 
 from dolphin.models import Member, Dailyreport, Workflow, Skill, Group, Release, \
     Project, Issue, Item, Phase, IssuePhase
@@ -56,38 +58,41 @@ class TestDailyreport(LocalApplicationTestCase):
             room_id=1
         )
 
-        issue = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(issue)
+        with Context(dict()):
+            context.identity = cls.member
 
-        issue_phase1 = IssuePhase(
-            issue=issue,
-            phase=phase,
-        )
-        session.add(issue_phase1)
+            issue = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(issue)
 
-        cls.item = Item(
-            issue_phase=issue_phase1,
-            member=cls.member,
-            start_date=datetime.now().date(),
-            end_date=datetime.now().date(),
-        )
-        session.add(cls.item)
+            issue_phase1 = IssuePhase(
+                issue=issue,
+                phase=phase,
+            )
+            session.add(issue_phase1)
 
-        cls.dailyreport = Dailyreport(
-            date=datetime.strptime('2019-1-2', '%Y-%m-%d').date(),
-            hours=3,
-            note='The note for a daily report',
-            item=cls.item,
-        )
-        session.add(cls.dailyreport)
-        session.commit()
+            cls.item = Item(
+                issue_phase=issue_phase1,
+                member=cls.member,
+                start_date=datetime.now().date(),
+                end_date=datetime.now().date(),
+            )
+            session.add(cls.item)
+
+            cls.dailyreport = Dailyreport(
+                date=datetime.strptime('2019-1-2', '%Y-%m-%d').date(),
+                hours=3,
+                note='The note for a daily report',
+                item=cls.item,
+            )
+            session.add(cls.dailyreport)
+            session.commit()
 
     def test_get(self):
         self.login(self.member.email)

@@ -11,7 +11,7 @@ from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import column_property
 
-from ..mixins import ModifiedByMixin
+from ..mixins import ModifiedByMixin, CreatedByMixin
 from .member import Member
 from .item import Item
 from .phase import Phase
@@ -82,7 +82,7 @@ class Priority:
 
 
 class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
-            Subscribable):
+            CreatedByMixin, Subscribable):
 
     __tablename__ = 'issue'
     __mapper_args__ = {'polymorphic_identity': __tablename__}

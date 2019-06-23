@@ -1,8 +1,10 @@
 from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when
+from nanohttp import context
+from nanohttp.contexts import Context
 
-from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 from dolphin.models import Member, Workflow, Group, Project, Issue, Release
+from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
 class TestDraftIssue(LocalApplicationTestCase):
@@ -45,16 +47,19 @@ class TestDraftIssue(LocalApplicationTestCase):
             room_id=1
         )
 
-        cls.issue = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(cls.issue)
-        session.commit()
+        with Context(dict()):
+            context.identity = cls.member1
+
+            cls.issue = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(cls.issue)
+            session.commit()
 
     def test_define(self):
         self.login(self.member1.email)

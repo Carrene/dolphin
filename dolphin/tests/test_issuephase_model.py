@@ -2,6 +2,8 @@ from datetime import datetime
 
 from restfulpy.testing import db
 from auditor.context import Context as AuditLogContext
+from nanohttp import context
+from nanohttp.contexts import Context
 
 from dolphin.models import Item, Project, Member, Workflow, Group, Release, \
     Skill, Phase, Issue, Dailyreport, IssuePhase
@@ -51,96 +53,99 @@ def test_issue_phase(db):
             room_id=1,
         )
 
-        issue1 = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            kind='feature',
-            days=1,
-            room_id=2,
-        )
-        session.add(issue1)
+        with Context(dict()):
+            context.identity = member1
 
-        issue2 = Issue(
-            project=project,
-            title='Second issue',
-            description='This is description of first issue',
-            kind='feature',
-            days=1,
-            room_id=4,
-        )
-        session.add(issue2)
+            issue1 = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=2,
+            )
+            session.add(issue1)
 
-        phase1 = Phase(
-            title='des',
-            order=-1,
-            workflow=workflow,
-            skill=skill,
-        )
-        session.add(phase1)
-        session.flush()
+            issue2 = Issue(
+                project=project,
+                title='Second issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=4,
+            )
+            session.add(issue2)
 
-        phase2 = Phase(
-            title='back',
-            order=-1,
-            workflow=workflow,
-            skill=skill,
-        )
-        session.add(phase2)
-        session.flush()
+            phase1 = Phase(
+                title='des',
+                order=-1,
+                workflow=workflow,
+                skill=skill,
+            )
+            session.add(phase1)
+            session.flush()
 
-        phase3 = Phase(
-            title='front',
-            order=-1,
-            workflow=workflow,
-            skill=skill,
-        )
-        session.add(phase3)
-        session.flush()
+            phase2 = Phase(
+                title='back',
+                order=-1,
+                workflow=workflow,
+                skill=skill,
+            )
+            session.add(phase2)
+            session.flush()
 
-        issue_phase1 = IssuePhase(
-            issue_id=issue1.id,
-            phase_id=phase1.id,
-        )
-        session.add(issue_phase1)
-        session.flush()
+            phase3 = Phase(
+                title='front',
+                order=-1,
+                workflow=workflow,
+                skill=skill,
+            )
+            session.add(phase3)
+            session.flush()
 
-        item1 = Item(
-            issue_phase_id=issue_phase1.id,
-            member_id=member1.id,
-            start_date=datetime.strptime('2019-1-2', '%Y-%m-%d'),
-            end_date=datetime.strptime('2019-2-2', '%Y-%m-%d'),
-            estimated_hours=5,
-        )
-        session.add(item1)
-        session.flush()
+            issue_phase1 = IssuePhase(
+                issue_id=issue1.id,
+                phase_id=phase1.id,
+            )
+            session.add(issue_phase1)
+            session.flush()
 
-        item2 = Item(
-            issue_phase_id=issue_phase1.id,
-            member_id=member2.id,
-            start_date=datetime.strptime('2019-1-2', '%Y-%m-%d'),
-            end_date=datetime.strptime('2019-2-2', '%Y-%m-%d'),
-            estimated_hours=6,
-        )
-        session.add(item2)
-        session.flush()
+            item1 = Item(
+                issue_phase_id=issue_phase1.id,
+                member_id=member1.id,
+                start_date=datetime.strptime('2019-1-2', '%Y-%m-%d'),
+                end_date=datetime.strptime('2019-2-2', '%Y-%m-%d'),
+                estimated_hours=5,
+            )
+            session.add(item1)
+            session.flush()
 
-        issue_phase2 = IssuePhase(
-            issue_id=issue1.id,
-            phase_id=phase2.id,
-        )
-        session.add(issue_phase2)
-        session.flush()
+            item2 = Item(
+                issue_phase_id=issue_phase1.id,
+                member_id=member2.id,
+                start_date=datetime.strptime('2019-1-2', '%Y-%m-%d'),
+                end_date=datetime.strptime('2019-2-2', '%Y-%m-%d'),
+                estimated_hours=6,
+            )
+            session.add(item2)
+            session.flush()
 
-        item3 = Item(
-            issue_phase_id=issue_phase2.id,
-            member_id=member1.id,
-            start_date=datetime.strptime('2019-1-2', '%Y-%m-%d'),
-            end_date=datetime.strptime('2019-2-2', '%Y-%m-%d'),
-            estimated_hours=5,
-        )
-        session.add(item1)
-        session.commit()
+            issue_phase2 = IssuePhase(
+                issue_id=issue1.id,
+                phase_id=phase2.id,
+            )
+            session.add(issue_phase2)
+            session.flush()
+
+            item3 = Item(
+                issue_phase_id=issue_phase2.id,
+                member_id=member1.id,
+                start_date=datetime.strptime('2019-1-2', '%Y-%m-%d'),
+                end_date=datetime.strptime('2019-2-2', '%Y-%m-%d'),
+                estimated_hours=5,
+            )
+            session.add(item1)
+            session.commit()
 
         assert issue_phase1.status == 'to-do'
 

@@ -136,3 +136,13 @@ class TestIssue(LocalApplicationTestCase):
             assert fields['origin']['example'] is not None
             assert fields['origin']['watermark'] is not None
 
+            assert fields['createdBy']['label'] is not None
+            assert fields['createdBy']['name'] is not None
+            assert fields['createdBy']['notNone'] is not None
+            assert fields['createdBy']['required'] is not None
+            assert fields['createdBy']['readonly'] is not None
+            assert fields['createdBy']['protected'] is not None
+            assert fields['createdBy']['message'] is not None
+            assert fields['createdBy']['example'] is not None
+            assert fields['createdBy']['watermark'] is not None
+

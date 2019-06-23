@@ -1,6 +1,8 @@
 from auditor import MiddleWare
 from auditor.context import Context as AuditLogContext
 from bddrest import status, when, given, response
+from nanohttp import context
+from nanohttp.contexts import Context
 
 from dolphin import Dolphin
 from dolphin.middleware_callback import callback as auditor_callback
@@ -73,16 +75,19 @@ class TestIssue(LocalApplicationTestCase):
         cls.project3.soft_delete()
         session.add(cls.project3)
 
-        cls.issue1 = Issue(
-            project=cls.project1,
-            title='First issue',
-            description='This is description of first issue',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(cls.issue1)
-        session.commit()
+        with Context(dict()):
+            context.identity = member
+
+            cls.issue1 = Issue(
+                project=cls.project1,
+                title='First issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(cls.issue1)
+            session.commit()
 
     def test_move(self):
         self.login('member1@example.com')

@@ -59,26 +59,29 @@ class TestIssue(LocalApplicationTestCase):
         )
         session.add(project1)
 
-        issue1 = Issue(
-            project=project1,
-            title='First issue',
-            description='This is description of first issue',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(issue1)
+        with Context(dict()):
+            context.identity = cls.member
 
-        cls.issue2 = Issue(
-            project=project1,
-            title='Second issue',
-            description='This is description of second issue',
-            kind='feature',
-            days=2,
-            room_id=3
-        )
-        session.add(cls.issue2)
-        session.commit()
+            issue1 = Issue(
+                project=project1,
+                title='First issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(issue1)
+
+            cls.issue2 = Issue(
+                project=project1,
+                title='Second issue',
+                description='This is description of second issue',
+                kind='feature',
+                days=2,
+                room_id=3
+            )
+            session.add(cls.issue2)
+            session.commit()
 
     def test_update(self):
         self.login(self.member.email)

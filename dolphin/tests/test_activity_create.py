@@ -2,6 +2,8 @@ from datetime import datetime, timedelta
 
 from bddrest import status, response, when, Update
 from auditor.context import Context as AuditLogContext
+from nanohttp import context
+from nanohttp.contexts import Context
 
 from dolphin.models import Member, Skill, Phase, Release, \
     Project, Issue, Item, IssuePhase
@@ -65,59 +67,62 @@ class TestActivity(LocalApplicationTestCase):
             room_id=1
         )
 
-        cls.issue1 = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(cls.issue1)
+        with Context(dict()):
+            context.identity = cls.member
 
-        cls.issue2 = Issue(
-            project=project,
-            title='Second issue',
-            description='This is description of second issue',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(cls.issue2)
-        session.flush()
+            cls.issue1 = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(cls.issue1)
 
-        issue_phase1 = IssuePhase(
-            issue_id=cls.issue1.id,
-            phase_id=phase2.id,
-        )
-        session.add(issue_phase1)
-        session.flush()
+            cls.issue2 = Issue(
+                project=project,
+                title='Second issue',
+                description='This is description of second issue',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(cls.issue2)
+            session.flush()
 
-        old_item = Item(
-            issue_phase_id=issue_phase1.id,
-            member_id=cls.member.id,
-        )
-        session.add(old_item)
+            issue_phase1 = IssuePhase(
+                issue_id=cls.issue1.id,
+                phase_id=phase2.id,
+            )
+            session.add(issue_phase1)
+            session.flush()
 
-        issue_phase2 = IssuePhase(
-            issue_id=cls.issue1.id,
-            phase_id=cls.phase1.id,
-        )
-        session.add(issue_phase2)
-        session.flush()
+            old_item = Item(
+                issue_phase_id=issue_phase1.id,
+                member_id=cls.member.id,
+            )
+            session.add(old_item)
 
-        cls.item = Item(
-            issue_phase_id=issue_phase2.id,
-            member_id=cls.member.id,
-        )
-        session.add(cls.item)
+            issue_phase2 = IssuePhase(
+                issue_id=cls.issue1.id,
+                phase_id=cls.phase1.id,
+            )
+            session.add(issue_phase2)
+            session.flush()
 
-        issue_phase3 = IssuePhase(
-            issue_id=cls.issue2.id,
-            phase_id=cls.phase1.id,
-        )
-        session.add(issue_phase3)
-        session.commit()
+            cls.item = Item(
+                issue_phase_id=issue_phase2.id,
+                member_id=cls.member.id,
+            )
+            session.add(cls.item)
+
+            issue_phase3 = IssuePhase(
+                issue_id=cls.issue2.id,
+                phase_id=cls.phase1.id,
+            )
+            session.add(issue_phase3)
+            session.commit()
 
     def test_create(self):
         self.login(self.member.email)

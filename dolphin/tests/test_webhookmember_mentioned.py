@@ -1,5 +1,7 @@
 from auditor.context import Context as AuditLogContext
 from bddrest import status, when, given
+from nanohttp import context
+from nanohttp.contexts import Context
 
 from dolphin.models import Issue, Project, Member, Workflow, Group, \
     Subscription, Release
@@ -45,34 +47,37 @@ class TestMentionedMemberWebhook(LocalApplicationTestCase):
             room_id=1
         )
 
-        cls.issue1 = Issue(
-            project=project,
-            title='First issue',
-            description='This is description of first issue',
-            kind='feature',
-            days=1,
-            room_id=2
-        )
-        session.add(cls.issue1)
+        with Context(dict()):
+            context.identity = cls.member1
 
-        cls.issue2 = Issue(
-            project=project,
-            title='Second issue',
-            description='This is description of second issue',
-            kind='feature',
-            days=2,
-            room_id=3
-        )
-        session.add(cls.issue2)
-        session.flush()
+            cls.issue1 = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+            session.add(cls.issue1)
 
-        subscription = Subscription(
-            member_id=cls.member1.id,
-            subscribable_id=cls.issue2.id,
-            one_shot=True
-        )
-        session.add(subscription)
-        session.commit()
+            cls.issue2 = Issue(
+                project=project,
+                title='Second issue',
+                description='This is description of second issue',
+                kind='feature',
+                days=2,
+                room_id=3
+            )
+            session.add(cls.issue2)
+            session.flush()
+
+            subscription = Subscription(
+                member_id=cls.member1.id,
+                subscribable_id=cls.issue2.id,
+                one_shot=True
+            )
+            session.add(subscription)
+            session.commit()
 
     def test_mentioned_member_webhook(self):
 
