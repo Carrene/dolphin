@@ -51,7 +51,7 @@ class CASClient:
             raise HTTPUnauthorized
 
         if response.status_code != 200:
-            logger.exception(response.content.decode())
+            logger.error(response.content.decode())
             raise StatusCASServerInternalError()
 
         result = json.loads(response.text)
