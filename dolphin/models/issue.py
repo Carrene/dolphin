@@ -142,8 +142,10 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         not_none=True,
         required=False,
         protected=False,
-        watermark='lorem ipsum',
-        message='lorem ipsum',
+        readonly=True,
+        watermark='Lorem ipsum',
+        message='Lorem ipsum',
+        example='Lorem ipsum',
     )
     stage = Field(
         Enum(*issue_stages, name='issues_stage'),

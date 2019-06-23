@@ -95,7 +95,7 @@ class TestIssue(LocalApplicationTestCase):
             assert fields['phaseId']['required'] is not None
             assert fields['phaseId']['message'] is not None
             assert fields['phaseId']['readonly'] is not None
-            assert fields['phaseId']['example'] is not None
+            assert fields['origin']['example'] is not None
 
             assert fields['tagId']['label'] is not None
             assert fields['tagId']['watermark'] is not None
@@ -125,4 +125,14 @@ class TestIssue(LocalApplicationTestCase):
             assert fields['unread']['name'] is not None
             assert fields['unread']['required'] is not None
             assert fields['unread']['readonly'] is not None
+
+            assert fields['origin']['label'] is not None
+            assert fields['origin']['name'] is not None
+            assert fields['origin']['notNone'] is not None
+            assert fields['origin']['required'] is not None
+            assert fields['origin']['readonly'] is not None
+            assert fields['origin']['protected'] is not None
+            assert fields['origin']['message'] is not None
+            assert fields['origin']['example'] is not None
+            assert fields['origin']['watermark'] is not None
 
