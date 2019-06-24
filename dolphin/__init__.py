@@ -7,7 +7,7 @@ from sqlalchemy_media import StoreManager, FileSystemStore
 
 from . import basedata, mockup
 from .authentication import Authenticator
-from .cli.email import EmailLauncher
+from .cli import EmailSubCommand
 from .controllers.root import Root
 
 
@@ -98,8 +98,10 @@ class Dolphin(Application):
     def insert_mockup(self, *args):# pragma: no cover
         mockup.insert()
 
-    def register_cli_launchers(self, subparsers):
-        EmailLauncher.register(subparsers)
+    def get_cli_arguments(self):
+        return [
+            EmailSubCommand,
+        ]
 
     @classmethod
     def initialize_orm(cls, engine=None):
