@@ -7,7 +7,7 @@ from sqlalchemy_media import StoreManager, FileSystemStore
 
 from . import basedata, mockup
 from .authentication import Authenticator
-from .cli import EmailSubCommand
+from .cli import EmailSubCommand, MuleSubCommand
 from .controllers.root import Root
 
 
@@ -101,6 +101,7 @@ class Dolphin(Application):
     def get_cli_arguments(self):
         return [
             EmailSubCommand,
+            MuleSubCommand,
         ]
 
     @classmethod
