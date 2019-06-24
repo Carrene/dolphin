@@ -73,7 +73,7 @@ class LocalApplicationTestCase(ApplicableTestCase):
                 max_length: 5
         '''
 
-    def login(self, email, password, organozation_id, url='/apiv1/tokens',
+    def login(self, email, password, organization_id=None, url='/apiv1/tokens',
               verb='CREATE'):
         super().login(
             form=dict(

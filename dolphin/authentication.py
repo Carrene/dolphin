@@ -33,8 +33,12 @@ class Authenticator(StatefulAuthenticator):
         return member.create_refresh_principal()
 
     def validate_credentials(self, credentials):
-        email, password = credentials
-        member = self.safe_member_lookup(Member.email == email)
+        email, password, organization_id = credentials
+
+        member = self.safe_member_lookup(and_(
+            Member.email == email,
+            Member.organizations == organization_id
+        ))
         member.validate_password(password)
         return member
 

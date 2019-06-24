@@ -182,13 +182,6 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         protected=True
     )
 
-    organizations = relationship(
-        'Organization',
-        back_populates='members',
-        secondary='organization_member',
-        protected=True,
-    )
-
     subscribables = relationship(
         'Subscribable',
         secondary='subscription',

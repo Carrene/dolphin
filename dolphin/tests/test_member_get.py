@@ -79,7 +79,7 @@ class TestProject(LocalApplicationTestCase):
         self.login(
             email='member1@example.com',
             password='123abcABC',
-            organization_id
+            organization_id=1,
         )
 
         with self.given(
