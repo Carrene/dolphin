@@ -143,7 +143,7 @@ class TestIssue(LocalApplicationTestCase):
             f'FINALIZE',
             json=dict(
                 title='Defined issue',
-                stage='on-hold',
+                stage='triage',
                 description='A description for defined issue',
                 kind='feature',
                 days=3,
@@ -155,7 +155,6 @@ class TestIssue(LocalApplicationTestCase):
             assert response.json['id'] == self.draft_issue1.id
             assert response.json['issueId'] is not None
             assert len(response.json['tags']) == 2
-
             created_issue_id = response.json['issueId']
             created_issue = session.query(Issue).get(created_issue_id)
             assert created_issue.modified_by is None
@@ -164,11 +163,22 @@ class TestIssue(LocalApplicationTestCase):
             assert isinstance(logs[0], InstantiationLogEntry)
             assert isinstance(logs[1], RequestLogEntry)
 
+            # Assert triage state
+            new_issue = session.query(Issue) \
+                .filter(Issue.id == response.json['issueId']) \
+                .one()
+            assert new_issue.boarding == 'on-time'
+
             when(
                 'Stage is null',
                 json=given | dict(stage=None, title='new title')
             )
             assert status == 200
+            new_issue = session.query(Issue) \
+                .filter(Issue.id == response.json['issueId']) \
+                .one()
+            assert new_issue.boarding == 'on-time'
+            assert new_issue.stage == 'triage'
 
             when(
                 'Isdone is null',

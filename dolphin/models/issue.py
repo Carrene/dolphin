@@ -1,6 +1,6 @@
 from datetime import datetime
-
 from auditor import observe
+
 from nanohttp import context
 from restfulpy.orm import Field, DeclarativeBase, relationship, \
     OrderingMixin, FilteringMixin, PaginationMixin
@@ -68,6 +68,7 @@ issue_origins = [
 ]
 
 
+# FIXME: Implement a class to encapsulate an enum value.
 class Boarding:
     ontime =    (1, 'on-time')
     delayed =   (2, 'delayed')
@@ -291,15 +292,22 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
 
         return status
 
+    @property
+    def _boarding(self):
+        if self.stage == 'on-hold':
+            return Boarding.frozen
+
+        if self.due_date == None:
+            return Boarding.ontime
+
+        if self.due_date < datetime.now():
+            return Boarding.delayed
+
+        return Boarding.ontime
+
     @hybrid_property
     def boarding_value(self):
-        if self.due_date == None:
-            return Boarding.frozen[0]
-
-        elif self.due_date < datetime.now():
-            return Boarding.delayed[0]
-
-        return Boarding.ontime[0]
+        return self._boarding[0]
 
     @boarding_value.expression
     def boarding_value(cls):
@@ -311,13 +319,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
 
     @hybrid_property
     def boarding(self):
-        if self.due_date == None:
-            return Boarding.frozen[1]
-
-        elif self.due_date < datetime.now():
-            return Boarding.delayed[1]
-
-        return Boarding.ontime[1]
+        return self._boarding[1]
 
     @boarding.expression
     def boarding(cls):
