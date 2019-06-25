@@ -48,6 +48,14 @@ class TestItem(LocalApplicationTestCase):
             assert fields['issue']['required'] is not None
             assert fields['issue']['watermark'] is not None
 
+            assert fields['isDone']['label'] is not None
+            assert fields['isDone']['name'] is not None
+            assert fields['isDone']['required'] is not None
+            assert fields['isDone']['readonly'] is not None
+            assert fields['isDone']['notNone'] is not None
+            assert fields['isDone']['notNone'] is not None
+            assert fields['isDone']['watermark'] is not None
+
             assert fields['perspective']['label'] is not None
             assert fields['perspective']['name'] is not None
             assert fields['perspective']['type'] is not None
