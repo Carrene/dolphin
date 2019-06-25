@@ -88,6 +88,17 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         required=True,
         example='Lorem Ipsum',
     )
+    is_done = Field(
+        Boolean,
+        python_type=bool,
+        label='Lorem Ipsum',
+        message='Lorem Ipsum',
+        watermark='Lorem Ipsum',
+        readonly=False,
+        nullable=True,
+        not_none=False,
+        required=False,
+    )
     member_id = Field(
         Integer,
         ForeignKey('member.id'),
