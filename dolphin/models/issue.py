@@ -213,6 +213,16 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         .where(IssuePhase.issue_id == id) \
         .correlate_except(Item)
     )
+
+    is_done = column_property(
+        select([func.bool_and(Item.is_done)]) \
+        .select_from(
+            join(IssuePhase, Item, IssuePhase.id == Item.issue_phase_id)
+        ) \
+        .where(IssuePhase.issue_id == id) \
+        .correlate_except(Item)
+    )
+
     is_subscribed = column_property(
         select([func.count(Subscription.member_id)])
         .select_from(
