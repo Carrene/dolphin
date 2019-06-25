@@ -180,12 +180,6 @@ class TestIssue(LocalApplicationTestCase):
             assert new_issue.boarding == 'on-time'
             assert new_issue.stage == 'triage'
 
-            when(
-                'Isdone is null',
-                json=given | dict(isDone=None, title='new title2')
-            )
-            assert status == 200
-
             when('Priority value not in form', json=Remove('priority'))
             assert status == '768 Priority Not In Form'
 
