@@ -94,6 +94,7 @@ class TestItem(LocalApplicationTestCase):
             assert status == 200
             assert response.json['id'] == self.item.id
             assert response.json['perspective'] == 'Due'
+            assert response.json['status'] == 'to-do'
             assert 'issue' in response.json
             assert response.json['phaseId'] == self.phase1.id
 

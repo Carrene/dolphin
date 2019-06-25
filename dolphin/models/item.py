@@ -178,6 +178,7 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         item_dict['perspective'] = self.perspective
         item_dict['issue'] = self.issue_phase.issue.to_dict()
         item_dict['phaseId'] = self.issue_phase.phase_id
+        item_dict['status'] = self.status
         return item_dict
 
     @classmethod
