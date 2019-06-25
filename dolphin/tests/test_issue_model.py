@@ -579,4 +579,3 @@ def test_issue_is_done(db):
             assert issue1.is_done == True
             assert issue2.is_done == False
 
-
