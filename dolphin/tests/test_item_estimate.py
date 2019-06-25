@@ -156,7 +156,7 @@ class TestItem(LocalApplicationTestCase):
                 json=dict(parameter='Invalid form parameter')
             )
             assert status == '707 Invalid field, only following fields are ' \
-                'accepted: startDate, endDate, estimatedHours'
+                'accepted: startDate, endDate, estimatedHours, isDone'
 
             when(
                 'Start date is less than end date',

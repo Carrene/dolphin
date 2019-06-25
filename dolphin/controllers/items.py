@@ -18,6 +18,7 @@ FORM_WHITLELIST_ITEM = [
     'startDate',
     'endDate',
     'estimatedHours',
+    'isDone',
 ]
 FORM_WHITLELIST_DAILYREPORT = [
     'hours',
@@ -193,6 +194,25 @@ class ItemController(ModelRestController):
 
         return item
 
+    @authorize
+    @json(
+        prevent_empty_form='708 Empty Form',
+        form_whitelist=(
+            FORM_WHITLELIST_ITEM,
+            f'707 Invalid field, only following fields are accepted: '
+            f'{FORM_WHITELIST_ITEM_STRING}'
+        )
+    )
+    def update(self, id):
+        id = int_or_notfound(id)
+
+        item = DBSession.query(Item).get(id)
+        if not item:
+            raise HTTPNotFound()
+
+        item.update_from_request()
+
+        return item
 
 class ItemDailyreportController(ModelRestController):
     __model__ = Dailyreport

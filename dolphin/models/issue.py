@@ -170,17 +170,6 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         watermark='lorem ipsum',
         example='lorem ipsum',
     )
-    is_done = Field(
-        Boolean,
-        python_type=bool,
-        label='Lorem Ipsum',
-        message='Lorem Ipsum',
-        watermark='Lorem Ipsum',
-        readonly=False,
-        nullable=True,
-        not_none=False,
-        required=False,
-    )
     attachments = relationship('Attachment', lazy='selectin')
     tags = relationship(
         'Tag',
@@ -224,6 +213,16 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         .where(IssuePhase.issue_id == id) \
         .correlate_except(Item)
     )
+
+    is_done = column_property(
+        select([func.bool_and(Item.is_done)]) \
+        .select_from(
+            join(IssuePhase, Item, IssuePhase.id == Item.issue_phase_id)
+        ) \
+        .where(IssuePhase.issue_id == id) \
+        .correlate_except(Item)
+    )
+
     is_subscribed = column_property(
         select([func.count(Subscription.member_id)])
         .select_from(
@@ -454,6 +453,13 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             example='Lorem Ipsum',
             message='Lorem Ipsum',
         )
+        yield MetadataField(
+            name='isDone',
+            key='is_done',
+            label='Lorem Ipsum',
+            required=False,
+            readonly=True,
+        )
 
     def to_dict(self, include_relations=True):
         # The `issue` relationship on Item model is `protected=False`, So the
@@ -479,7 +485,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         issue_dict['items'] = items_list
         issue_dict['dueDate'] = \
             self.due_date.isoformat() if self.due_date else None
-
+        issue_dict['isDone'] = self.is_done
         if include_relations:
             issue_dict['relations'] = []
             for x in self.relations:
