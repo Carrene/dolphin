@@ -23,6 +23,7 @@ class TestIssue(LocalApplicationTestCase):
             reference_id=2
         )
         session.add(cls.member)
+        session.commit()
 
         workflow = Workflow(title='default')
         group = Group(title='default')

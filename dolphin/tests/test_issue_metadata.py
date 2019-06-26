@@ -133,13 +133,23 @@ class TestIssue(LocalApplicationTestCase):
             assert fields['origin']['example'] is not None
             assert fields['origin']['watermark'] is not None
 
-            assert fields['createdBy']['label'] is not None
-            assert fields['createdBy']['name'] is not None
-            assert fields['createdBy']['notNone'] is not None
-            assert fields['createdBy']['required'] is not None
-            assert fields['createdBy']['readonly'] is not None
-            assert fields['createdBy']['protected'] is not None
-            assert fields['createdBy']['message'] is not None
-            assert fields['createdBy']['example'] is not None
-            assert fields['createdBy']['watermark'] is not None
+            assert fields['createdByMemberId']['label'] is not None
+            assert fields['createdByMemberId']['name'] is not None
+            assert fields['createdByMemberId']['notNone'] is not None
+            assert fields['createdByMemberId']['required'] is not None
+            assert fields['createdByMemberId']['readonly'] is not None
+            assert fields['createdByMemberId']['protected'] is not None
+            assert fields['createdByMemberId']['message'] is not None
+            assert fields['createdByMemberId']['example'] is not None
+            assert fields['createdByMemberId']['watermark'] is not None
+
+            assert fields['createdByReferenceId']['label'] is not None
+            assert fields['createdByReferenceId']['name'] is not None
+            assert fields['createdByReferenceId']['notNone'] is not None
+            assert fields['createdByReferenceId']['required'] is not None
+            assert fields['createdByReferenceId']['readonly'] is not None
+            assert fields['createdByReferenceId']['protected'] is not None
+            assert fields['createdByReferenceId']['message'] is not None
+            assert fields['createdByReferenceId']['example'] is not None
+            assert fields['createdByReferenceId']['watermark'] is not None
 

@@ -29,6 +29,8 @@ class TestIssue(LocalApplicationTestCase):
             phone=123456789,
             reference_id=2
         )
+        session.add(member1)
+        session.commit()
 
         workflow = Workflow(title='Default')
         group = Group(title='default')

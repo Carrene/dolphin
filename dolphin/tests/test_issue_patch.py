@@ -27,6 +27,8 @@ class TestIssue(LocalApplicationTestCase):
             phone=123456789,
             reference_id=1,
         )
+        session.add(cls.member)
+        session.commit()
 
         workflow = Workflow(title='default')
         skill = Skill(title='First Skill')

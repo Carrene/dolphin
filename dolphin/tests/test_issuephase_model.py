@@ -20,6 +20,7 @@ def test_issue_phase(db):
             access_token='access token 1',
             reference_id=2,
         )
+        session.add(member1)
 
         member2 = Member(
             title='Second Member',
@@ -28,6 +29,7 @@ def test_issue_phase(db):
             reference_id=3,
         )
         session.add(member2)
+        session.commit()
 
         workflow = Workflow(title='Default')
         skill = Skill(title='First Skill')

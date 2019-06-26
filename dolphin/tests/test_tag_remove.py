@@ -28,7 +28,7 @@ class TestTag(LocalApplicationTestCase):
             title='organization-title',
         )
         session.add(organization)
-        session.flush()
+        session.commit()
 
         workflow = Workflow(title='Default')
         group = Group(title='default')

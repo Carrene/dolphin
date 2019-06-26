@@ -22,6 +22,7 @@ def test_issue_due_date(db):
             reference_id=1
         )
         session.add(member)
+        session.commit()
 
         workflow = Workflow(title='Default')
         skill = Skill(title='First Skill')
@@ -166,6 +167,7 @@ def test_issue_lead_phase(db):
             reference_id=3
         )
         session.add(member2)
+        session.commit()
 
         workflow = Workflow(title='Default')
         skill = Skill(title='First Skill')
@@ -307,6 +309,8 @@ def test_issue_status(db):
             phone=123456789,
             reference_id=2,
         )
+        session.add(member1)
+        session.commit()
 
         workflow = Workflow(title='Default')
         skill = Skill(title='First Skill')
@@ -409,6 +413,8 @@ def test_issue_origin(db):
             access_token='access token 1',
             reference_id=2,
         )
+        session.add(member1)
+        session.commit()
 
         workflow = Workflow(title='Default')
         skill = Skill(title='First Skill')
@@ -460,6 +466,8 @@ def test_issue_is_done(db):
             access_token='access token 1',
             reference_id=2,
         )
+        session.add(member1)
+        session.commit()
 
         workflow = Workflow(title='Default')
         skill = Skill(title='First Skill')

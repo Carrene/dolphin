@@ -22,6 +22,7 @@ class TestDraftIssue(LocalApplicationTestCase):
             reference_id=2
         )
         session.add(cls.member1)
+        session.commit()
 
         workflow = Workflow(title='default')
 

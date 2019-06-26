@@ -32,6 +32,7 @@ class TestActivity(LocalApplicationTestCase):
             reference_id=2
         )
         session.add(cls.member2)
+        session.commit()
 
         workflow = Workflow(title='Default')
         skill = Skill(title='First Skill')

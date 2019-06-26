@@ -24,6 +24,7 @@ class TestDailyreport(LocalApplicationTestCase):
             reference_id=2,
         )
         session.add(cls.member)
+        session.commit()
 
         workflow = Workflow(title='Default')
         skill = Skill(title='First Skill')

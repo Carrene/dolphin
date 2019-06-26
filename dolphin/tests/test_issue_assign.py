@@ -22,6 +22,8 @@ class TestIssue(LocalApplicationTestCase):
             phone=123456789,
             reference_id=1
         )
+        session.add(cls.member1)
+        session.commit()
 
         cls.member2 = Member(
             title='Second Member',
