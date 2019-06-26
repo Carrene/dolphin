@@ -51,7 +51,7 @@ def upgrade():
 
 def downgrade():
     bind = op.get_bind()
-    session = orm.session(bind=bind)
+    session = orm.Session(bind=bind)
 
     op.add_column(
         'issue',
@@ -60,10 +60,6 @@ def downgrade():
     op.drop_column('issue', 'created_by_reference_id')
     op.drop_column('issue', 'created_by_member_id')
 
-    issues = session.query(Issue)
-    for issue in issues:
-        issue.created_by = 33
-
-    session.commit()
+    op.execute('UPDATE issue SET created_by = 33;')
     op.execute('ALTER TABLE issue ALTER COLUMN created_by SET NOT NULL')
 
