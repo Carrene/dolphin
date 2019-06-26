@@ -110,7 +110,11 @@ class Project(ModifiedByMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         default='queued',
         example='Lorem Ipsum'
     )
-
+    batches = relationship(
+        'Batch',
+        back_populates='projects',
+        protected=True
+    )
     workflow = relationship(
         'Workflow',
         back_populates='projects',
