@@ -23,6 +23,7 @@ class TestMentionedMemberWebhook(LocalApplicationTestCase):
             reference_id=1
         )
         session.add(cls.member1)
+        session.commit()
 
         workflow = Workflow(title='Default')
         group = Group(title='default')

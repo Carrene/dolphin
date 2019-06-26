@@ -33,6 +33,7 @@ class TestListGroup(LocalApplicationTestCase):
             phone=123456789,
             reference_id=2
         )
+        session.add(cls.member1)
 
         cls.member2 = Member(
             title='Second Member',
@@ -41,6 +42,7 @@ class TestListGroup(LocalApplicationTestCase):
             phone=987654321,
             reference_id=3
         )
+        session.add(cls.member2)
 
         cls.member3 = Member(
             title='Third Member',
@@ -50,6 +52,7 @@ class TestListGroup(LocalApplicationTestCase):
             reference_id=4
         )
         session.add(cls.member3)
+        session.commit()
 
         workflow = Workflow(title='Default')
         session.add(workflow)

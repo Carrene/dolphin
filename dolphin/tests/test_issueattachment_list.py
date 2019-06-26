@@ -40,6 +40,8 @@ class TestProject(LocalApplicationTestCase):
                     attachment4
                 ]
             )
+            session.add(member1)
+            session.commit()
 
             workflow = Workflow(title='Default')
             group = Group(title='default')

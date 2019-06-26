@@ -23,6 +23,7 @@ class TestIssue(LocalApplicationTestCase):
             reference_id=2
         )
         session.add(cls.member)
+        session.commit()
 
         workflow = Workflow(title='default')
         skill = Skill(title='First Skill')
@@ -97,7 +98,10 @@ class TestIssue(LocalApplicationTestCase):
             assert response.json['stage'] == 'triage'
             assert response.json['isDone'] is None
             assert response.json['origin'] == 'new'
-            assert response.json['createdBy'] == self.member.reference_id
+            assert response.json['createdByReferenceId'] \
+                == self.member.reference_id
+            assert response.json['createdByMemberId'] \
+                == self.member.id
 
             when(
                 'Intended project with string type not found',

@@ -27,7 +27,7 @@ class TestTag(LocalApplicationTestCase):
             title='organization-title',
         )
         session.add(organization)
-        session.flush()
+        session.commit()
 
         organization_member = OrganizationMember(
             organization_id=organization.id,

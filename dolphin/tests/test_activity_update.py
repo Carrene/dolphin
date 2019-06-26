@@ -25,6 +25,7 @@ class TestActivity(LocalApplicationTestCase):
             phone=123456789,
             reference_id=1
         )
+        session.add(cls.member)
 
         member2 = Member(
             title='Second Member',
@@ -34,6 +35,7 @@ class TestActivity(LocalApplicationTestCase):
             reference_id=2
         )
         session.add(member2)
+        session.commit()
 
         workflow = create_workflow()
         skill = Skill(title='First Skill')

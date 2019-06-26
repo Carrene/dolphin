@@ -57,6 +57,7 @@ def test_resource_load(db):
             reference_id=4
         )
         session.add(resource4)
+        session.commit()
 
         workflow = Workflow(title='Default')
         session.add(workflow)

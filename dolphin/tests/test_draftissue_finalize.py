@@ -37,6 +37,8 @@ class TestIssue(LocalApplicationTestCase):
             reference_id=1,
             skill=skill,
         )
+        session.add(cls.member)
+        session.commit()
 
         workflow1 = Workflow(title='default')
 

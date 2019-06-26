@@ -31,6 +31,7 @@ class TestIssue(LocalApplicationTestCase):
             reference_id=1
         )
         session.add(member)
+        session.commit()
 
         cls.tag1 = Tag(
             title='First tag',

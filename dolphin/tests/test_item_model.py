@@ -20,6 +20,9 @@ def test_item_perspective(db):
             phone=123456789,
             reference_id=2,
         )
+        session.add(member1)
+        session.commit()
+
         workflow = Workflow(title='Default')
         skill = Skill(title='First Skill')
         group = Group(title='default')
@@ -126,6 +129,8 @@ def test_item_hours_worked(db):
             access_token='access token 1',
             reference_id=1,
         )
+        session.add(member1)
+
         member2 = Member(
             title='Second Member',
             email='member2@example.com',
@@ -133,6 +138,7 @@ def test_item_hours_worked(db):
             reference_id=2,
         )
         session.add(member2)
+        session.commit()
 
         workflow = Workflow(title='Default')
         skill = Skill(title='First Skill')
@@ -234,6 +240,8 @@ def test_item_status(db):
             access_token='access token 1',
             reference_id=1,
         )
+        session.add(member1)
+
         member2 = Member(
             title='Second Member',
             email='member2@example.com',
@@ -241,6 +249,7 @@ def test_item_status(db):
             reference_id=2,
         )
         session.add(member2)
+        session.commit()
 
         workflow = Workflow(title='Default')
         skill = Skill(title='First Skill')
@@ -347,6 +356,8 @@ def test_response_time(db):
             phone=111111111,
             reference_id=3
         )
+        session.add(member2)
+        session.commit()
 
         workflow = Workflow(title='Default')
         skill = Skill(title='First Skill')

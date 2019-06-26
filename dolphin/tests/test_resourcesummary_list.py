@@ -82,6 +82,7 @@ class TestListPhaseSummary(LocalApplicationTestCase):
             skills=[skill2]
         )
         session.add(cls.resource3)
+        session.commit()
 
         group = Group(title='default')
 

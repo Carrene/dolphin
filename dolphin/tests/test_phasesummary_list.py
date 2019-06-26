@@ -33,6 +33,7 @@ class TestListPhaseSummary(LocalApplicationTestCase):
             phone=123456789,
             reference_id=2
         )
+        session.add(cls.member1)
 
         cls.member2 = Member(
             title='Second Member',
@@ -41,6 +42,8 @@ class TestListPhaseSummary(LocalApplicationTestCase):
             phone=987654321,
             reference_id=3
         )
+        session.add(cls.member2)
+        session.commit()
 
         workflow = Workflow(title='Default')
         session.add(workflow)
