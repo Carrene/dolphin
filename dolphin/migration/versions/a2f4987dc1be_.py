@@ -7,7 +7,9 @@ Create Date: 2019-06-26 14:31:26.661081
 """
 import sqlalchemy as sa
 from alembic import op
-from sqlalchmey import orm
+from sqlalchemy import orm
+
+from dolphin.models.issue import Issue
 
 
 # revision identifiers, used by Alembic.
