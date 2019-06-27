@@ -176,9 +176,9 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
             protected=False,
         )
         yield MetadataField(
-            name='itemId',
-            key='item_id',
-            label='item id',
+            name='status',
+            key='status',
+            label='status',
             required=False,
             readonly=True,
             protected=False,
