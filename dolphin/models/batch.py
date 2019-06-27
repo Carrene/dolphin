@@ -1,5 +1,5 @@
 from restfulpy.orm import Field, DeclarativeBase, relationship
-from sqlalchemy import Integer, Foreignkey, String, Unicode
+from sqlalchemy import Integer, ForeignKey, String, Unicode, UniqueConstraint
 
 
 class Batch(DeclarativeBase):
@@ -30,7 +30,7 @@ class Batch(DeclarativeBase):
     )
     project_id = Field(
         Integer,
-        Foreignkey('project.id'),
+        ForeignKey('project.id'),
         not_none=True,
         readonly=True
     )
