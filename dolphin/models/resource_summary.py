@@ -1,7 +1,10 @@
 from restfulpy.orm import Field, PaginationMixin, FilteringMixin, \
     OrderingMixin, BaseModel, MetadataField
-from sqlalchemy import Integer, Unicode, select, join, DateTime, func
-from sqlalchemy.orm import mapper
+from sqlalchemy import Integer, Unicode, select, join, DateTime, func, any_, \
+    case, text
+from sqlalchemy.orm import mapper, column_property
+from sqlalchemy.orm.properties import ColumnProperty
+from sqlalchemy.orm.session import Session
 
 from . import Phase, Item, Resource, Dailyreport, SkillMember
 from .issue_phase import IssuePhase
@@ -13,11 +16,12 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
     __table_args__ = {'autoload': True}
     __containig_fields__ = {
         'resource': ('id', 'title'),
-        'item': ('start_date', 'end_date', 'estimated_hours'),
+        'item': ('start_date', 'end_date', 'estimated_hours', 'id'),
         'dailyreport': ('hours')
     }
 
     id = Field('id', Integer, primary_key=True)
+    item_id = Field('item_id', Integer)
     title = Field('title', Unicode(100))
     load = Field('load', Unicode())
     start_date = Field('start_date', DateTime)
@@ -48,6 +52,7 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
             Resource.id,
             Resource.title,
             Resource.load.label('load'),
+            item_cte.c.id.label('item_id'),
             item_cte.c.start_date,
             item_cte.c.end_date,
             item_cte.c.estimated_hours,
@@ -107,6 +112,7 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
                 continue
 
             column = getattr(cls, c.key, None)
+            a = c.key
             if hasattr(c, 'info'):
                 column.info.update(c.info)
 
@@ -169,6 +175,14 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
             readonly=True,
             protected=False,
         )
+        yield MetadataField(
+            name='itemId',
+            key='item_id',
+            label='item id',
+            required=False,
+            readonly=True,
+            protected=False,
+        )
 
     def to_dict(self):
         # The `load` key is added manually because the `load` attribute is a
@@ -176,5 +190,13 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
         # `Resource.iter_columns` method.
         phase_summary_dict = super().to_dict()
         phase_summary_dict['load'] = self.load
+
+        if self.item_id:
+            session = Session.object_session(self)
+            status = session.query(Item).get(self.item_id).status
+        else:
+            status = None
+
+        phase_summary_dict['status'] = status
         return phase_summary_dict
 
