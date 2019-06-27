@@ -40,7 +40,7 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
             .cte()
 
         dailyreport_cte = select([
-            func.max(Dailyreport.hours).label('hours_worked'),
+            func.sum(Dailyreport.hours).label('hours_worked'),
             Dailyreport.item_id
         ]).group_by(Dailyreport.item_id).cte()
 
