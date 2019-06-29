@@ -212,6 +212,8 @@ class TestListPhaseSummary(LocalApplicationTestCase):
             when('Trying to sorting response', query=dict(sort='id'))
             assert response.json[0]['id'] == 1
             assert response.json[1]['id'] == 2
+            assert response.json[0]['status'] == 'complete'
+            assert response.json[1]['status'] == None
 
             when('Sorting the response descending', query=dict(sort='-id'))
             assert response.json[0]['id'] == 2

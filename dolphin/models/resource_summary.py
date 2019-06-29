@@ -1,6 +1,6 @@
 from restfulpy.orm import Field, PaginationMixin, FilteringMixin, \
     OrderingMixin, BaseModel, MetadataField
-from sqlalchemy import Integer, Unicode, select, join, DateTime, func
+from sqlalchemy import Integer, Unicode, select, join, DateTime, func, case
 from sqlalchemy.orm import mapper
 
 from . import Phase, Item, Resource, Dailyreport, SkillMember
@@ -13,17 +13,19 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
     __table_args__ = {'autoload': True}
     __containig_fields__ = {
         'resource': ('id', 'title'),
-        'item': ('start_date', 'end_date', 'estimated_hours'),
+        'item': ('start_date', 'end_date', 'estimated_hours', 'id', 'status'),
         'dailyreport': ('hours')
     }
 
     id = Field('id', Integer, primary_key=True)
+    item_id = Field('item_id', Integer)
     title = Field('title', Unicode(100))
     load = Field('load', Unicode())
     start_date = Field('start_date', DateTime)
     end_date = Field('end_date', DateTime)
     estimated_hours = Field('estimated_hours', Integer)
     hours = Field('hours_worked', Integer)
+    status = Field('sttaus', Unicode(100))
 
     @classmethod
     def create_mapped_class(cls, issue_id, phase_id):
@@ -44,14 +46,30 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
             Dailyreport.item_id
         ]).group_by(Dailyreport.item_id).cte()
 
+        item_status_cte = select([
+            Item.id,
+            case([
+                (
+                    Item.estimated_hours <= dailyreport_cte.c.hours_worked,
+                    'complete'
+                ),
+                (
+                    dailyreport_cte.c.hours_worked == 0 ,
+                    'to-do'
+                ),
+            ], else_='in-progress').label('status')
+        ]).cte()
+
         query = select([
             Resource.id,
             Resource.title,
             Resource.load.label('load'),
+            item_cte.c.id.label('item_id'),
             item_cte.c.start_date,
             item_cte.c.end_date,
             item_cte.c.estimated_hours,
             dailyreport_cte.c.hours_worked,
+            item_status_cte.c.status,
         ]) \
         .select_from(
             join(
@@ -70,6 +88,10 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
                 dailyreport_cte,
                 dailyreport_cte.c.item_id == item_cte.c.id,
                 isouter=True
+            ).join(
+                item_status_cte,
+                item_status_cte.c.id == item_cte.c.id,
+                isouter=True,
             )
         ) \
         .where(Phase.id == phase_id) \
@@ -107,6 +129,7 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
                 continue
 
             column = getattr(cls, c.key, None)
+            a = c.key
             if hasattr(c, 'info'):
                 column.info.update(c.info)
 
@@ -165,6 +188,14 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
             name='title',
             key='title',
             label='Resource',
+            required=False,
+            readonly=True,
+            protected=False,
+        )
+        yield MetadataField(
+            name='status',
+            key='status',
+            label='status',
             required=False,
             readonly=True,
             protected=False,

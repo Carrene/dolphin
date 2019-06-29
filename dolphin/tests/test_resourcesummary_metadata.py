@@ -56,3 +56,8 @@ class TestResourceSummary(LocalApplicationTestCase):
             assert fields['hours']['type'] is not None
             assert fields['hours']['required'] is not None
 
+            assert fields['status']['label'] is not None
+            assert fields['status']['name'] is not None
+            assert fields['status']['type'] is not None
+            assert fields['status']['required'] is not None
+
