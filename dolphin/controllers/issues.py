@@ -454,6 +454,12 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         )
         DBSession.add(item)
 
+        subscription = Subscription(
+            subscribable_id=issue.id,
+            member_id=member.id
+        )
+        DBSession.add(subscription)
+
         AuditLogContext.append(
             user=context.identity.email,
             object_=issue,
