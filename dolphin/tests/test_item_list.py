@@ -332,6 +332,12 @@ class TestListGroup(LocalApplicationTestCase):
             assert len(response.json) == 1
 
             when(
+                'Filter by issue id',
+                query=dict(issueId=self.issue3.id)
+            )
+            assert len(response.json) == 1
+
+            when(
                 'Filter by issue title',
                 query=dict(issueTitle=self.issue1.title)
             )
@@ -380,6 +386,18 @@ class TestListGroup(LocalApplicationTestCase):
             assert response.json[4]['issue']['title'] == self.issue1.title
             assert response.json[5]['issue']['title'] == self.issue1.title
             assert response.json[6]['issue']['title'] == self.issue1.title
+
+            when(
+                'Sort by issue id',
+                query=dict(sort='issueId')
+            )
+            assert len(response.json) == 7
+
+            when(
+                'Reverse sort by issue id',
+                query=dict(sort='-issueId')
+            )
+            assert len(response.json) == 7
 
             when(
                 'Sort by issue kind',
