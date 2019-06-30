@@ -1,17 +1,11 @@
-from auditor import context as AuditLogContext
-from nanohttp import HTTPStatus, json, context, HTTPNotFound, int_or_notfound
+from nanohttp import json, context, HTTPNotFound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 
-from ..backends import ChatClient
-from ..exceptions import StatusChatRoomNotFound, \
-    StatusRoomMemberAlreadyExist, StatusRoomMemberNotFound, \
-    StatusManagerNotFound, StatusSecondaryManagerNotFound
-from ..models import Batch, Project, Member, Subscription, Workflow, Group, Release
-from ..validators import project_validator, update_project_validator
-from .files import FileController
-from .issues import IssueController
+from ..exceptions import StatusIssueIdIsNull, StatusInvalidIssueIdType, \
+    StatusIssueIdNotInForm, StatusIssueNotFound
+from ..models import Batch, Issue
 
 
 class BatchController(ModelRestController):
@@ -19,25 +13,29 @@ class BatchController(ModelRestController):
 
     @authorize
     @json
-    @Batch_validator
     @Batch.expose
+    @Batch.validate(fields=dict(
+        issueIds=dict(
+            required=StatusIssueIdNotInForm,
+            type_=(int, StatusInvalidIssueIdType),
+            not_none=StatusIssueIdIsNull,
+        )
+    ))
     @commit
-    def append(self):
-        issues = context.form['issueId']
-        batch= Batch()
+    def append(self, id_):
+        batch = DBSession.query(Batch).filter(Batch.id == id_).one_or_none()
+        if batch is None:
+            raise HTTPNotFound('Batch with id: {id_} was not found')
 
-        last_batch = DBSession.query(Batch) \
-            .filter(Batch.max(Batch.id)) \
-            .one()
+        issue_id = context.form['issueIds']
+        issue = DBSession.query(Issue) \
+            .filter(Issue.id == issue_id) \
+            .one_or_none()
 
-        if last_batch:
-            DBSession.add(batch)
+        if issue is None:
+            raise StatusIssueNotFound(issue_id)
 
-        batch.update_from_request()
-        DBSession.add(batch)
+        batch.issues.append(issue)
 
         return batch
-
-
-
 

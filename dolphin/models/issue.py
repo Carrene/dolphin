@@ -174,7 +174,8 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
     batch_id = Field(
         Integer,
         ForeignKey('batch.id'),
-        readonly=True
+        readonly=True,
+        nullable=True
     )
     batches = relationship(
         'Batch',

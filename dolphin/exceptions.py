@@ -104,7 +104,8 @@ class StatusLaunchDateMustGreaterThanCutoffDate(HTTPKnownStatus):
 
 
 class StatusIssueNotFound(HTTPKnownStatus):
-    status = '605 Issue Not Found'
+    def __init__(self, issue_id):
+        self.status = f'605 Issue Not Found: {issue_id}'
 
 
 class StatusMemberNotFound(HTTPKnownStatus):
@@ -517,4 +518,7 @@ class StatusInvalidDateFormat(HTTPKnownStatus):
 
 class StatusDateNotInForm(HTTPKnownStatus):
     status = '931 Date Not In Form'
+
+class StatusIssueIdNotInForm(HTTPKnownStatus):
+    status = '723 Issue Id Not In Form'
 
