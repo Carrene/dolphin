@@ -4,7 +4,7 @@ from nanohttp import context
 from nanohttp.contexts import Context
 
 from dolphin.models import Issue, Project, Member, Phase, Group, Workflow, \
-    Release, Skill
+    Release, Skill, Subscription
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -91,6 +91,7 @@ class TestIssue(LocalApplicationTestCase):
 
     def test_assign(self):
         self.login(self.member1.email)
+        session = self.create_session()
         form = dict(
             memberId=self.member2.id,
             phaseId=1,
@@ -106,6 +107,11 @@ class TestIssue(LocalApplicationTestCase):
         ):
             assert status == 200
             assert response.json['id'] == self.issue1.id
+            assert session.query(Subscription) \
+                .filter(
+                    Subscription.subscribable_id==self.issue1.id,
+                    Subscription.member_id==self.member2.id
+                ).one()
 
             when(
                 'There is invalid parameter in the form',
