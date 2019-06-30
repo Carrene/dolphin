@@ -110,6 +110,10 @@ class ItemController(ModelRestController):
             value = context.query['issueKind']
             query = Item._filter_by_column_value(query, Issue.kind, value)
 
+        if 'issueId' in context.query:
+            value = context.query['issueId']
+            query = Item._filter_by_column_value(query, Issue.id, value)
+
         if 'issueTitle' in context.query:
             value = context.query['issueTitle']
             query = Item._filter_by_column_value(query, Issue.title, value)
@@ -124,7 +128,8 @@ class ItemController(ModelRestController):
             'issueBoarding',
             'issueKind',
             'issueTitle',
-            'projectTitle'
+            'projectTitle',
+            'issueId',
         )
 
         if sorting_expression:
@@ -148,6 +153,13 @@ class ItemController(ModelRestController):
                     query,
                     column=Issue.kind,
                     descending=sorting_columns['issueKind']
+                )
+
+            if 'issueId' in sorting_expression:
+                query = Issue._sort_by_key_value(
+                    query,
+                    column=Issue.id,
+                    descending=sorting_columns['issueId']
                 )
 
             if 'issueTitle' in sorting_expression:
