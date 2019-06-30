@@ -25,7 +25,7 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
     end_date = Field('end_date', DateTime)
     estimated_hours = Field('estimated_hours', Integer)
     hours = Field('hours_worked', Integer)
-    status = Field('sttaus', Unicode(100))
+    status = Field('status', Unicode(100))
 
     @classmethod
     def create_mapped_class(cls, issue_id, phase_id):
