@@ -118,7 +118,6 @@ class ItemController(ModelRestController):
             value = context.query['issueTitle']
             query = Item._filter_by_column_value(query, Issue.title, value)
 
-
         if 'projectTitle' in context.query:
             value = context.query['projectTitle']
             query = Item._filter_by_column_value(query, Project.title, value)
