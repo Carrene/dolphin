@@ -112,6 +112,7 @@ class TestBatch(LocalApplicationTestCase):
                 url_parameters=dict(id=0)
             )
             assert status == 404
+
             when(
                 'Inended batch with string type not found',
                 url_parameters=dict(id='Alaphabet')
