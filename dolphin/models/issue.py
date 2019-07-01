@@ -171,6 +171,17 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         example='lorem ipsum',
     )
     attachments = relationship('Attachment', lazy='selectin')
+    batch_id = Field(
+        Integer,
+        ForeignKey('batch.id'),
+        readonly=True,
+        nullable=True
+    )
+    batches = relationship(
+        'Batch',
+        back_populates='issues',
+        protected=False
+    )
     tags = relationship(
         'Tag',
         secondary='issue_tag',
