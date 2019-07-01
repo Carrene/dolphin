@@ -196,7 +196,7 @@ class TestListPhaseSummary(LocalApplicationTestCase):
             'LIST',
         ):
             assert status == 200
-            assert len(response.json) == 2
+            assert len(response.json) == 4
 
             when('Sorting by phase id', query=dict(sort='id'))
             assert response.json[0]['id'] < response.json[1]['id']
@@ -215,9 +215,9 @@ class TestListPhaseSummary(LocalApplicationTestCase):
 
             when(
                 'Filtering by the phase which member has not worked on it',
-                query=dict(id=self.phase1.id)
+                query=dict(id=self.phase3.id)
             )
             assert len(response.json) == 1
-            assert response.json[0]['id'] == self.phase1.id
-            assert response.json[0]['estimatedHours'] == 6
+            assert response.json[0]['id'] == self.phase3.id
+            assert response.json[0]['estimatedHours'] == None
 
