@@ -181,7 +181,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         'Project',
         foreign_keys=[project_id],
         back_populates='issues',
-        protected=False
+        protected=False,
     )
     draft_issue = relationship(
         'DraftIssue',
@@ -457,6 +457,13 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             name='isDone',
             key='is_done',
             label='Lorem Ipsum',
+            required=False,
+            readonly=True,
+        )
+        yield MetadataField(
+            name='project',
+            key='project',
+            label='Project',
             required=False,
             readonly=True,
         )

@@ -55,7 +55,7 @@ class CreatedByMixin:
         required=False,
         protected=False,
         default=lambda: Member.current().id,
-        label='Created By',
+        label='Creator',
         example='Lorem Ipsum',
         message='Lorem Ipsum',
         watermark='Lorem Ipsum',
