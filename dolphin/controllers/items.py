@@ -105,7 +105,6 @@ class ItemController(ModelRestController):
                     .filter(Item.status != 'complete')
 
             elif context.query['zone'] == 'complete':
-                import pudb; pudb.set_trace()  # XXX BREAKPOINT
                 query = query.filter(Item.status == 'complete')
 
         # FILTER
