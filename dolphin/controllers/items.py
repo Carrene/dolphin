@@ -122,6 +122,14 @@ class ItemController(ModelRestController):
             value = context.query['projectTitle']
             query = Item._filter_by_column_value(query, Project.title, value)
 
+        if 'phaseId' in context.query:
+            value = context.query['phaseId']
+            query = Item._filter_by_column_value(
+                query,
+                IssuePhase.phase_id,
+                value
+            )
+
         # SORT
         sorting_expression = context.query.get('sort', '').strip()
         external_columns = (
@@ -130,6 +138,7 @@ class ItemController(ModelRestController):
             'issueTitle',
             'projectTitle',
             'issueId',
+            'phaseId',
         )
 
         if sorting_expression:
@@ -174,6 +183,13 @@ class ItemController(ModelRestController):
                     query,
                     column=Project.title,
                     descending=sorting_columns['projectTitle']
+                )
+
+            if 'phaseId' in sorting_expression:
+                query = Issue._sort_by_key_value(
+                    query,
+                    column=IssuePhase.phase_id,
+                    descending=sorting_columns['phaseId']
                 )
 
         return query
