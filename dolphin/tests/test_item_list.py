@@ -362,6 +362,12 @@ class TestListGroup(LocalApplicationTestCase):
             assert len(response.json) == 2
 
             when(
+                'Filter by phase id',
+                query=dict(phaseId=self.phase2.id)
+            )
+            assert len(response.json) == 2
+
+            when(
                 'Sort by issue title',
                 query=dict(sort='issueTitle')
             )
@@ -462,6 +468,19 @@ class TestListGroup(LocalApplicationTestCase):
                 self.project1.title
             assert response.json[4]['issue']['project']['title'] == \
                 self.project1.title
+
+            when(
+                'Sort by phase id',
+                query=dict(sort='phaseId')
+            )
+            assert len(response.json) == 7
+
+            when(
+                'Reverse sort by phase id',
+                query=dict(sort='-phaseId')
+            )
+            assert len(response.json) == 7
+
 
             when('Request is not authorized', authorization=None)
             assert status == 401
