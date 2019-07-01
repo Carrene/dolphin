@@ -178,7 +178,6 @@ class Project(ModifiedByMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         .where(status == 'active')
     )
 
-
     @hybrid_property
     def boarding(self):
         if self.status == 'on-hold':
