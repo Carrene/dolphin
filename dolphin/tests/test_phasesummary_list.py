@@ -51,7 +51,7 @@ class TestListPhaseSummary(LocalApplicationTestCase):
         skill = Skill(title='First Skill')
         cls.phase1 = Phase(
             title='backlog',
-            order=-1,
+            order=5,
             workflow=workflow,
             skill=skill,
         )
@@ -143,11 +143,6 @@ class TestListPhaseSummary(LocalApplicationTestCase):
             )
             session.add(cls.item1)
 
-            issue_phase2 = IssuePhase(
-                issue_id=cls.issue1.id,
-                phase_id=cls.phase1.id,
-            )
-
             cls.item2 = Item(
                 issue_phase=issue_phase1,
                 member_id=cls.member2.id,
@@ -157,13 +152,13 @@ class TestListPhaseSummary(LocalApplicationTestCase):
             )
             session.add(cls.item2)
 
-            issue_phase3 = IssuePhase(
+            issue_phase2 = IssuePhase(
                 issue_id=cls.issue1.id,
                 phase_id=cls.phase2.id,
             )
 
             cls.item3 = Item(
-                issue_phase=issue_phase3,
+                issue_phase=issue_phase2,
                 member_id=cls.member1.id,
                 start_date=datetime.strptime('2018-2-2', '%Y-%m-%d'),
                 end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
@@ -171,13 +166,8 @@ class TestListPhaseSummary(LocalApplicationTestCase):
             )
             session.add(cls.item3)
 
-            issue_phase4 = IssuePhase(
-                issue_id=cls.issue1.id,
-                phase_id=cls.phase2.id,
-            )
-
             cls.item4 = Item(
-                issue_phase=issue_phase3,
+                issue_phase=issue_phase2,
                 member_id=cls.member2.id,
                 start_date=datetime.strptime('2018-2-2', '%Y-%m-%d'),
                 end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
@@ -185,13 +175,13 @@ class TestListPhaseSummary(LocalApplicationTestCase):
             )
             session.add(cls.item4)
 
-            issue_phase5 = IssuePhase(
+            issue_phase3 = IssuePhase(
                 issue_id=cls.issue2.id,
                 phase_id=cls.phase2.id,
             )
 
             cls.item5 = Item(
-                issue_phase=issue_phase5,
+                issue_phase=issue_phase3,
                 member_id=cls.member1.id,
             )
             session.add(cls.item5)
@@ -206,7 +196,7 @@ class TestListPhaseSummary(LocalApplicationTestCase):
             'LIST',
         ):
             assert status == 200
-            assert len(response.json) == 3
+            assert len(response.json) == 2
 
             when('Sorting by phase id', query=dict(sort='id'))
             assert response.json[0]['id'] < response.json[1]['id']
@@ -225,9 +215,9 @@ class TestListPhaseSummary(LocalApplicationTestCase):
 
             when(
                 'Filtering by the phase which member has not worked on it',
-                query=dict(id=self.phase3.id)
+                query=dict(id=self.phase1.id)
             )
             assert len(response.json) == 1
-            assert response.json[0]['id'] == self.phase3.id
-            assert response.json[0]['estimatedHours'] == None
+            assert response.json[0]['id'] == self.phase1.id
+            assert response.json[0]['estimatedHours'] == 6
 

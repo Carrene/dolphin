@@ -17,6 +17,7 @@ class AbstractPhaseSummaryView(PaginationMixin, OrderingMixin, FilteringMixin,
         'phase': ('id', 'title'),
         'item': ('issue_id', 'start_date', 'end_date', 'estimated_hours'),
         'dailyreport': ('hours'),
+        'issue_phase': ('status'),
     }
 
     id = Field('id', Integer, primary_key=True)
@@ -26,17 +27,23 @@ class AbstractPhaseSummaryView(PaginationMixin, OrderingMixin, FilteringMixin,
     issue_id = Field('issue_id', Integer)
     estimated_hours = Field('estimated_hours', Integer)
     hours = Field('hours_worked', Integer)
+    status = Field('status', Unicode(100))
 
     @classmethod
     def create_mapped_class(cls, issue_id):
-        item_cte = select([Item, IssuePhase.issue_id, IssuePhase.phase_id]) \
+        item_cte = select([
+            Item,
+            IssuePhase.issue_id,
+            IssuePhase.phase_id,
+            IssuePhase.status,
+        ]) \
             .select_from(join(
                 Item,
                 IssuePhase,
                 Item.issue_phase_id == IssuePhase.id
             )) \
-            .where(IssuePhase.issue_id == issue_id) \
             .cte()
+
         workflow_id_subquery = DBSession.query(Project.workflow_id) \
             .join(Issue, Project.id == Issue.project_id) \
             .filter(Issue.id == issue_id) \
@@ -46,6 +53,7 @@ class AbstractPhaseSummaryView(PaginationMixin, OrderingMixin, FilteringMixin,
             item_cte.c.issue_id.label('issue_id'),
             Phase.id,
             Phase.title,
+            item_cte.c.status.label('status'),
             func.min(item_cte.c.start_date).label('start_date'),
             func.max(item_cte.c.end_date).label('end_date'),
             func.sum(item_cte.c.estimated_hours).label('estimated_hours'),
@@ -65,7 +73,9 @@ class AbstractPhaseSummaryView(PaginationMixin, OrderingMixin, FilteringMixin,
         ) \
         .where(Phase.workflow_id.in_(workflow_id_subquery)) \
         .where(Phase.order > 0) \
+        .where(item_cte.c.issue_id == issue_id) \
         .group_by(item_cte.c.issue_id) \
+        .group_by(item_cte.c.status) \
         .group_by(Phase.id) \
         .group_by(Phase.title) \
         .order_by(Phase.order) \
@@ -136,6 +146,20 @@ class AbstractPhaseSummaryView(PaginationMixin, OrderingMixin, FilteringMixin,
 
              yield column
 
+        for c in IssuePhase.iter_columns(
+            relationships=relationships,
+            synonyms=synonyms,
+            composites=composites,
+        ):
+             if c.key not in cls.__containig_fields__['issue_phase']:
+                 continue
+
+             column = getattr(cls, c.key, None)
+             if hasattr(c, 'info'):
+                 column.info.update(c.info)
+
+             yield column
+
     @classmethod
     def iter_metadata_fields(cls):
         yield from super().iter_metadata_fields()
@@ -164,6 +188,13 @@ class AbstractPhaseSummaryView(PaginationMixin, OrderingMixin, FilteringMixin,
             name='title',
             key='title',
             label='Phase',
+            readonly=True,
+            required=False,
+        )
+        yield MetadataField(
+            name='status',
+            key='status',
+            label='Status',
             readonly=True,
             required=False,
         )
