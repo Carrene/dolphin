@@ -1,12 +1,9 @@
 from restfulpy.orm import Field, DeclarativeBase, relationship
-from sqlalchemy import Integer, ForeignKey, Enum, join, select, func, case, \
-    text
+from sqlalchemy import Integer, ForeignKey, select, case
 from sqlalchemy.orm import column_property
-from sqlalchemy.sql.expression import any_, all_, and_
-from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.sql.expression import any_, all_
 
 from .item import Item
-from .dailyreport import Dailyreport
 
 
 issue_phase_statuses = [
@@ -69,52 +66,25 @@ class IssuePhase(DeclarativeBase):
         back_populates='issue_phases',
         protected=True,
     )
-
-    @hybrid_property
-    def status(self):
-        complete_count = 0
-        for item in self.items:
-            if item.status == 'in-progress':
-                return 'in-progress'
-
-            if item.status == 'complete':
-                complete_count = complete_count + 1
-
-        if len(self.items) == complete_count:
-            return 'complete'
-
-        return 'to-do'
-
-    @status.expression
-    def status(cls):
-        return case([
+    status = column_property(
+        case([
             (
-                func.count(
-                    Item.__table__.select(Item.id)
-                    .where(and_(
-                        Item.status == 'to-do',
-                        Item.issue_phase_id == cls.id
-                    ))
-                ) == \
-                func.count(
-                    Item.__table__.select(Item.id)
-                    .where(Item.issue_phase_id == cls.id)
-                ),
-                'to-do'
+                any_(
+                    select([Item.status])
+                    .where(Item.issue_phase_id == id)
+                    .correlate_except(Item)
+                ) == 'in-progress',
+                'in-progress'
             ),
             (
-                func.count(
-                    Item.__table__.select(Item.id)
-                    .where(and_(
-                        Item.status == 'complete',
-                        Item.issue_phase_id == cls.id
-                    ))
-                ) == \
-                func.count(
-                    Item.__table__.select(Item.id)
-                    .where(Item.issue_phase_id == cls.id)
-                ),
+                all_(
+                    select([Item.status])
+                    .where(Item.issue_phase_id == id)
+                    .correlate_except(Item)
+                ) == 'complete',
                 'complete'
             ),
-        ], else_='in-progress')
+        ], else_='to-do').label('status'),
+        deferred=True
+    )
 
