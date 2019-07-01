@@ -456,8 +456,8 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         subscription = DBSession.query(Subscription) \
             .filter(
-                Subscription.issue_id == issue.id,
-                member_id == member.id
+                Subscription.subscribable_id == issue.id,
+                Subscription.member_id == member.id
             ) \
             .one_or_none()
         if subscription is None:
