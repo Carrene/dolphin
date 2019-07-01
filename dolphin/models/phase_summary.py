@@ -42,7 +42,6 @@ class AbstractPhaseSummaryView(PaginationMixin, OrderingMixin, FilteringMixin,
                 IssuePhase,
                 Item.issue_phase_id == IssuePhase.id
             )) \
-            .where(IssuePhase.issue_id == issue_id) \
             .cte()
 
         workflow_id_subquery = DBSession.query(Project.workflow_id) \
@@ -74,6 +73,7 @@ class AbstractPhaseSummaryView(PaginationMixin, OrderingMixin, FilteringMixin,
         ) \
         .where(Phase.workflow_id.in_(workflow_id_subquery)) \
         .where(Phase.order > 0) \
+        .where(item_cte.c.issue_id == issue_id) \
         .group_by(item_cte.c.issue_id) \
         .group_by(item_cte.c.status) \
         .group_by(Phase.id) \
@@ -188,6 +188,13 @@ class AbstractPhaseSummaryView(PaginationMixin, OrderingMixin, FilteringMixin,
             name='title',
             key='title',
             label='Phase',
+            readonly=True,
+            required=False,
+        )
+        yield MetadataField(
+            name='status',
+            key='status',
+            label='Status',
             readonly=True,
             required=False,
         )
