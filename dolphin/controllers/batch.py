@@ -59,7 +59,7 @@ class BatchController(ModelRestController):
 
         issue = DBSession.query(Issue).get(context.form.get('issueIds'))
         if issue is None:
-            raise StatusIsuueNotFound()
+            raise StatusIssueNotFound()
 
         DBSession.delete(issue)
         return batch
