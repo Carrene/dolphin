@@ -454,11 +454,18 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         )
         DBSession.add(item)
 
-        subscription = Subscription(
-            subscribable_id=issue.id,
-            member_id=member.id
-        )
-        DBSession.add(subscription)
+        subscription = DBSession.query(Subscription) \
+            .filter(
+                Subscription.issue_id == issue.id,
+                member_id == member.id
+            ) \
+            .one_or_none()
+        if subscription is None:
+            subscription = Subscription(
+                subscribable_id=issue.id,
+                member_id=member.id
+            )
+            DBSession.add(subscription)
 
         AuditLogContext.append(
             user=context.identity.email,
