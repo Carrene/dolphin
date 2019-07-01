@@ -6,7 +6,7 @@ from restfulpy.orm import Field, DeclarativeBase, relationship, \
     OrderingMixin, FilteringMixin, PaginationMixin
 from restfulpy.orm.metadata import MetadataField
 from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
-    case, join, Boolean, and_, any_
+    case, join, Boolean, and_, any_, exists
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import column_property
@@ -291,16 +291,25 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         .limit(1) \
         .as_scalar()
 
-    @property
-    def status(self):
-        status = 'to-do'
-        for issue_phase in self.issue_phases:
-            if issue_phase.phase_id == self.phase_id \
-                    and issue_phase.issue_id == self.id:
-                status = issue_phase.status
-                break
-
-        return status
+    status = column_property(
+        case([
+            (
+                exists(
+                    select([IssuePhase.status])
+                    .where(and_(
+                        IssuePhase.issue_id == id,
+                        IssuePhase.phase_id == phase_id
+                    ))
+                ),
+                select([IssuePhase.status])
+                .where(and_(
+                    IssuePhase.issue_id == id,
+                    IssuePhase.phase_id == phase_id
+                )).as_scalar()
+            )
+        ], else_='to-do').label('status'),
+        deferred=True
+    )
 
     @property
     def _boarding(self):

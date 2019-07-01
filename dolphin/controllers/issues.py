@@ -147,19 +147,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
     def list(self):
         query = DBSession.query(Issue)
         sorting_expression = context.query.get('sort', '').strip()
-        is_sort_by_status = False
-        if 'status' in sorting_expression:
-            is_sort_by_status = True
-            sorting_expression = sorting_expression.replace('status', '')
-            context.query['sort'] = sorting_expression
-
-        is_filter_by_status = False
-        if context.query.get('status') is not None:
-            status = context.query['status']
-            is_filter_by_status = True
-            is_multi_filter = re.search(r'in\(.*\)', status.lower())
-            status = status[3:-1].split(',') if is_multi_filter else [status]
-            del context.query['status']
 
         is_issue_tag_joined = False
         is_issue_issue_phase_joined = False
@@ -294,20 +281,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 ) \
                 .filter(Subscription.member_id == context.identity.id)
 
-        issues = Issue.dump_query(query)
-
-        # TODO: Filtering and sorting by the status must be handle by sql query
-        if is_sort_by_status:
-            issues = query.all()
-            issues = [i.to_dict() for i in issues]
-            issues = list(sorted(issues, key=lambda h: h['status']))
-
-        if is_filter_by_status:
-            for issue in issues:
-                if issue['status'] not in status:
-                    issues.remove(issue)
-
-        return issues
+        return query
 
     @authorize
     @json(prevent_form='709 Form Not Allowed')
