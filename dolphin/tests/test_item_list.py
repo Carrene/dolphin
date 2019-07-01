@@ -438,13 +438,13 @@ class TestListGroup(LocalApplicationTestCase):
                 'Sort by issue id',
                 query=dict(sort='issueId')
             )
-            assert len(response.json) == 7
+            assert len(response.json) == 8
 
             when(
                 'Reverse sort by issue id',
                 query=dict(sort='-issueId')
             )
-            assert len(response.json) == 7
+            assert len(response.json) == 8
 
             when(
                 'Sort by issue kind',
@@ -518,13 +518,13 @@ class TestListGroup(LocalApplicationTestCase):
                 'Sort by phase id',
                 query=dict(sort='phaseId')
             )
-            assert len(response.json) == 7
+            assert len(response.json) == 8
 
             when(
                 'Reverse sort by phase id',
                 query=dict(sort='-phaseId')
             )
-            assert len(response.json) == 7
+            assert len(response.json) == 8
 
             when('Request is not authorized', authorization=None)
             assert status == 401
