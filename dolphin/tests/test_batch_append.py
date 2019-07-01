@@ -46,6 +46,7 @@ class TestBatch(LocalApplicationTestCase):
             room_id=1001
         )
         session.add(cls.project1)
+        session.commit()
 
         cls.batch1 = Batch(title='01')
         cls.project1.batches.append(cls.batch1)
