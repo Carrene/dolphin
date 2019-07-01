@@ -1,4 +1,5 @@
 from restfulpy.orm import Field, DeclarativeBase, relationship
+from restfulpy.orm.metadata import MetadataField
 from sqlalchemy import Integer, ForeignKey, String, Unicode, UniqueConstraint
 
 
@@ -52,4 +53,20 @@ class Batch(DeclarativeBase):
             name='uix_title_project_id'
         ),
     )
+
+    def to_dict(self):
+        batch_dict = super().to_dict()
+        batch_dict['issueIds'] = [i.id for i in self.issues]
+        return batch_dict
+
+    @classmethod
+    def iter_metadata_fields(cls):
+        yield from super().iter_metadata_fields()
+        yield MetadataField(
+            name='issue_ids',
+            key='issueIds',
+            label='Issues IDs',
+            required=False,
+            readonly=True
+        )
 

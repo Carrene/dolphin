@@ -1,4 +1,4 @@
-from nanohttp import json, context, HTTPNotFound
+from nanohttp import json, context, HTTPNotFound, int_or_notfound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
@@ -23,6 +23,7 @@ class BatchController(ModelRestController):
     ))
     @commit
     def append(self, id_):
+        id_ = int_or_notfound(id_)
         batch = DBSession.query(Batch).filter(Batch.id == id_).one_or_none()
         if batch is None:
             raise HTTPNotFound('Batch with id: {id_} was not found')

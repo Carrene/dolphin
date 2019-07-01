@@ -8,7 +8,8 @@ from ..backends import ChatClient
 from ..exceptions import StatusChatRoomNotFound, \
     StatusRoomMemberAlreadyExist, StatusRoomMemberNotFound, \
     StatusManagerNotFound, StatusSecondaryManagerNotFound
-from ..models import Project, Member, Subscription, Workflow, Group, Release
+from ..models import Project, Member, Subscription, Workflow, Group, Release, \
+    Batch
 from ..validators import project_validator, update_project_validator
 from .files import FileController
 from .issues import IssueController

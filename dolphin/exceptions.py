@@ -104,8 +104,11 @@ class StatusLaunchDateMustGreaterThanCutoffDate(HTTPKnownStatus):
 
 
 class StatusIssueNotFound(HTTPKnownStatus):
-    def __init__(self, issue_id):
-        self.status = f'605 Issue Not Found: {issue_id}'
+    def __init__(self, issue_id=None):
+        # This + between strings are decided by PyLover.
+        # DO NOT DO THAT ANYWHERE
+        self.status = f'605 Issue Not Found' + \
+            (f': {issue_id}' if issue_id is not None else '')
 
 
 class StatusMemberNotFound(HTTPKnownStatus):
