@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when
@@ -6,7 +6,7 @@ from nanohttp import context
 from nanohttp.contexts import Context
 
 from dolphin.models import Member, Group, Workflow, Skill, Phase, Release, \
-    Project, Issue, Item, Admin, IssuePhase
+    Project, Issue, Item, Admin, IssuePhase, Dailyreport
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -163,7 +163,18 @@ class TestListGroup(LocalApplicationTestCase):
                 days=1,
                 room_id=5
             )
-            session.add(cls.issue3)
+            session.add(cls.issue4)
+            session.flush()
+
+            cls.issue5 = Issue(
+                project=cls.project2,
+                title='Fifth issue',
+                description='This is description of fifth issue',
+                kind='feature',
+                days=1,
+                room_id=6
+            )
+            session.add(cls.issue5)
             session.flush()
 
             issue_phase1 = IssuePhase(
@@ -243,6 +254,28 @@ class TestListGroup(LocalApplicationTestCase):
                 member_id=cls.member2.id,
             )
             session.add(cls.item7)
+
+            issue_phase7 = IssuePhase(
+                issue=cls.issue4,
+                phase=cls.phase3,
+            )
+
+            cls.item8 = Item(
+                issue_phase=issue_phase7,
+                member_id=cls.member2.id,
+                start_date=datetime.now().date() - 4 * timedelta(days=1),
+                end_date=datetime.now().date(),
+                estimated_hours=3,
+            )
+            session.add(cls.item7)
+
+            dailyreport1 = Dailyreport(
+                date=datetime.now().date() - 3 * timedelta(days=1),
+                hours=5,
+                note='note for dailyreport1',
+                item=cls.item8,
+            )
+            session.add(dailyreport1)
             session.commit()
 
     def test_list_item(self):
@@ -254,10 +287,10 @@ class TestListGroup(LocalApplicationTestCase):
             'LIST',
         ):
             assert status == 200
-            assert len(response.json) == 7
+            assert len(response.json) == 8
 
             when('Sort by id', query=dict(sort='id'))
-            assert len(response.json) == 7
+            assert len(response.json) == 8
             assert response.json[0]['id'] < response.json[1]['id']
             assert response.json[1]['id'] < response.json[2]['id']
             assert response.json[2]['id'] < response.json[3]['id']
@@ -266,7 +299,7 @@ class TestListGroup(LocalApplicationTestCase):
             assert response.json[5]['id'] < response.json[6]['id']
 
             when('Reverse sort by id', query=dict(sort='-id'))
-            assert len(response.json) == 7
+            assert len(response.json) == 8
             assert response.json[0]['id'] > response.json[1]['id']
             assert response.json[1]['id'] > response.json[2]['id']
             assert response.json[2]['id'] > response.json[3]['id']
@@ -279,7 +312,7 @@ class TestListGroup(LocalApplicationTestCase):
             assert response.json[0]['id'] == self.item1.id
 
             when('Filter by id', query=dict(id=f'!{self.item1.id}'))
-            assert len(response.json) == 6
+            assert len(response.json) == 7
             for item in response.json:
                 assert item['id'] != self.item1.id
 
@@ -320,6 +353,12 @@ class TestListGroup(LocalApplicationTestCase):
             assert response.json[1]['id'] in [self.item6.id ,self.item3.id]
 
             when(
+                'Filter by `complete` zone',
+                query=dict(zone='complete')
+            )
+            assert len(response.json) == 1
+
+            when(
                 'Paginate item',
                query=dict(sort='id', take=1, skip=2)
             )
@@ -347,7 +386,7 @@ class TestListGroup(LocalApplicationTestCase):
                 'Filter by issue kind',
                 query=dict(issueKind=self.issue1.kind)
             )
-            assert len(response.json) == 5
+            assert len(response.json) == 6
 
             when(
                 'Filter by issue boarding',
@@ -359,7 +398,7 @@ class TestListGroup(LocalApplicationTestCase):
                 'Filter by project title',
                 query=dict(projectTitle=self.project2.title)
             )
-            assert len(response.json) == 2
+            assert len(response.json) == 3
 
             when(
                 'Filter by phase id',
@@ -371,69 +410,71 @@ class TestListGroup(LocalApplicationTestCase):
                 'Sort by issue title',
                 query=dict(sort='issueTitle')
             )
-            assert len(response.json) == 7
+            assert len(response.json) == 8
             assert response.json[0]['issue']['title'] == self.issue1.title
             assert response.json[1]['issue']['title'] == self.issue1.title
             assert response.json[2]['issue']['title'] == self.issue1.title
             assert response.json[3]['issue']['title'] == self.issue1.title
             assert response.json[4]['issue']['title'] == self.issue4.title
-            assert response.json[5]['issue']['title'] == self.issue2.title
-            assert response.json[6]['issue']['title'] == self.issue3.title
+            assert response.json[5]['issue']['title'] == self.issue4.title
+            assert response.json[6]['issue']['title'] == self.issue2.title
+            assert response.json[7]['issue']['title'] == self.issue3.title
 
             when(
                 'Reverse sort by issue title',
                 query=dict(sort='-issueTitle')
             )
-            assert len(response.json) == 7
+            assert len(response.json) == 8
             assert response.json[0]['issue']['title'] == self.issue3.title
             assert response.json[1]['issue']['title'] == self.issue2.title
             assert response.json[2]['issue']['title'] == self.issue4.title
-            assert response.json[3]['issue']['title'] == self.issue1.title
+            assert response.json[3]['issue']['title'] == self.issue4.title
             assert response.json[4]['issue']['title'] == self.issue1.title
             assert response.json[5]['issue']['title'] == self.issue1.title
             assert response.json[6]['issue']['title'] == self.issue1.title
+            assert response.json[7]['issue']['title'] == self.issue1.title
 
             when(
                 'Sort by issue id',
                 query=dict(sort='issueId')
             )
-            assert len(response.json) == 7
+            assert len(response.json) == 8
 
             when(
                 'Reverse sort by issue id',
                 query=dict(sort='-issueId')
             )
-            assert len(response.json) == 7
+            assert len(response.json) == 8
 
             when(
                 'Sort by issue kind',
                 query=dict(sort='issueKind')
             )
-            assert len(response.json) == 7
+            assert len(response.json) == 8
 
             when(
                 'Reverse sort by issue kind',
                 query=dict(sort='-issueKind')
             )
-            assert len(response.json) == 7
+            assert len(response.json) == 8
 
             when(
                 'Sort by issue boarding',
                 query=dict(sort='issueBoarding')
             )
-            assert len(response.json) == 7
+            assert len(response.json) == 8
 
             when(
                 'Reverse sort by issue boarding',
                 query=dict(sort='-issueBoarding')
             )
-            assert len(response.json) == 7
+            assert len(response.json) == 8
 
             when(
                 'Sort by project title',
                 query=dict(sort='projectTitle')
             )
-            assert len(response.json) == 7
+            assert len(response.json) == 8
             assert response.json[0]['issue']['project']['title'] == \
                 self.project1.title
             assert response.json[1]['issue']['project']['title'] == \
@@ -448,38 +489,42 @@ class TestListGroup(LocalApplicationTestCase):
                 self.project2.title
             assert response.json[6]['issue']['project']['title'] == \
                 self.project2.title
+            assert response.json[7]['issue']['project']['title'] == \
+                self.project2.title
 
             when(
                 'Reverse sort by project title',
                 query=dict(sort='-projectTitle')
             )
-            assert len(response.json) == 7
+            assert len(response.json) == 8
             assert response.json[0]['issue']['project']['title'] == \
                 self.project2.title
             assert response.json[1]['issue']['project']['title'] == \
                 self.project2.title
             assert response.json[2]['issue']['project']['title'] == \
-                self.project1.title
+                self.project2.title
             assert response.json[3]['issue']['project']['title'] == \
                 self.project1.title
             assert response.json[4]['issue']['project']['title'] == \
                 self.project1.title
-            assert response.json[4]['issue']['project']['title'] == \
+            assert response.json[5]['issue']['project']['title'] == \
                 self.project1.title
-            assert response.json[4]['issue']['project']['title'] == \
+            assert response.json[6]['issue']['project']['title'] == \
+                self.project1.title
+            assert response.json[7]['issue']['project']['title'] == \
                 self.project1.title
 
             when(
                 'Sort by phase id',
                 query=dict(sort='phaseId')
             )
-            assert len(response.json) == 7
+            assert len(response.json) == 8
 
             when(
                 'Reverse sort by phase id',
                 query=dict(sort='-phaseId')
             )
-            assert len(response.json) == 7
+            assert len(response.json) == 8
 
             when('Request is not authorized', authorization=None)
             assert status == 401
@@ -491,5 +536,5 @@ class TestListGroup(LocalApplicationTestCase):
             'LIST',
         ):
             assert status == 200
-            assert len(response.json) == 7
+            assert len(response.json) == 8
 

@@ -29,7 +29,8 @@ VALID_ZONES = [
     'newlyAssigned',
     'needEstimate',
     'upcomingNuggets',
-    'inProgressNuggets'
+    'inProgressNuggets',
+    'complete',
 ]
 
 
@@ -94,12 +95,17 @@ class ItemController(ModelRestController):
             elif context.query['zone'] == 'upcomingNuggets':
                 query = query \
                     .filter(Item.estimated_hours.isnot(None)) \
-                    .filter(Item.start_date > datetime.now())
+                    .filter(Item.start_date > datetime.now()) \
+                    .filter(Item.status != 'complete')
 
             elif context.query['zone'] == 'inProgressNuggets':
                 query = query \
                     .filter(Item.estimated_hours.isnot(None)) \
-                    .filter(Item.start_date < datetime.now())
+                    .filter(Item.start_date < datetime.now()) \
+                    .filter(Item.status != 'complete')
+
+            elif context.query['zone'] == 'complete':
+                query = query.filter(Item.status == 'complete')
 
         # FILTER
         if 'issueBoarding' in context.query:
