@@ -6,7 +6,7 @@ from restfulpy.orm.metadata import MetadataField
 from restfulpy.orm.mixins import TimestampMixin, OrderingMixin, \
     FilteringMixin, PaginationMixin
 from sqlalchemy import Integer, ForeignKey, DateTime, Enum, String, select, \
-    func, Boolean, case, any_, text
+    func, Boolean, case, any_, text, exists
 from sqlalchemy.orm import column_property, synonym
 
 from .dailyreport import Dailyreport
@@ -156,47 +156,36 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         deferred=True
     )
 
-#SELECT
-#    CASE
-#        WHEN (select count(id) from dailyreport where item_id = 1)=0 THEN 'Due'
-#        WHEN (select date_part('day', now()::date - item.start_date) from item where id = 1) > (
-#            select count(id) from dailyreport where dailyreport.item_id = 1 and dailyreport.date < now()::date
-#        ) THEN 'Overdue'
-#        WHEN (
-#            select note from dailyreport where dailyreport.item_id = 1 and dailyreport.date = now()::date
-#            ) IS NULL THEN 'Due'
-#        ELSE 'Submitted'
-#    END
-#FROM item;
     perspective = column_property(
         case([
             (
-            select([func.count(Dailyreport.id)])
-            .where(Dailyreport.item_id == id) == 0,
-            'due'
+                select([func.count(Dailyreport.hours)])
+                .where(Dailyreport.item_id == id)
+                .as_scalar() == 0,
+                'due'
+            ),
+            (
+                func.date_part('DAY', func.now() - start_date) >
+                select([func.count(Dailyreport.id)])
+                .where(Dailyreport.item_id == id)
+                .where(Dailyreport.date < datetime.now().date())
+                .as_scalar(),
+                'overdue'
+            ),
+            (
+                exists(
+                    select([Dailyreport.note])
+                    .where(Dailyreport.item_id == id)
+                    .where(Dailyreport.date == datetime.now().date())
+                    .where(Dailyreport.note.is_(None))
+                ),
+                'due2'
             )
         ],
         else_='submitted'
         ).label('perspective'),
         deferred=True
     )
-
-
-#    @property
-#    def perspective(self):
-#        if len(self.dailyreports) == 0:
-#            return 'Due'
-#
-#        for dailyreport in self.dailyreports:
-#            if dailyreport.note == None \
-#                    and dailyreport.date < datetime.now().date():
-#                return 'Overdue'
-#
-#        if self.dailyreports[-1].note == None \
-#                and self.dailyreports[-1].date == datetime.now().date():
-#            return 'Due'
-#
-#        return 'Submitted'
 
     @property
     def response_time(self):
