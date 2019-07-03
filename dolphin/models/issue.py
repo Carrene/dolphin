@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from auditor import observe
 
 from nanohttp import context
@@ -6,10 +6,10 @@ from restfulpy.orm import Field, DeclarativeBase, relationship, \
     OrderingMixin, FilteringMixin, PaginationMixin
 from restfulpy.orm.metadata import MetadataField
 from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
-    case, join, Boolean, and_, any_, exists
+    case, join, Boolean, and_, any_, exists, DateTime
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import column_property
+from sqlalchemy.orm import column_property, synonym
 
 from ..mixins import ModifiedByMixin, CreatedByMixin
 from .member import Member
@@ -311,6 +311,38 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         deferred=True
     )
 
+    _last_moving_time = Field(
+        DateTime,
+        python_type=datetime,
+        label='Last Moving Time',
+        nullable=True,
+        protected=True,
+    )
+
+    def _get_last_moving_time(self):
+        return self._last_moving_time
+
+    def _set_last_moving_time(self, value):
+        self._last_moving_time = None
+
+        if value == 'triage':
+            self._last_moving_time = datetime.now()
+
+
+    last_moving_time = synonym(
+        'stage',
+        descriptor=property(_set_last_moving_time, _get_last_moving_time),
+        info=dict(protected=True)
+    )
+
+    @hybrid_property
+    def response_time(self):
+        if self._last_moving_time:
+            return (
+                self.last_moving_time + \
+                timedelta(hours=settings.issue.response_time)
+            ) - datetime.now()
+
     @property
     def _boarding(self):
         if self.stage == 'on-hold':
@@ -504,6 +536,9 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
                 ))
 
         issue_dict = super().to_dict()
+        issue_dict['responseTime'] = \
+            self._get_hours_from_timedelta(self.response_time) \
+            if self.response_time else None
         issue_dict['status'] = self.status
         issue_dict['boarding'] = self.boarding
         issue_dict['isSubscribed'] = True if self.is_subscribed else False
@@ -529,6 +564,10 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
 
     def get_room_title(self):
         return f'{self.title.lower()}-{self.project_id}'
+
+    @staticmethod
+    def _get_hours_from_timedelta(timedelta):
+        return timedelta.seconds / 3600
 
 
 @listens_for(Issue.stage, 'set')
