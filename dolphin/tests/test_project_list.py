@@ -343,8 +343,8 @@ class TestProject(LocalApplicationTestCase):
                 assert status == 200
                 assert len(response.json) == 4
                 assert response.json[0]['title'] == self.project1.title
-                assert response.json[1]['title'] == self.project3.title
-                assert response.json[2]['title'] == self.project2.title
+                assert response.json[1]['title'] == self.project2.title
+                assert response.json[2]['title'] == self.project3.title
                 assert response.json[3]['title'] == self.project4.title
 
                 when(
@@ -354,8 +354,8 @@ class TestProject(LocalApplicationTestCase):
                 assert status == 200
                 assert len(response.json) == 4
                 assert response.json[0]['title'] == self.project3.title
-                assert response.json[1]['title'] == self.project2.title
-                assert response.json[2]['title'] == self.project1.title
+                assert response.json[1]['title'] == self.project1.title
+                assert response.json[2]['title'] == self.project2.title
                 assert response.json[3]['title'] == self.project4.title
 
             with self.given(
@@ -384,7 +384,7 @@ class TestProject(LocalApplicationTestCase):
                     query=dict(sort='id', status='on-hold')
                 )
                 assert response.json[0]['status'] == 'on-hold'
-                assert response.json[0]['boarding'] == 'frozen'
+                assert response.json[0]['boarding'] == 'on-time'
 
                 when(
                     'List projects excepts one of statuses',
@@ -397,8 +397,7 @@ class TestProject(LocalApplicationTestCase):
                     query=dict(boarding='on-time')
                 )
                 assert status == 200
-                assert len(response.json) == 1
-                assert response.json[0]['title'] == self.project2.title
+                assert len(response.json) == 3
 
                 when(
                     'Filter project by boarding using IN clause',

@@ -4,7 +4,7 @@ from restfulpy.orm import Field, relationship, SoftDeleteMixin, \
     OrderingMixin, FilteringMixin, PaginationMixin
 from restfulpy.orm.metadata import MetadataField
 from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
-    join, case
+    join, case, exists
 from sqlalchemy.orm import column_property
 from sqlalchemy.ext.hybrid import hybrid_property
 
@@ -172,39 +172,22 @@ class Project(ModifiedByMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         deferred=True
     )
 
-    boarding_value = column_property(
-        select([func.max(Issue.boarding_value)])
-        .where(Issue.project_id == id)
-        .where(status == 'active')
+    boarding = column_property(
+        case([
+            (
+                status == 'queued',
+                None
+            ),
+            (
+                exists(
+                    select([Issue.id])
+                    .where(Issue.project_id == id)
+                    .where(Issue.boarding == 'delayed')
+                ),
+                'delayed'
+            )], else_='on-time'
+        )
     )
-
-    @hybrid_property
-    def boarding(self):
-        if self.status == 'on-hold':
-            return Boarding.frozen[1]
-
-        elif self.status == 'queued':
-            return None
-
-        elif self.boarding_value == Boarding.ontime[0]:
-            return Boarding.ontime[1]
-
-        elif self.boarding_value == Boarding.delayed[0]:
-            return Boarding.delayed[1]
-
-        elif self.boarding_value == Boarding.frozen[0]:
-            return Boarding.frozen[1]
-
-        return None
-
-    @boarding.expression
-    def boarding(cls):
-        return case([
-            (cls.status == 'on-hold', Boarding.frozen[1]),
-            (cls.boarding_value == Boarding.ontime[0], Boarding.ontime[1]),
-            (cls.boarding_value == Boarding.delayed[0], Boarding.delayed[1]),
-            (cls.boarding_value == Boarding.frozen[0], Boarding.frozen[1]),
-        ])
 
     @classmethod
     def iter_metadata_fields(cls):
