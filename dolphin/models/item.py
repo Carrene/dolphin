@@ -181,9 +181,7 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
                 ),
                 'due2'
             )
-        ],
-        else_='submitted'
-        ).label('perspective'),
+        ], else_='submitted').label('perspective'),
         deferred=True
     )
 
