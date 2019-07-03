@@ -34,7 +34,9 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
             Item.start_date,
             Item.end_date,
             Item.estimated_hours,
-            Item.status]) \
+            Item.status,
+            Item.member_id,
+        ]) \
             .select_from(
                 join(
                     Item,
