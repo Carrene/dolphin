@@ -18,7 +18,7 @@ from ..exceptions import StatusRoomMemberAlreadyExist, \
     StatusQueryParameterNotInFormOrQueryString
 from ..models import Issue, Subscription, Phase, Item, Member, Project, \
     RelatedIssue, Subscribable, IssueTag, Tag, Resource, SkillMember, \
-    AbstractResourceSummaryView, AbstractPhaseSummaryView, IssuePhase
+    AbstractResourceSummaryView, AbstractPhaseSummaryView, IssuePhase, Job
 from ..validators import update_issue_validator, assign_issue_validator, \
     issue_move_validator, unassign_issue_validator, issue_relate_validator, \
     issue_unrelate_validator, search_issue_validator
@@ -78,6 +78,9 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
             elif remaining_paths[1] == 'phasessummaries':
                 return IssuePhaseSummaryController(issue=issue)(*remaining_paths[2:])
+
+            elif remaining_paths[1] == 'jobs':
+                return IssueJobsController(issue=issue)(*remaining_path[2:])
 
         return super().__call__(*remaining_paths)
 
@@ -815,3 +818,16 @@ class IssuePhaseResourceSummaryController(ModelRestController):
         query = DBSession.query(phase_summary_view)
         return query
 
+
+class IssueJobsController(ModelRestController):
+    __model__ = Job
+
+    def __init__(self, issue):
+        self.issue = issue
+
+    @authorize
+    @Job.expose
+    @json
+    def schedule(self, id):
+        import pudb; pudb.set_trace()  # XXX BREAKPOINT
+        pass
