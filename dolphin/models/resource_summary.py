@@ -29,7 +29,14 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
 
     @classmethod
     def create_mapped_class(cls, issue_id, phase_id):
-        item_cte = select([Item]) \
+        item_cte = select([
+            Item.id,
+            Item.start_date,
+            Item.end_date,
+            Item.estimated_hours,
+            Item.status,
+            Item.member_id,
+        ]) \
             .select_from(
                 join(
                     Item,
@@ -46,20 +53,6 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
             Dailyreport.item_id
         ]).group_by(Dailyreport.item_id).cte()
 
-        item_status_cte = select([
-            Item.id,
-            case([
-                (
-                    Item.estimated_hours <= dailyreport_cte.c.hours_worked,
-                    'complete'
-                ),
-                (
-                    dailyreport_cte.c.hours_worked == 0 ,
-                    'to-do'
-                ),
-            ], else_='in-progress').label('status')
-        ]).cte()
-
         query = select([
             Resource.id,
             Resource.title,
@@ -68,8 +61,8 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
             item_cte.c.start_date,
             item_cte.c.end_date,
             item_cte.c.estimated_hours,
+            item_cte.c.status,
             dailyreport_cte.c.hours_worked,
-            item_status_cte.c.status,
         ]) \
         .select_from(
             join(
@@ -88,10 +81,6 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
                 dailyreport_cte,
                 dailyreport_cte.c.item_id == item_cte.c.id,
                 isouter=True
-            ).join(
-                item_status_cte,
-                item_status_cte.c.id == item_cte.c.id,
-                isouter=True,
             )
         ) \
         .where(Phase.id == phase_id) \
