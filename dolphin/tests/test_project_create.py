@@ -83,7 +83,7 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['title'] == 'My awesome project'
             assert response.json['description'] == 'A decription for my project'
             assert response.json['status'] == 'active'
-            assert response.json['boarding'] == None
+            assert response.json['boarding'] == 'on-time'
             assert response.json['dueDate'] == None
             assert response.json['managerId'] == self.member.id
             assert response.json['secondaryManagerId'] is None
