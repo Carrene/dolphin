@@ -143,16 +143,14 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
                 'complete'
             ),
             (
-                any_(
+                exists(
                     select([Dailyreport.item_id])
                     .where(Dailyreport.item_id == id)
                     .group_by(Dailyreport.item_id)
-                ) == 1,
+                ),
                 'in-progress'
             ),
-        ],
-        else_='to-do'
-        ).label('status'),
+        ], else_='to-do').label('status'),
         deferred=True
     )
 

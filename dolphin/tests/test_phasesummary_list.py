@@ -6,7 +6,7 @@ from nanohttp import context
 from nanohttp.contexts import Context
 
 from dolphin.models import Member, Group, Workflow, Skill, Phase, Release, \
-    Project, Issue, Item, Admin, IssuePhase
+    Project, Issue, Item, Admin, IssuePhase, Dailyreport
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -143,6 +143,14 @@ class TestListPhaseSummary(LocalApplicationTestCase):
             )
             session.add(cls.item1)
 
+            dailyreport1 = Dailyreport(
+                date=datetime.strptime('2020-2-2', '%Y-%m-%d'),
+                hours=1,
+                note='note for dailyreport1',
+                item=cls.item1,
+            )
+            session.add(dailyreport1)
+
             cls.item2 = Item(
                 issue_phase=issue_phase1,
                 member_id=cls.member2.id,
@@ -200,6 +208,10 @@ class TestListPhaseSummary(LocalApplicationTestCase):
 
             when('Sorting by phase id', query=dict(sort='id'))
             assert response.json[0]['id'] < response.json[1]['id']
+            assert response.json[0]['status'] == 'in-progress'
+            assert response.json[1]['status'] == None
+            assert response.json[2]['status'] == None
+            assert response.json[3]['status'] == 'to-do'
 
             when('Reverse sorting by phase id', query=dict(sort='-id'))
             assert response.json[1]['id'] < response.json[0]['id']
