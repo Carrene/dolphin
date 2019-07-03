@@ -205,6 +205,11 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         back_populates='issues',
         protected=False,
     )
+    #jobs = relationship(
+    #    'Job',
+    #    back_populates='issues',
+    #    protected=False
+    #)
     draft_issue = relationship(
         'DraftIssue',
         back_populates='issue',
