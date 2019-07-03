@@ -12,6 +12,7 @@ from dolphin.models import Item, Project, Member, Workflow, Group, Release,  \
 
 def test_boarding(db):
     session = db()
+    session.expire_on_commit = True
 
     with AuditLogContext(dict()):
         member = Member(
@@ -46,6 +47,7 @@ def test_boarding(db):
             title='My first project',
             description='A decription for my project',
             room_id=1,
+            status='active',
         )
 
         with Context(dict()):
@@ -100,18 +102,6 @@ def test_boarding(db):
                 phase_id=phase1.id,
             )
             session.add(issue_phase1)
-
-            issue_phase2 = IssuePhase(
-                issue_id=issue1.id,
-                phase_id=phase2.id,
-            )
-            session.add(issue_phase2)
-
-            issue_phase3 = IssuePhase(
-                issue_id=issue1.id,
-                phase_id=phase3.id,
-            )
-            session.add(issue_phase3)
             session.flush()
 
             item1 = Item(
@@ -122,26 +112,15 @@ def test_boarding(db):
                 estimated_hours=4,
             )
             session.add(item1)
-
-            item2 = Item(
-                issue_phase_id=issue_phase2.id,
-                member_id=member.id,
-                start_date=datetime.strptime('2020-2-2', '%Y-%m-%d'),
-                end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
-                estimated_hours=4,
-            )
-            session.add(item2)
-
-            item3 = Item(
-                issue_phase_id=issue_phase3.id,
-                member_id=member.id,
-                start_date=datetime.strptime('2019-2-2', '%Y-%m-%d'),
-                end_date=datetime.strptime('2019-2-3', '%Y-%m-%d'),
-                estimated_hours=4,
-            )
-            session.add(item3)
             session.commit()
 
-    assert issue1.due_date == item2.end_date
-    assert issue2.due_date == None
+            assert project.boarding == 'on-time'
+
+            item1.end_date = datetime.strptime('2019-2-3', '%Y-%m-%d'),
+            session.commit()
+            assert project.boarding == 'delayed'
+
+            project.status = 'queued'
+            session.commit()
+            assert project.boarding == None
 
