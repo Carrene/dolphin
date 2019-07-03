@@ -23,35 +23,11 @@ class TestListPhaseSummary(LocalApplicationTestCase):
 
         cls.phase1 = Phase(
             title='backlog',
-            order=-1,
+            order=4,
             workflow=workflow,
             skill=skill1
         )
         session.add(cls.phase1)
-
-        cls.phase2 = Phase(
-            title='Design',
-            order=1,
-            workflow=workflow,
-            skill=skill2
-        )
-        session.add(cls.phase2)
-
-        cls.phase3 = Phase(
-            title='Development',
-            order=2,
-            workflow=workflow,
-            skill=skill1,
-        )
-        session.add(cls.phase3)
-
-        cls.phase4 = Phase(
-            title='Test',
-            order=3,
-            workflow=workflow,
-            skill=skill2,
-        )
-        session.add(cls.phase4)
 
         cls.resource1 = Resource(
             title='First Resource',
@@ -100,7 +76,7 @@ class TestListPhaseSummary(LocalApplicationTestCase):
             release=release,
             workflow=workflow,
             group=group,
-            manager=cls.resource2,
+            manager=cls.resource1,
             title='My first project',
             description='A decription for my project',
             room_id=1
