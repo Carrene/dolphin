@@ -316,6 +316,10 @@ class TestListGroup(LocalApplicationTestCase):
             for item in response.json:
                 assert item['id'] != self.item1.id
 
+            when('Filter by perspective', query=dict(perspective='overdue'))
+            assert len(response.json) == 1
+            assert response.json[0]['id'] == self.item8.id
+
             when(
                 'The zone in query string is invalid',
                 query=dict(zone='invalidZone')
@@ -443,6 +447,18 @@ class TestListGroup(LocalApplicationTestCase):
             when(
                 'Reverse sort by issue id',
                 query=dict(sort='-issueId')
+            )
+            assert len(response.json) == 8
+
+            when(
+                'Sort by perspective',
+                query=dict(sort='perspective')
+            )
+            assert len(response.json) == 8
+
+            when(
+                'Reverse sort by perspective',
+                query=dict(sort='-perspective')
             )
             assert len(response.json) == 8
 

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from nanohttp import settings
 from nanohttp import context
@@ -13,6 +13,8 @@ from dolphin.models import Item, Project, Member, Workflow, Group, Release, \
 def test_item_perspective(db):
     with AuditLogContext(dict()):
         session = db()
+        session.expire_on_commit = True
+
         member1 = Member(
             title='First Member',
             email='member1@example.com',
@@ -74,50 +76,47 @@ def test_item_perspective(db):
             item = Item(
                 issue_phase=issue_phase1,
                 member_id=member1.id,
+                start_date=datetime.now().date() - timedelta(days=2),
+                end_date=datetime.now().date(),
             )
             session.add(item)
             session.commit()
 
-            assert item.perspective == 'Due'
+            assert item.perspective == 'due'
 
             dailyreport1 = Dailyreport(
-                date=datetime.strptime('2019-1-2', '%Y-%m-%d').date(),
+                date=datetime.now().date() - timedelta(days=2),
                 hours=3,
-                note='The note for a daily report',
+                note='The note for a daily report 1',
                 item=item,
             )
             session.add(dailyreport1)
             session.commit()
 
+            assert item.perspective == 'overdue'
+
             dailyreport2 = Dailyreport(
-                date=datetime.strptime('2019-1-3', '%Y-%m-%d').date(),
+                date=datetime.now().date() - timedelta(days=1),
                 hours=3,
                 item=item,
+                note='The note for a daily report 2',
             )
             session.add(dailyreport2)
             session.commit()
 
-            assert item.perspective == 'Overdue'
-
-            dailyreport2.note = 'The note for a daily report'
-            session.commit()
-
-            assert item.perspective == 'Submitted'
-
             dailyreport3 = Dailyreport(
                 date=datetime.now().date(),
-                hours=3,
                 item=item,
             )
             session.add(dailyreport3)
             session.commit()
 
-            assert item.perspective == 'Due'
+            assert item.perspective == 'due2'
 
-            dailyreport3.note = 'The note for a daily report'
+            dailyreport3.note = 'The note for a daily report 3'
             session.commit()
 
-            assert item.perspective == 'Submitted'
+            assert item.perspective == 'submitted'
 
 
 def test_item_hours_worked(db):
@@ -440,12 +439,15 @@ def test_response_time(db):
 
         assert item2.response_time.total_seconds() > 0
 
-#    assert item1.response_time == None
+    # FIXME: These lines must be uncommented when the response time field
+    # specified how is started
 
-#    item1.status = 'in-progress'
-#    settings.item.response_time = 0.0000000001
-#    assert item1.response_time.total_seconds() < 0
-#
-#    settings.item.response_time = 1
-#    assert item1.response_time.total_seconds() > 0
+    # assert item1.response_time == None
+
+    # item1.status = 'in-progress'
+    # settings.item.response_time = 0.0000000001
+    # assert item1.response_time.total_seconds() < 0
+    #
+    # settings.item.response_time = 1
+    # assert item1.response_time.total_seconds() > 0
 
