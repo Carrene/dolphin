@@ -11,7 +11,7 @@ from .cli import EmailSubCommand, MuleSubCommand
 from .controllers.root import Root
 
 
-__version__ = '0.52.1a14'
+__version__ = '0.52.2a14'
 
 
 class Dolphin(Application):
