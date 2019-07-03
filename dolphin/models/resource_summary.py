@@ -29,7 +29,12 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
 
     @classmethod
     def create_mapped_class(cls, issue_id, phase_id):
-        item_cte = select([Item, Item.status]) \
+        item_cte = select([
+            Item.id,
+            Item.start_date,
+            Item.end_date,
+            Item.estimated_hours,
+            Item.status]) \
             .select_from(
                 join(
                     Item,
