@@ -1,6 +1,8 @@
 from restfulpy.mule import MuleTask
 from restfulpy.orm import Field, relationship, OrderingMixin, DeclarativeBase
 from sqlalchemy import Integer, ForeignKey
+from sqlalchemy.orm.session import object_session
+from sqlalchemy.sql import select, update
 
 from .issue import Issue
 
@@ -11,6 +13,7 @@ class Job(MuleTask, OrderingMixin, DeclarativeBase):
 
     id = Field(
         Integer,
+        ForeignKey('mule_task.id'),
         primary_key=True,
         readonly=True,
         not_none=True,
@@ -27,5 +30,5 @@ class Job(MuleTask, OrderingMixin, DeclarativeBase):
         nullable=True,
     )
 
-    def do_():
+    def do_(self, context):
         pass

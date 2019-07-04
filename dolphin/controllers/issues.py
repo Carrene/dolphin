@@ -9,6 +9,7 @@ from nanohttp import HTTPStatus, json, context, HTTPNotFound, \
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import DBSession, commit
+from restfulpy.mule import MuleTask, worker
 from sqlalchemy import and_, exists, select, func, join, or_, Text, cast
 
 from ..backends import ChatClient
@@ -80,7 +81,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 return IssuePhaseSummaryController(issue=issue)(*remaining_paths[2:])
 
             elif remaining_paths[1] == 'jobs':
-                return IssueJobsController(issue=issue)(*remaining_path[2:])
+                return IssueJobController(issue=issue)(*remaining_paths[2:])
 
         return super().__call__(*remaining_paths)
 
@@ -830,7 +831,7 @@ class IssuePhaseResourceSummaryController(ModelRestController):
         return query
 
 
-class IssueJobsController(ModelRestController):
+class IssueJobController(ModelRestController):
     __model__ = Job
 
     def __init__(self, issue):
@@ -839,6 +840,12 @@ class IssueJobsController(ModelRestController):
     @authorize
     @Job.expose
     @json
-    def schedule(self, id):
+    def schedule(self):
+        issue_job = Job()
+        issue_job.at = context.form['date']
+        issue_job.issue_id = self.issue.id
+        DBSession.add(issue_job)
         import pudb; pudb.set_trace()  # XXX BREAKPOINT
-        pass
+        tasks = worker(tries=0, filters=MuleTask.type == 'Job')
+
+        return issue_job

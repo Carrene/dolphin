@@ -1,3 +1,4 @@
+import datetime
 from auditor.context import Context as AuditLogContext
 from bddrest import status, when, response
 from nanohttp import context
@@ -95,11 +96,13 @@ class TestJob(LocalApplicationTestCase):
     def test_schedule(self):
         self.login('member1@example.com')
 
-        with oauth_mockup_server(), chat_mockup_server(), self.given(
+        with oauth_mockup_server(), self.given(
             'Schedule an issue',
             f'/apiv1/issues/id: {self.issue1.id}/jobs',
             'SCHEDULE',
+            json=dict(date=datetime.datetime.now().isoformat())
         ):
+            import pudb; pudb.set_trace()  # XXX BREAKPOINT
             assert status == 200
-            assert response.json['id'] == self.issue1.id
+            assert response.json['issueId'] == self.issue1.id
 
