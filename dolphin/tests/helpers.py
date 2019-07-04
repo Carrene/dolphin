@@ -71,6 +71,9 @@ class LocalApplicationTestCase(ApplicableTestCase):
             issue:
               subscription:
                 max_length: 5
+
+            item:
+              response_time: 48
         '''
 
     def login(self, email, organization_id=None):

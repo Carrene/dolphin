@@ -6,10 +6,13 @@ from restfulpy.orm.metadata import MetadataField
 from restfulpy.orm.mixins import TimestampMixin, OrderingMixin, \
     FilteringMixin, PaginationMixin
 from sqlalchemy import Integer, ForeignKey, DateTime, Enum, String, select, \
-    func, Boolean, case, any_, text, exists
+    func, Boolean, case, any_, text, exists, cast
 from sqlalchemy.orm import column_property, synonym
+from sqlalchemy.types import TIMESTAMP
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from .dailyreport import Dailyreport
+from ..constants import ITEM_RESPONSE_TIME
 
 
 class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
@@ -110,6 +113,14 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         required=True,
         example='Lorem Ipsum'
     )
+    need_estimate_timestamp = Field(
+        DateTime,
+        python_type=datetime,
+        nullable=True,
+        not_none=False,
+        required=False,
+        readonly=False,
+    )
     issue_phase = relationship(
         'IssuePhase',
         foreign_keys=issue_phase_id,
@@ -183,17 +194,33 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         deferred=True
     )
 
-    @property
+    @hybrid_property
     def response_time(self):
-          return (
-              self.created_at + \
-              timedelta(hours=settings.item.response_time)
-          ) - datetime.now()
+        if self.need_estimate_timestamp:
+            return self.need_estimate_timestamp + \
+                   timedelta(hours=ITEM_RESPONSE_TIME) - \
+                   datetime.now()
+
+        return None
+
+    @response_time.expression
+    def response_time(cls):
+        return case([
+            (
+                cls.need_estimate_timestamp != None,
+                func.date_part(
+                    'hour',
+                    cls.need_estimate_timestamp + \
+                    timedelta(hours=ITEM_RESPONSE_TIME) - \
+                    func.now()
+                )
+            )
+        ])
 
     def to_dict(self):
         item_dict = super().to_dict()
         item_dict['responseTime'] = \
-            self._get_hours_from_timedelta(self.response_time) \
+            self._get_hours(self.response_time) \
             if self.response_time else None
 
         item_dict['hoursWorked'] = self.hours_worked
@@ -251,6 +278,10 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         )
 
     @staticmethod
-    def _get_hours_from_timedelta( timedelta):
-        return timedelta.seconds / 3600
+    def _get_hours(timedelta):
+        hours = 0
+        if timedelta.days > 0:
+            hours = timedelta.days * 24
+
+        return hours + (timedelta.seconds // 3600)
 

@@ -16,6 +16,7 @@ class TestListGroup(LocalApplicationTestCase):
     @AuditLogContext(dict())
     def mockup(cls):
         session = cls.create_session()
+        cls.RESPONSE_TIME_TIMEDELTA = 24
 
         cls.admin = Admin(
             title='First Admin',
@@ -188,6 +189,8 @@ class TestListGroup(LocalApplicationTestCase):
                 start_date=datetime.strptime('2020-2-2', '%Y-%m-%d'),
                 end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
                 estimated_hours=3,
+                need_estimate_timestamp= \
+                    datetime.now() - timedelta(hours=cls.RESPONSE_TIME_TIMEDELTA),
             )
             session.add(cls.item1)
 
@@ -252,6 +255,8 @@ class TestListGroup(LocalApplicationTestCase):
             cls.item7 = Item(
                 issue_phase=issue_phase1,
                 member_id=cls.member2.id,
+                need_estimate_timestamp= \
+                    datetime.now() - timedelta(hours=cls.RESPONSE_TIME_TIMEDELTA),
             )
             session.add(cls.item7)
 
@@ -373,6 +378,12 @@ class TestListGroup(LocalApplicationTestCase):
                 query=dict(sort='-id', take=1, skip=2)
             )
             assert len(response.json) == 1
+
+            when(
+                'Filter by response time',
+                query=dict(responseTime=self.RESPONSE_TIME_TIMEDELTA - 1)
+            )
+            assert len(response.json) == 2
 
             when(
                 'Filter by issue id',
@@ -541,6 +552,20 @@ class TestListGroup(LocalApplicationTestCase):
                 query=dict(sort='-phaseId')
             )
             assert len(response.json) == 8
+
+            when(
+                'Sort by response time',
+                query=dict(sort='responseTime')
+            )
+            assert len(response.json) == 8
+
+            when(
+                'Reverse sort by response time',
+                query=dict(sort='-responseTime')
+            )
+            assert len(response.json) == 8
+
+
 
             when('Request is not authorized', authorization=None)
             assert status == 401

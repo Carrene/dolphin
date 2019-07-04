@@ -5,6 +5,7 @@ from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 from sqlalchemy import select, func, join
+from sqlalchemy.sql.expression import all_
 
 from ..models import Item, Dailyreport, Event, Member, Issue, Project, Phase, \
     IssuePhase
@@ -55,6 +56,19 @@ class ItemController(ModelRestController):
             raise HTTPNotFound()
 
         return item
+
+    def _are_sibling_items_estimated(self, issue_phase):
+        return DBSession.query(Item) \
+            .filter(Item.issue_phase_id == issue_phase.id) \
+            .filter(all_(Item.estimated_hours) != None)
+
+    def _set_need_estimate_sibling_items(self, issue_phase):
+        for item in issue_phase.items:
+            item.need_estimate_timestamp = datetime.now()
+
+    def _unset_need_estimate_sibling_items(self, issue_phase):
+        for item in issue_phase.items:
+            item.need_estimate_timestamp = None
 
     @authorize
     @json(prevent_form='709 Form Not Allowed')
@@ -226,6 +240,24 @@ class ItemController(ModelRestController):
         if item.issue_phase.issue.phase_id is not None:
             item.issue_phase.issue.stage = 'working'
 
+        if self._are_sibling_items_estimated(item.issue_phase):
+            next_phase_id = DBSession.query(Phase.id) \
+                .filter(
+                    Phase.workflow_id == item.issue_phase.phase.workflow_id
+                ) \
+                .filter(Phase.order > item.issue_phase.phase.order) \
+                .order_by(Phase.order) \
+                .first()
+
+            next_issue_phase = DBSession.query(IssuePhase) \
+                .filter(IssuePhase.issue_id == item.issue_phase.issue_id) \
+                .filter(IssuePhase.phase_id == next_phase_id) \
+                .one_or_none()
+
+            if next_issue_phase is not None:
+                self._set_need_estimate_sibling_items(next_issue_phase)
+                self._unset_need_estimate_sibling_items(item.issue_phase)
+
         return item
 
     @authorize
@@ -247,6 +279,7 @@ class ItemController(ModelRestController):
         item.update_from_request()
 
         return item
+
 
 class ItemDailyreportController(ModelRestController):
     __model__ = Dailyreport

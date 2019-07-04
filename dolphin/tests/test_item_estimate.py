@@ -33,7 +33,7 @@ class TestItem(LocalApplicationTestCase):
 
         phase1 = Phase(
             title='backlog',
-            order=-1,
+            order=1,
             workflow=workflow,
             skill=skill,
         )
@@ -41,7 +41,7 @@ class TestItem(LocalApplicationTestCase):
 
         phase2 = Phase(
             title='backlog',
-            order=12,
+            order=2,
             workflow=workflow,
             skill=skill,
         )
@@ -98,11 +98,12 @@ class TestItem(LocalApplicationTestCase):
             cls.item1 = Item(
                 issue_phase=issue_phase1,
                 member=cls.member1,
+                need_estimate_timestamp=datetime.now(),
             )
             session.add(cls.item1)
 
             issue_phase2 = IssuePhase(
-                issue=cls.issue2,
+                issue=cls.issue1,
                 phase=phase2,
             )
 
@@ -114,6 +115,7 @@ class TestItem(LocalApplicationTestCase):
             session.commit()
 
     def test_estimate(self):
+        session = self.create_session()
         self.login(self.member1.email)
         json = dict(
             startDate=datetime.strptime('2019-2-2', '%Y-%m-%d').isoformat(),
@@ -134,6 +136,15 @@ class TestItem(LocalApplicationTestCase):
             assert response.json['endDate'] == json['endDate']
             assert self.issue1.stage == 'working'
             assert self.issue2.stage == 'triage'
+            assert session.query(Item) \
+                .filter(Item.id == self.item1.id) \
+                .filter(Item.need_estimate_timestamp == None) \
+                .one()
+
+            assert session.query(Item) \
+                .filter(Item.id == self.item2.id) \
+                .filter(Item.need_estimate_timestamp != None) \
+                .one()
 
             when(
                 'Intended item with string type not found',
