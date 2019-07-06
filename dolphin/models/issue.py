@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from auditor import observe
 
 from nanohttp import context
+from nanohttp import settings
 from restfulpy.orm import Field, DeclarativeBase, relationship, \
     OrderingMixin, FilteringMixin, PaginationMixin
 from restfulpy.orm.metadata import MetadataField
@@ -17,6 +18,7 @@ from .item import Item
 from .phase import Phase
 from .issue_phase import IssuePhase
 from .subscribable import Subscribable, Subscription
+from ..constants import ISSUE_RESPONSE_TIME
 
 
 class IssueTag(DeclarativeBase):
@@ -148,7 +150,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         message='Lorem ipsum',
         example='Lorem ipsum',
     )
-    stage = Field(
+    _stage = Field(
         Enum(*issue_stages, name='issues_stage'),
         python_type=str,
         label='Stage',
@@ -169,6 +171,13 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         default='low',
         watermark='lorem ipsum',
         example='lorem ipsum',
+    )
+    last_moving_time = Field(
+        DateTime,
+        python_type=datetime,
+        label='Last Moving Time',
+        nullable=True,
+        protected=True,
     )
     attachments = relationship('Attachment', lazy='selectin')
     batch_id = Field(
@@ -311,37 +320,30 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         deferred=True
     )
 
-    _last_moving_time = Field(
-        DateTime,
-        python_type=datetime,
-        label='Last Moving Time',
-        nullable=True,
-        protected=True,
-    )
+    def _get_stage(self):
+        return self._stage
 
-    def _get_last_moving_time(self):
-        return self._last_moving_time
-
-    def _set_last_moving_time(self, value):
-        self._last_moving_time = None
-
+    def _set_stage(self, value):
         if value == 'triage':
-            self._last_moving_time = datetime.now()
+            self.last_moving_time = datetime.now()
 
+        self._stage = value
 
-    last_moving_time = synonym(
-        'stage',
-        descriptor=property(_set_last_moving_time, _get_last_moving_time),
+    stage = synonym(
+        '_stage',
+        descriptor=property(_get_stage, _set_stage),
         info=dict(protected=True)
     )
 
     @hybrid_property
     def response_time(self):
-        if self._last_moving_time:
+        if self.last_moving_time:
             return (
                 self.last_moving_time + \
-                timedelta(hours=settings.issue.response_time)
+                timedelta(hours=ISSUE_RESPONSE_TIME)
             ) - datetime.now()
+
+        return None
 
     @property
     def _boarding(self):
@@ -519,6 +521,18 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             required=False,
             readonly=True,
         )
+        yield MetadataField(
+            name='stage',
+            key='stage',
+            label='Stage',
+            default='triage',
+            required=False,
+            readonly=True,
+            not_none=True,
+            protected=False,
+            watermark='lorem ipsum',
+            message='lorem ipsum',
+        )
 
     def to_dict(self, include_relations=True):
         # The `issue` relationship on Item model is `protected=False`, So the
@@ -554,6 +568,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
                 issue_dict['relations'].append(
                     x.to_dict(include_relations=False)
                 )
+        issue_dict['stage'] = self.stage
 
         return issue_dict
 
@@ -570,7 +585,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         return timedelta.seconds / 3600
 
 
-@listens_for(Issue.stage, 'set')
+@listens_for(Issue._stage, 'set')
 def handle_change_stage(target, value, oldvalue, initiator):
     if value == 'backlog':
         target.origin = 'backlog'
