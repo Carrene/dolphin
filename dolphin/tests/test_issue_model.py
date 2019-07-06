@@ -455,6 +455,7 @@ def test_issue_origin(db):
             session.commit()
 
             assert issue1.origin == 'new'
+
             issue1.stage = 'backlog'
             assert issue1.origin == 'backlog'
 
@@ -590,4 +591,62 @@ def test_issue_is_done(db):
 
             assert issue1.is_done == True
             assert issue2.is_done == False
+
+
+def test_issue_response_time(db):
+    session = db()
+    session.expire_on_commit = True
+
+    with AuditLogContext(dict()):
+        member1 = Member(
+            title='First Member',
+            email='member1@example.com',
+            access_token='access token 1',
+            reference_id=2,
+        )
+        session.add(member1)
+        session.commit()
+
+        workflow = Workflow(title='Default')
+        skill = Skill(title='First Skill')
+        group = Group(title='default')
+
+        release = Release(
+            title='My first release',
+            cutoff='2030-2-20',
+            launch_date='2030-2-20',
+            manager=member1,
+            room_id=0,
+            group=group,
+        )
+
+        project = Project(
+            release=release,
+            workflow=workflow,
+            group=group,
+            manager=member1,
+            title='My first project',
+            room_id=1,
+        )
+
+        with Context(dict()):
+            context.identity = member1
+
+            issue1 = Issue(
+                project=project,
+                title='First issue',
+                days=1,
+                room_id=2,
+                stage='backlog',
+            )
+
+            session.add(issue1)
+            session.commit()
+
+            assert issue1.response_time == None
+
+            issue1.stage = 'triage'
+            session.commit()
+
+            assert issue1.response_time is not None
 
