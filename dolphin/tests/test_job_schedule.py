@@ -3,14 +3,15 @@ from auditor.context import Context as AuditLogContext
 from bddrest import status, when, response
 from nanohttp import context
 from nanohttp.contexts import Context
+from restfulpy.mule import MuleTask, worker
 
 from dolphin.models import Issue, Project, Member, Workflow, Group, Release, \
-    Subscription
+    Subscription, ReturnTotriageJob
 from dolphin.tests.helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
 
-class TestJob(LocalApplicationTestCase):
+class TestRetuenTotriageJob(LocalApplicationTestCase):
 
     @classmethod
     @AuditLogContext(dict())
@@ -74,23 +75,13 @@ class TestJob(LocalApplicationTestCase):
             )
             session.add(cls.issue2)
 
-            cls.issue3 = Issue(
-                project=project,
-                title='Third issue',
-                description='This is description of third issue',
-                kind='feature',
-                days=3,
-                room_id=4
+            cls.job1 = ReturnTotriageJob(
+                at=datetime.datetime.now(),
+                issue_id=cls.issue2.id
             )
-            session.add(cls.issue2)
+            session.add(cls.job1)
 
             session.flush()
-            subscription1 = Subscription(
-                member_id=member.id,
-                subscribable_id=cls.issue2.id,
-                one_shot=True,
-            )
-            session.add(subscription1)
             session.commit()
 
     def test_schedule(self):
@@ -100,9 +91,14 @@ class TestJob(LocalApplicationTestCase):
             'Schedule an issue',
             f'/apiv1/issues/id: {self.issue1.id}/jobs',
             'SCHEDULE',
-            json=dict(date=datetime.datetime.now().isoformat())
+            json=dict(at=datetime.datetime.now().isoformat())
         ):
-            import pudb; pudb.set_trace()  # XXX BREAKPOINT
             assert status == 200
             assert response.json['issueId'] == self.issue1.id
+
+            tasks = worker(tries=0, filters=MuleTask.type == 'returntotriagejob')
+            assert len(tasks) == 2
+
+            tasks = worker(tries=0, filters=MuleTask.type == 'returntotriagejob')
+            assert len(tasks) == 0
 
