@@ -177,7 +177,7 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
                     .where(Dailyreport.date == datetime.now().date())
                     .where(Dailyreport.note.is_(None))
                 ),
-                'due2'
+                'due'
             )
         ], else_='submitted').label('perspective'),
         deferred=True

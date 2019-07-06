@@ -111,7 +111,7 @@ def test_item_perspective(db):
             session.add(dailyreport3)
             session.commit()
 
-            assert item.perspective == 'due2'
+            assert item.perspective == 'due'
 
             dailyreport3.note = 'The note for a daily report 3'
             session.commit()
