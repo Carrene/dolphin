@@ -7,8 +7,8 @@ from sqlalchemy.sql import select, update
 from .issue import Issue
 
 
-class Job(MuleTask, OrderingMixin, DeclarativeBase):
-    __tablename__ = 'job'
+class ReturnTotriageJob(MuleTask, OrderingMixin, DeclarativeBase):
+    __tablename__ = 'returntotriagejob'
     __mapper_args__ = {'polymorphic_identity': __tablename__}
 
     id = Field(
@@ -29,6 +29,15 @@ class Job(MuleTask, OrderingMixin, DeclarativeBase):
         readonly=True,
         nullable=True,
     )
+    issue = relationship(
+        'Issue',
+        back_populates='returntotriagejob',
+        protected=False
+    )
 
     def do_(self, context):
-        pass
+        session = object_session(self)
+        session.query(Issue).filter(Issue.id == self.issue_id). \
+            update({Issue.stage : 'triage'})
+        session.commit()
+
