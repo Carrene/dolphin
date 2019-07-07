@@ -194,6 +194,10 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         back_populates='issues',
         protected=False,
     )
+    returntotriagejob = relationship(
+        'ReturnTotriageJob',
+        back_populates='issue',
+    )
     draft_issue = relationship(
         'DraftIssue',
         back_populates='issue',
