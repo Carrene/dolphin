@@ -562,6 +562,13 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             not_none=True,
             protected=False,
         )
+        yield MetadataField(
+            name='returnToTriage',
+            key='returntotriagejob',
+            label='Return to triage',
+            required=False,
+            readonly=True,
+        )
 
     def to_dict(self, include_relations=True):
         # The `issue` relationship on Item model is `protected=False`, So the
