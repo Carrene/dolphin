@@ -829,7 +829,6 @@ class IssueJobController(ModelRestController):
 
     @authorize
     @ReturnTotriageJob.validate()
-    @ReturnTotriageJob.expose
     @json
     @commit
     def schedule(self):
