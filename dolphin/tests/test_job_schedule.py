@@ -77,7 +77,7 @@ class TestRetuenTotriageJob(LocalApplicationTestCase):
 
             cls.job1 = ReturnTotriageJob(
                 at=datetime.datetime.now(),
-                issue_id=cls.issue2.id
+                issue_id=cls.issue2.id,
             )
             session.add(cls.job1)
 
@@ -97,12 +97,14 @@ class TestRetuenTotriageJob(LocalApplicationTestCase):
             assert response.json['issueId'] == self.issue1.id
 
             tasks = worker(
-                tries=0, filters=MuleTask.type == 'returntotriagejob'
+                tries=0,
+                filters=MuleTask.type == 'returntotriagejob'
             )
             assert len(tasks) == 2
 
             tasks = worker(
-                tries=0, filters=MuleTask.type == 'returntotriagejob'
+                tries=0,
+                filters=MuleTask.type == 'returntotriagejob'
             )
             assert len(tasks) == 0
 
