@@ -8,7 +8,7 @@ from .issue import Issue
 
 
 class ReturnTotriageJob(MuleTask, OrderingMixin):
-    __tablename__ = 'return_to_triage_job'
+    __tablename__ = 'returntotriagejob'
     __mapper_args__ = {'polymorphic_identity': __tablename__}
 
     id = Field(
