@@ -161,7 +161,7 @@ $ ./gunicorn
 $ dolphin mule start
 ```
 
-- Using `--query-interval` to determine the working time interval.
+- Use `--query-interval` to determine the working time interval.
 
 ```bash
 $ dolphin mule start --query-interval 5
