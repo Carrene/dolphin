@@ -342,12 +342,25 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
     @hybrid_property
     def response_time(self):
         if self.last_moving_time:
-            return (
-                self.last_moving_time + \
-                timedelta(hours=ISSUE_RESPONSE_TIME)
-            ) - datetime.now()
+            return self.last_moving_time + \
+                   timedelta(hours=ISSUE_RESPONSE_TIME) - \
+                   datetime.now()
 
         return None
+
+    @response_time.expression
+    def response_time(cls):
+        return case([
+            (
+                cls.last_moving_time != None,
+                func.date_part(
+                    'hour',
+                    cls.last_moving_time + \
+                    timedelta(hours=ISSUE_RESPONSE_TIME) - \
+                    func.now()
+                )
+            )
+        ])
 
     @property
     def _boarding(self):
@@ -555,7 +568,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
 
         issue_dict = super().to_dict()
         issue_dict['responseTime'] = \
-            self._get_hours_from_timedelta(self.response_time) \
+            self._get_hours(self.response_time) \
             if self.response_time else None
         issue_dict['status'] = self.status
         issue_dict['boarding'] = self.boarding
@@ -585,8 +598,12 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         return f'{self.title.lower()}-{self.project_id}'
 
     @staticmethod
-    def _get_hours_from_timedelta(timedelta):
-        return timedelta.seconds / 3600
+    def _get_hours(timedelta):
+        hours = 0
+        if timedelta.days > 0:
+            hours = timedelta.days * 24
+
+        return hours + (timedelta.seconds // 3600)
 
 
 @listens_for(Issue._stage, 'set')
