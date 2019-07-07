@@ -23,7 +23,7 @@ class TestRetuenTotriageJob(LocalApplicationTestCase):
             email='member1@example.com',
             access_token='access token 1',
             phone=123456789,
-            reference_id=2
+            reference_id=2,
         )
         session.add(member)
         session.commit()
@@ -48,7 +48,7 @@ class TestRetuenTotriageJob(LocalApplicationTestCase):
             manager=member,
             title='My first project',
             description='A decription for my project',
-            room_id=1
+            room_id=1,
         )
         session.add(project)
 
@@ -61,7 +61,7 @@ class TestRetuenTotriageJob(LocalApplicationTestCase):
                 description='This is description of first issue',
                 kind='feature',
                 days=1,
-                room_id=2
+                room_id=2,
             )
             session.add(cls.issue1)
 
@@ -71,7 +71,7 @@ class TestRetuenTotriageJob(LocalApplicationTestCase):
                 description='This is description of second issue',
                 kind='feature',
                 days=2,
-                room_id=3
+                room_id=3,
             )
             session.add(cls.issue2)
 
