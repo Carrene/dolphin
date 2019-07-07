@@ -839,7 +839,6 @@ class IssueJobController(ModelRestController):
         self.issue = issue
 
     @authorize
-    @ReturnTotriageJob.validate()
     @json
     @commit
     def schedule(self):

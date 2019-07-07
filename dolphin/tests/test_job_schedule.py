@@ -82,7 +82,6 @@ class TestRetuenTotriageJob(LocalApplicationTestCase):
             session.add(cls.job1)
             session.commit()
 
-
     def test_schedule(self):
         self.login('member1@example.com')
 
@@ -109,8 +108,14 @@ class TestRetuenTotriageJob(LocalApplicationTestCase):
 
             when(
                 'Intended item with integer type not found',
-                url_parameters=dict(id=100),
-                json=given
+                url_parameters=dict(id=0),
+                json=given,
+            )
+            assert status == 404
+
+            when(
+                'Intended item with string type not found',
+                url_parameters=dict(id='Alphabetical'),
             )
             assert status == 404
 
