@@ -17,36 +17,28 @@ def insert(): # pragma: no cover
     skill = Skill(title='Project Manager')
 
     phase1 = Phase(
-        title='Backlog',
-        order=0,
+        title='Design',
+        order=1,
         workflow=default_workflow,
         skill=skill
     )
     DBSession.add(phase1)
 
     phase2 = Phase(
-        title='Design',
-        order=1,
+        title='Development',
+        order=2,
         workflow=default_workflow,
         skill=skill
     )
     DBSession.add(phase2)
 
     phase3 = Phase(
-        title='Development',
-        order=2,
-        workflow=default_workflow,
-        skill=skill
-    )
-    DBSession.add(phase3)
-
-    phase4 = Phase(
         title='Test',
         order=3,
         workflow=default_workflow,
         skill=skill
     )
-    DBSession.add(phase4)
+    DBSession.add(phase3)
 
     event_type1 = EventType(
         title='Personal',
@@ -118,7 +110,6 @@ def insert(): # pragma: no cover
         print(phase1)
         print(phase2)
         print(phase3)
-        print(phase4)
 
         print('Following tags have been added:')
         print(code_review_tag)

@@ -15,23 +15,6 @@ def insert(): # pragma: no cover
         .filter(Skill.title == 'Project Manager') \
         .one()
 
-    workflow = DBSession.query(Workflow) \
-        .filter(Workflow.title == 'Default') \
-        .one()
-
-    phase1 = Phase(
-        title='First Phase',
-        order=1,
-        workflow_id=workflow.id,
-        skill_id=skill.id,
-    )
-    phase2 = Phase(
-        title='Second Phase',
-        order=2,
-        workflow_id=workflow.id,
-        skill_id=skill.id,
-    )
-
     with Context(dict()), StoreManager(DBSession):
         god = DBSession.query(Member).filter(Member.title == 'GOD').one()
 
@@ -44,7 +27,6 @@ def insert(): # pragma: no cover
         organization = DBSession.query(Organization) \
             .filter(Organization.title == 'carrene') \
             .one()
-        phase = DBSession.query(Phase).filter(Phase.title == 'Backlog').one()
 
         resource1 = Resource(
             id=2,
