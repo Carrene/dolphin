@@ -82,6 +82,7 @@ class TestIssue(LocalApplicationTestCase):
                 days=1,
                 room_id=2,
                 tags=[cls.tag1],
+                stage='triage',
             )
             session.add(cls.issue1)
             session.flush()
@@ -291,6 +292,10 @@ class TestIssue(LocalApplicationTestCase):
             when('Filter by status', query=dict(status='to-do'))
             assert status == 200
             assert len(response.json) == 4
+
+            when('Filter by response time', query=dict(responseTime=47))
+            assert status == 200
+            assert len(response.json) == 1
 
             when(
                 'Filter by multi statuses',
