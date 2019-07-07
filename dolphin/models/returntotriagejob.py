@@ -7,7 +7,7 @@ from sqlalchemy.sql import select, update
 from .issue import Issue
 
 
-class ReturnTotriageJob(MuleTask, OrderingMixin, DeclarativeBase):
+class ReturnTotriageJob(MuleTask, OrderingMixin):
     __tablename__ = 'returntotriagejob'
     __mapper_args__ = {'polymorphic_identity': __tablename__}
 

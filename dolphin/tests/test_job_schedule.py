@@ -1,14 +1,14 @@
 import datetime
+
 from auditor.context import Context as AuditLogContext
-from bddrest import status, when, response
+from bddrest import status, response
 from nanohttp import context
 from nanohttp.contexts import Context
 from restfulpy.mule import MuleTask, worker
 
-from dolphin.models import Issue, Project, Member, Workflow, Group, Release, \
-    Subscription, ReturnTotriageJob
-from dolphin.tests.helpers import LocalApplicationTestCase, \
-    oauth_mockup_server, chat_mockup_server, chat_server_status
+from dolphin.models import Issue, Project, Member, Workflow, Group, \
+    Release, ReturnTotriageJob
+from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
 class TestRetuenTotriageJob(LocalApplicationTestCase):
@@ -84,6 +84,7 @@ class TestRetuenTotriageJob(LocalApplicationTestCase):
             session.flush()
             session.commit()
 
+
     def test_schedule(self):
         self.login('member1@example.com')
 
@@ -96,9 +97,13 @@ class TestRetuenTotriageJob(LocalApplicationTestCase):
             assert status == 200
             assert response.json['issueId'] == self.issue1.id
 
-            tasks = worker(tries=0, filters=MuleTask.type == 'returntotriagejob')
+            tasks = worker(
+                tries=0, filters=MuleTask.type == 'returntotriagejob'
+            )
             assert len(tasks) == 2
 
-            tasks = worker(tries=0, filters=MuleTask.type == 'returntotriagejob')
+            tasks = worker(
+                tries=0, filters=MuleTask.type == 'returntotriagejob'
+            )
             assert len(tasks) == 0
 

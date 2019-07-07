@@ -838,3 +838,4 @@ class IssueJobController(ModelRestController):
         job.issue_id = self.issue.id
         DBSession.add(job)
         return job
+
