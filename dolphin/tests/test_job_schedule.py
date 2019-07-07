@@ -80,7 +80,6 @@ class TestRetuenTotriageJob(LocalApplicationTestCase):
                 issue_id=cls.issue2.id,
             )
             session.add(cls.job1)
-
             session.commit()
 
 
@@ -98,13 +97,13 @@ class TestRetuenTotriageJob(LocalApplicationTestCase):
 
             tasks = worker(
                 tries=0,
-                filters=MuleTask.type == 'returntotriagejob'
+                filters=MuleTask.type == 'return_to_triage_job',
             )
             assert len(tasks) == 2
 
             tasks = worker(
                 tries=0,
-                filters=MuleTask.type == 'returntotriagejob'
+                filters=MuleTask.type == 'return_to_triage_job',
             )
             assert len(tasks) == 0
 
