@@ -152,3 +152,18 @@ $ dolphin serve
 ```bash
 $ ./gunicorn
 ```
+
+#### Runing worker
+
+- Using to start. 
+
+```bash
+$ dolphin mule start
+```
+
+- Using `--query-interval` to determine the working time interval.
+
+```bash
+$ dolphin mule start --query-interval 5
+```
+
