@@ -81,7 +81,6 @@ class TestRetuenTotriageJob(LocalApplicationTestCase):
             )
             session.add(cls.job1)
 
-            session.flush()
             session.commit()
 
 
