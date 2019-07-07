@@ -1,7 +1,7 @@
 import datetime
 
 from auditor.context import Context as AuditLogContext
-from bddrest import status, response
+from bddrest import status, response, when, given
 from nanohttp import context
 from nanohttp.contexts import Context
 from restfulpy.mule import MuleTask, worker
@@ -106,4 +106,14 @@ class TestRetuenTotriageJob(LocalApplicationTestCase):
                 tries=0, filters=MuleTask.type == 'returntotriagejob'
             )
             assert len(tasks) == 0
+
+            when(
+                'Intended item with integer type not found',
+                url_parameters=dict(id=100),
+                json=given
+            )
+            assert status == 404
+
+            when('Request is not authorized', authorization=None)
+            assert status == 401
 
