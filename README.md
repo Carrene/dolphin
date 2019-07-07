@@ -153,7 +153,7 @@ $ dolphin serve
 $ ./gunicorn
 ```
 
-#### Runing the worker
+#### Running the worker
 
 ```bash
 $ dolphin mule start
