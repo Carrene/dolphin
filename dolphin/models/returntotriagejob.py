@@ -8,7 +8,7 @@ from .issue import Issue
 
 
 class ReturnTotriageJob(MuleTask, OrderingMixin):
-    __tablename__ = 'returntotriagejob'
+    __tablename__ = 'return_to_triage_job'
     __mapper_args__ = {'polymorphic_identity': __tablename__}
 
     id = Field(
@@ -32,7 +32,7 @@ class ReturnTotriageJob(MuleTask, OrderingMixin):
     issue = relationship(
         'Issue',
         back_populates='returntotriagejob',
-        protected=False
+        protected=False,
     )
 
     def do_(self, context):
