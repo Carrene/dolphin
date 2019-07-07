@@ -7,7 +7,7 @@ from sqlalchemy_media import StoreManager, FileSystemStore
 
 from . import basedata, mockup
 from .authentication import Authenticator
-from .cli import EmailSubCommand, MuleSubCommand, FixWeekendSubCommand, \
+from .cli import EmailSubCommand, FixWeekendSubCommand, \
     FixEventSubCommand
 from .controllers.root import Root
 
@@ -99,9 +99,12 @@ class Dolphin(Application):
     def get_cli_arguments(self):
         return [
             EmailSubCommand,
+<<<<<<< HEAD
             MuleSubCommand,
             FixWeekendSubCommand,
             FixEventSubCommand,
+=======
+>>>>>>> Remove duplicated cli
         ]
 
     @classmethod
