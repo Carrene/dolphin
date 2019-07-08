@@ -5,6 +5,7 @@ from bddrest import status, response, when, given
 from nanohttp import context
 from nanohttp.contexts import Context
 from restfulpy.mule import MuleTask, worker
+from sqlalchemy import and_
 
 from dolphin.models import Issue, Project, Member, Workflow, Group, \
     Release, ReturnTotriageJob
@@ -52,6 +53,7 @@ class TestRetuenTotriageJob(LocalApplicationTestCase):
         )
         session.add(project)
 
+
         with Context(dict()):
             context.identity = member
 
@@ -74,12 +76,19 @@ class TestRetuenTotriageJob(LocalApplicationTestCase):
                 room_id=3,
             )
             session.add(cls.issue2)
+            session.flush()
 
             cls.job1 = ReturnTotriageJob(
                 at=datetime.datetime.now(),
                 issue_id=cls.issue2.id,
             )
+            cls.job2 = ReturnTotriageJob(
+                at=datetime.date.today() + datetime.timedelta(days=1),
+                issue_id=cls.issue1.id,
+            )
+
             session.add(cls.job1)
+            session.add(cls.job2)
             session.commit()
 
     def test_schedule(self):
@@ -93,6 +102,13 @@ class TestRetuenTotriageJob(LocalApplicationTestCase):
         ):
             assert status == 200
             assert response.json['issueId'] == self.issue1.id
+
+            session = self.create_session()
+            assert session.query(ReturnTotriageJob) \
+                .filter(and_(
+                    ReturnTotriageJob.issue_id == self.issue1.id,
+                    ReturnTotriageJob.status == 'new',
+                )).count() == 1
 
             tasks = worker(
                 tries=0,

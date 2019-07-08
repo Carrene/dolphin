@@ -842,6 +842,14 @@ class IssueJobController(ModelRestController):
     @json
     @commit
     def schedule(self):
+        if self.issue.returntotriagejobs:
+            returntotriages = DBSession.query(ReturnTotriageJob) \
+                .filter(ReturnTotriageJob.issue_id == self.issue.id)
+
+            for returntotriage in returntotriages:
+                returntotriage.status = 'expired'
+                returntotriage.terminated_at = datetime.now()
+
         job = ReturnTotriageJob()
         job.update_from_request()
         job.issue_id = self.issue.id
