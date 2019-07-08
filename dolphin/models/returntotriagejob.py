@@ -31,8 +31,8 @@ class ReturnTotriageJob(MuleTask, OrderingMixin):
     )
     issue = relationship(
         'Issue',
-        back_populates='returntotriagejob',
-        protected=False,
+        back_populates='returntotriagejobs',
+        protected=True,
     )
 
     def do_(self, context):
