@@ -25,6 +25,7 @@ class BatchController(ModelRestController):
     def append(self, id_):
         id_ = int_or_notfound(id_)
         batch = DBSession.query(Batch).filter(Batch.id == id_).one_or_none()
+        lastbatch = DBSession.query(Batch).order_by(Batch.id.desc()).first()
         if batch is None:
             raise HTTPNotFound('Batch with id: {id_} was not found')
 
@@ -35,6 +36,11 @@ class BatchController(ModelRestController):
 
         if issue is None:
             raise StatusIssueNotFound(issue_id)
+
+        if batch == lastbatch:
+            batch_ = Batch(title='01.2')
+            batch_.project_id = issue.project_id
+            DBSession.add(batch_)
 
         batch.issues.append(issue)
 
@@ -61,6 +67,6 @@ class BatchController(ModelRestController):
         if issue is None:
             raise StatusIssueNotFound()
 
-        DBSession.delete(issue)
+        issue.batch_id = None
         return batch
 

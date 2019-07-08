@@ -49,7 +49,9 @@ class TestBatch(LocalApplicationTestCase):
         session.commit()
 
         cls.batch1 = Batch(title='01')
+        cls.batch2 = Batch(title='01.1')
         cls.project1.batches.append(cls.batch1)
+        cls.project1.batches.append(cls.batch2)
 
         with Context(dict()):
             context.identity = cls.member1
@@ -61,7 +63,16 @@ class TestBatch(LocalApplicationTestCase):
                 days=1,
                 room_id=2
             )
+            cls.issue2 = Issue(
+                title='second issue',
+                description='This is description of second issue',
+                kind='feature',
+                days=1,
+                room_id=2
+            )
+
             cls.project1.issues.append(cls.issue1)
+            cls.project1.issues.append(cls.issue2)
             session.commit()
 
     def test_append(self):
@@ -121,4 +132,22 @@ class TestBatch(LocalApplicationTestCase):
 
             when('Request is not authorized', authorization=None)
             assert status == 401
+
+        with oauth_mockup_server(), self.given(
+            'Appending a batch',
+            f'/apiv1/batches/id: {self.batch2.id}',
+            'APPEND',
+            json=dict(
+                issueIds=self.issue2.id
+            )
+        ):
+            assert status == 200
+            assert response.json['id'] is not None
+            assert response.json['title'] == self.batch2.title
+
+            session = self.create_session()
+            assert session.query(Batch) \
+                .filter(Batch.project_id == self.project1.id) \
+                .order_by(Batch.id.desc()) \
+                .first() != self.batch2
 
