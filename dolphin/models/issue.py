@@ -205,9 +205,10 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         back_populates='issues',
         protected=False,
     )
-    returntotriagejob = relationship(
+    returntotriagejobs = relationship(
         'ReturnTotriageJob',
         back_populates='issue',
+        protected=False,
     )
     draft_issue = relationship(
         'DraftIssue',
@@ -564,7 +565,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         )
         yield MetadataField(
             name='returnToTriage',
-            key='returntotriagejob',
+            key='returntotriagejobs',
             label='Return to triage',
             required=False,
             readonly=True,
