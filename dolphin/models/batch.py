@@ -1,9 +1,10 @@
-from restfulpy.orm import Field, DeclarativeBase, relationship
+from restfulpy.orm import Field, DeclarativeBase, relationship, \
+    OrderingMixin, FilteringMixin, PaginationMixin
 from restfulpy.orm.metadata import MetadataField
 from sqlalchemy import Integer, ForeignKey, String, Unicode, UniqueConstraint
 
 
-class Batch(DeclarativeBase):
+class Batch(DeclarativeBase, OrderingMixin, FilteringMixin, PaginationMixin):
 
     __tablename__ = 'batch'
 
