@@ -8,7 +8,7 @@ from restfulpy.mule import MuleTask, worker
 from sqlalchemy import and_
 
 from dolphin.models import Issue, Project, Member, Workflow, Group, \
-    Release, ReturnTotriageJob
+    Release, ReturnToTriageJob
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -78,11 +78,11 @@ class TestRetuenTotriageJob(LocalApplicationTestCase):
             session.add(cls.issue2)
             session.flush()
 
-            cls.job1 = ReturnTotriageJob(
+            cls.job1 = ReturnToTriageJob(
                 at=datetime.datetime.now(),
                 issue_id=cls.issue2.id,
             )
-            cls.job2 = ReturnTotriageJob(
+            cls.job2 = ReturnToTriageJob(
                 at=datetime.date.today() + datetime.timedelta(days=1),
                 issue_id=cls.issue1.id,
             )
@@ -104,10 +104,10 @@ class TestRetuenTotriageJob(LocalApplicationTestCase):
             assert response.json['issueId'] == self.issue1.id
 
             session = self.create_session()
-            assert session.query(ReturnTotriageJob) \
+            assert session.query(ReturnToTriageJob) \
                 .filter(and_(
-                    ReturnTotriageJob.issue_id == self.issue1.id,
-                    ReturnTotriageJob.status == 'new',
+                    ReturnToTriageJob.issue_id == self.issue1.id,
+                    ReturnToTriageJob.status == 'new',
                 )).count() == 1
 
             tasks = worker(

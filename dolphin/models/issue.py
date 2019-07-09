@@ -206,7 +206,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         protected=False,
     )
     returntotriagejobs = relationship(
-        'ReturnTotriageJob',
+        'ReturnToTriageJob',
         back_populates='issue',
         protected=False,
     )
