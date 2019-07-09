@@ -38,7 +38,8 @@ class BatchController(ModelRestController):
             raise StatusIssueNotFound(issue_id)
 
         if batch == lastbatch:
-            batch_ = Batch(title='01.2')
+            batch_title = int(batch.title) + 1
+            batch_ = Batch(title=format(batch_title, '03'))
             batch_.project_id = issue.project_id
             DBSession.add(batch_)
 

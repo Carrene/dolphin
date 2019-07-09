@@ -20,7 +20,7 @@ class TestBatch(LocalApplicationTestCase):
             email='member1@example.com',
             access_token='access token',
             phone=123456789,
-            reference_id=2
+            reference_id=2,
         )
 
         workflow = Workflow(title='Default')
@@ -43,13 +43,13 @@ class TestBatch(LocalApplicationTestCase):
             manager=cls.member1,
             title='My first project',
             description='A decription for my project',
-            room_id=1001
+            room_id=1001,
         )
         session.add(cls.project1)
         session.commit()
 
-        cls.batch1 = Batch(title='01')
-        cls.batch2 = Batch(title='01.1')
+        cls.batch1 = Batch(title='002')
+        cls.batch2 = Batch(title='003')
         cls.project1.batches.append(cls.batch1)
         cls.project1.batches.append(cls.batch2)
 
@@ -61,14 +61,14 @@ class TestBatch(LocalApplicationTestCase):
                 description='This is description of first issue',
                 kind='feature',
                 days=1,
-                room_id=2
+                room_id=2,
             )
             cls.issue2 = Issue(
                 title='second issue',
                 description='This is description of second issue',
                 kind='feature',
                 days=1,
-                room_id=2
+                room_id=2,
             )
 
             cls.project1.issues.append(cls.issue1)
@@ -138,7 +138,7 @@ class TestBatch(LocalApplicationTestCase):
             f'/apiv1/batches/id: {self.batch2.id}',
             'APPEND',
             json=dict(
-                issueIds=self.issue2.id
+                issueIds=self.issue2.id,
             )
         ):
             assert status == 200
