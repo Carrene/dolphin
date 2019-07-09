@@ -2,6 +2,7 @@ from nanohttp import json, context, HTTPNotFound, int_or_notfound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
+from sqlalchemy import and_
 
 from ..exceptions import StatusIssueIdIsNull, StatusInvalidIssueIdType, \
     StatusIssueIdNotInForm, StatusIssueNotFound
@@ -19,16 +20,10 @@ class BatchController(ModelRestController):
             required=StatusIssueIdNotInForm,
             type_=(int, StatusInvalidIssueIdType),
             not_none=StatusIssueIdIsNull,
-        )
+        ),
     ))
     @commit
-    def append(self, id_):
-        id_ = int_or_notfound(id_)
-        batch = DBSession.query(Batch).filter(Batch.id == id_).one_or_none()
-        lastbatch = DBSession.query(Batch).order_by(Batch.id.desc()).first()
-        if batch is None:
-            raise HTTPNotFound('Batch with id: {id_} was not found')
-
+    def append(self, title):
         issue_id = context.form['issueIds']
         issue = DBSession.query(Issue) \
             .filter(Issue.id == issue_id) \
@@ -37,13 +32,35 @@ class BatchController(ModelRestController):
         if issue is None:
             raise StatusIssueNotFound(issue_id)
 
-        if batch == lastbatch:
-            batch_title = int(batch.title) + 1
-            batch_ = Batch(title=format(batch_title, '03'))
-            batch_.project_id = issue.project_id
-            DBSession.add(batch_)
+        title = int_or_notfound(title)
+        batch = DBSession.query(Batch) \
+            .filter(and_(
+                Batch.title == str(title),
+                Batch.project_id == issue.project_id
+            )) \
+            .one_or_none()
 
-        batch.issues.append(issue)
+        lastbatch = DBSession.query(Batch) \
+            .filter(Batch.project_id == issue.project_id) \
+            .order_by(Batch.id.desc()) \
+            .first()
+
+        if batch is None:
+            for i in range(title - int(lastbatch.title)):
+                batch_title = int(lastbatch.title) + i + 1
+                if batch_title < 100:
+                    batch = Batch(title=format(batch_title, '03'))
+                    batch.project_id = issue.project_id
+                    DBSession.add(batch)
+
+                else:
+                    # TODO: raise some error in this position
+                    raise HTTPNotFound(f'Batch with title: {title} was not found')
+
+            batch.issues.append(issue)
+
+        else:
+            batch.issues.append(issue)
 
         return batch
 

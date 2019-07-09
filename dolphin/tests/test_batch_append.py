@@ -78,10 +78,11 @@ class TestBatch(LocalApplicationTestCase):
     def test_append(self):
         session = self.create_session()
         self.login('member1@example.com')
+        title = '010'
 
         with oauth_mockup_server(), self.given(
             'Appending a batch',
-            f'/apiv1/batches/id: {self.batch1.id}',
+            f'/apiv1/batches/id: {title}',
             'APPEND',
             json=dict(
                 issueIds=self.issue1.id
@@ -89,7 +90,7 @@ class TestBatch(LocalApplicationTestCase):
         ):
             assert status == 200
             assert response.json['id'] is not None
-            assert response.json['title'] == self.batch1.title
+            assert response.json['title'] == title
             assert response.json['projectId'] == self.project1.id
             assert self.issue1.id in response.json['issueIds']
             assert len(response.json['issueIds']) == 1
@@ -120,7 +121,7 @@ class TestBatch(LocalApplicationTestCase):
 
             when(
                 'Inended batch with integer type not found',
-                url_parameters=dict(id=0)
+                url_parameters=dict(id=101)
             )
             assert status == 404
 
@@ -132,18 +133,6 @@ class TestBatch(LocalApplicationTestCase):
 
             when('Request is not authorized', authorization=None)
             assert status == 401
-
-        with oauth_mockup_server(), self.given(
-            'Appending a batch',
-            f'/apiv1/batches/id: {self.batch2.id}',
-            'APPEND',
-            json=dict(
-                issueIds=self.issue2.id,
-            )
-        ):
-            assert status == 200
-            assert response.json['id'] is not None
-            assert response.json['title'] == self.batch2.title
 
             session = self.create_session()
             assert session.query(Batch) \
