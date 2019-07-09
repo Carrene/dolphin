@@ -89,6 +89,11 @@ class TestProject(LocalApplicationTestCase):
             assert response.json['secondaryManagerId'] is None
             assert response.json['releaseCutoff'] == self.release1.cutoff
 
+            session = self.create_session()
+            assert session.query(Project) \
+                .get(response.json['id']) \
+                .batches
+
             created_project_id = response.json['id']
             created_project = session.query(Project).get(created_project_id)
             assert created_project.modified_by is None

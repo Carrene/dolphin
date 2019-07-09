@@ -1,7 +1,7 @@
 from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when, given
-from nanohttp.contexts import Context
 from nanohttp import context
+from nanohttp.contexts import Context
 
 from dolphin.models import Workflow, Group, Release, Member, Batch, Issue, \
     Project
@@ -35,7 +35,6 @@ class TestBatch(LocalApplicationTestCase):
             room_id=0,
             group=group,
         )
-
         cls.project1 = Project(
             release=release1,
             workflow=workflow,
@@ -48,10 +47,8 @@ class TestBatch(LocalApplicationTestCase):
         session.add(cls.project1)
         session.commit()
 
-        cls.batch1 = Batch(title='002')
-        cls.batch2 = Batch(title='003')
+        cls.batch1 = Batch(title='001')
         cls.project1.batches.append(cls.batch1)
-        cls.project1.batches.append(cls.batch2)
 
         with Context(dict()):
             context.identity = cls.member1
@@ -63,26 +60,17 @@ class TestBatch(LocalApplicationTestCase):
                 days=1,
                 room_id=2,
             )
-            cls.issue2 = Issue(
-                title='second issue',
-                description='This is description of second issue',
-                kind='feature',
-                days=1,
-                room_id=2,
-            )
-
             cls.project1.issues.append(cls.issue1)
-            cls.project1.issues.append(cls.issue2)
             session.commit()
 
-    def test_append(self):
+    def test_remove(self):
         session = self.create_session()
         self.login('member1@example.com')
 
         with oauth_mockup_server(), self.given(
-            'Appending a batch',
+            'Removing a batch',
             f'/apiv1/batches/id: {self.batch1.id}',
-            'APPEND',
+            'REMOVE',
             json=dict(
                 issueIds=self.issue1.id
             )
@@ -91,63 +79,38 @@ class TestBatch(LocalApplicationTestCase):
             assert response.json['id'] is not None
             assert response.json['title'] == self.batch1.title
             assert response.json['projectId'] == self.project1.id
-            assert self.issue1.id in response.json['issueIds']
-            assert len(response.json['issueIds']) == 1
+            assert self.issue1.id not in response.json['issueIds']
 
             when(
                 'Trying to pass without issue id',
-                json=given - 'issueIds'
+                json=given - 'issueIds',
             )
             assert status == '723 Issue Id Not In Form'
 
             when(
                 'Trying to pass with invalid issue id type',
-                json=given | dict(issueIds='a')
+                json=given | dict(issueIds='a'),
             )
             assert status == '722 Invalid Issue Id Type'
 
             when(
                 'Trying to pass with none issue id',
-                json=given | dict(issueIds=None)
+                json=given | dict(issueIds=None),
             )
             assert status == '775 Issue Id Is Null'
 
             when(
-                'Issue is not found',
-                json=given | dict(issueIds=0)
-            )
-            assert status == '605 Issue Not Found: 0'
-
-            when(
-                'Inended batch with integer type not found',
-                url_parameters=dict(id=0)
+                'Intended batch with int not found',
+                url_parameters=dict(id=0),
             )
             assert status == 404
 
             when(
-                'Inended batch with string type not found',
-                url_parameters=dict(id='Alaphabet')
+                'Intended batch with string type not found',
+                url_parameters=dict(id='Alaphabet'),
             )
             assert status == 404
 
             when('Request is not authorized', authorization=None)
             assert status == 401
-
-        with oauth_mockup_server(), self.given(
-            'Appending a batch',
-            f'/apiv1/batches/id: {self.batch2.id}',
-            'APPEND',
-            json=dict(
-                issueIds=self.issue2.id,
-            )
-        ):
-            assert status == 200
-            assert response.json['id'] is not None
-            assert response.json['title'] == self.batch2.title
-
-            session = self.create_session()
-            assert session.query(Batch) \
-                .filter(Batch.project_id == self.project1.id) \
-                .order_by(Batch.id.desc()) \
-                .first() != self.batch2
 
