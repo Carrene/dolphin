@@ -150,7 +150,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         message='Lorem ipsum',
         example='Lorem ipsum',
     )
-    _stage = Field(
+    stage = Field(
         Enum(*issue_stages, name='issues_stage'),
         python_type=str,
         label='Stage',
@@ -320,27 +320,12 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         deferred=True
     )
 
-    def _get_stage(self):
-        return self._stage
-
-    def _set_stage(self, value):
-        if value == 'triage':
-            self.last_moving_time = datetime.now()
-
-        self._stage = value
-
-    stage = synonym(
-        '_stage',
-        descriptor=property(_get_stage, _set_stage),
-        info=dict(protected=True)
-    )
-
     @hybrid_property
     def response_time(self):
         if self.last_moving_time:
-            return self.last_moving_time + \
-                   timedelta(hours=ISSUE_RESPONSE_TIME) - \
-                   datetime.now()
+            return self.last_moving_time - \
+                datetime.now() + \
+                timedelta(hours=ISSUE_RESPONSE_TIME)
 
         return None
 
@@ -349,12 +334,8 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         return case([
             (
                 cls.last_moving_time != None,
-                func.date_part(
-                    'hour',
-                    cls.last_moving_time + \
-                    timedelta(hours=ISSUE_RESPONSE_TIME) - \
-                    func.now()
-                )
+                func.date_part('hour', cls.last_moving_time - func.now()) + \
+                ISSUE_RESPONSE_TIME
             )
         ])
 
@@ -602,8 +583,11 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         return hours + (timedelta.seconds // 3600)
 
 
-@listens_for(Issue._stage, 'set')
+@listens_for(Issue.stage, 'set')
 def handle_change_stage(target, value, oldvalue, initiator):
-    if value == 'backlog':
+    if value == 'triage':
+        target.last_moving_time = datetime.now()
+
+    elif value == 'backlog':
         target.origin = 'backlog'
 
