@@ -299,6 +299,10 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
     status = column_property(
         case([
             (
+                is_done,
+                'done'
+            ),
+            (
                 exists(
                     select([IssuePhase.status])
                     .where(and_(
