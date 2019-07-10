@@ -100,6 +100,12 @@ class TestBatch(LocalApplicationTestCase):
             assert status == '775 Issue Id Is Null'
 
             when(
+                'Intended issue not found',
+                json=given | dict(issueIds=0),
+            )
+            assert status == '605 Issue Not Found'
+
+            when(
                 'Intended batch with int not found',
                 url_parameters=dict(id=0),
             )
