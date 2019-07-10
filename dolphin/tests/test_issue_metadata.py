@@ -153,3 +153,17 @@ class TestIssue(LocalApplicationTestCase):
             assert fields['createdByReferenceId']['example'] is not None
             assert fields['createdByReferenceId']['watermark'] is not None
 
+            assert fields['responseTime']['label'] is not None
+            assert fields['responseTime']['name'] is not None
+            assert fields['responseTime']['notNone'] is not None
+            assert fields['responseTime']['required'] is not None
+            assert fields['responseTime']['readonly'] is not None
+            assert fields['responseTime']['protected'] is not None
+
+            assert fields['lastMovingTime']['label'] is not None
+            assert fields['lastMovingTime']['name'] is not None
+            assert fields['lastMovingTime']['notNone'] is not None
+            assert fields['lastMovingTime']['required'] is not None
+            assert fields['lastMovingTime']['readonly'] is not None
+            assert fields['lastMovingTime']['protected'] is not None
+

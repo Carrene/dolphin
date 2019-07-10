@@ -178,6 +178,9 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         label='Last Moving Time',
         nullable=True,
         protected=True,
+        required=False,
+        not_none=False,
+        readonly=True,
     )
     attachments = relationship('Attachment', lazy='selectin')
     batch_id = Field(
@@ -526,6 +529,15 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             protected=False,
             watermark='lorem ipsum',
             message='lorem ipsum',
+        )
+        yield MetadataField(
+            name='responseTime',
+            key='response_time',
+            label='Response Time',
+            required=False,
+            readonly=True,
+            not_none=True,
+            protected=False,
         )
 
     def to_dict(self, include_relations=True):
