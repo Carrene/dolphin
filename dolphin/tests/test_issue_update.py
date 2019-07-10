@@ -133,7 +133,7 @@ class TestIssue(LocalApplicationTestCase):
             assert status == 404
 
             when(
-                'Stage chenged',
+                'Stage changed',
                 form=given | dict(stage='working')
             )
             assert status == 200
