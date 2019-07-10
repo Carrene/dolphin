@@ -123,7 +123,7 @@ class TestBatch(LocalApplicationTestCase):
                 'Inended batch with integer type not found',
                 url_parameters=dict(id=101)
             )
-            assert status == 404
+            assert status == '936 Invalid Batch More Than 100'
 
             when(
                 'Inended batch with string type not found',
@@ -139,4 +139,19 @@ class TestBatch(LocalApplicationTestCase):
                 .filter(Batch.project_id == self.project1.id) \
                 .order_by(Batch.id.desc()) \
                 .first() != self.batch2
+
+        with oauth_mockup_server(), self.given(
+            'Appending a batch',
+            f'/apiv1/batches/id: {self.batch1.title}',
+            'APPEND',
+            json=dict(
+                issueIds=self.issue2.id
+            )
+        ):
+            assert status == 200
+            assert response.json['id'] is not None
+            assert response.json['title'] == self.batch1.title
+            assert response.json['projectId'] == self.project1.id
+            assert self.issue2.id in response.json['issueIds']
+            assert len(response.json['issueIds']) == 1
 

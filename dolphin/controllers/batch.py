@@ -5,7 +5,7 @@ from restfulpy.orm import DBSession, commit
 from sqlalchemy import and_
 
 from ..exceptions import StatusIssueIdIsNull, StatusInvalidIssueIdType, \
-    StatusIssueIdNotInForm, StatusIssueNotFound
+    StatusIssueIdNotInForm, StatusIssueNotFound, StatusInvalidBatch
 from ..models import Batch, Issue
 
 
@@ -35,7 +35,7 @@ class BatchController(ModelRestController):
         title = int_or_notfound(title)
         batch = DBSession.query(Batch) \
             .filter(and_(
-                Batch.title == str(title),
+                Batch.title == format(title, '03'),
                 Batch.project_id == issue.project_id
             )) \
             .one_or_none()
@@ -54,8 +54,7 @@ class BatchController(ModelRestController):
                     DBSession.add(batch)
 
                 else:
-                    # TODO: raise some error in this position
-                    raise HTTPNotFound(f'Batch with title: {title} was not found')
+                    raise StatusInvalidBatch
 
             batch.issues.append(issue)
 
