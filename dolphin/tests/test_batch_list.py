@@ -56,7 +56,7 @@ class TestBatch(LocalApplicationTestCase):
             title='My first project',
             description='A decription for my project',
             status='active',
-            room_id=1001
+            room_id=1001,
         )
         session.add(cls.project1)
         session.flush()
@@ -69,7 +69,7 @@ class TestBatch(LocalApplicationTestCase):
             title='My second project',
             description='A decription for my project',
             status='active',
-            room_id=1002
+            room_id=1002,
         )
         session.add(cls.project2)
 
@@ -87,7 +87,7 @@ class TestBatch(LocalApplicationTestCase):
                 description='This is description of first issue',
                 kind='feature',
                 days=1,
-                room_id=2
+                room_id=2,
             )
             session.add(issue1)
 
@@ -107,7 +107,7 @@ class TestBatch(LocalApplicationTestCase):
                 description='This is description of third issue',
                 kind='feature',
                 days=1,
-                room_id=2
+                room_id=2,
             )
             session.add(issue3)
             session.commit()
@@ -137,7 +137,6 @@ class TestBatch(LocalApplicationTestCase):
                 )
                 assert response.json[0]['title'] == self.batch2.title
 
-
                 when(
                     'Sorting projects by release title',
                     query=dict(sort='title')
@@ -148,9 +147,9 @@ class TestBatch(LocalApplicationTestCase):
 
                 when(
                     'Reverse sorting projects by release title',
-                    query=dict(sort='-releaseTitle')
+                    query=dict(sort='-title')
                 )
                 assert status == 200
                 assert len(response.json) == 2
-                assert response.json[0]['title'] <= response.json[1]['title']
+                assert response.json[0]['title'] >= response.json[1]['title']
 
