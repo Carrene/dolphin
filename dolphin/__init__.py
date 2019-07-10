@@ -12,7 +12,7 @@ from .cli import EmailSubCommand, FixWeekendSubCommand, \
 from .controllers.root import Root
 
 
-__version__ = '0.53.0a15'
+__version__ = '0.54.0a16'
 
 
 class Dolphin(Application):
