@@ -82,7 +82,7 @@ def test_item_perspective(db):
             session.add(item)
             session.commit()
 
-            assert item.perspective == 'due'
+            assert item.perspective == 'overdue'
 
             dailyreport1 = Dailyreport(
                 date=datetime.now().date() - timedelta(days=2),
