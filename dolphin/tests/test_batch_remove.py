@@ -45,10 +45,11 @@ class TestBatch(LocalApplicationTestCase):
             room_id=1001,
         )
         session.add(cls.project1)
-        session.commit()
 
         cls.batch1 = Batch(title='001')
         cls.project1.batches.append(cls.batch1)
+        session.add(cls.batch1)
+        session.commit()
 
         with Context(dict()):
             context.identity = cls.member1
@@ -59,6 +60,7 @@ class TestBatch(LocalApplicationTestCase):
                 kind='feature',
                 days=1,
                 room_id=2,
+                batch_id=cls.batch1.id,
             )
             cls.project1.issues.append(cls.issue1)
             session.commit()
@@ -69,7 +71,7 @@ class TestBatch(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             'Removing a batch',
-            f'/apiv1/batches/id: {self.batch1.id}',
+            f'/apiv1/batches',
             'REMOVE',
             json=dict(
                 issueIds=self.issue1.id
@@ -104,18 +106,6 @@ class TestBatch(LocalApplicationTestCase):
                 json=given | dict(issueIds=0),
             )
             assert status == '605 Issue Not Found'
-
-            when(
-                'Intended batch with int not found',
-                url_parameters=dict(id=0),
-            )
-            assert status == 404
-
-            when(
-                'Intended batch with string type not found',
-                url_parameters=dict(id='Alaphabet'),
-            )
-            assert status == 404
 
             when('Request is not authorized', authorization=None)
             assert status == 401
