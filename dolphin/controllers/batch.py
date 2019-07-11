@@ -74,16 +74,13 @@ class BatchController(ModelRestController):
         )
     ))
     @commit
-    def remove(self, id_):
-        id_ = int_or_notfound(id_)
-        batch = DBSession.query(Batch).get(id_)
-        if batch is None:
-            raise HTTPNotFound()
-
+    def remove(self):
         issue = DBSession.query(Issue).get(context.form.get('issueIds'))
         if issue is None:
             raise StatusIssueNotFound()
 
+        batch_id = issue.batch_id
         issue.batch_id = None
+        batch = DBSession.query(Batch).get(batch_id)
         return batch
 
