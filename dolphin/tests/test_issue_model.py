@@ -401,6 +401,10 @@ def test_issue_status(db):
 
             assert issue1.status == 'complete'
 
+            item.is_done = True
+            session.commit()
+            assert issue1.is_done == True
+
 
 def test_issue_origin(db):
     session = db()

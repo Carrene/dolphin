@@ -246,6 +246,7 @@ class TestIssue(LocalApplicationTestCase):
             item6 = Item(
                 member_id=member.id,
                 issue_phase=issue_phase6,
+                is_done=True,
             )
             session.add(item6)
             session.commit()
@@ -283,21 +284,21 @@ class TestIssue(LocalApplicationTestCase):
             assert response.json[3]['title'] == self.issue3.title
 
             when('Sort issues by status', query=dict(sort='status'))
-            assert response.json[0]['status'] == 'to-do'
+            assert response.json[0]['status'] == 'done'
             assert response.json[1]['status'] == 'to-do'
             assert response.json[2]['status'] == 'to-do'
             assert response.json[3]['status'] == 'to-do'
 
-            when('Filter by status', query=dict(status='to-do'))
+            when('Filter by status', query=dict(status='done'))
             assert status == 200
-            assert len(response.json) == 4
+            assert len(response.json) == 1
 
             when(
                 'Filter by multi statuses',
                 query=dict(status='IN(to-do, in-progress)')
             )
             assert status == 200
-            assert len(response.json) == 4
+            assert len(response.json) == 3
 
             when(
                 'Reverse sorting titles by alphabet',
