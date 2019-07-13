@@ -1,8 +1,7 @@
 from datetime import datetime
 
-from easycli import SubCommand, Argument
-from nanohttp import settings
-from restfulpy.orm import DBSession, commit
+from easycli import SubCommand
+from restfulpy.orm import DBSession
 
 from ..models import Dailyreport, Item, Event
 
@@ -19,7 +18,7 @@ class FixWeekendSubCommand(SubCommand):  # pragma: no cover
                 .filter(Item.end_date > datetime.now()):
 
             dailyreport = Dailyreport(
-                note=str(),
+                note='',
                 hours=0,
                 item_id=item.id,
                 date=datetime.now().date(),
@@ -41,14 +40,13 @@ class FixEventSubCommand(SubCommand):  # pragma: no cover
             .first()
 
         if is_today_event is not None:
-
             for item in DBSession.query(Item) \
                     .filter(Item.estimated_hours != None) \
                     .filter(Item.start_date < datetime.now()) \
                     .filter(Item.end_date > datetime.now()):
 
                 dailyreport = Dailyreport(
-                    note=str(),
+                    note='',
                     hours=0,
                     item_id=item.id,
                     date=datetime.now().date(),
