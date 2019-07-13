@@ -207,7 +207,7 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     def response_time(cls):
         # The constant `ITEM_RESPONSE_TIME` used in query below is derived from
         # constants.py instead of `nanohttp.settings`. Because before setting
-        # up the models, `Issue` model is loaded; So the response_time
+        # up the models, `Item` model is loaded; So the response_time
         # expression is loaded at this time also. Thus, settings is not
         # initialized yet.
         return case([
