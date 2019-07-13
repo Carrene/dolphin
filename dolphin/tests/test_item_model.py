@@ -339,23 +339,17 @@ def test_item_status(db):
 
 
 def test_response_time(db):
-    settings.merge(
-        '''
-            item:
-              response_time: 48
-        '''
-    )
+    session = db()
 
     with AuditLogContext(dict()):
-        session = db()
-        member2 = Member(
-            title='Second Member',
-            email='member2@example.com',
-            access_token='access token 2',
+        member = Member(
+            title='First Member',
+            email='member@example.com',
+            access_token='access token 1',
             phone=111111111,
-            reference_id=3
+            reference_id=2
         )
-        session.add(member2)
+        session.add(member)
         session.commit()
 
         workflow = Workflow(title='Default')
@@ -375,7 +369,7 @@ def test_response_time(db):
             description='A decription for my first release',
             cutoff='2030-2-20',
             launch_date='2030-2-20',
-            manager=member2,
+            manager=member,
             room_id=0,
             group=group,
         )
@@ -384,14 +378,14 @@ def test_response_time(db):
             release=release,
             workflow=workflow,
             group=group,
-            manager=member2,
+            manager=member,
             title='My first project',
             description='A decription for my project',
             room_id=1
         )
 
         with Context(dict()):
-            context.identity = member2
+            context.identity = member
 
             issue1 = Issue(
                 project=project,
@@ -421,33 +415,19 @@ def test_response_time(db):
 
             item1 = Item(
                 issue_phase=issue_phase1,
-                member_id=member2.id,
+                member_id=member.id,
             )
             session.add(item1)
-
-            issue_phase2 = IssuePhase(
-                issue_id=issue2.id,
-                phase_id=phase1.id,
-            )
-
-            item2 = Item(
-                issue_phase=issue_phase2,
-                member_id=member2.id,
-            )
-            session.add(item2)
             session.commit()
 
-        assert item2.response_time.total_seconds() > 0
+            assert item1.response_time == None
 
-    # FIXME: These lines must be uncommented when the response time field
-    # specified how is started
+            item1.need_estimate_timestamp = datetime.now()
+            session.commit()
+            assert item1.response_time.total_seconds() > 0
 
-    # assert item1.response_time == None
-
-    # item1.status = 'in-progress'
-    # settings.item.response_time = 0.0000000001
-    # assert item1.response_time.total_seconds() < 0
-    #
-    # settings.item.response_time = 1
-    # assert item1.response_time.total_seconds() > 0
+            item1.need_estimate_timestamp = datetime \
+                .strptime('2019-2-2', '%Y-%m-%d')
+            session.commit()
+            assert item1.response_time.total_seconds() < 0
 
