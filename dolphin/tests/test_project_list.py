@@ -14,29 +14,29 @@ class TestProject(LocalApplicationTestCase):
     @AuditLogContext(dict())
     def mockup(cls):
         session = cls.create_session()
+        workflow = Workflow(title='Default')
+        skill = Skill(title='First Skill')
+        group = Group(title='default')
 
         member1 = Member(
             title='First Member',
             email='member1@example.com',
             access_token='access token 1',
             phone=123456789,
-            reference_id=2
+            reference_id=2,
+            groups=[group],
         )
         session.add(member1)
 
-        member2 = Member(
+        cls.member2 = Member(
             title='Second Member',
             email='member2@example.com',
             access_token='access token 2',
             phone=222222222,
             reference_id=3
         )
-        session.add(member2)
+        session.add(cls.member2)
         session.commit()
-
-        workflow = Workflow(title='Default')
-        skill = Skill(title='First Skill')
-        group = Group(title='default')
 
         cls.release1 = Release(
             title='My first release',
@@ -85,7 +85,7 @@ class TestProject(LocalApplicationTestCase):
             release=cls.release2,
             workflow=workflow,
             group=group,
-            manager=member2,
+            manager=cls.member2,
             title='My second project',
             description='A decription for my project',
             status='active',
@@ -97,7 +97,7 @@ class TestProject(LocalApplicationTestCase):
             release=cls.release3,
             workflow=workflow,
             group=group,
-            manager=member2,
+            manager=cls.member2,
             title='My third project',
             description='A decription for my project',
             removed_at='2020-2-20',
@@ -110,7 +110,7 @@ class TestProject(LocalApplicationTestCase):
             release=cls.release3,
             workflow=workflow,
             group=group,
-            manager=member2,
+            manager=cls.member2,
             title='My third project',
             description='A decription for my project',
             removed_at='2020-2-20',
@@ -424,4 +424,11 @@ class TestProject(LocalApplicationTestCase):
 
                 when('Request is not authorized', authorization=None)
                 assert status == 401
+
+            self.login(self.member2.email)
+            when(
+                'Trying to pass with another member',
+                authorization=self._authentication_token
+            )
+            assert len(response.json) == 0
 

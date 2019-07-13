@@ -9,7 +9,7 @@ from ..exceptions import StatusChatRoomNotFound, \
     StatusRoomMemberAlreadyExist, StatusRoomMemberNotFound, \
     StatusManagerNotFound, StatusSecondaryManagerNotFound
 from ..models import Project, Member, Subscription, Workflow, Group, Release, \
-    Batch
+    Batch, GroupMember
 from ..validators import project_validator, update_project_validator
 from .files import FileController
 from .issues import IssueController
@@ -318,7 +318,10 @@ class ProjectController(ModelRestController):
     @json
     @Project.expose
     def list(self):
-        query = DBSession.query(Project)
+        current_member = Member.current()
+        query = DBSession.query(Project) \
+            .join(GroupMember, GroupMember.group_id == Project.group_id) \
+            .filter(GroupMember.member_id == current_member.id)
         sorting_expression = context.query.get('sort', '').strip()
 
         # SORT
