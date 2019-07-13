@@ -8,6 +8,7 @@ from nanohttp.contexts import Context
 from dolphin.models import Issue, Project, Member, Workflow, Item, Phase, \
     Group, Subscription, Release, Skill, Organization, Tag, IssuePhase
 from dolphin.tests.helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.constants import ISSUE_RESPONSE_TIME
 
 
 class TestIssue(LocalApplicationTestCase):
@@ -82,6 +83,7 @@ class TestIssue(LocalApplicationTestCase):
                 days=1,
                 room_id=2,
                 tags=[cls.tag1],
+                stage='triage',
             )
             session.add(cls.issue1)
             session.flush()
@@ -290,6 +292,13 @@ class TestIssue(LocalApplicationTestCase):
             assert response.json[3]['status'] == 'to-do'
 
             when('Filter by status', query=dict(status='done'))
+            assert status == 200
+            assert len(response.json) == 1
+
+            when(
+                'Filter by response time',
+                query=dict(responseTime=ISSUE_RESPONSE_TIME)
+            )
             assert status == 200
             assert len(response.json) == 1
 
@@ -503,6 +512,21 @@ class TestIssue(LocalApplicationTestCase):
             assert len(response.json) == 4
             assert response.json[3]['id'] == self.issue2.id
             assert response.json[2]['id'] == self.issue1.id
+
+            when('Sort by response time', query=dict(sort='responseTime'))
+            assert status == 200
+            assert len(response.json) == 4
+            assert response.json[0]['id'] == self.issue1.id
+            assert response.json[1]['id'] == self.issue4.id
+
+            when(
+                'Reverse sort by response time',
+                query=dict(sort='-responseTime')
+            )
+            assert status == 200
+            assert len(response.json) == 4
+            assert response.json[3]['id'] == self.issue1.id
+            assert response.json[2]['id'] == self.issue3.id
 
             when(
                 'Filter by phase id and sort by phase title',

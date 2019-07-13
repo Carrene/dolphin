@@ -1,21 +1,22 @@
-from datetime import datetime
-from auditor import observe
+from datetime import datetime, timedelta
 
+from auditor import observe
 from nanohttp import context
 from restfulpy.orm import Field, DeclarativeBase, relationship, \
     OrderingMixin, FilteringMixin, PaginationMixin
 from restfulpy.orm.metadata import MetadataField
 from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
-    case, join, Boolean, and_, any_, exists
+    case, join, and_, exists, DateTime
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import column_property
 
+from ..constants import ISSUE_RESPONSE_TIME
 from ..mixins import ModifiedByMixin, CreatedByMixin
-from .member import Member
-from .item import Item
-from .phase import Phase
 from .issue_phase import IssuePhase
+from .item import Item
+from .member import Member
+from .phase import Phase
 from .subscribable import Subscribable, Subscription
 
 
@@ -153,9 +154,9 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         python_type=str,
         label='Stage',
         default='triage',
-        not_none=True,
         required=False,
         protected=False,
+        readonly=False,
         watermark='lorem ipsum',
         message='lorem ipsum',
     )
@@ -169,6 +170,16 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         default='low',
         watermark='lorem ipsum',
         example='lorem ipsum',
+    )
+    last_moving_time = Field(
+        DateTime,
+        python_type=datetime,
+        label='Last Moving Time',
+        nullable=True,
+        protected=True,
+        required=False,
+        not_none=False,
+        readonly=True,
     )
     attachments = relationship('Attachment', lazy='selectin')
     batch_id = Field(
@@ -314,6 +325,41 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         ], else_='to-do').label('status'),
         deferred=True
     )
+
+    @hybrid_property
+    def response_time(self):
+        if self.last_moving_time:
+            return self.last_moving_time - \
+                datetime.now() + \
+                timedelta(hours=ISSUE_RESPONSE_TIME)
+
+        return None
+
+    @response_time.expression
+    def response_time(cls):
+        # The constant `ISSUE_RESPONSE_TIME` used in query below is derived from
+        # constants.py instead of `nanohttp.settings`. Because before setting
+        # up the models, `Issue` model is loaded; So the response_time
+        # expression is loaded at this time also. Thus, settings is not
+        # initialized yet.
+        return case([
+            (
+                cls.last_moving_time != None,
+                (
+                    func.date_part(
+                        'day',
+                        cls.last_moving_time - func.now()
+                    ) * 24
+                ) + \
+                (
+                    func.date_part(
+                        'hour',
+                        cls.last_moving_time - func.now()
+                    )
+                ) + \
+                ISSUE_RESPONSE_TIME
+            )
+        ])
 
     @property
     def _boarding(self):
@@ -491,6 +537,27 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             required=False,
             readonly=True,
         )
+        yield MetadataField(
+            name='stage',
+            key='stage',
+            label='Stage',
+            default='triage',
+            required=False,
+            readonly=True,
+            not_none=True,
+            protected=False,
+            watermark='lorem ipsum',
+            message='lorem ipsum',
+        )
+        yield MetadataField(
+            name='responseTime',
+            key='response_time',
+            label='Response Time',
+            required=False,
+            readonly=True,
+            not_none=True,
+            protected=False,
+        )
 
     def to_dict(self, include_relations=True):
         # The `issue` relationship on Item model is `protected=False`, So the
@@ -508,6 +575,9 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
                 ))
 
         issue_dict = super().to_dict()
+        issue_dict['responseTime'] = \
+            self._get_hours(self.response_time) \
+            if self.response_time else None
         issue_dict['status'] = self.status
         issue_dict['boarding'] = self.boarding
         issue_dict['isSubscribed'] = True if self.is_subscribed else False
@@ -523,6 +593,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
                 issue_dict['relations'].append(
                     x.to_dict(include_relations=False)
                 )
+        issue_dict['stage'] = self.stage
 
         return issue_dict
 
@@ -534,9 +605,16 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
     def get_room_title(self):
         return f'{self.title.lower()}-{self.project_id}'
 
+    @staticmethod
+    def _get_hours(timedelta):
+        return timedelta.total_seconds() // 3600
+
 
 @listens_for(Issue.stage, 'set')
 def handle_change_stage(target, value, oldvalue, initiator):
-    if value == 'backlog':
+    if value == 'triage':
+        target.last_moving_time = datetime.now()
+
+    elif value == 'backlog':
         target.origin = 'backlog'
 
