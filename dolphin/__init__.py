@@ -7,7 +7,8 @@ from sqlalchemy_media import StoreManager, FileSystemStore
 
 from . import basedata, mockup
 from .authentication import Authenticator
-from .cli import EmailSubCommand, MuleSubCommand
+from .cli import EmailSubCommand, MuleSubCommand, FixWeekendSubCommand, \
+    FixEventSubCommand
 from .controllers.root import Root
 
 
@@ -102,6 +103,8 @@ class Dolphin(Application):
         return [
             EmailSubCommand,
             MuleSubCommand,
+            FixWeekendSubCommand,
+            FixEventSubCommand,
         ]
 
     @classmethod
