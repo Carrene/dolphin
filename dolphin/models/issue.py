@@ -341,7 +341,18 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         return case([
             (
                 cls.last_moving_time != None,
-                func.date_part('hour', cls.last_moving_time - func.now()) + \
+                (
+                    func.date_part(
+                        'day',
+                        cls.last_moving_time - func.now()
+                    ) * 24
+                ) + \
+                (
+                    func.date_part(
+                        'hour',
+                        cls.last_moving_time - func.now()
+                    )
+                ) + \
                 ISSUE_RESPONSE_TIME
             )
         ])
