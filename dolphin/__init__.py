@@ -28,7 +28,6 @@ class Dolphin(Application):
         ini: %(root_path)s/alembic.ini
 
       issue:
-        response_time: 48 # Hours
         subscription:
           max_length: 100
 

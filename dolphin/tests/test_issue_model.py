@@ -639,7 +639,6 @@ def test_issue_response_time(db):
                 room_id=2,
                 stage='backlog',
             )
-
             session.add(issue1)
             session.commit()
 

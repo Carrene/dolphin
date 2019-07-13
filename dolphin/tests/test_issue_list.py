@@ -297,7 +297,8 @@ class TestIssue(LocalApplicationTestCase):
 
             when(
                 'Filter by response time',
-                query=dict(responseTime=ISSUE_RESPONSE_TIME))
+                query=dict(responseTime=ISSUE_RESPONSE_TIME)
+            )
             assert status == 200
             assert len(response.json) == 1
 

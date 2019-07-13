@@ -1,24 +1,23 @@
 from datetime import datetime, timedelta
-from auditor import observe
 
+from auditor import observe
 from nanohttp import context
-from nanohttp import settings
 from restfulpy.orm import Field, DeclarativeBase, relationship, \
     OrderingMixin, FilteringMixin, PaginationMixin
 from restfulpy.orm.metadata import MetadataField
 from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
-    case, join, Boolean, and_, any_, exists, DateTime
+    case, join, and_, exists, DateTime
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import column_property, synonym
+from sqlalchemy.orm import column_property
 
-from ..mixins import ModifiedByMixin, CreatedByMixin
-from .member import Member
-from .item import Item
-from .phase import Phase
-from .issue_phase import IssuePhase
-from .subscribable import Subscribable, Subscription
 from ..constants import ISSUE_RESPONSE_TIME
+from ..mixins import ModifiedByMixin, CreatedByMixin
+from .issue_phase import IssuePhase
+from .item import Item
+from .member import Member
+from .phase import Phase
+from .subscribable import Subscribable, Subscription
 
 
 class IssueTag(DeclarativeBase):
