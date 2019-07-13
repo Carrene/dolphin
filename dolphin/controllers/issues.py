@@ -9,6 +9,7 @@ from nanohttp import HTTPStatus, json, context, HTTPNotFound, \
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
 from restfulpy.orm import DBSession, commit
+from restfulpy.mule import MuleTask, worker
 from sqlalchemy import and_, exists, select, func, join, or_, Text, cast
 
 from ..backends import ChatClient
@@ -18,7 +19,8 @@ from ..exceptions import StatusRoomMemberAlreadyExist, \
     StatusQueryParameterNotInFormOrQueryString
 from ..models import Issue, Subscription, Phase, Item, Member, Project, \
     RelatedIssue, Subscribable, IssueTag, Tag, Resource, SkillMember, \
-    AbstractResourceSummaryView, AbstractPhaseSummaryView, IssuePhase
+    AbstractResourceSummaryView, AbstractPhaseSummaryView, IssuePhase, \
+    ReturnToTriageJob
 from ..validators import update_issue_validator, assign_issue_validator, \
     issue_move_validator, unassign_issue_validator, issue_relate_validator, \
     issue_unrelate_validator, search_issue_validator
@@ -78,6 +80,9 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
             elif remaining_paths[1] == 'phasessummaries':
                 return IssuePhaseSummaryController(issue=issue)(*remaining_paths[2:])
+
+            elif remaining_paths[1] == 'jobs':
+                return IssueJobController(issue=issue)(*remaining_paths[2:])
 
         return super().__call__(*remaining_paths)
 
@@ -825,4 +830,29 @@ class IssuePhaseResourceSummaryController(ModelRestController):
             .create_mapped_class(issue_id=self.issue.id, phase_id=self.phase.id)
         query = DBSession.query(phase_summary_view)
         return query
+
+
+class IssueJobController(ModelRestController):
+    __model__ = ReturnToTriageJob
+
+    def __init__(self, issue):
+        self.issue = issue
+
+    @authorize
+    @json
+    @commit
+    def schedule(self):
+        if self.issue.returntotriagejobs:
+            returntotriages = DBSession.query(ReturnToTriageJob) \
+                .filter(ReturnToTriageJob.issue_id == self.issue.id)
+
+            for returntotriage in returntotriages:
+                returntotriage.status = 'expired'
+                returntotriage.terminated_at = datetime.now()
+
+        job = ReturnToTriageJob()
+        job.update_from_request()
+        job.issue_id = self.issue.id
+        DBSession.add(job)
+        return job
 

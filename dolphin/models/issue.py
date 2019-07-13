@@ -205,6 +205,11 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         back_populates='issues',
         protected=False,
     )
+    returntotriagejobs = relationship(
+        'ReturnToTriageJob',
+        back_populates='issue',
+        protected=False,
+    )
     draft_issue = relationship(
         'DraftIssue',
         back_populates='issue',
@@ -557,6 +562,13 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             readonly=True,
             not_none=True,
             protected=False,
+        )
+        yield MetadataField(
+            name='returnToTriage',
+            key='returntotriagejobs',
+            label='Return to triage',
+            required=False,
+            readonly=True,
         )
 
     def to_dict(self, include_relations=True):
