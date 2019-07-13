@@ -75,9 +75,6 @@ class Dolphin(Application):
             max_length: 50 # KB
             min_length: 1  # KB
 
-      item:
-        response_time: 48 # Hours
-
       resource:
         load_thresholds:
           heavy: 5

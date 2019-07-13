@@ -197,9 +197,9 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     @hybrid_property
     def response_time(self):
         if self.need_estimate_timestamp:
-            return self.need_estimate_timestamp + \
-                   timedelta(hours=ITEM_RESPONSE_TIME) - \
-                   datetime.now()
+            return self.need_estimate_timestamp - \
+                   datetime.now() + \
+                   timedelta(hours=ITEM_RESPONSE_TIME)
 
         return None
 
@@ -213,12 +213,19 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         return case([
             (
                 cls.need_estimate_timestamp != None,
-                func.date_part(
-                    'hour',
-                    cls.need_estimate_timestamp + \
-                    timedelta(hours=ITEM_RESPONSE_TIME) - \
-                    func.now()
-                )
+                (
+                    func.date_part(
+                        'day',
+                        cls.need_estimate_timestamp - func.now()
+                    ) * 24
+                ) + \
+                (
+                    func.date_part(
+                        'hour',
+                        cls.need_estimate_timestamp - func.now()
+                    )
+                ) + \
+                ITEM_RESPONSE_TIME
             )
         ])
 

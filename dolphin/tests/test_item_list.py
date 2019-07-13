@@ -381,7 +381,7 @@ class TestListGroup(LocalApplicationTestCase):
 
             when(
                 'Filter by response time',
-                query=dict(responseTime=self.RESPONSE_TIME_TIMEDELTA - 1)
+                query=dict(responseTime=24)
             )
             assert len(response.json) == 2
 
