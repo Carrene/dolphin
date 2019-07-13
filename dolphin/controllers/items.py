@@ -4,7 +4,7 @@ from nanohttp import json, context, HTTPNotFound, int_or_notfound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
-from sqlalchemy import select, func, join
+from sqlalchemy import select, func, join, exists, and_
 from sqlalchemy.sql.expression import all_
 
 from ..models import Item, Dailyreport, Event, Member, Issue, Project, Phase, \
@@ -12,7 +12,7 @@ from ..models import Item, Dailyreport, Event, Member, Issue, Project, Phase, \
 from ..validators import update_item_validator, dailyreport_update_validator, \
     estimate_item_validator, dailyreport_create_validator
 from ..exceptions import StatusEndDateMustBeGreaterThanStartDate, \
-    StatusInvalidDatePeriod
+    StatusInvalidDatePeriod, StatusDailyReportAlreadyExist
 
 
 FORM_WHITLELIST_ITEM = [
@@ -311,7 +311,16 @@ class ItemDailyreportController(ModelRestController):
     @commit
     def update(self, id):
         id = int_or_notfound(id)
+        date = context.form.get('date')
         dailyreport = DBSession.query(Dailyreport).get(id)
+        if date is not None and dailyreport.date != date:
+            is_exist_dailyreport = DBSession.query(exists().where(and_(
+                Dailyreport.item_id == dailyreport.item_id,
+                Dailyreport.date == date
+            ))).scalar()
+            if is_exist_dailyreport:
+                raise StatusDailyReportAlreadyExist()
+
         if dailyreport is None:
             raise HTTPNotFound()
 
@@ -341,6 +350,15 @@ class ItemDailyreportController(ModelRestController):
         date = context.form.get('date')
         if self.item.end_date < date or date < self.item.start_date:
             raise StatusInvalidDatePeriod()
+
+        dailyreport = DBSession.query(Dailyreport) \
+            .filter(
+                Dailyreport.item_id == self.item.id,
+                Dailyreport.date == date
+            ) \
+            .one_or_none()
+        if dailyreport is not None:
+            raise StatusDailyReportAlreadyExist()
 
         dailyreport = Dailyreport(
             note=context.form.get('note'),
