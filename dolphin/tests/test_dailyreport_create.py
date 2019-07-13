@@ -129,6 +129,9 @@ class TestDailyreport(LocalApplicationTestCase):
             assert response.json['hours'] == form['hours']
             assert response.json['note'] == form['note']
 
+            when('Can not create two daily reports in one day')
+            assert status == '665 Daily Report Already Exist'
+
             when('Date format is wrong', json=given | dict(date='30-20-20'))
             assert status == 400
 
