@@ -246,7 +246,8 @@ class TestProject(LocalApplicationTestCase):
             assert status == 200
             assert response.json[0]['title'] == 'My first project'
 
-            when( 'Reverse sorting titles by alphabet',
+            when(
+                'Reverse sorting titles by alphabet',
                 query=dict(sort='-title')
             )
             assert response.json[0]['title'] == 'My third project'
@@ -278,6 +279,7 @@ class TestProject(LocalApplicationTestCase):
             assert response.json[1]['dueDate'] == None
             assert response.json[2]['dueDate'] == None
             assert response.json[3]['dueDate'] == '2020-02-03T00:00:00'
+
             when(
                 'Sorting project by "isSubscribed" field',
                 query=dict(sort='isSubscribed')
