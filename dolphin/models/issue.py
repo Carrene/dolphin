@@ -608,11 +608,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
 
     @staticmethod
     def _get_hours(timedelta):
-        hours = 0
-        if timedelta.days > 0:
-            hours = timedelta.days * 24
-
-        return hours + (timedelta.seconds // 3600)
+        return timedelta.total_seconds() // 3600
 
 
 @listens_for(Issue.stage, 'set')
