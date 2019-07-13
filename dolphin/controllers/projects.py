@@ -223,7 +223,7 @@ class ProjectController(ModelRestController):
             )
             raise
 
-        batch = Batch(title='00')
+        batch = Batch(title='001')
         project.batches.append(batch)
 
         DBSession.add(project)
