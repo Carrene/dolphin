@@ -99,12 +99,8 @@ class Dolphin(Application):
     def get_cli_arguments(self):
         return [
             EmailSubCommand,
-<<<<<<< HEAD
-            MuleSubCommand,
             FixWeekendSubCommand,
             FixEventSubCommand,
-=======
->>>>>>> Remove duplicated cli
         ]
 
     @classmethod
