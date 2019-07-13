@@ -75,6 +75,7 @@ class TestRetuenTotriageJob(LocalApplicationTestCase):
                 room_id=3,
             )
             session.add(cls.issue2)
+            session.flush()
 
             cls.job1 = ReturnToTriageJob(
                 at=datetime.datetime.now(),
