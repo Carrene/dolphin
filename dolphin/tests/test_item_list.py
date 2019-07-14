@@ -584,7 +584,6 @@ class TestListGroup(LocalApplicationTestCase):
             )
             assert len(response.json) == 8
 
-
             when('Request is not authorized', authorization=None)
             assert status == 401
 
