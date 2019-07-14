@@ -555,6 +555,13 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             not_none=True,
             protected=False,
         )
+        yield MetadataField(
+            name='batchTitle',
+            key='batch_title',
+            label='Lorem Ipsum',
+            required=False,
+            readonly=True,
+        )
 
     def to_dict(self, include_relations=True):
         # The `issue` relationship on Item model is `protected=False`, So the
@@ -591,7 +598,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
                     x.to_dict(include_relations=False)
                 )
         issue_dict['stage'] = self.stage
-
+        issue_dict['batchTitle'] = self.batches.title if self.batches else None
         return issue_dict
 
     @classmethod
