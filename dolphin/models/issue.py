@@ -613,7 +613,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
                     x.to_dict(include_relations=False)
                 )
         issue_dict['stage'] = self.stage
-        issue_dict['batchTitle'] = [batch.title for batch in self.batches]
+        issue_dict['batchTitle'] = self.batches.title if self.batches else None
 
         return issue_dict
 
