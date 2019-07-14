@@ -12,14 +12,14 @@ class TestRelease(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        member = Member(
+        cls.member = Member(
             title='First Member',
             email='member1@example.com',
             access_token='access token 1',
             phone=123456789,
             reference_id=1
         )
-        session.add(member)
+        session.add(cls.member)
 
         group = Group(title='default')
 
@@ -28,7 +28,7 @@ class TestRelease(LocalApplicationTestCase):
             description='A decription for my first release',
             cutoff='2030-2-20',
             launch_date='2030-2-20',
-            manager=member,
+            manager=cls.member,
             room_id=0,
             group=group,
         )
@@ -39,7 +39,7 @@ class TestRelease(LocalApplicationTestCase):
             description='A decription for my second release',
             cutoff='2030-2-20',
             launch_date='2030-2-20',
-            manager=member,
+            manager=cls.member,
             room_id=0,
             group=group,
         )
@@ -50,7 +50,7 @@ class TestRelease(LocalApplicationTestCase):
             description='A decription for my third release',
             cutoff='2030-2-20',
             launch_date='2030-2-20',
-            manager=member,
+            manager=cls.member,
             room_id=0,
             group=group,
         )
@@ -58,7 +58,7 @@ class TestRelease(LocalApplicationTestCase):
         session.commit()
 
     def test_list(self):
-        self.login('member1@example.com')
+        self.login(self.member.email)
 
         with oauth_mockup_server(), self.given(
             'List releases',
@@ -68,12 +68,10 @@ class TestRelease(LocalApplicationTestCase):
             assert status == 200
             assert len(response.json) == 3
 
-        with oauth_mockup_server(), self.given(
-            'Sort releases by title',
-            '/apiv1/releases',
-            'LIST',
-            query=dict(sort='title')
-        ):
+            when(
+                'Sort releases by title',
+                query=dict(sort='title')
+            )
             assert response.json[0]['title'] == 'My first release'
 
             when(
@@ -82,12 +80,10 @@ class TestRelease(LocalApplicationTestCase):
             )
             assert response.json[0]['title'] == 'My third release'
 
-        with oauth_mockup_server(), self.given(
-            'Filter releases',
-            '/apiv1/releases',
-            'LIST',
-            query=dict(sort='id', take=1, skip=2)
-        ):
+            when(
+                'Filtering by release id',
+                query=dict(sort='id', take=1, skip=2)
+            )
             assert response.json[0]['title'] == 'My third release'
 
             when(
@@ -96,12 +92,10 @@ class TestRelease(LocalApplicationTestCase):
             )
             assert response.json[0]['title'] == 'My first release'
 
-        with oauth_mockup_server(), self.given(
-             'Issues pagination',
-             '/apiv1/releases',
-             'LIST',
-             query=dict(sort='id', take=1, skip=2)
-         ):
+            when(
+                'Issues pagination',
+                query=dict(sort='id', take=1, skip=2)
+            )
             assert response.json[0]['title'] == 'My third release'
 
             when(
