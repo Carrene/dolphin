@@ -52,7 +52,7 @@ class BatchController(ModelRestController):
                     DBSession.add(batch)
 
                 else:
-                    raise StatusInvalidBatch
+                    raise StatusInvalidBatch()
 
             batch.issues.append(issue)
 
