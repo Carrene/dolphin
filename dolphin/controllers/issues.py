@@ -20,7 +20,7 @@ from ..exceptions import StatusRoomMemberAlreadyExist, \
 from ..models import Issue, Subscription, Phase, Item, Member, Project, \
     RelatedIssue, Subscribable, IssueTag, Tag, Resource, SkillMember, \
     AbstractResourceSummaryView, AbstractPhaseSummaryView, IssuePhase, \
-    ReturnTotriageJob
+    ReturnToTriageJob
 from ..validators import update_issue_validator, assign_issue_validator, \
     issue_move_validator, unassign_issue_validator, issue_relate_validator, \
     issue_unrelate_validator, search_issue_validator
@@ -833,7 +833,7 @@ class IssuePhaseResourceSummaryController(ModelRestController):
 
 
 class IssueJobController(ModelRestController):
-    __model__ = ReturnTotriageJob
+    __model__ = ReturnToTriageJob
 
     def __init__(self, issue):
         self.issue = issue
@@ -842,7 +842,15 @@ class IssueJobController(ModelRestController):
     @json
     @commit
     def schedule(self):
-        job = ReturnTotriageJob()
+        if self.issue.returntotriagejobs:
+            returntotriages = DBSession.query(ReturnToTriageJob) \
+                .filter(ReturnToTriageJob.issue_id == self.issue.id)
+
+            for returntotriage in returntotriages:
+                returntotriage.status = 'expired'
+                returntotriage.terminated_at = datetime.now()
+
+        job = ReturnToTriageJob()
         job.update_from_request()
         job.issue_id = self.issue.id
         DBSession.add(job)

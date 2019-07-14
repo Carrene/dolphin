@@ -271,8 +271,9 @@ class TestListGroup(LocalApplicationTestCase):
                 start_date=datetime.now().date(),
                 end_date=datetime.now().date(),
                 estimated_hours=3,
+                need_estimate_timestamp=datetime.now() - timedelta(days=3),
             )
-            session.add(cls.item7)
+            session.add(cls.item8)
 
             dailyreport1 = Dailyreport(
                 date=datetime.now().date(),
@@ -381,9 +382,15 @@ class TestListGroup(LocalApplicationTestCase):
 
             when(
                 'Filter by response time',
-                query=dict(responseTime=self.RESPONSE_TIME_TIMEDELTA - 1)
+                query=dict(responseTime=24)
             )
             assert len(response.json) == 2
+
+            when(
+                'Filter by grace period',
+                query=dict(gracePeriod=24)
+            )
+            assert len(response.json) == 1
 
             when(
                 'Filter by issue id',
@@ -565,7 +572,17 @@ class TestListGroup(LocalApplicationTestCase):
             )
             assert len(response.json) == 8
 
+            when(
+                'Sort by grace period',
+                query=dict(sort='gracePeriod')
+            )
+            assert len(response.json) == 8
 
+            when(
+                'Reverse sort by grace period',
+                query=dict(sort='-gracePeriod')
+            )
+            assert len(response.json) == 8
 
             when('Request is not authorized', authorization=None)
             assert status == 401

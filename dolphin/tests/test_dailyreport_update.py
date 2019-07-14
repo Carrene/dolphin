@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timedelta
 
 from bddrest import status, response, when, given
 from auditor.context import Context as AuditLogContext
@@ -81,16 +81,26 @@ class TestDailyreport(LocalApplicationTestCase):
             cls.item = Item(
                 issue_phase=issue_phase1,
                 member=cls.member,
+                start_date=datetime.now().date() - timedelta(days=1),
+                end_date=datetime.now().date(),
             )
             session.add(cls.item)
 
-            cls.dailyreport = Dailyreport(
-                date=datetime.datetime.now().date(),
+            cls.dailyreport1 = Dailyreport(
+                date=datetime.now().date(),
                 hours=3,
                 note='The note for a daily report',
                 item=cls.item,
             )
-            session.add(cls.dailyreport)
+            session.add(cls.dailyreport1)
+
+            cls.dailyreport2 = Dailyreport(
+                date=datetime.now().date() - timedelta(days=1),
+                hours=3,
+                note='The note for a daily report',
+                item=cls.item,
+            )
+            session.add(cls.dailyreport2)
             session.commit()
 
     def test_update(self):
@@ -103,7 +113,7 @@ class TestDailyreport(LocalApplicationTestCase):
         with oauth_mockup_server(), self.given(
             f'Updating a dailyreport',
             f'/apiv1/items/item_id: {self.item.id}'
-                f'/dailyreports/id: {self.dailyreport.id}',
+                f'/dailyreports/id: {self.dailyreport1.id}',
             f'UPDATE',
             json=form,
         ):
@@ -111,6 +121,13 @@ class TestDailyreport(LocalApplicationTestCase):
             assert response.json['id'] is not None
             assert response.json['hours'] == form['hours']
             assert response.json['note'] == form['note']
+
+            last_day = datetime.now().date() - timedelta(days=1)
+            when(
+                'Can not create two daily reports in one day',
+                json=given | dict(date=last_day.isoformat())
+            )
+            assert status == '665 Daily Report Already Exist'
 
             when('Date format is wrong', json=given | dict(date='30-20-20'))
             assert status == 400

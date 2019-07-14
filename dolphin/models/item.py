@@ -6,13 +6,13 @@ from restfulpy.orm.metadata import MetadataField
 from restfulpy.orm.mixins import TimestampMixin, OrderingMixin, \
     FilteringMixin, PaginationMixin
 from sqlalchemy import Integer, ForeignKey, DateTime, Enum, String, select, \
-    func, Boolean, case, any_, text, exists, cast
+    func, Boolean, case, any_, text, exists, cast, and_
 from sqlalchemy.orm import column_property, synonym
 from sqlalchemy.types import TIMESTAMP
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from .dailyreport import Dailyreport
-from ..constants import ITEM_RESPONSE_TIME
+from ..constants import ITEM_RESPONSE_TIME, ITEM_GRACE_PERIOD
 
 
 class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
@@ -197,32 +197,67 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
     @hybrid_property
     def response_time(self):
         if self.need_estimate_timestamp:
-            return self.need_estimate_timestamp + \
-                   timedelta(hours=ITEM_RESPONSE_TIME) - \
-                   datetime.now()
+            response_timedelta = self.need_estimate_timestamp - \
+                datetime.now() + \
+                timedelta(hours=ITEM_RESPONSE_TIME)
+
+            return self._get_hours(response_timedelta)
 
         return None
 
     @response_time.expression
     def response_time(cls):
+        # The constant `ITEM_RESPONSE_TIME` used in query below is derived from
+        # constants.py instead of `nanohttp.settings`. Because before setting
+        # up the models, `Item` model is loaded; So the response_time
+        # expression is loaded at this time also. Thus, settings is not
+        # initialized yet.
         return case([
             (
                 cls.need_estimate_timestamp != None,
-                func.date_part(
-                    'hour',
-                    cls.need_estimate_timestamp + \
-                    timedelta(hours=ITEM_RESPONSE_TIME) - \
-                    func.now()
-                )
+                (
+                    func.date_part(
+                        'day',
+                        cls.need_estimate_timestamp - func.now()
+                    ) * 24
+                ) + \
+                (
+                    func.date_part(
+                        'hour',
+                        cls.need_estimate_timestamp - func.now()
+                    )
+                ) + \
+                ITEM_RESPONSE_TIME
+            )
+        ])
+
+    @hybrid_property
+    def grace_period(self):
+        if self.need_estimate_timestamp and self.response_time <= 0:
+            return ITEM_GRACE_PERIOD + self.response_time
+
+        return None
+
+    @grace_period.expression
+    def grace_period(cls):
+        # The constant `ITEM_GRACE_PERIOD` used in query below is derived from
+        # constants.py instead of `nanohttp.settings`. Because before setting
+        # up the models, `Item` model is loaded; So the response_time
+        # expression is loaded at this time also. Thus, settings is not
+        # initialized yet.
+        return case([
+            (
+                and_(
+                    cls.need_estimate_timestamp != None,
+                    cls.response_time <= 0
+                ),
+                ITEM_GRACE_PERIOD + cls.response_time.expression
             )
         ])
 
     def to_dict(self):
         item_dict = super().to_dict()
-        item_dict['responseTime'] = \
-            self._get_hours(self.response_time) \
-            if self.response_time else None
-
+        item_dict['responseTime'] = self.response_time
         item_dict['hoursWorked'] = self.hours_worked
         item_dict['perspective'] = self.perspective
         item_dict['issue'] = self.issue_phase.issue.to_dict()
@@ -259,7 +294,7 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             key='issue',
             label='Issue',
             required=False,
-            readonly=True,
+            readonly=False,
             not_none=True,
             watermark='Lorem Ipsum',
             example='Lorem Ipsum',
@@ -279,9 +314,5 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
 
     @staticmethod
     def _get_hours(timedelta):
-        hours = 0
-        if timedelta.days > 0:
-            hours = timedelta.days * 24
-
-        return hours + (timedelta.seconds // 3600)
+        return timedelta.total_seconds() // 3600
 

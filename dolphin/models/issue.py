@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
-from auditor import observe
 
+from auditor import observe
 from nanohttp import context
 from nanohttp import settings
 from restfulpy.orm import Field, DeclarativeBase, relationship, \
@@ -12,11 +12,12 @@ from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import column_property, synonym
 
+from ..constants import ISSUE_RESPONSE_TIME
 from ..mixins import ModifiedByMixin, CreatedByMixin
-from .member import Member
-from .item import Item
-from .phase import Phase
 from .issue_phase import IssuePhase
+from .item import Item
+from .member import Member
+from .phase import Phase
 from .subscribable import Subscribable, Subscription
 from ..constants import ISSUE_RESPONSE_TIME
 
@@ -207,7 +208,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         protected=False,
     )
     returntotriagejobs = relationship(
-        'ReturnTotriageJob',
+        'ReturnToTriageJob',
         back_populates='issue',
         protected=False,
     )
@@ -343,10 +344,26 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
 
     @response_time.expression
     def response_time(cls):
+        # The constant `ISSUE_RESPONSE_TIME` used in query below is derived from
+        # constants.py instead of `nanohttp.settings`. Because before setting
+        # up the models, `Issue` model is loaded; So the response_time
+        # expression is loaded at this time also. Thus, settings is not
+        # initialized yet.
         return case([
             (
                 cls.last_moving_time != None,
-                func.date_part('hour', cls.last_moving_time - func.now()) + \
+                (
+                    func.date_part(
+                        'day',
+                        cls.last_moving_time - func.now()
+                    ) * 24
+                ) + \
+                (
+                    func.date_part(
+                        'hour',
+                        cls.last_moving_time - func.now()
+                    )
+                ) + \
                 ISSUE_RESPONSE_TIME
             )
         ])
@@ -611,11 +628,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
 
     @staticmethod
     def _get_hours(timedelta):
-        hours = 0
-        if timedelta.days > 0:
-            hours = timedelta.days * 24
-
-        return hours + (timedelta.seconds // 3600)
+        return timedelta.total_seconds() // 3600
 
 
 @listens_for(Issue.stage, 'set')
