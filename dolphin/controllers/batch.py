@@ -1,8 +1,7 @@
-from nanohttp import json, context, HTTPNotFound, int_or_notfound
+from nanohttp import json, context, int_or_notfound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
-from sqlalchemy import and_
 
 from ..exceptions import StatusIssueIdIsNull, StatusInvalidIssueIdType, \
     StatusIssueIdNotInForm, StatusIssueNotFound, StatusInvalidBatch
