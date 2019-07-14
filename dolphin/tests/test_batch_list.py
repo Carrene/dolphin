@@ -73,8 +73,8 @@ class TestBatch(LocalApplicationTestCase):
         )
         session.add(cls.project2)
 
-        cls.batch1 = Batch(title='002')
-        cls.batch2 = Batch(title='003')
+        cls.batch1 = Batch(title='02')
+        cls.batch2 = Batch(title='03')
         cls.project1.batches.append(cls.batch1)
         cls.project1.batches.append(cls.batch2)
 
@@ -119,37 +119,30 @@ class TestBatch(LocalApplicationTestCase):
             'List projects',
             f'/apiv1/projects/id: {self.project1.id}/batches',
             'LIST',
+            query=dict(sort='title'),
         ):
             assert status == 200
-            assert len(response.json) == 2
+            assert response.json[0]['title'] == self.batch1.title
 
-            with self.given(
-                'Sort projects by phases title',
-                f'/apiv1/projects/{self.project1.id}/batches',
-                'LIST',
+            when(
+                'List batch with filtering by title',
+                query=dict(title='02')
+            )
+            assert response.json[0]['title'] == self.batch1.title
+
+            when(
+                'Sorting batch with title',
                 query=dict(sort='title')
-            ):
-                assert status == 200
-                assert response.json[0]['title'] == self.batch1.title
+            )
+            assert status == 200
+            assert len(response.json) == 2
+            assert response.json[0]['title'] <= response.json[1]['title']
 
-                when( 'Reverse sorting titles by alphabet',
-                    query=dict(sort='-title')
-                )
-                assert response.json[0]['title'] == self.batch2.title
-
-                when(
-                    'Sorting projects by release title',
-                    query=dict(sort='title')
-                )
-                assert status == 200
-                assert len(response.json) == 2
-                assert response.json[0]['title'] <= response.json[1]['title']
-
-                when(
-                    'Reverse sorting projects by release title',
-                    query=dict(sort='-title')
-                )
-                assert status == 200
-                assert len(response.json) == 2
-                assert response.json[0]['title'] >= response.json[1]['title']
+            when(
+                'Reverse sorting batch with title',
+                query=dict(sort='-title')
+            )
+            assert status == 200
+            assert len(response.json) == 2
+            assert response.json[0]['title'] >= response.json[1]['title']
 

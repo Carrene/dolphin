@@ -493,7 +493,6 @@ class ProjectBatchesController(ModelRestController):
     @authorize
     @json
     @Batch.expose
-    @commit
     def list(self):
         query = DBSession.query(Batch) \
             .filter(Batch.project_id == self.project.id)
