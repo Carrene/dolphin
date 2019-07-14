@@ -424,10 +424,96 @@ def test_response_time(db):
 
             item1.need_estimate_timestamp = datetime.now()
             session.commit()
-            assert item1.response_time.total_seconds() > 0
+            assert item1.response_time > 0
 
             item1.need_estimate_timestamp = datetime \
                 .strptime('2019-2-2', '%Y-%m-%d')
             session.commit()
-            assert item1.response_time.total_seconds() < 0
+            assert item1.response_time < 0
+
+
+def test_grace_period(db):
+    with AuditLogContext(dict()):
+        session = db()
+        session.expire_on_commit = True
+
+        member1 = Member(
+            title='First Member',
+            email='member1@example.com',
+            access_token='access token 1',
+            phone=123456789,
+            reference_id=2,
+        )
+        session.add(member1)
+        session.commit()
+
+        workflow = Workflow(title='Default')
+        skill = Skill(title='First Skill')
+        group = Group(title='default')
+        release = Release(
+            title='My first release',
+            description='A decription for my first release',
+            cutoff='2030-2-20',
+            launch_date='2030-2-20',
+            manager=member1,
+            room_id=0,
+            group=group,
+        )
+        project = Project(
+            release=release,
+            workflow=workflow,
+            group=group,
+            manager=member1,
+            title='My first project',
+            description='A decription for my project',
+            room_id=1,
+        )
+
+        with Context(dict()):
+            context.identity = member1
+
+            issue1 = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=2,
+            )
+            session.add(issue1)
+
+            phase1 = Phase(
+                title='backlog',
+                order=-1,
+                workflow=workflow,
+                skill=skill,
+            )
+            session.add(phase1)
+            session.flush()
+
+            issue_phase1 = IssuePhase(
+                issue_id=issue1.id,
+                phase_id=phase1.id,
+            )
+
+            item = Item(
+                issue_phase=issue_phase1,
+                member_id=member1.id,
+                start_date=datetime.now().date() - timedelta(days=2),
+                end_date=datetime.now().date(),
+            )
+            session.add(item)
+            session.commit()
+
+            assert item.grace_period == None
+
+            item.need_estimate_timestamp = datetime.now() - timedelta(days=3)
+            session.commit()
+
+            assert item.grace_period > 0
+
+            item.need_estimate_timestamp = datetime.now() - timedelta(days=6)
+            session.commit()
+
+            assert item.grace_period < 0
 
