@@ -54,10 +54,7 @@ class BatchController(ModelRestController):
                 else:
                     raise StatusInvalidBatch()
 
-            batch.issues.append(issue)
-
-        else:
-            batch.issues.append(issue)
+        batch.issues.append(issue)
 
         return batch
 
