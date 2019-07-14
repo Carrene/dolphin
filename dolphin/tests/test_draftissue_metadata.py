@@ -104,3 +104,8 @@ class TestIssue(LocalApplicationTestCase):
             assert fields['origin']['example'] is not None
             assert fields['origin']['watermark'] is not None
 
+            assert fields['batchTitle']['label'] is not None
+            assert fields['batchTitle']['name'] is not None
+            assert fields['batchTitle']['required'] is not None
+            assert fields['batchTitle']['readonly'] is not None
+

@@ -140,15 +140,12 @@ class TestBatch(LocalApplicationTestCase):
                 .order_by(Batch.id.desc()) \
                 .first() != self.batch2
 
-        with oauth_mockup_server(), self.given(
-            'Appending a batch',
-            f'/apiv1/batches/id: {self.batch1.title}',
-            'APPEND',
-            json=dict(
-                issueIds=self.issue2.id
+            when(
+                'Appending a batch',
+                url_parameters=dict(id=self.batch1.title),
+                json=dict(issueIds=self.issue2.id)
+
             )
-        ):
-            assert status == 200
             assert response.json['id'] is not None
             assert response.json['title'] == self.batch1.title
             assert response.json['projectId'] == self.project1.id

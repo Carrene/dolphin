@@ -522,8 +522,10 @@ class StatusInvalidDateFormat(HTTPKnownStatus):
 class StatusDateNotInForm(HTTPKnownStatus):
     status = '931 Date Not In Form'
 
+
 class StatusIssueIdNotInForm(HTTPKnownStatus):
     status = '723 Issue Id Not In Form'
+
 
 class StatusInvalidBatch(HTTPKnownStatus):
     status = '936 Invalid Batch More Than 100'

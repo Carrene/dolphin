@@ -536,6 +536,13 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             readonly=True,
         )
         yield MetadataField(
+            name='batchTitle',
+            key='batch_title',
+            label='Lorem Ipsum',
+            required=False,
+            readonly=True,
+        )
+        yield MetadataField(
             name='project',
             key='project',
             label='Project',
@@ -606,6 +613,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
                     x.to_dict(include_relations=False)
                 )
         issue_dict['stage'] = self.stage
+        issue_dict['batchTitle'] = [batch.title for batch in self.batches]
 
         return issue_dict
 

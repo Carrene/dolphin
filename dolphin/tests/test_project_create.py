@@ -96,7 +96,7 @@ class TestProject(LocalApplicationTestCase):
             session = self.create_session()
             assert session.query(Project) \
                 .get(response.json['id']) \
-                .batches
+                .batches[0]
 
             assert len(logs) == 2
             assert isinstance(logs[0], InstantiationLogEntry)
