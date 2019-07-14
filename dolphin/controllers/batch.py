@@ -35,7 +35,7 @@ class BatchController(ModelRestController):
         # Title is unique in per a project and always is numerical.
         title = int_or_notfound(title)
         batch = DBSession.query(Batch) \
-            .filter(Batch.title == format(title, '03')) \
+            .filter(Batch.title == format(title, '02')) \
             .filter(Batch.project_id == issue.project_id) \
             .one_or_none()
 
@@ -48,7 +48,7 @@ class BatchController(ModelRestController):
             for i in range(title - int(last_batch.title)):
                 batch_title = int(last_batch.title) + i + 1
                 if batch_title < 100:
-                    batch = Batch(title=format(batch_title, '03'))
+                    batch = Batch(title=format(batch_title, '02'))
                     batch.project_id = issue.project_id
                     DBSession.add(batch)
 
@@ -61,3 +61,4 @@ class BatchController(ModelRestController):
             batch.issues.append(issue)
 
         return batch
+

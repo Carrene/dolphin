@@ -48,8 +48,8 @@ class TestBatch(LocalApplicationTestCase):
         session.add(cls.project1)
         session.commit()
 
-        cls.batch1 = Batch(title='002')
-        cls.batch2 = Batch(title='003')
+        cls.batch1 = Batch(title='02')
+        cls.batch2 = Batch(title='03')
         cls.project1.batches.append(cls.batch1)
         cls.project1.batches.append(cls.batch2)
 
@@ -78,7 +78,7 @@ class TestBatch(LocalApplicationTestCase):
     def test_append(self):
         session = self.create_session()
         self.login('member1@example.com')
-        title = '010'
+        title = '10'
 
         with oauth_mockup_server(), self.given(
             'Appending a batch',
@@ -154,5 +154,4 @@ class TestBatch(LocalApplicationTestCase):
             assert response.json['projectId'] == self.project1.id
             assert self.issue2.id in response.json['issueIds']
             assert len(response.json['issueIds']) == 1
-
 
