@@ -318,11 +318,17 @@ class ProjectController(ModelRestController):
     @json
     @Project.expose
     def list(self):
-        current_member = Member.current()
-        query = DBSession.query(Project) \
-            .join(GroupMember, GroupMember.group_id == Project.group_id) \
-            .filter(GroupMember.member_id == current_member.id)
+        query = DBSession.query(Project)
         sorting_expression = context.query.get('sort', '').strip()
+
+        # FILTER
+        if 'groupId' in context.query:
+            value = context.query['groupId']
+            query = Issue._filter_by_column_value(
+                query,
+                Project.goup_id,
+                value
+            )
 
         # SORT
         external_columns = ('releaseTitle', 'managerTitle')

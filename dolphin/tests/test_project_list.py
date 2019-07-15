@@ -16,7 +16,8 @@ class TestProject(LocalApplicationTestCase):
         session = cls.create_session()
         workflow = Workflow(title='Default')
         skill = Skill(title='First Skill')
-        group = Group(title='default')
+        cls.group1 = Group(title='First Group')
+        cls.group2 = Group(title='Second Group')
 
         cls.member1 = Member(
             title='First Member',
@@ -24,7 +25,7 @@ class TestProject(LocalApplicationTestCase):
             access_token='access token 1',
             phone=123456789,
             reference_id=2,
-            groups=[group],
+            groups=[cls.group1],
         )
         session.add(cls.member1)
 
@@ -45,7 +46,7 @@ class TestProject(LocalApplicationTestCase):
             launch_date='2030-2-20',
             manager=cls.member1,
             room_id=0,
-            group=group,
+            group=cls.group1,
         )
 
         cls.release2 = Release(
@@ -55,7 +56,7 @@ class TestProject(LocalApplicationTestCase):
             launch_date='2030-2-20',
             manager=cls.member1,
             room_id=0,
-            group=group,
+            group=cls.group1,
         )
 
         cls.release3 = Release(
@@ -65,13 +66,13 @@ class TestProject(LocalApplicationTestCase):
             launch_date='2030-2-20',
             manager=cls.member1,
             room_id=0,
-            group=group,
+            group=cls.group1,
         )
 
         cls.project1 = Project(
             release=cls.release1,
             workflow=workflow,
-            group=group,
+            group=cls.group1,
             manager=cls.member1,
             title='My first project',
             description='A decription for my project',
@@ -84,7 +85,7 @@ class TestProject(LocalApplicationTestCase):
         cls.project2 = Project(
             release=cls.release2,
             workflow=workflow,
-            group=group,
+            group=cls.group1,
             manager=cls.member2,
             title='My second project',
             description='A decription for my project',
@@ -96,7 +97,7 @@ class TestProject(LocalApplicationTestCase):
         cls.project3 = Project(
             release=cls.release3,
             workflow=workflow,
-            group=group,
+            group=cls.group1,
             manager=cls.member2,
             title='My third project',
             description='A decription for my project',
@@ -109,7 +110,7 @@ class TestProject(LocalApplicationTestCase):
         cls.project4 = Project(
             release=cls.release3,
             workflow=workflow,
-            group=group,
+            group=cls.group2,
             manager=cls.member2,
             title='My third project',
             description='A decription for my project',
@@ -365,6 +366,12 @@ class TestProject(LocalApplicationTestCase):
             assert response.json[0]['title'] == 'My first project'
 
             when(
+                'Filtering by group ID',
+                query=dict(groupId=f'IN({self.group2.id})')
+            )
+            assert len(response.json) == 1
+
+            when(
                 'List projects except one of them',
                 query=dict(sort='id', title='!My awesome project')
             )
@@ -420,11 +427,4 @@ class TestProject(LocalApplicationTestCase):
 
             when('Request is not authorized', authorization=None)
             assert status == 401
-
-            self.login(self.member2.email)
-            when(
-                'Trying to pass with another member',
-                authorization=self._authentication_token
-            )
-            assert len(response.json) == 0
 
