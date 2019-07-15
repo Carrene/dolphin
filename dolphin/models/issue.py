@@ -543,6 +543,13 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             readonly=True,
         )
         yield MetadataField(
+            name='returnToTriage',
+            key='returntotriagejobs',
+            label='Return to triage',
+            required=False,
+            readonly=True,
+        )
+        yield MetadataField(
             name='stage',
             key='stage',
             label='Stage',
