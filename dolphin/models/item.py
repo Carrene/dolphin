@@ -164,21 +164,34 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         ], else_='to-do').label('status'),
         deferred=True
     )
-
     perspective = column_property(
         case([
             (
                 select([func.count(Dailyreport.hours)])
                 .where(Dailyreport.item_id == id)
                 .as_scalar() == 0,
-                'due'
+                'overdue'
             ),
             (
-                func.date_part('DAY', func.now() - start_date) >
-                select([func.count(Dailyreport.id)])
-                .where(Dailyreport.item_id == id)
-                .where(Dailyreport.date < datetime.now().date())
-                .as_scalar(),
+                and_(
+                    func.date_part('DAY', end_date - func.now()) >= 0,
+                    func.date_part('DAY', func.now() - start_date) >
+                    select([func.count(Dailyreport.id)])
+                    .where(Dailyreport.item_id == id)
+                    .where(Dailyreport.date < datetime.now().date())
+                    .as_scalar(),
+                ),
+                'overdue'
+            ),
+            (
+                and_(
+                    func.date_part('DAY', func.now() - end_date) > 0,
+                    func.date_part('DAY', end_date - start_date) + 1 >
+                    select([func.count(Dailyreport.id)])
+                    .where(Dailyreport.item_id == id)
+                    .where(Dailyreport.date < datetime.now().date())
+                    .as_scalar(),
+                ),
                 'overdue'
             ),
             (

@@ -23,6 +23,14 @@ def test_item_perspective(db):
             reference_id=2,
         )
         session.add(member1)
+
+        member2 = Member(
+            title='Second Member',
+            email='member2@example.com',
+            access_token='access token 2',
+            reference_id=3,
+        )
+        session.add(member2)
         session.commit()
 
         workflow = Workflow(title='Default')
@@ -82,7 +90,7 @@ def test_item_perspective(db):
             session.add(item)
             session.commit()
 
-            assert item.perspective == 'due'
+            assert item.perspective == 'overdue'
 
             dailyreport1 = Dailyreport(
                 date=datetime.now().date() - timedelta(days=2),
@@ -117,6 +125,25 @@ def test_item_perspective(db):
             session.commit()
 
             assert item.perspective == 'submitted'
+
+            item1 = Item(
+                issue_phase=issue_phase1,
+                member_id=member2.id,
+                start_date=datetime.now().date() - timedelta(days=2),
+                end_date=datetime.now().date() - timedelta(days=1),
+            )
+            session.add(item1)
+
+            dailyreport4 = Dailyreport(
+                date=datetime.now().date() - timedelta(days=2),
+                hours=3,
+                note='The note for a daily report 1',
+                item=item1,
+            )
+            session.add(dailyreport4)
+            session.commit()
+
+            assert item1.perspective == 'overdue'
 
 
 def test_item_hours_worked(db):

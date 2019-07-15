@@ -268,7 +268,7 @@ class TestListGroup(LocalApplicationTestCase):
             cls.item8 = Item(
                 issue_phase=issue_phase7,
                 member_id=cls.member2.id,
-                start_date=datetime.now().date() - 4 * timedelta(days=1),
+                start_date=datetime.now().date(),
                 end_date=datetime.now().date(),
                 estimated_hours=3,
                 need_estimate_timestamp=datetime.now() - timedelta(days=3),
@@ -276,7 +276,7 @@ class TestListGroup(LocalApplicationTestCase):
             session.add(cls.item8)
 
             dailyreport1 = Dailyreport(
-                date=datetime.now().date() - 3 * timedelta(days=1),
+                date=datetime.now().date(),
                 hours=5,
                 note='note for dailyreport1',
                 item=cls.item8,
@@ -322,7 +322,7 @@ class TestListGroup(LocalApplicationTestCase):
             for item in response.json:
                 assert item['id'] != self.item1.id
 
-            when('Filter by perspective', query=dict(perspective='overdue'))
+            when('Filter by perspective', query=dict(perspective='submitted'))
             assert len(response.json) == 1
             assert response.json[0]['id'] == self.item8.id
 
