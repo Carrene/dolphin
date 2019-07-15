@@ -87,7 +87,7 @@ class TestItem(LocalApplicationTestCase):
             session.add(cls.item)
             session.commit()
 
-    def test_get(self):
+    def test_extend(self):
         self.login(self.member1.email)
 
         with oauth_mockup_server(), self.given(
