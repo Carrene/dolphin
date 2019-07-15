@@ -644,7 +644,6 @@ def test_issue_response_time(db):
             assert issue1.response_time is not None
 
             issue1.stage = 'backlog'
-<<<<<<< HEAD
             assert issue1.origin == 'backlog'
 
 
@@ -827,17 +826,12 @@ def test_issue_response_time(db):
                 room_id=2,
             )
             session.add(issue1)
-=======
->>>>>>> Enhance item model
             session.commit()
 
             assert issue1.response_time is not None
 
-<<<<<<< HEAD
             issue1.stage = 'backlog'
             session.commit()
 
             assert issue1.response_time == None
 
-=======
->>>>>>> Enhance item model
