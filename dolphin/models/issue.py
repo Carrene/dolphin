@@ -152,7 +152,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
     stage = Field(
         Enum(*issue_stages, name='issues_stage'),
         python_type=str,
-        label='Stage',
+        label='Phase',
         default='triage',
         required=False,
         protected=False,
@@ -548,18 +548,6 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             label='Return to triage',
             required=False,
             readonly=True,
-        )
-        yield MetadataField(
-            name='stage',
-            key='stage',
-            label='Stage',
-            default='triage',
-            required=False,
-            readonly=True,
-            not_none=True,
-            protected=False,
-            watermark='lorem ipsum',
-            message='lorem ipsum',
         )
         yield MetadataField(
             name='responseTime',
