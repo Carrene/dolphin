@@ -93,6 +93,11 @@ class TestProject(LocalApplicationTestCase):
             created_project = session.query(Project).get(created_project_id)
             assert created_project.modified_by is None
 
+            session = self.create_session()
+            assert session.query(Project) \
+                .get(response.json['id']) \
+                .batches[0]
+
             assert len(logs) == 2
             assert isinstance(logs[0], InstantiationLogEntry)
             assert isinstance(logs[1], RequestLogEntry)
