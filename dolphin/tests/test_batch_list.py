@@ -73,8 +73,13 @@ class TestBatch(LocalApplicationTestCase):
         )
         session.add(cls.project2)
 
+<<<<<<< HEAD
         cls.batch1 = Batch(title='002')
         cls.batch2 = Batch(title='003')
+=======
+        cls.batch1 = Batch(title='02')
+        cls.batch2 = Batch(title='03')
+>>>>>>> feature/batchlist
         cls.project1.batches.append(cls.batch1)
         cls.project1.batches.append(cls.batch2)
 
@@ -119,6 +124,7 @@ class TestBatch(LocalApplicationTestCase):
             'List projects',
             f'/apiv1/projects/id: {self.project1.id}/batches',
             'LIST',
+<<<<<<< HEAD
         ):
             assert status == 200
             assert len(response.json) == 2
@@ -152,4 +158,32 @@ class TestBatch(LocalApplicationTestCase):
                 assert status == 200
                 assert len(response.json) == 2
                 assert response.json[0]['title'] >= response.json[1]['title']
+=======
+            query=dict(sort='title'),
+        ):
+            assert status == 200
+            assert response.json[0]['title'] == self.batch1.title
+
+            when(
+                'List batch with filtering by title',
+                query=dict(title='02')
+            )
+            assert response.json[0]['title'] == self.batch1.title
+
+            when(
+                'Sorting batch with title',
+                query=dict(sort='title')
+            )
+            assert status == 200
+            assert len(response.json) == 2
+            assert response.json[0]['title'] <= response.json[1]['title']
+
+            when(
+                'Reverse sorting batch with title',
+                query=dict(sort='-title')
+            )
+            assert status == 200
+            assert len(response.json) == 2
+            assert response.json[0]['title'] >= response.json[1]['title']
+>>>>>>> feature/batchlist
 
