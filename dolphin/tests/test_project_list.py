@@ -97,7 +97,7 @@ class TestProject(LocalApplicationTestCase):
         cls.project3 = Project(
             release=cls.release3,
             workflow=workflow,
-            group=cls.group1,
+            group=cls.group2,
             manager=cls.member2,
             title='My third project',
             description='A decription for my project',
@@ -369,7 +369,7 @@ class TestProject(LocalApplicationTestCase):
                 'Filtering by group ID',
                 query=dict(groupId=f'IN({self.group2.id})')
             )
-            assert len(response.json) == 1
+            assert len(response.json) == 2
 
             when(
                 'List projects except one of them',

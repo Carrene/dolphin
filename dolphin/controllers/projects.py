@@ -321,15 +321,6 @@ class ProjectController(ModelRestController):
         query = DBSession.query(Project)
         sorting_expression = context.query.get('sort', '').strip()
 
-        # FILTER
-        if 'groupId' in context.query:
-            value = context.query['groupId']
-            query = Issue._filter_by_column_value(
-                query,
-                Project.goup_id,
-                value
-            )
-
         # SORT
         external_columns = ('releaseTitle', 'managerTitle')
 
