@@ -175,6 +175,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
     last_moving_time = Field(
         DateTime,
         python_type=datetime,
+        default=datetime.now(),
         label='Last Moving Time',
         nullable=True,
         protected=True,
@@ -633,4 +634,5 @@ def handle_change_stage(target, value, oldvalue, initiator):
 
     elif value == 'backlog':
         target.origin = 'backlog'
+        target.last_moving_time = None
 

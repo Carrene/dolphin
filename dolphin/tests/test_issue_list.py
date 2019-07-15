@@ -88,6 +88,8 @@ class TestIssue(LocalApplicationTestCase):
             session.add(cls.issue1)
             session.flush()
 
+            cls.issue1.stage = 'backlog'
+
             subscription_issue1 = Subscription(
                 subscribable_id=cls.issue1.id,
                 member_id=member.id,
@@ -300,7 +302,7 @@ class TestIssue(LocalApplicationTestCase):
                 query=dict(responseTime=ISSUE_RESPONSE_TIME)
             )
             assert status == 200
-            assert len(response.json) == 1
+            assert len(response.json) == 3
 
             when(
                 'Filter by multi statuses',
@@ -516,8 +518,8 @@ class TestIssue(LocalApplicationTestCase):
             when('Sort by response time', query=dict(sort='responseTime'))
             assert status == 200
             assert len(response.json) == 4
-            assert response.json[0]['id'] == self.issue1.id
-            assert response.json[1]['id'] == self.issue4.id
+            assert response.json[0]['id'] == self.issue4.id
+            assert response.json[1]['id'] == self.issue2.id
 
             when(
                 'Reverse sort by response time',
@@ -525,8 +527,8 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert status == 200
             assert len(response.json) == 4
-            assert response.json[3]['id'] == self.issue1.id
-            assert response.json[2]['id'] == self.issue3.id
+            assert response.json[3]['id'] == self.issue3.id
+            assert response.json[2]['id'] == self.issue2.id
 
             when(
                 'Filter by phase id and sort by phase title',
