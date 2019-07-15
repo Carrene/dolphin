@@ -58,3 +58,23 @@ class BatchController(ModelRestController):
 
         return batch
 
+    @authorize
+    @json
+    @Batch.validate(fields=dict(
+        issueIds=dict(
+            required=StatusIssueIdNotInForm,
+            type_=(int, StatusInvalidIssueIdType),
+            not_none=StatusIssueIdIsNull,
+        )
+    ))
+    @commit
+    def remove(self):
+        issue = DBSession.query(Issue).get(context.form.get('issueIds'))
+        if issue is None:
+            raise StatusIssueNotFound()
+
+        batch_id = issue.batch_id
+        issue.batch_id = None
+        batch = DBSession.query(Batch).get(batch_id)
+        return batch
+
