@@ -280,6 +280,20 @@ class ItemController(ModelRestController):
 
         return item
 
+    @authorize
+    @json(prevent_form='709 Form Not Allowed')
+    @commit
+    def extend(self, id):
+        id = int_or_notfound(id)
+
+        item = DBSession.query(Item).get(id)
+        if not item:
+            raise HTTPNotFound()
+
+        item.need_estimate_timestamp = datetime.now()
+
+        return item
+
 
 class ItemDailyreportController(ModelRestController):
     __model__ = Dailyreport
