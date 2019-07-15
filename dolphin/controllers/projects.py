@@ -42,6 +42,10 @@ class ProjectController(ModelRestController):
             project = self._get_project(remaining_paths[0])
             return IssueController(project)(*remaining_paths[2:])
 
+        if len(remaining_paths) > 1 and remaining_paths[1] == 'batches':
+            project = self._get_project(remaining_paths[0])
+            return ProjectBatchesController(project)(*remaining_paths[2:])
+
         return super().__call__(*remaining_paths)
 
     def _get_project(self, id):
@@ -476,4 +480,19 @@ class ProjectController(ModelRestController):
             raise HTTPNotFound()
 
         return project
+
+class ProjectBatchesController(ModelRestController):
+    __model__ = Batch
+
+    def __init__(self, project):
+        self.project = project
+
+    @authorize
+    @json
+    @Batch.expose
+    def list(self):
+        query = DBSession.query(Batch) \
+            .filter(Batch.project_id == self.project.id)
+
+        return query
 
