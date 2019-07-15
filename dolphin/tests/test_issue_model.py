@@ -644,7 +644,200 @@ def test_issue_response_time(db):
             assert issue1.response_time is not None
 
             issue1.stage = 'backlog'
+<<<<<<< HEAD
+            assert issue1.origin == 'backlog'
+
+
+def test_issue_is_done(db):
+    session = db()
+    session.expire_on_commit = True
+
+    with AuditLogContext(dict()):
+        member1 = Member(
+            title='First Member',
+            email='member1@example.com',
+            access_token='access token 1',
+            reference_id=2,
+        )
+        session.add(member1)
+        session.commit()
+
+        workflow = Workflow(title='Default')
+        skill = Skill(title='First Skill')
+        group = Group(title='default')
+
+        release = Release(
+            title='My first release',
+            cutoff='2030-2-20',
+            launch_date='2030-2-20',
+            manager=member1,
+            room_id=0,
+            group=group,
+        )
+
+        project = Project(
+            release=release,
+            workflow=workflow,
+            group=group,
+            manager=member1,
+            title='My first project',
+            room_id=1,
+        )
+
+        with Context(dict()):
+            context.identity = member1
+
+            issue1 = Issue(
+                project=project,
+                title='First issue',
+                days=1,
+                room_id=2,
+            )
+            session.add(issue1)
+            session.commit()
+
+            issue2 = Issue(
+                project=project,
+                title='Secend issue',
+                days=1,
+                room_id=2,
+            )
+            session.add(issue2)
+            session.commit()
+
+            phase1 = Phase(
+                title='backlog',
+                order=-1,
+                workflow=workflow,
+                skill=skill,
+            )
+            session.add(phase1)
+            session.flush()
+
+            issue_phase = IssuePhase(
+                issue_id=issue1.id,
+                phase_id=phase1.id,
+            )
+            session.add(issue_phase)
+
+            issue_phase2 = IssuePhase(
+                issue_id=issue2.id,
+                phase_id=phase1.id,
+            )
+            session.add(issue_phase)
+            session.add(issue_phase2)
+            session.flush()
+
+            item = Item(
+                issue_phase_id=issue_phase.id,
+                member_id=member1.id,
+                start_date=datetime.strptime('2019-1-2', '%Y-%m-%d'),
+                end_date=datetime.strptime('2019-2-2', '%Y-%m-%d'),
+                estimated_hours=5,
+                is_done=True,
+            )
+            session.add(item)
+
+            item3 = Item(
+                issue_phase_id=issue_phase2.id,
+                member_id=member1.id,
+                start_date=datetime.strptime('2019-1-2', '%Y-%m-%d'),
+                end_date=datetime.strptime('2019-2-2', '%Y-%m-%d'),
+                estimated_hours=5,
+                is_done=False,
+            )
+            session.add(item)
+            session.add(item3)
+
+            phase2 = Phase(
+                workflow=workflow,
+                title='Test',
+                order=2,
+                skill=skill,
+            )
+            session.add(phase2)
+            session.flush()
+
+            issue_phase1 = IssuePhase(
+                issue_id=issue1.id,
+                phase_id=phase2.id,
+            )
+            session.add(issue_phase1)
+            session.flush()
+
+            item2 = Item(
+                issue_phase_id=issue_phase1.id,
+                member_id=member1.id,
+                start_date=datetime.strptime('2020-2-2', '%Y-%m-%d'),
+                end_date=datetime.strptime('2020-2-3', '%Y-%m-%d'),
+                estimated_hours=4,
+                is_done=True,
+            )
+            session.add(item2)
+            session.commit()
+
+
+            assert issue1.is_done == True
+            assert issue2.is_done == False
+
+
+def test_issue_response_time(db):
+    session = db()
+    session.expire_on_commit = True
+
+    with AuditLogContext(dict()):
+        member1 = Member(
+            title='First Member',
+            email='member1@example.com',
+            access_token='access token 1',
+            reference_id=2,
+        )
+        session.add(member1)
+        session.commit()
+
+        workflow = Workflow(title='Default')
+        skill = Skill(title='First Skill')
+        group = Group(title='default')
+
+        release = Release(
+            title='My first release',
+            cutoff='2030-2-20',
+            launch_date='2030-2-20',
+            manager=member1,
+            room_id=0,
+            group=group,
+        )
+
+        project = Project(
+            release=release,
+            workflow=workflow,
+            group=group,
+            manager=member1,
+            title='My first project',
+            room_id=1,
+        )
+
+        with Context(dict()):
+            context.identity = member1
+
+            issue1 = Issue(
+                project=project,
+                title='First issue',
+                days=1,
+                room_id=2,
+            )
+            session.add(issue1)
+=======
+>>>>>>> Enhance item model
+            session.commit()
+
+            assert issue1.response_time is not None
+
+<<<<<<< HEAD
+            issue1.stage = 'backlog'
             session.commit()
 
             assert issue1.response_time == None
 
+=======
+>>>>>>> Enhance item model
