@@ -637,15 +637,14 @@ def test_issue_response_time(db):
                 title='First issue',
                 days=1,
                 room_id=2,
-                stage='backlog',
             )
             session.add(issue1)
             session.commit()
 
-            assert issue1.response_time == None
+            assert issue1.response_time is not None
 
-            issue1.stage = 'triage'
+            issue1.stage = 'backlog'
             session.commit()
 
-            assert issue1.response_time is not None
+            assert issue1.response_time == None
 
