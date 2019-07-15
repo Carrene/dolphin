@@ -3,8 +3,8 @@ from nanohttp.contexts import Context
 from restfulpy.orm import DBSession
 from sqlalchemy_media import StoreManager
 
-from .models import Resource, Phase, Member, Organization, OrganizationMember, \
-    Skill, Workflow
+from .models import Resource, Phase, Member, Organization, \
+    OrganizationMember, Skill, Workflow
 
 
 def insert(): # pragma: no cover
@@ -14,23 +14,6 @@ def insert(): # pragma: no cover
     skill = DBSession.query(Skill) \
         .filter(Skill.title == 'Project Manager') \
         .one()
-
-    workflow = DBSession.query(Workflow) \
-        .filter(Workflow.title == 'Default') \
-        .one()
-
-    phase1 = Phase(
-        title='First Phase',
-        order=1,
-        workflow_id=workflow.id,
-        skill_id=skill.id,
-    )
-    phase2 = Phase(
-        title='Second Phase',
-        order=2,
-        workflow_id=workflow.id,
-        skill_id=skill.id,
-    )
 
     with Context(dict()), StoreManager(DBSession):
         god = DBSession.query(Member).filter(Member.title == 'GOD').one()
@@ -44,7 +27,6 @@ def insert(): # pragma: no cover
         organization = DBSession.query(Organization) \
             .filter(Organization.title == 'carrene') \
             .one()
-        phase = DBSession.query(Phase).filter(Phase.title == 'Backlog').one()
 
         resource1 = Resource(
             id=2,
