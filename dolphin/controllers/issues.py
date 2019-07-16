@@ -441,9 +441,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         )
         DBSession.add(item)
 
-        if self._is_first_phase(phase):
-            item.need_estimate_timestamp = datetime.now()
-
         subscription = DBSession.query(Subscription) \
             .filter(
                 Subscription.subscribable_id == issue.id,
@@ -456,6 +453,25 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 member_id=member.id
             )
             DBSession.add(subscription)
+
+        need_estimate_phase = DBSession.query(Phase) \
+            .filter(Phase.id == issue._need_estimated_phase_id) \
+            .one_or_none()
+
+        # Set and unset Items response time related to Issue
+        if need_estimate_phase is None or need_estimate_phase == phase.id:
+            item.need_estimate_timestamp = datetime.now()
+
+        elif need_estimate_phase.order > phase.order:
+            item.need_estimate_timestamp = datetime.now()
+
+            for item in DBSession.query(Item) \
+                    .join(IssuePhase, IssuePhase.id == Item.issue_phase_id) \
+                    .filter(
+                        IssuePhase.phase_id == issue._need_estimated_phase_id
+                    ):
+
+                item.need_estimate_timestamp = None
 
         AuditLogContext.append(
             user=context.identity.email,
