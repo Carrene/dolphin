@@ -86,7 +86,12 @@ class TestIssue(LocalApplicationTestCase):
                 issue_id=cls.issue1.id,
                 related_issue_id=cls.issue3.id
             )
+            related_issue1 = RelatedIssue(
+                issue_id=cls.issue3.id,
+                related_issue_id=cls.issue1.id
+            )
             session.add(related_issue)
+            session.add(related_issue1)
             session.commit()
 
     def test_relate(self):
@@ -101,6 +106,11 @@ class TestIssue(LocalApplicationTestCase):
             assert status == 200
             assert response.json['id'] == self.issue1.id
             assert len(response.json['relations']) == 2
+
+            session = self.create_session()
+            assert session.query(Issue) \
+                .filter(Issue.id == self.issue2.id) \
+                .first().relations[0]
 
             when(
                 'Intended project with string type not found',
