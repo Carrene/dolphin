@@ -7,7 +7,7 @@ from restfulpy.testing import db
 from sqlalchemy.orm import aliased
 
 from dolphin.models import Item, Project, Member, Workflow, Group, Release,  \
-    Skill, Phase, Issue, IssuePhase, Dailyreport
+    Specialty, Phase, Issue, IssuePhase, Dailyreport
 
 
 def test_issue_due_date(db):
@@ -25,7 +25,7 @@ def test_issue_due_date(db):
         session.commit()
 
         workflow = Workflow(title='Default')
-        skill = Skill(title='First Skill')
+        specialty = Specialty(title='First Specialty')
         group = Group(title='default')
 
         release = Release(
@@ -74,7 +74,7 @@ def test_issue_due_date(db):
                 workflow=workflow,
                 title='Backlog',
                 order=1,
-                skill=skill,
+                specialty=specialty,
             )
             session.add(phase1)
 
@@ -82,7 +82,7 @@ def test_issue_due_date(db):
                 workflow=workflow,
                 title='Test',
                 order=2,
-                skill=skill,
+                specialty=specialty,
             )
             session.add(phase1)
 
@@ -90,7 +90,7 @@ def test_issue_due_date(db):
                 workflow=workflow,
                 title='Development',
                 order=3,
-                skill=skill,
+                specialty=specialty,
             )
             session.add(phase1)
             session.flush()
@@ -170,7 +170,7 @@ def test_issue_lead_phase(db):
         session.commit()
 
         workflow = Workflow(title='Default')
-        skill = Skill(title='First Skill')
+        specialty = Specialty(title='First Specialty')
         group = Group(title='default')
 
         release = Release(
@@ -219,7 +219,7 @@ def test_issue_lead_phase(db):
                 workflow=workflow,
                 title='Backlog',
                 order=1,
-                skill=skill,
+                specialty=specialty,
             )
             session.add(phase1)
 
@@ -227,7 +227,7 @@ def test_issue_lead_phase(db):
                 workflow=workflow,
                 title='Test',
                 order=2,
-                skill=skill,
+                specialty=specialty,
             )
             session.add(phase1)
 
@@ -235,7 +235,7 @@ def test_issue_lead_phase(db):
                 workflow=workflow,
                 title='Development',
                 order=3,
-                skill=skill,
+                specialty=specialty,
             )
             session.add(phase1)
             session.flush()
@@ -313,7 +313,7 @@ def test_issue_status(db):
         session.commit()
 
         workflow = Workflow(title='Default')
-        skill = Skill(title='First Skill')
+        specialty = Specialty(title='First Specialty')
         group = Group(title='default')
 
         release = Release(
@@ -356,7 +356,7 @@ def test_issue_status(db):
                 title='backlog',
                 order=-1,
                 workflow=workflow,
-                skill=skill,
+                specialty=specialty,
             )
             session.add(phase1)
             session.flush()
@@ -421,7 +421,7 @@ def test_issue_origin(db):
         session.commit()
 
         workflow = Workflow(title='Default')
-        skill = Skill(title='First Skill')
+        specialty = Specialty(title='First Specialty')
         group = Group(title='default')
 
         release = Release(
@@ -475,7 +475,7 @@ def test_issue_is_done(db):
         session.commit()
 
         workflow = Workflow(title='Default')
-        skill = Skill(title='First Skill')
+        specialty = Specialty(title='First Specialty')
         group = Group(title='default')
 
         release = Release(
@@ -521,7 +521,7 @@ def test_issue_is_done(db):
                 title='backlog',
                 order=-1,
                 workflow=workflow,
-                skill=skill,
+                specialty=specialty,
             )
             session.add(phase1)
             session.flush()
@@ -565,7 +565,7 @@ def test_issue_is_done(db):
                 workflow=workflow,
                 title='Test',
                 order=2,
-                skill=skill,
+                specialty=specialty,
             )
             session.add(phase2)
             session.flush()
@@ -608,7 +608,7 @@ def test_issue_response_time(db):
         session.commit()
 
         workflow = Workflow(title='Default')
-        skill = Skill(title='First Skill')
+        specialty = Specialty(title='First Specialty')
         group = Group(title='default')
 
         release = Release(
@@ -662,7 +662,7 @@ def test_issue_is_done(db):
         session.commit()
 
         workflow = Workflow(title='Default')
-        skill = Skill(title='First Skill')
+        specialty = Specialty(title='First Specialty')
         group = Group(title='default')
 
         release = Release(
@@ -708,7 +708,7 @@ def test_issue_is_done(db):
                 title='backlog',
                 order=-1,
                 workflow=workflow,
-                skill=skill,
+                specialty=specialty,
             )
             session.add(phase1)
             session.flush()
@@ -752,7 +752,7 @@ def test_issue_is_done(db):
                 workflow=workflow,
                 title='Test',
                 order=2,
-                skill=skill,
+                specialty=specialty,
             )
             session.add(phase2)
             session.flush()
@@ -795,7 +795,7 @@ def test_issue_response_time(db):
         session.commit()
 
         workflow = Workflow(title='Default')
-        skill = Skill(title='First Skill')
+        specialty = Specialty(title='First Specialty')
         group = Group(title='default')
 
         release = Release(

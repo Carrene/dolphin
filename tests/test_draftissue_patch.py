@@ -4,7 +4,7 @@ from nanohttp import context
 from nanohttp.contexts import Context
 
 from dolphin.models import Issue, Project, Workflow, Phase, Tag, \
-    Organization, DraftIssue, Group, Release, Skill, Resource
+    Organization, DraftIssue, Group, Release, Specialty, Resource
 from .helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server
 
@@ -20,7 +20,7 @@ class TestIssue(LocalApplicationTestCase):
             title='First Organization'
         )
 
-        skill = Skill(title='Project Manager')
+        specialty = Specialty(title='Project Manager')
 
         cls.member = Resource(
             title='First Member',
@@ -28,20 +28,20 @@ class TestIssue(LocalApplicationTestCase):
             access_token='access token 1',
             phone=123456789,
             reference_id=1,
-            skill=skill,
+            specialty=specialty,
         )
         session.add(cls.member)
         session.commit()
 
         workflow = Workflow(title='Default')
-        skill = Skill(title='First Skill')
+        specialty = Specialty(title='First Specialty')
         group = Group(title='default')
 
         phase1 = Phase(
             title='Backlog',
             order=-1,
             workflow=workflow,
-            skill=skill
+            specialty=specialty
         )
         session.add(phase1)
 
@@ -49,7 +49,7 @@ class TestIssue(LocalApplicationTestCase):
             title='Triage',
             order=0,
             workflow=workflow,
-            skill=skill
+            specialty=specialty
         )
         session.add(phase2)
 

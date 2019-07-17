@@ -142,9 +142,9 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         back_populates='members',
         protected=False,
     )
-    skills = relationship(
-        'Skill',
-        secondary='skill_member',
+    specialtys = relationship(
+        'Specialty',
+        secondary='specialty_member',
         back_populates='members',
         protected=False,
     )
@@ -208,9 +208,9 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             watermark='lorem ipsum',
         )
         yield MetadataField(
-            name='skills',
-            key='skills',
-            label='Skills',
+            name='specialtys',
+            key='specialtys',
+            label='Specialtys',
             required=False,
             readonly=True,
             example='lorem ipsum',

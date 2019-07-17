@@ -5,7 +5,7 @@ from bddrest import status, response, when, given
 from nanohttp.contexts import Context
 from nanohttp import context
 
-from dolphin.models import Resource, Group, Workflow, Skill, Phase, Release, \
+from dolphin.models import Resource, Group, Workflow, Specialty, Phase, Release, \
     Project, Issue, Item, Dailyreport, IssuePhase
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
 
@@ -18,14 +18,14 @@ class TestListPhaseSummary(LocalApplicationTestCase):
         session = cls.create_session()
 
         workflow = Workflow(title='Default')
-        skill1 = Skill(title='First Skill')
-        skill2 = Skill(title='Second Skill')
+        specialty1 = Specialty(title='First Specialty')
+        specialty2 = Specialty(title='Second Specialty')
 
         cls.phase1 = Phase(
             title='backlog',
             order=4,
             workflow=workflow,
-            skill=skill1
+            specialty=specialty1
         )
         session.add(cls.phase1)
 
@@ -35,7 +35,7 @@ class TestListPhaseSummary(LocalApplicationTestCase):
             access_token='access token 1',
             phone=222222222,
             reference_id=2,
-            skills=[skill1],
+            specialtys=[specialty1],
         )
         session.add(cls.resource1)
 
@@ -45,7 +45,7 @@ class TestListPhaseSummary(LocalApplicationTestCase):
             access_token='access token 2',
             phone=333333333,
             reference_id=3,
-            skills=[skill1],
+            specialtys=[specialty1],
         )
         session.add(cls.resource2)
 
@@ -55,7 +55,7 @@ class TestListPhaseSummary(LocalApplicationTestCase):
             access_token='access token 3',
             phone=444444444,
             reference_id=4,
-            skills=[skill2]
+            specialtys=[specialty2]
         )
         session.add(cls.resource3)
         session.commit()

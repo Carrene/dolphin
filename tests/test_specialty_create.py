@@ -1,10 +1,10 @@
 from bddrest import status, response, when, Remove, Update
 
-from dolphin.models import Member, Skill
+from dolphin.models import Member, Specialty
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
-class TestSkill(LocalApplicationTestCase):
+class TestSpecialty(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
@@ -19,23 +19,23 @@ class TestSkill(LocalApplicationTestCase):
         )
         session.add(cls.member)
 
-        cls.skill = Skill(
+        cls.specialty = Specialty(
             title='Already-added',
         )
-        session.add(cls.skill)
+        session.add(cls.specialty)
         session.commit()
 
     def test_create(self):
         self.login(self.member.email)
-        title = 'first skill'
+        title = 'first specialty'
 
         with oauth_mockup_server(), self.given(
-            'Creating a skill',
-            '/apiv1/skills',
+            'Creating a specialty',
+            '/apiv1/specialtys',
             'CREATE',
             json=dict(
                 title=title,
-                description='A description for skill',
+                description='A description for specialty',
             ),
         ):
             assert status == 200
@@ -55,7 +55,7 @@ class TestSkill(LocalApplicationTestCase):
 
             when(
                 'Trying to pass with repetitive title',
-                json=dict(title=self.skill.title),
+                json=dict(title=self.specialty.title),
             )
             assert status == '600 Repetitive Title'
 

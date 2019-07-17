@@ -17,7 +17,7 @@ from .invitation import Invitation
 from .draft_issue import DraftIssue, DraftIssueTag, DraftIssueIssue
 from .tag import Tag
 from .attachment import Attachment
-from .skill import Skill, SkillMember
+from .specialty import Specialty, SpecialtyMember
 from .activity import Activity
 from .eventtype import EventType
 from .dailyreport import Dailyreport

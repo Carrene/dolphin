@@ -3,18 +3,18 @@ from restfulpy.controllers import ModelRestController, RestController
 from restfulpy.authorization import authorize
 from restfulpy.orm import DBSession, commit
 
-from ..models import Workflow, Phase, Skill
+from ..models import Workflow, Phase, Specialty
 from .phases import PhaseController
 from ..validators import workflow_create_validator, workflow_update_validator, \
     phase_update_validator, phase_validator
 from ..exceptions import StatusRepetitiveTitle, StatusRepetitiveOrder, \
-    StatusSkillNotFound
+    StatusSpecialtyNotFound
 
 
 FORM_WHITELIST_PHASE = [
     'title',
     'order',
-    'skillId',
+    'specialtyId',
     'description',
 ]
 
@@ -147,10 +147,10 @@ class WorkflowPhaseController(RestController):
                 and is_repetitive_order is not None:
             raise StatusRepetitiveOrder()
 
-        if 'skillId' in form and not DBSession.query(Skill) \
-                .filter(Skill.id == form.get('skillId')) \
+        if 'specialtyId' in form and not DBSession.query(Specialty) \
+                .filter(Specialty.id == form.get('specialtyId')) \
                 .one_or_none():
-            raise StatusSkillNotFound()
+            raise StatusSpecialtyNotFound()
 
         phase.update_from_request()
         return phase
@@ -172,7 +172,7 @@ class WorkflowPhaseController(RestController):
         phase = Phase()
         phase.update_from_request()
         phase.workflow = self.workflow
-        phase.skill_id = form['skillId']
+        phase.specialty_id = form['specialtyId']
         DBSession.add(phase)
         return phase
 

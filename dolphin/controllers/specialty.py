@@ -3,10 +3,10 @@ from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 
-from ..models import Skill, SkillMember
-from ..exceptions import StatusAlreadyGrantedSkill, StatusSkillNotGrantedYet, \
+from ..models import Specialty, SpecialtyMember
+from ..exceptions import StatusAlreadyGrantedSpecialty, StatusSpecialtyNotGrantedYet, \
     StatusRepetitiveTitle
-from ..validators import skill_create_validator, skill_update_validator
+from ..validators import specialty_create_validator, specialty_update_validator
 
 
 FORM_WHITELIST = [
@@ -18,8 +18,8 @@ FORM_WHITELIST = [
 FORM_WHITELISTS_STRING = ', '.join(FORM_WHITELIST)
 
 
-class SkillController(ModelRestController):
-    __model__ = Skill
+class SpecialtyController(ModelRestController):
+    __model__ = Specialty
 
     @authorize
     @json(
@@ -30,13 +30,13 @@ class SkillController(ModelRestController):
             f'{FORM_WHITELISTS_STRING}'
         )
     )
-    @skill_create_validator
+    @specialty_create_validator
     @commit
     def create(self):
-        skill = Skill()
-        skill.update_from_request()
-        DBSession.add(skill)
-        return skill
+        specialty = Specialty()
+        specialty.update_from_request()
+        DBSession.add(specialty)
+        return specialty
 
     @authorize
     @json(
@@ -47,39 +47,39 @@ class SkillController(ModelRestController):
             f'{FORM_WHITELISTS_STRING}'
         )
     )
-    @skill_update_validator
+    @specialty_update_validator
     @commit
     def update(self, id):
         id = int_or_notfound(id)
-        skill = DBSession.query(Skill).get(id)
-        if skill is None:
+        specialty = DBSession.query(Specialty).get(id)
+        if specialty is None:
             raise HTTPNotFound()
 
-        if DBSession.query(Skill) \
+        if DBSession.query(Specialty) \
                 .filter(
-                    Skill.title == context.form['title'],
-                    Skill.id != id
+                    Specialty.title == context.form['title'],
+                    Specialty.id != id
                 ) \
                 .one_or_none():
             raise StatusRepetitiveTitle()
 
-        skill.update_from_request()
-        DBSession.add(skill)
-        return skill
+        specialty.update_from_request()
+        DBSession.add(specialty)
+        return specialty
 
     @authorize
     @json(prevent_form='709 Form Not Allowed')
     def get(self, id):
         id = int_or_notfound(id)
-        skill = DBSession.query(Skill).get(id)
-        if skill is None:
+        specialty = DBSession.query(Specialty).get(id)
+        if specialty is None:
             raise HTTPNotFound()
 
-        return skill
+        return specialty
 
     @authorize
     @json(prevent_form='709 Form Not Allowed')
-    @Skill.expose
+    @Specialty.expose
     def list(self):
-        return DBSession.query(Skill)
+        return DBSession.query(Specialty)
 

@@ -20,10 +20,10 @@ class TeamResource(DeclarativeBase):
 class Resource(Member):
     __mapper_args__ = {'polymorphic_identity': 'resource'}
 
-    skill_id = Field(
+    specialty_id = Field(
         Integer,
-        ForeignKey('skill.id'),
-        label='Skills',
+        ForeignKey('specialty.id'),
+        label='Specialtys',
         required=True,
         nullable=True,
         not_none=False,
@@ -34,8 +34,8 @@ class Resource(Member):
         back_populates='resources',
         protected=True
     )
-    skill = relationship(
-        'Skill',
+    specialty = relationship(
+        'Specialty',
         back_populates='resources',
         protected=True
     )

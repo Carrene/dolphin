@@ -1,6 +1,6 @@
 from bddrest import when, response, status
 
-from dolphin.models import Workflow, Phase, Resource, Skill
+from dolphin.models import Workflow, Phase, Resource, Specialty
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -11,15 +11,15 @@ class TestResource(LocalApplicationTestCase):
         session = cls.create_session()
 
         workflow = Workflow(title='Default')
-        skill1 = Skill(title='First Skill')
+        specialty1 = Specialty(title='First Specialty')
 
-        skill2 = Skill(title='Second Skill')
+        specialty2 = Specialty(title='Second Specialty')
 
         cls.phase1 = Phase(
             title='backlog',
             order=-1,
             workflow=workflow,
-            skill=skill1
+            specialty=specialty1
         )
         session.add(cls.phase1)
 
@@ -27,7 +27,7 @@ class TestResource(LocalApplicationTestCase):
             title='backend',
             order=-2,
             workflow=workflow,
-            skill=skill2
+            specialty=specialty2
         )
         session.add(phase2)
 
@@ -37,7 +37,7 @@ class TestResource(LocalApplicationTestCase):
             access_token='access token 1',
             phone=222222222,
             reference_id=2,
-            skills=[skill1],
+            specialtys=[specialty1],
         )
         session.add(cls.resource1)
 
@@ -47,7 +47,7 @@ class TestResource(LocalApplicationTestCase):
             access_token='access token 2',
             phone=333333333,
             reference_id=3,
-            skills=[skill1],
+            specialtys=[specialty1],
         )
         session.add(resource2)
 
@@ -57,7 +57,7 @@ class TestResource(LocalApplicationTestCase):
             access_token='access token 3',
             phone=444444444,
             reference_id=4,
-            skill=skill2
+            specialty=specialty2
         )
         session.add(resource3)
         session.commit()

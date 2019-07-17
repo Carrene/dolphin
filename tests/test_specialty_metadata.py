@@ -3,12 +3,12 @@ from bddrest.authoring import status, response
 from .helpers import LocalApplicationTestCase
 
 
-class TestSkill(LocalApplicationTestCase):
+class TestSpecialty(LocalApplicationTestCase):
 
     def test_metadata(self):
         with self.given(
             'Test metadata verb',
-            '/apiv1/skills',
+            '/apiv1/specialtys',
             'METADATA'
         ):
             assert status == 200

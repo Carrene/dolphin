@@ -6,13 +6,13 @@ from restfulpy.orm import DBSession, commit
 from sqlalchemy_media import store_manager
 from sqlalchemy import or_
 
-from ..models import Member, Skill, SkillMember, Organization, \
+from ..models import Member, Specialty, SpecialtyMember, Organization, \
     OrganizationMember, Group, GroupMember
-from ..exceptions import StatusAlreadyGrantedSkill, StatusSkillNotGrantedYet, \
+from ..exceptions import StatusAlreadyGrantedSpecialty, StatusSpecialtyNotGrantedYet, \
     StatusQueryParameterNotInFormOrQueryString
 from ..validators import search_member_validator
 from .organization import OrganizationController
-from .skill import SkillController
+from .specialty import SpecialtyController
 
 
 class MemberController(ModelRestController):
@@ -33,14 +33,14 @@ class MemberController(ModelRestController):
             return MemberOrganizationController(member=member) \
                 (*remaining_paths[2:])
 
-        if len(remaining_paths) > 1 and remaining_paths[1] == 'skills':
+        if len(remaining_paths) > 1 and remaining_paths[1] == 'specialtys':
 
             id = int_or_notfound(remaining_paths[0])
             member = DBSession.query(Member).get(id)
             if member is None:
                 raise HTTPNotFound()
 
-            return MemberSkillController(member=member)(*remaining_paths[2:])
+            return MemberSpecialtyController(member=member)(*remaining_paths[2:])
 
         if len(remaining_paths) > 1 and remaining_paths[1] == 'groups':
             id = int_or_notfound(remaining_paths[0])
@@ -90,8 +90,8 @@ class MemberController(ModelRestController):
         return query
 
 
-class MemberSkillController(ModelRestController):
-    __model__ = Skill
+class MemberSpecialtyController(ModelRestController):
+    __model__ = Specialty
 
     def __init__(self, member):
         self.member = member
@@ -101,52 +101,52 @@ class MemberSkillController(ModelRestController):
     @commit
     def grant(self, id):
         id = int_or_notfound(id)
-        skill = DBSession.query(Skill).get(id)
-        if skill is None:
+        specialty = DBSession.query(Specialty).get(id)
+        if specialty is None:
             raise HTTPNotFound()
 
-        if DBSession.query(SkillMember) \
+        if DBSession.query(SpecialtyMember) \
                 .filter(
-                    SkillMember.skill_id == id,
-                    SkillMember.member_id == self.member.id
+                    SpecialtyMember.specialty_id == id,
+                    SpecialtyMember.member_id == self.member.id
                 ) \
                 .one_or_none():
-            raise StatusAlreadyGrantedSkill()
+            raise StatusAlreadyGrantedSpecialty()
 
-        skill_member = SkillMember(
-            skill_id=id,
+        specialty_member = SpecialtyMember(
+            specialty_id=id,
             member_id=self.member.id,
         )
-        DBSession.add(skill_member)
-        return skill
+        DBSession.add(specialty_member)
+        return specialty
 
     @authorize
     @json
     @commit
     def deny(self, id):
         id = int_or_notfound(id)
-        skill = DBSession.query(Skill).get(id)
-        if skill is None:
+        specialty = DBSession.query(Specialty).get(id)
+        if specialty is None:
             raise HTTPNotFound()
 
-        if not DBSession.query(SkillMember) \
+        if not DBSession.query(SpecialtyMember) \
                 .filter(
-                    SkillMember.skill_id == id,
-                    SkillMember.member_id == self.member.id
+                    SpecialtyMember.specialty_id == id,
+                    SpecialtyMember.member_id == self.member.id
                 ) \
                 .one_or_none():
-            raise StatusSkillNotGrantedYet()
+            raise StatusSpecialtyNotGrantedYet()
 
-        skill.members.remove(self.member)
-        return skill
+        specialty.members.remove(self.member)
+        return specialty
 
     @authorize
     @json(prevent_form='709 Form Not Allowed')
-    @Skill.expose
+    @Specialty.expose
     def list(self):
-        return DBSession.query(Skill) \
-            .join(SkillMember, Skill.id == SkillMember.skill_id) \
-            .filter(SkillMember.member_id == self.member.id)
+        return DBSession.query(Specialty) \
+            .join(SpecialtyMember, Specialty.id == SpecialtyMember.specialty_id) \
+            .filter(SpecialtyMember.member_id == self.member.id)
 
 
 class MemberOrganizationController(ModelRestController):

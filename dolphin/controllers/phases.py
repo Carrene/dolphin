@@ -5,17 +5,17 @@ from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 
 from ..validators  import phase_validator
-from ..models import Phase, Member, Workflow, Skill
+from ..models import Phase, Member, Workflow, Specialty
 from .resource import ResourceController
 from ..validators import phase_update_validator
-from ..exceptions import StatusRepetitiveTitle, StatusSkillNotFound, \
+from ..exceptions import StatusRepetitiveTitle, StatusSpecialtyNotFound, \
     StatusRepetitiveOrder
 
 
 FORM_WHITELIST = [
     'title',
     'order',
-    'skillId',
+    'specialtyId',
     'description',
 ]
 

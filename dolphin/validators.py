@@ -259,9 +259,9 @@ def tag_exists_validator(title, project, field):
     return title
 
 
-def skill_exists_validator(title, project, field):
-    skill = DBSession.query(Skill).filter(Skill.title == title).one_or_none()
-    if skill is not None:
+def specialty_exists_validator(title, project, field):
+    specialty = DBSession.query(Specialty).filter(Specialty.title == title).one_or_none()
+    if specialty is not None:
         raise StatusRepetitiveTitle()
 
     return title
@@ -720,7 +720,7 @@ draft_issue_relate_validator = validate(
 )
 
 
-skill_create_validator = validate(
+specialty_create_validator = validate(
     description=dict(
         max_length=(
             512, StatusMaxLenghtForDescription(512),
@@ -730,12 +730,12 @@ skill_create_validator = validate(
         required=StatusTitleNotInForm,
         not_none=StatusTitleIsNull,
         max_length=(50, StatusMaxLenghtForTitle(50)),
-        callback=skill_exists_validator,
+        callback=specialty_exists_validator,
     ),
 )
 
 
-skill_update_validator = validate(
+specialty_update_validator = validate(
     description=dict(
         max_length=(
             512, StatusMaxLenghtForDescription(512),
@@ -762,8 +762,8 @@ workflow_update_validator = validate(
 
 
 phase_update_validator = validate(
-    skillId=dict(
-        type_=(int, StatusInvalidSkillIdType),
+    specialtyId=dict(
+        type_=(int, StatusInvalidSpecialtyIdType),
     ),
     order=dict(
         type_=(int, StatusInvalidOrderType),

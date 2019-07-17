@@ -9,7 +9,7 @@ from ..backends import ChatClient
 from ..exceptions import StatusRoomMemberAlreadyExist, StatusChatRoomNotFound, \
     StatusIssueBugMustHaveRelatedIssue
 from ..models import Issue, Phase, Item, Member, DraftIssue, DraftIssueTag, \
-    Tag, Skill, Resource, IssueTag, RelatedIssue, DraftIssueIssue
+    Tag, Specialty, Resource, IssueTag, RelatedIssue, DraftIssueIssue
 from ..validators import draft_issue_finalize_validator, \
     draft_issue_define_validator, draft_issue_relate_validator
 from .tag import TagController

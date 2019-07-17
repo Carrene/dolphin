@@ -1,6 +1,6 @@
 from bddrest import status, response, when, given, Update
 
-from dolphin.models import Member, Phase, Skill
+from dolphin.models import Member, Phase, Specialty
 from .helpers import create_workflow, LocalApplicationTestCase, \
     oauth_mockup_server
 
@@ -20,11 +20,11 @@ class TestPhase(LocalApplicationTestCase):
         )
         session.add(cls.member)
 
-        cls.skill1 = Skill(title='skill 1')
-        session.add(cls.skill1)
+        cls.specialty1 = Specialty(title='specialty 1')
+        session.add(cls.specialty1)
 
-        cls.skill2 = Skill(title='skill 1')
-        session.add(cls.skill2)
+        cls.specialty2 = Specialty(title='specialty 1')
+        session.add(cls.specialty2)
 
         cls.workflow = create_workflow()
         session.add(cls.workflow)
@@ -32,7 +32,7 @@ class TestPhase(LocalApplicationTestCase):
         cls.phase1 = Phase(
             title='phase 1',
             order=1,
-            skill=cls.skill1,
+            specialty=cls.specialty1,
             workflow=cls.workflow,
             description='Description for phase 1',
         )
@@ -41,7 +41,7 @@ class TestPhase(LocalApplicationTestCase):
         cls.phase2 = Phase(
             title='phase 2',
             order=2,
-            skill=cls.skill1,
+            specialty=cls.specialty1,
             workflow=cls.workflow,
             description='Description for phase 2',
         )
@@ -61,7 +61,7 @@ class TestPhase(LocalApplicationTestCase):
             f'UPDATE',
             json=dict(
                 title=new_title,
-                skillId=self.skill2.id,
+                specialtyId=self.specialty2.id,
                 order=new_order,
                 description=new_description,
             ),
@@ -70,10 +70,10 @@ class TestPhase(LocalApplicationTestCase):
             assert response.json['id'] is not None
             assert response.json['title'] == new_title
             assert response.json['order'] == new_order
-            assert response.json['skillId'] == self.skill2.id
+            assert response.json['specialtyId'] == self.specialty2.id
             assert response.json['description'] == new_description
 
-            when('Skill id not in form', json=given - 'skillId')
+            when('Specialty id not in form', json=given - 'specialtyId')
             assert status == 200
 
             when(
@@ -125,16 +125,16 @@ class TestPhase(LocalApplicationTestCase):
             assert status == 404
 
             when(
-                'Skill is not found',
-                json=given | dict(skillId=0),
+                'Specialty is not found',
+                json=given | dict(specialtyId=0),
             )
-            assert status == '645 Skill Not Found'
+            assert status == '645 Specialty Not Found'
 
             when(
-                'Skill id type is wrong',
-                json=given | dict(skillId='not-integer'),
+                'Specialty id type is wrong',
+                json=given | dict(specialtyId='not-integer'),
             )
-            assert status == '788 Invalid Skill Id Type'
+            assert status == '788 Invalid Specialty Id Type'
 
             when('Request is not authorized', authorization=None)
             assert status == 401

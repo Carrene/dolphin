@@ -1,10 +1,10 @@
 from bddrest import when, response, status
 
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
-from dolphin.models import Skill, Member, SkillMember
+from dolphin.models import Specialty, Member, SpecialtyMember
 
 
-class TestSkill(LocalApplicationTestCase):
+class TestSpecialty(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
@@ -18,30 +18,30 @@ class TestSkill(LocalApplicationTestCase):
         )
         session.add(cls.member)
 
-        skill1 = Skill(
-            title='first skill',
+        specialty1 = Specialty(
+            title='first specialty',
             members=[cls.member],
         )
-        session.add(skill1)
+        session.add(specialty1)
 
-        skill2 = Skill(
-            title='second skill',
+        specialty2 = Specialty(
+            title='second specialty',
             members=[cls.member],
         )
-        session.add(skill2)
+        session.add(specialty2)
 
-        skill3 = Skill(
-            title='thired skill',
+        specialty3 = Specialty(
+            title='thired specialty',
         )
-        session.add(skill3)
+        session.add(specialty3)
         session.commit()
 
     def test_list(self):
         self.login(self.member.email)
 
         with oauth_mockup_server(), self.given(
-            'List of skills',
-            '/apiv1/skills',
+            'List of specialtys',
+            '/apiv1/specialtys',
             'LIST',
         ):
             assert status == 200
@@ -71,12 +71,12 @@ class TestSkill(LocalApplicationTestCase):
             when('Request is not authorized', authorization=None)
             assert status == 401
 
-    def test_list_skills_of_member(self):
+    def test_list_specialtys_of_member(self):
         self.login(self.member.email)
 
         with oauth_mockup_server(), self.given(
-            f'List of member\'s skills',
-            f'/apiv1/members/id: {self.member.id}/skills',
+            f'List of member\'s specialtys',
+            f'/apiv1/members/id: {self.member.id}/specialtys',
             f'LIST',
         ):
             assert status == 200

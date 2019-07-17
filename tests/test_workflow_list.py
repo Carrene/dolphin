@@ -1,6 +1,6 @@
 from bddrest.authoring import status, response, when
 
-from dolphin.models import Phase, Workflow, Member, Skill
+from dolphin.models import Phase, Workflow, Member, Specialty
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -27,13 +27,13 @@ class TestListWorkflow(LocalApplicationTestCase):
         workflow3 = Workflow(title='third workflow')
         session.add(workflow3)
 
-        skill = Skill(title='skill 1')
-        session.add(skill)
+        specialty = Specialty(title='specialty 1')
+        session.add(specialty)
 
         phase1 = Phase(
             title='phase 1',
             order=1,
-            skill=skill,
+            specialty=specialty,
             workflow=workflow1,
         )
         session.add(phase1)
@@ -41,7 +41,7 @@ class TestListWorkflow(LocalApplicationTestCase):
         phase2 = Phase(
             title='phase 2',
             order=2,
-            skill=skill,
+            specialty=specialty,
             workflow=workflow2,
         )
         session.add(phase2)
@@ -49,7 +49,7 @@ class TestListWorkflow(LocalApplicationTestCase):
         phase3 = Phase(
             title='phase 3',
             order=1,
-            skill=skill,
+            specialty=specialty,
             workflow=workflow3,
         )
         session.add(phase3)

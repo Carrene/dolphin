@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy import Table, Integer, Column, orm
 from sqlalchemy.ext.declarative import declarative_base
 
-from dolphin.models import Skill, Phase
+from dolphin.models import Specialty, Phase
 
 
 # revision identifiers, used by Alembic.
@@ -23,16 +23,16 @@ depends_on = None
 Base = declarative_base()
 
 
-OldSkill = Table(
-    Skill.__tablename__,
+OldSpecialty = Table(
+    Specialty.__tablename__,
     Base.metadata,
     Column('phase_id', Integer),
     Column('resource_id', Integer)
 )
 
 
-PHASE_SKILL_ID_CONSTRAINT_NAME = 'phase_skill_id_fkey'
-MEMBER_SKILL_ID_CONSTRAINT_NAME = 'member_skill_id_fkey'
+PHASE_SKILL_ID_CONSTRAINT_NAME = 'phase_specialty_id_fkey'
+MEMBER_SKILL_ID_CONSTRAINT_NAME = 'member_specialty_id_fkey'
 
 
 def upgrade():
@@ -40,40 +40,40 @@ def upgrade():
     bind = op.get_bind()
     session = orm.Session(bind=bind)
 
-    op.execute('DELETE FROM skill')
+    op.execute('DELETE FROM specialty')
 
-    op.drop_constraint('skill_phase_id_fkey', 'skill', type_='foreignkey')
-    op.drop_constraint('skill_resource_id_fkey', 'skill', type_='foreignkey')
-    op.drop_column('skill', 'phase_id')
-    op.drop_column('skill', 'resource_id')
+    op.drop_constraint('specialty_phase_id_fkey', 'specialty', type_='foreignkey')
+    op.drop_constraint('specialty_resource_id_fkey', 'specialty', type_='foreignkey')
+    op.drop_column('specialty', 'phase_id')
+    op.drop_column('specialty', 'resource_id')
 
-    op.execute('ALTER TABLE skill ADD COLUMN id SERIAL PRIMARY KEY;')
+    op.execute('ALTER TABLE specialty ADD COLUMN id SERIAL PRIMARY KEY;')
 
-    op.add_column('skill', sa.Column('title', sa.String(length=50), nullable=False))
+    op.add_column('specialty', sa.Column('title', sa.String(length=50), nullable=False))
 
-    op.add_column('member', sa.Column('skill_id', sa.Integer(), nullable=True))
+    op.add_column('member', sa.Column('specialty_id', sa.Integer(), nullable=True))
     op.create_foreign_key(
         MEMBER_SKILL_ID_CONSTRAINT_NAME,
         'member',
-        'skill',
-        ['skill_id'],
+        'specialty',
+        ['specialty_id'],
         ['id']
     )
 
-    op.add_column('phase', sa.Column('skill_id', sa.Integer(), nullable=True))
+    op.add_column('phase', sa.Column('specialty_id', sa.Integer(), nullable=True))
     op.create_foreign_key(
         PHASE_SKILL_ID_CONSTRAINT_NAME,
         'phase',
-        'skill',
-        ['skill_id'],
+        'specialty',
+        ['specialty_id'],
         ['id']
     )
 
-    default_skill = session.query(Skill) \
-        .filter(Skill.title == 'Project Manager') \
+    default_specialty = session.query(Specialty) \
+        .filter(Specialty.title == 'Project Manager') \
         .one()
 
-    op.execute(f'UPDATE phase SET skill_id = {default_skill.id}')
+    op.execute(f'UPDATE phase SET specialty_id = {default_specialty.id}')
 
     # ### end Alembic commands ###
 
@@ -89,27 +89,27 @@ def downgrade():
         'phase',
         type_='foreignkey'
     )
-    op.drop_column('phase', 'skill_id')
+    op.drop_column('phase', 'specialty_id')
 
     op.drop_constraint(
         MEMBER_SKILL_ID_CONSTRAINT_NAME,
         'member',
         type_='foreignkey'
     )
-    op.drop_column('member', 'skill_id')
+    op.drop_column('member', 'specialty_id')
 
-    op.drop_column('skill', 'title')
-    op.drop_column('skill', 'id')
+    op.drop_column('specialty', 'title')
+    op.drop_column('specialty', 'id')
 
-    op.execute('DELETE FROM skill')
+    op.execute('DELETE FROM specialty')
 
-    op.add_column('skill', sa.Column(
+    op.add_column('specialty', sa.Column(
         'resource_id',
         sa.INTEGER(),
         autoincrement=False,
         nullable=False
     ))
-    op.add_column('skill', sa.Column(
+    op.add_column('specialty', sa.Column(
         'phase_id',
         sa.INTEGER(),
         autoincrement=False,
@@ -117,15 +117,15 @@ def downgrade():
     ))
 
     op.create_foreign_key(
-        'skill_resource_id_fkey',
-        'skill',
+        'specialty_resource_id_fkey',
+        'specialty',
         'member',
         ['resource_id'],
         ['id']
     )
     op.create_foreign_key(
-        'skill_phase_id_fkey',
-        'skill',
+        'specialty_phase_id_fkey',
+        'specialty',
         'phase',
         ['phase_id'],
         ['id']

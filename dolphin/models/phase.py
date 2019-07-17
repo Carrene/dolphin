@@ -2,7 +2,7 @@ from restfulpy.orm import DeclarativeBase, Field, relationship, \
     FilteringMixin, OrderingMixin, PaginationMixin
 from sqlalchemy import Integer, String, ForeignKey
 
-from .skill import Skill
+from .specialty import Specialty
 
 
 class Phase(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
@@ -19,10 +19,10 @@ class Phase(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
         example=1,
         protected=False,
     )
-    skill_id = Field(
+    specialty_id = Field(
         Integer,
-        ForeignKey('skill.id'),
-        label='Associated Skills',
+        ForeignKey('specialty.id'),
+        label='Associated Specialtys',
         required=True,
         nullable=False,
         not_none=True,
@@ -87,8 +87,8 @@ class Phase(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
         back_populates='phase',
         protected=True
     )
-    skill = relationship(
-        'Skill',
+    specialty = relationship(
+        'Specialty',
         back_populates='phases',
         protected=True
     )

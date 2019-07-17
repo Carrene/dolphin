@@ -4,7 +4,7 @@ from restfulpy.orm import DBSession
 from sqlalchemy_media import StoreManager
 
 from .models import Release, Admin, Organization, OrganizationMember,\
-    Workflow, Phase, Tag, Group, Skill, EventType
+    Workflow, Phase, Tag, Group, Specialty, EventType
 
 
 def insert(): # pragma: no cover
@@ -14,13 +14,13 @@ def insert(): # pragma: no cover
     public_group = Group(title='Public', public=True)
     DBSession.add(public_group)
 
-    skill = Skill(title='Project Manager')
+    specialty = Specialty(title='Project Manager')
 
     phase1 = Phase(
         title='Design',
         order=1,
         workflow=default_workflow,
-        skill=skill
+        specialty=specialty
     )
     DBSession.add(phase1)
 
@@ -28,7 +28,7 @@ def insert(): # pragma: no cover
         title='Development',
         order=2,
         workflow=default_workflow,
-        skill=skill
+        specialty=specialty
     )
     DBSession.add(phase2)
 
@@ -36,7 +36,7 @@ def insert(): # pragma: no cover
         title='Test',
         order=3,
         workflow=default_workflow,
-        skill=skill
+        specialty=specialty
     )
     DBSession.add(phase3)
 

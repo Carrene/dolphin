@@ -3,7 +3,7 @@ from restfulpy.orm import Field, PaginationMixin, FilteringMixin, \
 from sqlalchemy import Integer, Unicode, select, join, DateTime, func, case
 from sqlalchemy.orm import mapper
 
-from . import Phase, Item, Resource, Dailyreport, SkillMember
+from . import Phase, Item, Resource, Dailyreport, SpecialtyMember
 from .issue_phase import IssuePhase
 
 
@@ -67,12 +67,12 @@ class AbstractResourceSummaryView(PaginationMixin, OrderingMixin,
         .select_from(
             join(
                 Resource,
-                SkillMember,
-                SkillMember.member_id == Resource.id,
+                SpecialtyMember,
+                SpecialtyMember.member_id == Resource.id,
                 isouter=True
             ).join(
                 Phase,
-                Phase.skill_id == SkillMember.skill_id
+                Phase.specialty_id == SpecialtyMember.specialty_id
             ).join(
                 item_cte,
                 item_cte.c.member_id == Resource.id,

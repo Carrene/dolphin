@@ -1,10 +1,10 @@
 from bddrest import status, response, when
 
-from dolphin.models import Member, Skill
+from dolphin.models import Member, Specialty
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
-class TestSkill(LocalApplicationTestCase):
+class TestSpecialty(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
@@ -19,23 +19,23 @@ class TestSkill(LocalApplicationTestCase):
         )
         session.add(cls.member)
 
-        cls.skill = Skill(
-            title='skill 1',
+        cls.specialty = Specialty(
+            title='specialty 1',
             description='A description',
         )
-        session.add(cls.skill)
+        session.add(cls.specialty)
         session.commit()
 
     def test_get(self):
         self.login(self.member.email)
 
         with oauth_mockup_server(), self.given(
-            f'Getting a skill',
-            f'/apiv1/skills/id: {self.skill.id}',
+            f'Getting a specialty',
+            f'/apiv1/specialtys/id: {self.specialty.id}',
             f'GET',
         ):
             assert status == 200
-            assert response.json['id'] == self.skill.id
+            assert response.json['id'] == self.specialty.id
 
             when(
                 'Intended group with string type not found',

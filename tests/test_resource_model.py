@@ -5,7 +5,7 @@ from nanohttp.contexts import Context
 from restfulpy.testing import db
 from auditor.context import Context as AuditLogContext
 
-from dolphin.models import Resource, Group, Workflow, Skill, Phase, Release, \
+from dolphin.models import Resource, Group, Workflow, Specialty, Phase, Release, \
     Project, Issue, Item, IssuePhase
 
 
@@ -62,12 +62,12 @@ def test_resource_load(db):
         workflow = Workflow(title='Default')
         session.add(workflow)
 
-        skill = Skill(title='First Skill')
+        specialty = Specialty(title='First Specialty')
         phase1 = Phase(
             title='backlog',
             order=-1,
             workflow=workflow,
-            skill=skill,
+            specialty=specialty,
         )
         session.add(phase1)
 

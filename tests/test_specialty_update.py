@@ -1,10 +1,10 @@
 from bddrest import status, response, when, Update
 
-from dolphin.models import Member, Skill
+from dolphin.models import Member, Specialty
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
-class TestSkill(LocalApplicationTestCase):
+class TestSpecialty(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
@@ -19,26 +19,26 @@ class TestSkill(LocalApplicationTestCase):
         )
         session.add(cls.member)
 
-        cls.skill1 = Skill(
+        cls.specialty1 = Specialty(
             title='Already-added',
-            description='A description for skill',
+            description='A description for specialty',
         )
-        session.add(cls.skill1)
+        session.add(cls.specialty1)
 
-        cls.skill2 = Skill(
-            title='Second skill',
-            description='A description for second skill',
+        cls.specialty2 = Specialty(
+            title='Second specialty',
+            description='A description for second specialty',
         )
-        session.add(cls.skill2)
+        session.add(cls.specialty2)
         session.commit()
 
     def test_update(self):
         self.login(self.member.email)
-        title = 'first skill'
+        title = 'first specialty'
 
         with oauth_mockup_server(), self.given(
-            'Creating a skill',
-            f'/apiv1/skills/id: {self.skill1.id}',
+            'Creating a specialty',
+            f'/apiv1/specialtys/id: {self.specialty1.id}',
             'UPDATE',
             json=dict(
                 title=title,
@@ -50,24 +50,24 @@ class TestSkill(LocalApplicationTestCase):
             assert response.json['id'] is not None
             assert response.json['description'] is not None
 
-            when('Skill not found', url_parameters=dict(id=0))
+            when('Specialty not found', url_parameters=dict(id=0))
             assert status == 404
 
             when(
-                'Intended skill with string type not found',
+                'Intended specialty with string type not found',
                 url_parameters=dict(id='Alphabetical'),
             )
             assert status == 404
 
             when(
-                'Trying to send title which intended skill already has',
+                'Trying to send title which intended specialty already has',
                 json=dict(title=title),
             )
             assert status == 200
 
             when(
-                'Title is same as title of another skill',
-                json=dict(title=self.skill2.title),
+                'Title is same as title of another specialty',
+                json=dict(title=self.specialty2.title),
             )
             assert status == '600 Repetitive Title'
 

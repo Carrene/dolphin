@@ -5,7 +5,7 @@ from bddrest import status, response, when
 from nanohttp import context
 from nanohttp.contexts import Context
 
-from dolphin.models import Project, Member, Workflow, Group, Release, Skill, \
+from dolphin.models import Project, Member, Workflow, Group, Release, Specialty, \
     Phase, Issue, Item, IssuePhase
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
 from dolphin.constants import ITEM_RESPONSE_TIME
@@ -30,14 +30,14 @@ class TestItem(LocalApplicationTestCase):
 
         workflow = Workflow(title='Default')
         session.add(workflow)
-        skill = Skill(title='First Skill')
+        specialty = Specialty(title='First Specialty')
         group = Group(title='default')
 
         cls.phase1 = Phase(
             title='backlog',
             order=-1,
             workflow=workflow,
-            skill=skill,
+            specialty=specialty,
         )
         session.add(cls.phase1)
 

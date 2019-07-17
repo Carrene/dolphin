@@ -4,15 +4,15 @@ from restfulpy.orm import DBSession
 from sqlalchemy_media import StoreManager
 
 from .models import Resource, Phase, Member, Organization, \
-    OrganizationMember, Skill, Workflow
+    OrganizationMember, Specialty, Workflow
 
 
 def insert(): # pragma: no cover
     # These mockup datas are shared between panda and dolphin.
     # The GOD id is 1.
 
-    skill = DBSession.query(Skill) \
-        .filter(Skill.title == 'Project Manager') \
+    specialty = DBSession.query(Specialty) \
+        .filter(Specialty.title == 'Project Manager') \
         .one()
 
     with Context(dict()), StoreManager(DBSession):
@@ -34,7 +34,7 @@ def insert(): # pragma: no cover
             email='user1@example.com',
             reference_id=2,
             access_token='access token 2',
-            skill_id=skill.id,
+            specialty_id=specialty.id,
         )
         DBSession.add(resource1)
         DBSession.flush()
@@ -52,7 +52,7 @@ def insert(): # pragma: no cover
             email='user2@example.com',
             reference_id=3,
             access_token='access token 3',
-            skill_id=skill.id,
+            specialty_id=specialty.id,
         )
         DBSession.add(resource2)
         DBSession.flush()
@@ -70,7 +70,7 @@ def insert(): # pragma: no cover
             email='user3@example.com',
             reference_id=4,
             access_token='access token 4',
-            skill_id=skill.id,
+            specialty_id=specialty.id,
         )
         DBSession.add(resource3)
         DBSession.flush()
@@ -88,7 +88,7 @@ def insert(): # pragma: no cover
             email='user4@example.com',
             reference_id=5,
             access_token='access token 5',
-            skill_id=skill.id,
+            specialty_id=specialty.id,
         )
         DBSession.add(resource4)
         DBSession.flush()
@@ -106,7 +106,7 @@ def insert(): # pragma: no cover
             email='user5@example.com',
             reference_id=6,
             access_token='access token 6',
-            skill_id=skill.id,
+            specialty_id=specialty.id,
         )
         DBSession.add(resource5)
         DBSession.flush()
@@ -124,7 +124,7 @@ def insert(): # pragma: no cover
             email='user6@example.com',
             reference_id=7,
             access_token='access token 7',
-            skill_id=skill.id,
+            specialty_id=specialty.id,
         )
         DBSession.add(resource6)
         DBSession.flush()
@@ -142,7 +142,7 @@ def insert(): # pragma: no cover
             email='user7@example.com',
             reference_id=8,
             access_token='access token 8',
-            skill_id=skill.id,
+            specialty_id=specialty.id,
         )
         DBSession.add(resource7)
         DBSession.flush()
@@ -160,7 +160,7 @@ def insert(): # pragma: no cover
             email='user8@example.com',
             reference_id=9,
             access_token='access token 8',
-            skill_id=skill.id,
+            specialty_id=specialty.id,
         )
         DBSession.add(resource8)
         DBSession.flush()
@@ -178,7 +178,7 @@ def insert(): # pragma: no cover
             email='user9@example.com',
             reference_id=10,
             access_token='access token 10',
-            skill_id=skill.id,
+            specialty_id=specialty.id,
         )
         DBSession.add(resource9)
         DBSession.flush()

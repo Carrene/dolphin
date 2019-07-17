@@ -123,20 +123,20 @@ class StatusMemberNotExistsInGroup(HTTPKnownStatus):
     status = '653 Member Not Exists In Group'
 
 
-class StatusAlreadyGrantedSkill(HTTPKnownStatus):
-    status = '655 Skill Already Granted'
+class StatusAlreadyGrantedSpecialty(HTTPKnownStatus):
+    status = '655 Specialty Already Granted'
 
 
-class StatusSkillNotGrantedYet(HTTPKnownStatus):
-    status = '656 Skill Not Granted Yet'
+class StatusSpecialtyNotGrantedYet(HTTPKnownStatus):
+    status = '656 Specialty Not Granted Yet'
 
 
 class StatusRepetitiveOrder(HTTPKnownStatus):
     status = '615 Repetitive Order'
 
 
-class StatusSkillNotFound(HTTPKnownStatus):
-    status = '645 Skill Not Found'
+class StatusSpecialtyNotFound(HTTPKnownStatus):
+    status = '645 Specialty Not Found'
 
 
 class StatusGroupNotFound(HTTPKnownStatus):
@@ -291,8 +291,8 @@ class StatusInvalidOrderType(HTTPKnownStatus):
     status = '741 Invalid Order Type'
 
 
-class StatusInvalidSkillIdType(HTTPKnownStatus):
-    status = '788 Invalid Skill Id Type'
+class StatusInvalidSpecialtyIdType(HTTPKnownStatus):
+    status = '788 Invalid Specialty Id Type'
 
 
 class StatusOrderNotInForm(HTTPKnownStatus):
