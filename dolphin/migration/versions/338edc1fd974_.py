@@ -17,6 +17,7 @@ depends_on = None
 
 
 def upgrade():
+    import pudb; pudb.set_trace()  # XXX BREAKPOINT
     op.create_table(
         'specialty',
         sa.Column('id', sa.Integer(), nullable=False),
@@ -33,19 +34,14 @@ def upgrade():
         sa.PrimaryKeyConstraint('specialty_id', 'member_id'),
     )
 
-    op.add_column(
-        'member',
-        sa.Column('specialty_id',sa.Integer(), nullable=True)
+    op.execute(
+        'ALTER TABLE phase RENAME COLUMN skill_id TO specialty_id;'
     )
     op.create_foreign_key(
         None,
         'member',
         'specialty',
         ['specialty_id'], ['id'],
-    )
-    op.add_column(
-        'phase',
-        sa.Column('specialty_id', sa.Integer(), nullable=False)
     )
     op.create_foreign_key(
         None,
