@@ -459,6 +459,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             .one_or_none()
 
         # Set and unset Items response time related to Issue
+        # More description: https://github.com/Carrene/dolphin/issues/1021
         if need_estimate_phase is None or need_estimate_phase.id == phase.id:
             item.need_estimate_timestamp = datetime.now()
 
@@ -540,6 +541,8 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             .where(Item.estimated_hours == None) \
         ).one()
 
+        # Set and unset Items response time related to Issue
+        # More description: https://github.com/Carrene/dolphin/issues/1021
         if need_estimate_phase.id == phase.id and \
                 (related_items_count == 0 or are_related_items_estimated):
 
