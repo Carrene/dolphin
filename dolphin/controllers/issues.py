@@ -521,16 +521,16 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         member = DBSession.query(Member).get(context.form.get('memberId'))
         phase = DBSession.query(Phase).get(context.form.get('phaseId'))
 
-        need_estimate_phase = DBSession.query(Phase)\
+        need_estimate_phase = DBSession.query(Phase) \
             .get(issue._need_estimated_phase_id)
 
         related_items_count = DBSession.query(func.count(Item.id)) \
-                .join(IssuePhase, IssuePhase.id == Item.issue_phase_id) \
-                .filter(IssuePhase.id == issue_phase.id) \
-                .filter(Item.id != item.id) \
-                .scalar()
+            .join(IssuePhase, IssuePhase.id == Item.issue_phase_id) \
+            .filter(IssuePhase.id == issue_phase.id) \
+            .filter(Item.id != item.id) \
+            .scalar()
 
-        are_related_items_estimated = DBSession.query(
+        are_related_items_estimated, = DBSession.query(
             ~exists() \
             .select_from(
                 join(Item, IssuePhase, IssuePhase.id == Item.issue_phase_id)
@@ -538,7 +538,7 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
             .where(IssuePhase.id == issue_phase.id) \
             .where(Item.id != item.id) \
             .where(Item.estimated_hours == None) \
-        )
+        ).one()
 
         if need_estimate_phase.id == phase.id and \
                 (related_items_count == 0 or are_related_items_estimated):

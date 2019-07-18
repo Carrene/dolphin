@@ -1,5 +1,7 @@
+from datetime import datetime, timedelta
+
 from auditor.context import Context as AuditLogContext
-from bddrest import status, when, response, Update, Remove
+from bddrest import status, when, response, Update, Remove, given
 from nanohttp import context
 from nanohttp.contexts import Context
 
@@ -25,16 +27,33 @@ class TestIssue(LocalApplicationTestCase):
         session.add(cls.member)
         session.commit()
 
+        cls.member2 = Member(
+            title='Second Member',
+            email='member2@example.com',
+            access_token='access token 2',
+            phone=123456788,
+            reference_id=2
+        )
+        session.add(cls.member2)
+
         workflow = Workflow(title='Default')
         specialty = Specialty(title='First Specialty')
 
         cls.phase1 = Phase(
-            title='Backlog',
-            order=-1,
+            title='design',
+            order=1,
             workflow=workflow,
             specialty=specialty,
         )
         session.add(cls.phase1)
+
+        cls.phase2 = Phase(
+            title='developement',
+            order=2,
+            workflow=workflow,
+            skill=skill,
+        )
+        session.add(cls.phase2)
 
         group = Group(title='Default')
 
@@ -87,24 +106,59 @@ class TestIssue(LocalApplicationTestCase):
                 phase=cls.phase1,
             )
 
-            item = Item(
+            item1 = Item(
                 issue_phase=issue_phase1,
                 member_id=cls.member.id,
             )
-            session.add(item)
+            session.add(item1)
+
+            item2 = Item(
+                issue_phase=issue_phase1,
+                member_id=cls.member2.id,
+                start_date=datetime.now() - timedelta(days=1),
+                end_date=datetime.now() + timedelta(days=1),
+                estimated_hours=10,
+            )
+            session.add(item2)
+
+            issue_phase2 = IssuePhase(
+                issue=cls.issue1,
+                phase=cls.phase2,
+            )
+
+            item3 = Item(
+                issue_phase=issue_phase2,
+                member_id=cls.member.id,
+            )
+            session.add(item3)
             session.commit()
 
     def test_unassign(self):
         self.login(self.member.email)
+        session = self.create_session()
+        form=dict(memberId=self.member.id, phaseId=self.phase1.id)
 
         with oauth_mockup_server(), self.given(
             f'UNAssign an issue from a resource',
             f'/apiv1/issues/id: {self.issue1.id}',
             f'UNASSIGN',
-            form=dict(memberId=self.member.id, phaseId=self.phase1.id)
+            form=form,
         ):
             assert status == 200
             assert response.json['id'] == self.issue1.id
+
+            when(
+                'There is one item on need estimate phase of issue',
+                form=given | dict(memberId=self.member2.id)
+            )
+            assert status == 200
+            assert session.query(Item) \
+                .join(IssuePhase, IssuePhase.id == Item.issue_phase_id) \
+                .filter(IssuePhase.issue_id == self.issue1.id) \
+                .filter(IssuePhase.phase_id == self.phase2.id) \
+                .filter(Item.member_id == form['memberId']) \
+                .filter(Item.need_estimate_timestamp != None) \
+                .one()
 
             when(
                 'Intended issue with string type not found',
