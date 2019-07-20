@@ -31,7 +31,7 @@ class TestSpecialty(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             'Creating a specialty',
-            '/apiv1/specialtys',
+            '/apiv1/specialties',
             'CREATE',
             json=dict(
                 title=title,

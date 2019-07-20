@@ -8,7 +8,7 @@ class TestSpecialty(LocalApplicationTestCase):
     def test_metadata(self):
         with self.given(
             'Test metadata verb',
-            '/apiv1/specialtys',
+            '/apiv1/specialties',
             'METADATA'
         ):
             assert status == 200

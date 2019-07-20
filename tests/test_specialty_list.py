@@ -41,7 +41,7 @@ class TestSpecialty(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             'List of specialtys',
-            '/apiv1/specialtys',
+            '/apiv1/specialties',
             'LIST',
         ):
             assert status == 200
@@ -76,7 +76,7 @@ class TestSpecialty(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             f'List of member\'s specialtys',
-            f'/apiv1/members/id: {self.member.id}/specialtys',
+            f'/apiv1/members/id: {self.member.id}/specialties',
             f'LIST',
         ):
             assert status == 200

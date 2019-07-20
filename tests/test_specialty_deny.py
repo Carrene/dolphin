@@ -34,7 +34,7 @@ class TestSpecialty(LocalApplicationTestCase):
         with oauth_mockup_server(), self.given(
             f'Denying a specialty',
             f'/apiv1/members/member_id: {self.member.id}/' \
-            f'specialtys/specialty_id: {self.specialty.id}',
+            f'specialties/specialty_id: {self.specialty.id}',
             f'DENY',
             json=dict(
                 memberId=self.member.id,

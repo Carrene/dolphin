@@ -51,7 +51,7 @@ class Apiv1(RestController, JsonPatchControllerMixin):
     draftissues = DraftIssueController()
     resources = ResourceController()
     files = FileController()
-    specialtys = SpecialtyController()
+    specialties = SpecialtyController()
     groups = GroupController()
     activities = ActivityController()
     eventtypes = EventTypeController()

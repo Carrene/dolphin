@@ -33,7 +33,7 @@ class MemberController(ModelRestController):
             return MemberOrganizationController(member=member) \
                 (*remaining_paths[2:])
 
-        if len(remaining_paths) > 1 and remaining_paths[1] == 'specialtys':
+        if len(remaining_paths) > 1 and remaining_paths[1] == 'specialties':
 
             id = int_or_notfound(remaining_paths[0])
             member = DBSession.query(Member).get(id)

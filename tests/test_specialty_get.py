@@ -31,7 +31,7 @@ class TestSpecialty(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             f'Getting a specialty',
-            f'/apiv1/specialtys/id: {self.specialty.id}',
+            f'/apiv1/specialties/id: {self.specialty.id}',
             f'GET',
         ):
             assert status == 200
