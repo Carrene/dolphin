@@ -40,7 +40,7 @@ class TestSpecialty(LocalApplicationTestCase):
         self.login(self.member.email)
 
         with oauth_mockup_server(), self.given(
-            'List of specialtys',
+            'List of specialties',
             '/apiv1/specialties',
             'LIST',
         ):
@@ -71,11 +71,11 @@ class TestSpecialty(LocalApplicationTestCase):
             when('Request is not authorized', authorization=None)
             assert status == 401
 
-    def test_list_specialtys_of_member(self):
+    def test_list_specialties_of_member(self):
         self.login(self.member.email)
 
         with oauth_mockup_server(), self.given(
-            f'List of member\'s specialtys',
+            f'List of member\'s specialties',
             f'/apiv1/members/id: {self.member.id}/specialties',
             f'LIST',
         ):

@@ -120,11 +120,11 @@ def downgrade():
     bind = op.get_bind()
     session = orm.Session(bind=bind)
 
-    specialtys = session.query(Specialty) \
+    specialties = session.query(Specialty) \
         .join(Resource, Specialty.resource_id == Resource.id)\
         .all()
 
-    for specialty in specialtys:
+    for specialty in specialties:
         op.execute(
             f'UPDATE member SET phase_id={specialty.phase_id}'
                 f' WHERE id = {specialty.resource_id}'
