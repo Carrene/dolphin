@@ -54,13 +54,13 @@ class TestMember(LocalApplicationTestCase):
             assert fields['organizationRole']['protected'] is not None
             assert fields['organizationRole']['primaryKey'] is not None
 
-            assert fields['specialtys']['label'] is not None
-            assert fields['specialtys']['example'] is not None
-            assert fields['specialtys']['name'] is not None
-            assert fields['specialtys']['key'] is not None
-            assert fields['specialtys']['required'] is not None
-            assert fields['specialtys']['readonly'] is not None
-            assert fields['specialtys']['protected'] is not None
+            assert fields['specialties']['label'] is not None
+            assert fields['specialties']['example'] is not None
+            assert fields['specialties']['name'] is not None
+            assert fields['specialties']['key'] is not None
+            assert fields['specialties']['required'] is not None
+            assert fields['specialties']['readonly'] is not None
+            assert fields['specialties']['protected'] is not None
 
             assert fields['groups']['label'] is not None
             assert fields['groups']['example'] is not None

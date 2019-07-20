@@ -86,7 +86,7 @@ class TestOrganizationMembers(LocalApplicationTestCase):
             assert member['organizationRole'] == 'member'
             assert owner['organizationRole'] == 'owner'
 
-            assert member['specialtys'] is not None
+            assert member['specialties'] is not None
             assert member['groups'] is not None
 
             when('Trying to pass with wrong id', url_parameters=dict(id=0))

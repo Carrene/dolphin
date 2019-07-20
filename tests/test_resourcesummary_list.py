@@ -35,7 +35,7 @@ class TestListPhaseSummary(LocalApplicationTestCase):
             access_token='access token 1',
             phone=222222222,
             reference_id=2,
-            specialtys=[specialty1],
+            specialties=[specialty1],
         )
         session.add(cls.resource1)
 
@@ -45,7 +45,7 @@ class TestListPhaseSummary(LocalApplicationTestCase):
             access_token='access token 2',
             phone=333333333,
             reference_id=3,
-            specialtys=[specialty1],
+            specialties=[specialty1],
         )
         session.add(cls.resource2)
 
@@ -55,7 +55,7 @@ class TestListPhaseSummary(LocalApplicationTestCase):
             access_token='access token 3',
             phone=444444444,
             reference_id=4,
-            specialtys=[specialty2]
+            specialties=[specialty2]
         )
         session.add(cls.resource3)
         session.commit()

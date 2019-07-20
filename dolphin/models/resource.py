@@ -23,7 +23,7 @@ class Resource(Member):
     specialty_id = Field(
         Integer,
         ForeignKey('specialty.id'),
-        label='Specialtys',
+        label='Specialties',
         required=True,
         nullable=True,
         not_none=False,

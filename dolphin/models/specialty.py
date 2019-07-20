@@ -69,7 +69,7 @@ class Specialty(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase)
     members = relationship(
         'Member',
         secondary='specialty_member',
-        back_populates='specialtys',
+        back_populates='specialties',
         protected=True,
     )
 

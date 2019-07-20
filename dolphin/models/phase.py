@@ -22,7 +22,7 @@ class Phase(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
     specialty_id = Field(
         Integer,
         ForeignKey('specialty.id'),
-        label='Associated Specialtys',
+        label='Associated Specialties',
         required=True,
         nullable=False,
         not_none=True,
