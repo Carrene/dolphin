@@ -1,11 +1,11 @@
 import itsdangerous
 from nanohttp import settings
-from restfulpy.principal import BaseJwtPrincipal
+from restfulpy.principal import BaseJWTPrincipal
 
 from .exceptions import StatusTokenExpired, StatusMalformedToken
 
 
-class OrganizationInvitationToken(BaseJwtPrincipal):
+class OrganizationInvitationToken(BaseJWTPrincipal):
 
     @classmethod
     def load(cls, token):
