@@ -5,8 +5,8 @@ from nanohttp.contexts import Context
 from restfulpy.testing import db
 from auditor.context import Context as AuditLogContext
 
-from dolphin.models import Resource, Group, Workflow, Specialty, Phase, Release, \
-    Project, Issue, Item, IssuePhase
+from dolphin.models import Resource, Group, Workflow, Specialty, Phase, \
+    Release, Project, Issue, Item, IssuePhase
 
 
 def test_resource_load(db):

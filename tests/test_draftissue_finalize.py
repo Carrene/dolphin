@@ -7,8 +7,8 @@ from bddrest import status, response, Update, when, given, Remove
 
 from dolphin import Dolphin
 from dolphin.middleware_callback import callback as auditor_callback
-from dolphin.models import Issue, Project, Workflow, Phase, Tag, \
-    DraftIssue, Organization, OrganizationMember, Group, Release, Specialty, Resource
+from dolphin.models import Issue, Project, Workflow, Phase, Tag, DraftIssue, \
+    Organization, OrganizationMember, Group, Release, Specialty, Resource
 from .helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 

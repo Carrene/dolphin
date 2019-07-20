@@ -5,8 +5,8 @@ from bddrest import status, response, when
 from nanohttp import context
 from nanohttp.contexts import Context
 
-from dolphin.models import Member, Group, Workflow, Specialty, Phase, Release, \
-    Project, Issue, Item, Admin, IssuePhase, Dailyreport
+from dolphin.models import Member, Group, Workflow, Specialty, Phase, \
+    Release, Project, Issue, Item, Admin, IssuePhase, Dailyreport
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
 
 

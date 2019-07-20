@@ -5,8 +5,8 @@ from auditor.context import Context as AuditLogContext
 from nanohttp import context
 from nanohttp.contexts import Context
 
-from dolphin.models import Member, Dailyreport, Workflow, Specialty, Group, Phase, \
-    Release, Project, Issue, Item, IssuePhase
+from dolphin.models import Member, Dailyreport, Workflow, Specialty, Group, \
+    Phase, Release, Project, Issue, Item, IssuePhase
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
 
 

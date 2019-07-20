@@ -4,8 +4,8 @@ from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 
 from ..models import Specialty, SpecialtyMember
-from ..exceptions import StatusAlreadyGrantedSpecialty, StatusSpecialtyNotGrantedYet, \
-    StatusRepetitiveTitle
+from ..exceptions import StatusAlreadyGrantedSpecialty, \
+    StatusSpecialtyNotGrantedYet, StatusRepetitiveTitle
 from ..validators import specialty_create_validator, specialty_update_validator
 
 

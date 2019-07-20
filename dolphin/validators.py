@@ -260,7 +260,9 @@ def tag_exists_validator(title, project, field):
 
 
 def specialty_exists_validator(title, project, field):
-    specialty = DBSession.query(Specialty).filter(Specialty.title == title).one_or_none()
+    specialty = DBSession.query(Specialty) \
+        .filter(Specialty.title == title) \
+        .one_or_none()
     if specialty is not None:
         raise StatusRepetitiveTitle()
 
