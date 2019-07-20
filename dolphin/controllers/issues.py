@@ -99,14 +99,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         return issue
 
-    def _is_first_phase(self, phase):
-        workflow = phase.workflow
-        first_phase_order, = DBSession.query(func.min(Phase.order)) \
-            .filter(Phase.workflow_id == workflow.id) \
-            .one()
-
-        return first_phase_order == phase.order
-
     @authorize
     @json(
         prevent_empty_form='708 No Parameter Exists In The Form',
