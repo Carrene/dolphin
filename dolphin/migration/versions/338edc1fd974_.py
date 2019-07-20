@@ -1,4 +1,4 @@
-"""empty message
+"""Convert the skill model to the specialty
 
 Revision ID: 338edc1fd974
 Revises: 36e21154d542
@@ -17,7 +17,6 @@ depends_on = None
 
 
 def upgrade():
-    import pudb; pudb.set_trace()  # XXX BREAKPOINT
     op.create_table(
         'specialty',
         sa.Column('id', sa.Integer(), nullable=False),
@@ -33,74 +32,38 @@ def upgrade():
         sa.ForeignKeyConstraint(['specialty_id'], ['specialty.id'], ),
         sa.PrimaryKeyConstraint('specialty_id', 'member_id'),
     )
-
     op.execute(
-        'ALTER TABLE phase RENAME COLUMN skill_id TO specialty_id;'
+        'insert into specialty (id, title, description) '
+        'select id, title, description from skill;'
     )
+    op.execute('ALTER TABLE phase RENAME COLUMN skill_id TO specialty_id;')
+    op.execute('ALTER TABLE member RENAME COLUMN skill_id TO specialty_id;')
     op.create_foreign_key(
         None,
         'member',
         'specialty',
-        ['specialty_id'], ['id'],
+        ['specialty_id'],
+        ['id'],
     )
     op.create_foreign_key(
         None,
         'phase',
         'specialty',
-        ['specialty_id'], ['id'],
+        ['specialty_id'],
+        ['id'],
     )
-
-    op.execute(
-        'insert into specialty (id, title, description) '
-        'select id, title, description from skill;'
-    )
-
     op.execute(
         'insert into specialty_member (specialty_id, member_id) '
         'select skill_id, member_id from skill_member;'
     )
 
+    op.drop_constraint('member_skill_id_fkey', 'member', type_='foreignkey')
+    op.drop_constraint('phase_skill_id_fkey', 'phase', type_='foreignkey')
     op.drop_table('skill_member')
     op.drop_table('skill')
 
-    op.drop_constraint('member_skill_id_fkey', 'member', type_='foreignkey')
-    op.drop_column('member', 'skill_id')
-    op.drop_constraint('phase_skill_id_fkey', 'phase', type_='foreignkey')
-    op.drop_column('phase', 'skill_id')
-
 
 def downgrade():
-    op.add_column(
-        'phase',
-        sa.Column(
-            'skill_id',
-            sa.INTEGER(),
-            autoincrement=False,
-            nullable=False
-        )
-    )
-    op.drop_constraint(None, 'phase', type_='foreignkey')
-    op.create_foreign_key(
-        'phase_skill_id_fkey',
-        'phase',
-        'skill',
-        ['skill_id'],
-        ['id']
-    )
-    op.drop_column('phase', 'specialty_id')
-    op.add_column(
-        'member',
-        sa.Column('skill_id', sa.INTEGER(), autoincrement=False, nullable=True)
-    )
-    op.drop_constraint(None, 'member', type_='foreignkey')
-    op.create_foreign_key(
-        'member_skill_id_fkey',
-        'member',
-        'skill',
-        ['skill_id'],
-        ['id']
-    )
-    op.drop_column('member', 'specialty_id')
     op.create_table(
         'skill',
         sa.Column(
@@ -159,11 +122,29 @@ def downgrade():
         'insert into skill(id, title, description) '
         'select id, title, description from specialty;'
     )
-
     op.execute(
         'insert into skill_member (skill_id, member_id) '
         'select specialty_id, member_id from specialty_member;'
     )
+    op.execute('ALTER TABLE phase RENAME COLUMN specialty_id TO skill_id;')
+    op.execute('ALTER TABLE member RENAME COLUMN specialty_id TO skill_id;')
+    op.create_foreign_key(
+        'phase_skill_id_fkey',
+        'phase',
+        'skill',
+        ['skill_id'],
+        ['id']
+    )
+    op.create_foreign_key(
+        'member_skill_id_fkey',
+        'member',
+        'skill',
+        ['skill_id'],
+        ['id']
+    )
+
+    op.drop_constraint('member_specialty_id_fkey', 'member', type_='foreignkey')
+    op.drop_constraint('phase_specialty_id_fkey', 'phase', type_='foreignkey')
     op.drop_table('specialty_member')
     op.drop_table('specialty')
 
