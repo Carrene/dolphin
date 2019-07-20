@@ -6,7 +6,7 @@ from restfulpy.orm import DeclarativeBase, Field, relationship, DBSession, \
     SoftDeleteMixin, ModifiedMixin, FilteringMixin, PaginationMixin, \
     OrderingMixin
 from restfulpy.orm.metadata import MetadataField
-from restfulpy.principal import JwtRefreshToken
+from restfulpy.principal import JWTRefreshToken
 from sqlalchemy import Integer, String, Unicode, BigInteger, select, bindparam
 from sqlalchemy.orm import column_property
 
@@ -181,7 +181,7 @@ class Member(ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         ))
 
     def create_refresh_principal(self):
-        return JwtRefreshToken(dict(
+        return JWTRefreshToken(dict(
             id=self.id
         ))
 
