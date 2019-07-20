@@ -19,7 +19,7 @@ from .phases import PhaseController
 from .draft_issue import DraftIssueController
 from .files import FileController
 from .resource import ResourceController
-from .skill import SkillController
+from .specialty import SpecialtyController
 from .group import GroupController
 from .activity import ActivityController
 from .eventtype import EventTypeController
@@ -51,7 +51,7 @@ class Apiv1(RestController, JsonPatchControllerMixin):
     draftissues = DraftIssueController()
     resources = ResourceController()
     files = FileController()
-    skills = SkillController()
+    specialties = SpecialtyController()
     groups = GroupController()
     activities = ActivityController()
     eventtypes = EventTypeController()

@@ -24,12 +24,12 @@ def upgrade():
     sa.ForeignKeyConstraint(['member_id'], ['member.id'], ),
     sa.PrimaryKeyConstraint('group_id', 'member_id')
     )
-    op.create_table('skill_member',
-    sa.Column('skill_id', sa.Integer(), nullable=False),
+    op.create_table('specialty_member',
+    sa.Column('specialty_id', sa.Integer(), nullable=False),
     sa.Column('member_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['member_id'], ['member.id'], ),
-    sa.ForeignKeyConstraint(['skill_id'], ['skill.id'], ),
-    sa.PrimaryKeyConstraint('skill_id', 'member_id')
+    sa.ForeignKeyConstraint(['specialty_id'], ['specialty.id'], ),
+    sa.PrimaryKeyConstraint('specialty_id', 'member_id')
     )
     op.add_column('group', sa.Column('description', sa.Unicode(), nullable=True))
     op.add_column('tag', sa.Column('description', sa.Unicode(), nullable=True))
@@ -41,6 +41,6 @@ def downgrade():
     op.drop_column('workflow', 'description')
     op.drop_column('tag', 'description')
     op.drop_column('group', 'description')
-    op.drop_table('skill_member')
+    op.drop_table('specialty_member')
     op.drop_table('group_member')
     # ### end Alembic commands ###

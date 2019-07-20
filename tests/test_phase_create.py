@@ -1,6 +1,6 @@
 from bddrest import status, response, when, given
 
-from dolphin.models import Member, Phase, Skill, Workflow
+from dolphin.models import Member, Phase, Specialty, Workflow
 from .helpers import create_workflow, LocalApplicationTestCase, \
     oauth_mockup_server
 
@@ -20,8 +20,8 @@ class TestPhase(LocalApplicationTestCase):
         )
         session.add(cls.member)
 
-        cls.skill = Skill(title='skill 1')
-        session.add(cls.skill)
+        cls.specialty = Specialty(title='specialty 1')
+        session.add(cls.specialty)
 
         cls.workflow1 = Workflow(title='Workflow 1')
         session.add(cls.workflow1)
@@ -32,7 +32,7 @@ class TestPhase(LocalApplicationTestCase):
         cls.phase1 = Phase(
             title='phase 1',
             order=1,
-            skill=cls.skill,
+            specialty=cls.specialty,
             workflow=cls.workflow1,
         )
         session.add(cls.phase1)
@@ -40,7 +40,7 @@ class TestPhase(LocalApplicationTestCase):
         cls.phase2 = Phase(
             title='phase 2',
             order=2,
-            skill=cls.skill,
+            specialty=cls.specialty,
             workflow=cls.workflow2,
         )
         session.add(cls.phase2)
@@ -57,7 +57,7 @@ class TestPhase(LocalApplicationTestCase):
             'CREATE',
             json=dict(
                 title=title,
-                skillId=self.skill.id,
+                specialtyId=self.specialty.id,
                 order=self.phase1.order + 2,
                 description=description
             ),
@@ -66,7 +66,7 @@ class TestPhase(LocalApplicationTestCase):
             assert response.json['id'] is not None
             assert response.json['title'] == title
             assert response.json['order'] == self.phase1.order + 2
-            assert response.json['skillId'] == self.skill.id
+            assert response.json['specialtyId'] == self.specialty.id
             assert response.json['description'] == description
 
             when(

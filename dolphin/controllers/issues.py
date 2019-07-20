@@ -18,7 +18,7 @@ from ..exceptions import StatusRoomMemberAlreadyExist, \
     StatusIssueBugMustHaveRelatedIssue, StatusIssueNotFound, \
     StatusQueryParameterNotInFormOrQueryString
 from ..models import Issue, Subscription, Phase, Item, Member, Project, \
-    RelatedIssue, Subscribable, IssueTag, Tag, Resource, SkillMember, \
+    RelatedIssue, Subscribable, IssueTag, Tag, Resource, SpecialtyMember, \
     AbstractResourceSummaryView, AbstractPhaseSummaryView, IssuePhase, \
     ReturnToTriageJob
 from ..validators import update_issue_validator, assign_issue_validator, \

@@ -6,7 +6,7 @@ from nanohttp import context
 from nanohttp.contexts import Context
 
 from dolphin.models import Issue, Project, Member, Workflow, Group, Release, \
-    Item, Phase, Skill, IssuePhase
+    Item, Phase, Specialty, IssuePhase
 from .helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server
 
@@ -30,7 +30,7 @@ class TestItem(LocalApplicationTestCase):
         workflow = Workflow(title='Default')
         group = Group(title='default')
 
-        skill = Skill(title='First Skill')
+        specialty = Specialty(title='First Specialty')
         release = Release(
             title='My first release',
             description='A decription for my first release',
@@ -69,7 +69,7 @@ class TestItem(LocalApplicationTestCase):
                 workflow=workflow,
                 title='Development',
                 order=3,
-                skill=skill,
+                specialty=specialty,
             )
             session.add(cls.phase1)
             session.flush()

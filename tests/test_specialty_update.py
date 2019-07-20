@@ -1,10 +1,10 @@
-from bddrest import status, response, when, Remove, Update
+from bddrest import status, response, when, Update
 
-from dolphin.models import Member, Skill
+from dolphin.models import Member, Specialty
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
-class TestSkill(LocalApplicationTestCase):
+class TestSpecialty(LocalApplicationTestCase):
 
     @classmethod
     def mockup(cls):
@@ -19,29 +19,57 @@ class TestSkill(LocalApplicationTestCase):
         )
         session.add(cls.member)
 
-        cls.skill = Skill(
+        cls.specialty1 = Specialty(
             title='Already-added',
+            description='A description for specialty',
         )
-        session.add(cls.skill)
+        session.add(cls.specialty1)
+
+        cls.specialty2 = Specialty(
+            title='Second specialty',
+            description='A description for second specialty',
+        )
+        session.add(cls.specialty2)
         session.commit()
 
-    def test_create(self):
+    def test_update(self):
         self.login(self.member.email)
-        title = 'first skill'
+        title = 'first specialty'
 
         with oauth_mockup_server(), self.given(
-            'Creating a skill',
-            '/apiv1/skills',
-            'CREATE',
+            'Creating a specialty',
+            f'/apiv1/specialties/id: {self.specialty1.id}',
+            'UPDATE',
             json=dict(
                 title=title,
-                description='A description for skill',
+                description='Another description',
             ),
         ):
             assert status == 200
             assert response.json['title'] == title
             assert response.json['id'] is not None
             assert response.json['description'] is not None
+
+            when('Specialty not found', url_parameters=dict(id=0))
+            assert status == 404
+
+            when(
+                'Intended specialty with string type not found',
+                url_parameters=dict(id='Alphabetical'),
+            )
+            assert status == 404
+
+            when(
+                'Trying to send title which intended specialty already has',
+                json=dict(title=title),
+            )
+            assert status == 200
+
+            when(
+                'Title is same as title of another specialty',
+                json=dict(title=self.specialty2.title),
+            )
+            assert status == '600 Repetitive Title'
 
             when('Trying to pass without form parameters', json={})
             assert status == '708 Empty Form'
@@ -54,12 +82,6 @@ class TestSkill(LocalApplicationTestCase):
                 'accepted: title, description'
 
             when(
-                'Trying to pass with repetitive title',
-                json=dict(title=self.skill.title),
-            )
-            assert status == '600 Repetitive Title'
-
-            when(
                 'Title length is more than limit',
                 json=dict(title=((50 + 1) * 'a'))
             )
@@ -70,12 +92,6 @@ class TestSkill(LocalApplicationTestCase):
                 json=dict(title=None)
             )
             assert status == '727 Title Is Null'
-
-            when(
-                'Trying to pass without title',
-                json=Remove('title')
-            )
-            assert status == '710 Title Not In Form'
 
             when(
                 'Description length is more than limit',

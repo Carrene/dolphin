@@ -6,7 +6,7 @@ from nanohttp import context
 from nanohttp.contexts import Context
 
 from dolphin.models import Item, Project, Member, Workflow, Group, Release, \
-    Skill, Phase, Issue, Dailyreport, IssuePhase
+    Specialty, Phase, Issue, Dailyreport, IssuePhase
 
 
 def test_issue_phase(db):
@@ -32,7 +32,7 @@ def test_issue_phase(db):
         session.commit()
 
         workflow = Workflow(title='Default')
-        skill = Skill(title='First Skill')
+        specialty = Specialty(title='First Specialty')
         group = Group(title='default')
 
         release = Release(
@@ -82,7 +82,7 @@ def test_issue_phase(db):
                 title='des',
                 order=-1,
                 workflow=workflow,
-                skill=skill,
+                specialty=specialty,
             )
             session.add(phase1)
             session.flush()
@@ -91,7 +91,7 @@ def test_issue_phase(db):
                 title='back',
                 order=-1,
                 workflow=workflow,
-                skill=skill,
+                specialty=specialty,
             )
             session.add(phase2)
             session.flush()
@@ -100,7 +100,7 @@ def test_issue_phase(db):
                 title='front',
                 order=-1,
                 workflow=workflow,
-                skill=skill,
+                specialty=specialty,
             )
             session.add(phase3)
             session.flush()

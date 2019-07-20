@@ -1,4 +1,4 @@
-"""Group and Skill migration
+"""Group and Specialty migration
 
 Revision ID: b9ff7f16e411
 Revises: e371cfc0cb1e
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy import orm, Table, Integer, Column
 from sqlalchemy.ext.declarative import declarative_base
 
-from dolphin.models import Skill, Group, Resource
+from dolphin.models import Specialty, Group, Resource
 
 
 # revision identifiers, used by Alembic.
@@ -37,7 +37,7 @@ def upgrade():
     session = orm.Session(bind=bind)
 
     op.create_table(
-        'skill',
+        'specialty',
         sa.Column('phase_id', sa.Integer(), nullable=False),
         sa.Column('resource_id', sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(['phase_id'], ['phase.id'], ),
@@ -76,8 +76,8 @@ def upgrade():
         .all()
 
     for resource in resources:
-        skill = Skill(phase_id=resource.phase_id, resource_id=resource.id)
-        session.add(skill)
+        specialty = Specialty(phase_id=resource.phase_id, resource_id=resource.id)
+        session.add(specialty)
 
     op.execute(
         f'UPDATE project SET group_id={public_group.id}'
@@ -120,15 +120,15 @@ def downgrade():
     bind = op.get_bind()
     session = orm.Session(bind=bind)
 
-    skills = session.query(Skill) \
-        .join(Resource, Skill.resource_id == Resource.id)\
+    specialtys = session.query(Specialty) \
+        .join(Resource, Specialty.resource_id == Resource.id)\
         .all()
 
-    for skill in skills:
+    for specialty in specialtys:
         op.execute(
-            f'UPDATE member SET phase_id={skill.phase_id}'
-                f' WHERE id = {skill.resource_id}'
+            f'UPDATE member SET phase_id={specialty.phase_id}'
+                f' WHERE id = {specialty.resource_id}'
         )
 
-    op.drop_table('skill')
+    op.drop_table('specialty')
     # ### end Alembic commands ###

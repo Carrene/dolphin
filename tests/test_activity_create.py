@@ -5,7 +5,7 @@ from auditor.context import Context as AuditLogContext
 from nanohttp import context
 from nanohttp.contexts import Context
 
-from dolphin.models import Member, Skill, Phase, Release, \
+from dolphin.models import Member, Specialty, Phase, Release, \
     Project, Issue, Item, IssuePhase
 from .helpers import create_group, LocalApplicationTestCase, \
     oauth_mockup_server, create_workflow
@@ -29,13 +29,13 @@ class TestActivity(LocalApplicationTestCase):
         session.commit()
 
         workflow = create_workflow()
-        skill = Skill(title='First Skill')
+        specialty = Specialty(title='First Specialty')
 
         cls.phase1 = Phase(
             title='Backlog',
             order=-1,
             workflow=workflow,
-            skill=skill,
+            specialty=specialty,
         )
         session.add(cls.phase1)
 
@@ -43,7 +43,7 @@ class TestActivity(LocalApplicationTestCase):
             title='PreBacklog',
             order=-2,
             workflow=workflow,
-            skill=skill,
+            specialty=specialty,
         )
         session.add(phase2)
 

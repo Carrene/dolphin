@@ -7,8 +7,8 @@ from bddrest import status, response, Update, when, given, Remove
 
 from dolphin import Dolphin
 from dolphin.middleware_callback import callback as auditor_callback
-from dolphin.models import Issue, Project, Workflow, Phase, Tag, \
-    DraftIssue, Organization, OrganizationMember, Group, Release, Skill, Resource
+from dolphin.models import Issue, Project, Workflow, Phase, Tag, DraftIssue, \
+    Organization, OrganizationMember, Group, Release, Specialty, Resource
 from .helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
@@ -27,7 +27,7 @@ class TestIssue(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        skill = Skill(title='Project Manager')
+        specialty = Specialty(title='Project Manager')
 
         cls.member = Resource(
             title='First Member',
@@ -35,7 +35,7 @@ class TestIssue(LocalApplicationTestCase):
             access_token='access token 1',
             phone=123456789,
             reference_id=1,
-            skill=skill,
+            specialty=specialty,
         )
         session.add(cls.member)
         session.commit()
@@ -46,7 +46,7 @@ class TestIssue(LocalApplicationTestCase):
             title='Backlog',
             order=-1,
             workflow=workflow1,
-            skill=skill,
+            specialty=specialty,
         )
         session.add(phase1)
 
@@ -54,7 +54,7 @@ class TestIssue(LocalApplicationTestCase):
             title='Triage',
             order=0,
             workflow=workflow1,
-            skill=skill,
+            specialty=specialty,
         )
         session.add(phase2)
 

@@ -7,7 +7,7 @@ from restfulpy.testing import db
 from auditor.context import Context as AuditLogContext
 
 from dolphin.models import Item, Project, Member, Workflow, Group, Release, \
-    Skill, Phase, Issue, Dailyreport, IssuePhase
+    Specialty, Phase, Issue, Dailyreport, IssuePhase
 
 
 def test_item_perspective(db):
@@ -34,7 +34,7 @@ def test_item_perspective(db):
         session.commit()
 
         workflow = Workflow(title='Default')
-        skill = Skill(title='First Skill')
+        specialty = Specialty(title='First Specialty')
         group = Group(title='default')
         release = Release(
             title='My first release',
@@ -71,7 +71,7 @@ def test_item_perspective(db):
                 title='backlog',
                 order=-1,
                 workflow=workflow,
-                skill=skill,
+                specialty=specialty,
             )
             session.add(phase1)
             session.flush()
@@ -167,7 +167,7 @@ def test_item_hours_worked(db):
         session.commit()
 
         workflow = Workflow(title='Default')
-        skill = Skill(title='First Skill')
+        specialty = Specialty(title='First Specialty')
         group = Group(title='default')
         release = Release(
             title='My first release',
@@ -204,7 +204,7 @@ def test_item_hours_worked(db):
                 title='backlog',
                 order=-1,
                 workflow=workflow,
-                skill=skill,
+                specialty=specialty,
             )
             session.add(phase1)
             session.flush()
@@ -278,7 +278,7 @@ def test_item_status(db):
         session.commit()
 
         workflow = Workflow(title='Default')
-        skill = Skill(title='First Skill')
+        specialty = Specialty(title='First Specialty')
         group = Group(title='default')
         release = Release(
             title='My first release',
@@ -315,7 +315,7 @@ def test_item_status(db):
                 title='backlog',
                 order=-1,
                 workflow=workflow,
-                skill=skill,
+                specialty=specialty,
             )
             session.add(phase1)
             session.flush()
@@ -380,14 +380,14 @@ def test_response_time(db):
         session.commit()
 
         workflow = Workflow(title='Default')
-        skill = Skill(title='First Skill')
+        specialty = Specialty(title='First Specialty')
         group = Group(title='Example Group')
 
         phase1 = Phase(
             title='backlog',
             order=-1,
             workflow=workflow,
-            skill=skill,
+            specialty=specialty,
         )
         session.add(phase1)
 
@@ -475,7 +475,7 @@ def test_grace_period(db):
         session.commit()
 
         workflow = Workflow(title='Default')
-        skill = Skill(title='First Skill')
+        specialty = Specialty(title='First Specialty')
         group = Group(title='default')
         release = Release(
             title='My first release',
@@ -513,7 +513,7 @@ def test_grace_period(db):
                 title='backlog',
                 order=-1,
                 workflow=workflow,
-                skill=skill,
+                specialty=specialty,
             )
             session.add(phase1)
             session.flush()

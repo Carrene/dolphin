@@ -7,7 +7,7 @@ from restfulpy.testing import db
 from sqlalchemy.orm import aliased
 
 from dolphin.models import Item, Project, Member, Workflow, Group, Release,  \
-    Skill, Phase, Issue, IssuePhase, Dailyreport
+    Specialty, Phase, Issue, IssuePhase, Dailyreport
 
 
 def test_boarding(db):
@@ -26,7 +26,7 @@ def test_boarding(db):
         session.commit()
 
         workflow = Workflow(title='Default')
-        skill = Skill(title='First Skill')
+        specialty = Specialty(title='First Specialty')
         group = Group(title='default')
 
         release = Release(
@@ -76,7 +76,7 @@ def test_boarding(db):
                 workflow=workflow,
                 title='Backlog',
                 order=1,
-                skill=skill,
+                specialty=specialty,
             )
             session.add(phase1)
 
@@ -84,7 +84,7 @@ def test_boarding(db):
                 workflow=workflow,
                 title='Test',
                 order=2,
-                skill=skill,
+                specialty=specialty,
             )
             session.add(phase1)
 
@@ -92,7 +92,7 @@ def test_boarding(db):
                 workflow=workflow,
                 title='Development',
                 order=3,
-                skill=skill,
+                specialty=specialty,
             )
             session.add(phase1)
             session.flush()
