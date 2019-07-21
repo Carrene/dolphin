@@ -240,6 +240,8 @@ class ItemController(ModelRestController):
         if item.issue_phase.issue.phase_id is not None:
             item.issue_phase.issue.stage = 'working'
 
+        # Set and unset Items response time related to Issue
+        # More description: https://github.com/Carrene/dolphin/issues/1021
         if self._are_sibling_items_estimated(item.issue_phase):
             next_phase_id = DBSession.query(Phase.id) \
                 .filter(

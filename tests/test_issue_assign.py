@@ -2,6 +2,7 @@ from auditor.context import Context as AuditLogContext
 from bddrest import status, when, response, Remove, Update, given
 from nanohttp import context
 from nanohttp.contexts import Context
+from sqlalchemy import func
 
 from dolphin.models import Issue, Project, Member, Phase, Group, Workflow, \
     Release, Specialty, Subscription, Item, IssuePhase
@@ -34,25 +35,41 @@ class TestIssue(LocalApplicationTestCase):
         )
         session.add(cls.member2)
 
+        cls.member3 = Member(
+            title='Third Member',
+            email='member3@example.com',
+            access_token='access token 3',
+            reference_id=3
+        )
+        session.add(cls.member3)
+
         workflow = Workflow(title='Default')
         session.add(workflow)
 
         specialty = Specialty(title='First Specialty')
-        phase1 = Phase(
-            title='backlog',
-            order=-1,
+        cls.phase1 = Phase(
+            title='design',
+            order=1,
             workflow=workflow,
             specialty=specialty,
         )
-        session.add(phase1)
+        session.add(cls.phase1)
 
-        phase2 = Phase(
-            title='triage',
-            order=0,
+        cls.phase2 = Phase(
+            title='developement',
+            order=2,
             workflow=workflow,
             specialty=specialty,
         )
-        session.add(phase2)
+        session.add(cls.phase2)
+
+        cls.phase3 = Phase(
+            title='test',
+            order=3,
+            workflow=workflow,
+            specialty=specialty,
+        )
+        session.add(cls.phase3)
 
         group = Group(title='default')
 
@@ -94,7 +111,7 @@ class TestIssue(LocalApplicationTestCase):
         session = self.create_session()
         form = dict(
             memberId=self.member2.id,
-            phaseId=1,
+            phaseId=self.phase2.id,
             description='A description for item',
             stage='triage'
         )
@@ -120,6 +137,41 @@ class TestIssue(LocalApplicationTestCase):
                 .filter(Item.member_id == form['memberId']) \
                 .filter(Item.need_estimate_timestamp != None) \
                 .one()
+
+            when(
+                'The issue already has a need estimate phase and we are '
+                'assiging another member to issue on need estimate phase',
+                form=given | dict(memberId=self.member3.id)
+            )
+            assert status == 200
+            assert session.query(Item) \
+                .join(IssuePhase, IssuePhase.id == Item.issue_phase_id) \
+                .filter(IssuePhase.issue_id == self.issue1.id) \
+                .filter(IssuePhase.phase_id == form['phaseId']) \
+                .filter(Item.member_id == self.member3.id) \
+                .filter(Item.need_estimate_timestamp != None) \
+                .one()
+
+            when(
+                'The issue is assigned on phase with less order than issue '
+                'need estimate phase',
+                form=given | dict(phaseId=self.phase1.id)
+
+            )
+            assert status == 200
+            assert session.query(Item) \
+                .join(IssuePhase, IssuePhase.id == Item.issue_phase_id) \
+                .filter(IssuePhase.issue_id == self.issue1.id) \
+                .filter(IssuePhase.phase_id == self.phase1.id) \
+                .filter(Item.member_id == form['memberId']) \
+                .filter(Item.need_estimate_timestamp != None) \
+                .one()
+            assert session.query(func.count(Item.id)) \
+                .join(IssuePhase, IssuePhase.id == Item.issue_phase_id) \
+                .filter(IssuePhase.issue_id == self.issue1.id) \
+                .filter(IssuePhase.phase_id == self.phase2.id) \
+                .filter(Item.need_estimate_timestamp == None) \
+                .scalar() == 2
 
             when(
                 'There is invalid parameter in the form',
@@ -162,7 +214,7 @@ class TestIssue(LocalApplicationTestCase):
                 'Member id is not in form',
                 form=Remove('memberId'),
             )
-            assert len(response.json['items']) == 2
+            assert len(response.json['items']) == 4
 
             when(
                 'Member id type is not valid',

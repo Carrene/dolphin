@@ -99,14 +99,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
 
         return issue
 
-    def _is_first_phase(self, phase):
-        workflow = phase.workflow
-        first_phase_order, = DBSession.query(func.min(Phase.order)) \
-            .filter(Phase.workflow_id == workflow.id) \
-            .one()
-
-        return first_phase_order == phase.order
-
     @authorize
     @json(
         prevent_empty_form='708 No Parameter Exists In The Form',
@@ -441,9 +433,6 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         )
         DBSession.add(item)
 
-        if self._is_first_phase(phase):
-            item.need_estimate_timestamp = datetime.now()
-
         subscription = DBSession.query(Subscription) \
             .filter(
                 Subscription.subscribable_id == issue.id,
@@ -456,6 +445,26 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
                 member_id=member.id
             )
             DBSession.add(subscription)
+
+        need_estimate_phase = DBSession.query(Phase) \
+            .filter(Phase.id == issue._need_estimated_phase_id) \
+            .one_or_none()
+
+        # Set and unset Items response time related to Issue
+        # More description: https://github.com/Carrene/dolphin/issues/1021
+        if need_estimate_phase is None or need_estimate_phase.id == phase.id:
+            item.need_estimate_timestamp = datetime.now()
+
+        elif need_estimate_phase.order > phase.order:
+            item.need_estimate_timestamp = datetime.now()
+
+            for item in DBSession.query(Item) \
+                    .join(IssuePhase, IssuePhase.id == Item.issue_phase_id) \
+                    .filter(
+                        IssuePhase.phase_id == issue._need_estimated_phase_id
+                    ):
+
+                item.need_estimate_timestamp = None
 
         AuditLogContext.append(
             user=context.identity.email,
@@ -502,10 +511,59 @@ class IssueController(ModelRestController, JsonPatchControllerMixin):
         if not item:
             raise HTTPStatus('636 Not Assigned Yet')
 
-        DBSession.delete(item)
-
         member = DBSession.query(Member).get(context.form.get('memberId'))
         phase = DBSession.query(Phase).get(context.form.get('phaseId'))
+
+        need_estimate_phase = DBSession.query(Phase) \
+            .get(issue._need_estimated_phase_id)
+
+        related_items_count = DBSession.query(func.count(Item.id)) \
+            .join(IssuePhase, IssuePhase.id == Item.issue_phase_id) \
+            .filter(IssuePhase.id == issue_phase.id) \
+            .filter(Item.id != item.id) \
+            .scalar()
+
+        are_related_items_estimated, = DBSession.query(
+            ~exists() \
+            .select_from(
+                join(Item, IssuePhase, IssuePhase.id == Item.issue_phase_id)
+            ) \
+            .where(IssuePhase.id == issue_phase.id) \
+            .where(Item.id != item.id) \
+            .where(Item.estimated_hours == None) \
+        ).one()
+
+        # Set and unset Items response time related to Issue
+        # More description: https://github.com/Carrene/dolphin/issues/1021
+        if need_estimate_phase.id == phase.id and \
+                (related_items_count == 0 or are_related_items_estimated):
+
+            next_need_estimate_phase = DBSession.query(Phase) \
+                .join(IssuePhase, IssuePhase.phase_id == Phase.id) \
+                .join(Item, Item.issue_phase_id == IssuePhase.id) \
+                .filter(IssuePhase.issue_id == issue.id) \
+                .filter(Item.estimated_hours.is_(None)) \
+                .filter(Phase.order > phase.order) \
+                .order_by(Phase.order) \
+                .first()
+
+            if next_need_estimate_phase is not None:
+                for next_phase_item in DBSession.query(Item) \
+                        .join(
+                            IssuePhase,
+                            IssuePhase.id == Item.issue_phase_id
+                        ) \
+                        .filter(
+                            IssuePhase.issue_id == issue.id
+                        ) \
+                        .filter(
+                            IssuePhase.phase_id == next_need_estimate_phase.id
+                        ):
+
+                    next_phase_item.need_estimate_timestamp = datetime.now()
+
+        DBSession.delete(item)
+
         AuditLogContext.remove(
             user=context.identity.email,
             object_=issue,
