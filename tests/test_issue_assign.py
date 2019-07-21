@@ -47,9 +47,9 @@ class TestIssue(LocalApplicationTestCase):
         session.add(workflow)
 
         specialty = Specialty(title='First Specialty')
-        phase1 = Phase(
-            title='backlog',
-            order=-1,
+        cls.phase1 = Phase(
+            title='design',
+            order=1,
             workflow=workflow,
             specialty=specialty,
         )
@@ -67,7 +67,7 @@ class TestIssue(LocalApplicationTestCase):
             title='test',
             order=3,
             workflow=workflow,
-            skill=skill,
+            specialty=specialty,
         )
         session.add(cls.phase3)
 

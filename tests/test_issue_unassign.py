@@ -51,7 +51,7 @@ class TestIssue(LocalApplicationTestCase):
             title='developement',
             order=2,
             workflow=workflow,
-            skill=skill,
+            specialty=specialty,
         )
         session.add(cls.phase2)
 
