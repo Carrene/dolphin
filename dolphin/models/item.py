@@ -315,7 +315,10 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         mojo = {
             'remainingHours': self.mojo_remaining_hours,
             'boarding': self.mojo_boarding,
-            'progress': 100 if self.mojo_progress >= 100 else self.mojo_progress
+            'progress': 100 \
+                if isinstance(self.mojo_progress, int) \
+                and self.mojo_progress >= 100 \
+                else self.mojo_progress
         }
         item_dict = super().to_dict()
         item_dict['responseTime'] = self.response_time
