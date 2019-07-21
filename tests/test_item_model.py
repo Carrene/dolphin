@@ -544,3 +544,110 @@ def test_grace_period(db):
 
             assert item.grace_period < 0
 
+
+def test_mojo(db):
+    with AuditLogContext(dict()):
+        session = db()
+        session.expire_on_commit = True
+
+        member1 = Member(
+            title='First Member',
+            email='member1@example.com',
+            access_token='access token 1',
+            phone=123456789,
+            reference_id=2,
+        )
+        session.add(member1)
+        session.commit()
+
+        workflow = Workflow(title='Default')
+        specialty = Specialty(title='First Specialty')
+        group = Group(title='default')
+        release = Release(
+            title='My first release',
+            description='A decription for my first release',
+            cutoff='2030-2-20',
+            launch_date='2030-2-20',
+            manager=member1,
+            room_id=0,
+            group=group,
+        )
+        project = Project(
+            release=release,
+            workflow=workflow,
+            group=group,
+            manager=member1,
+            title='My first project',
+            description='A decription for my project',
+            room_id=1,
+        )
+
+        with Context(dict()):
+            context.identity = member1
+
+            issue1 = Issue(
+                project=project,
+                title='First issue',
+                description='This is description of first issue',
+                kind='feature',
+                days=1,
+                room_id=2,
+            )
+            session.add(issue1)
+
+            phase1 = Phase(
+                title='backlog',
+                order=-1,
+                workflow=workflow,
+                specialty=specialty,
+            )
+            session.add(phase1)
+            session.flush()
+
+            issue_phase1 = IssuePhase(
+                issue_id=issue1.id,
+                phase_id=phase1.id,
+            )
+
+            item = Item(
+                issue_phase=issue_phase1,
+                member_id=member1.id,
+                start_date=datetime.now().date() - timedelta(days=1),
+                end_date=datetime.now().date(),
+                estimated_hours=6,
+            )
+            session.add(item)
+
+            dailyreport1 = Dailyreport(
+                date=datetime.now().date() - timedelta(days=1),
+                hours=3,
+                note='The note for a daily report 1',
+                item=item,
+            )
+            session.add(dailyreport1)
+            session.commit()
+
+            assert item.mojo_remaining_hours == 3
+            assert item.mojo_progress == 50
+            assert item._days_left_to_estimate == 1
+            assert item.mojo_boarding == 'on-time'
+
+            dailyreport1.hours = 0
+            session.commit()
+            assert item.mojo_boarding == 'at-risk'
+
+            item.start_date = item.start_date - timedelta(days=1)
+            dailyreport2 = Dailyreport(
+                date=datetime.now().date() - timedelta(days=2),
+                hours=4,
+                note='The note for a daily report 2',
+                item=item,
+            )
+            session.add(dailyreport2)
+
+            item.estimated_hours = 15
+            dailyreport1.hours = 5
+            session.commit()
+
+            assert item.mojo_boarding == 'delayed'
+

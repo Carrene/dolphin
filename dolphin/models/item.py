@@ -207,6 +207,49 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         deferred=True
     )
 
+    mojo_remaining_hours = column_property(
+        select([estimated_hours - func.sum(Dailyreport.hours)]) \
+        .where(Dailyreport.item_id == id) \
+        .as_scalar()
+    )
+
+    mojo_progress = column_property(
+        select([(func.sum(Dailyreport.hours) / estimated_hours) * 100]) \
+        .where(Dailyreport.item_id == id) \
+        .as_scalar()
+    )
+
+    _days_left_to_estimate = column_property(
+        select([
+            func.date_part('days', end_date - start_date) + 1 \
+            - func.count(Dailyreport.id)
+        ]) \
+        .where(Dailyreport.item_id == id) \
+        .as_scalar()
+    )
+
+    mojo_boarding = column_property(
+        case([
+            (
+                mojo_remaining_hours > _days_left_to_estimate * (
+                    select([func.sum(Dailyreport.hours)]) \
+                    .where(Dailyreport.item_id == id) \
+                    .as_scalar()
+                ),
+                'at-risk'
+            ),
+            (
+                mojo_remaining_hours > _days_left_to_estimate * (
+                    estimated_hours / (
+                        func.date_part('days', end_date - start_date) + 1
+                    )
+                ),
+                'delayed'
+            ),
+        ], else_='on-time').label('mojo_boarding'),
+        deferred=True
+    )
+
     @hybrid_property
     def response_time(self):
         if self.need_estimate_timestamp:
@@ -269,6 +312,14 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         ])
 
     def to_dict(self):
+        mojo = {
+            'remainingHours': self.mojo_remaining_hours,
+            'boarding': self.mojo_boarding,
+            'progress': 100 \
+                if isinstance(self.mojo_progress, int) \
+                and self.mojo_progress >= 100 \
+                else self.mojo_progress
+        }
         item_dict = super().to_dict()
         item_dict['responseTime'] = self.response_time
         item_dict['hoursWorked'] = self.hours_worked
@@ -276,6 +327,7 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
         item_dict['issue'] = self.issue_phase.issue.to_dict()
         item_dict['phaseId'] = self.issue_phase.phase_id
         item_dict['status'] = self.status
+        item_dict['mojo'] = mojo
         return item_dict
 
     @classmethod
