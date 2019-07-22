@@ -12,6 +12,7 @@ from ..validators import specialty_create_validator, specialty_update_validator
 FORM_WHITELIST = [
     'title',
     'description',
+    'skillId',
 ]
 
 

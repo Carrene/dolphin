@@ -307,6 +307,16 @@ def item_exists_validator(item_id, container, field):
     return item_id
 
 
+def skill_exists_validator(title, project, field):
+    skill = DBSession.query(Skill) \
+        .filter(Skill.title == title) \
+        .one_or_none()
+    if skill is not None:
+        raise StatusRepetitiveTitle()
+
+    return title
+
+
 release_validator = validate(
     title=dict(
         required=StatusTitleNotInForm,
@@ -733,6 +743,21 @@ specialty_create_validator = validate(
         not_none=StatusTitleIsNull,
         max_length=(50, StatusMaxLenghtForTitle(50)),
         callback=specialty_exists_validator,
+    ),
+)
+
+
+skill_create_validator = validate(
+    description=dict(
+        max_length=(
+            512, StatusMaxLenghtForDescription(512),
+        ),
+    ),
+    title = dict(
+        required=StatusTitleNotInForm,
+        not_none=StatusTitleIsNull,
+        max_length=(50, StatusMaxLenghtForTitle(50)),
+        callback=skill_exists_validator,
     ),
 )
 

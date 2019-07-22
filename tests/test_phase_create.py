@@ -1,6 +1,6 @@
 from bddrest import status, response, when, given
 
-from dolphin.models import Member, Phase, Specialty, Workflow
+from dolphin.models import Member, Phase, Specialty, Workflow, Skill
 from .helpers import create_workflow, LocalApplicationTestCase, \
     oauth_mockup_server
 
@@ -20,7 +20,12 @@ class TestPhase(LocalApplicationTestCase):
         )
         session.add(cls.member)
 
-        cls.specialty = Specialty(title='specialty 1')
+        skill = Skill(title='First Skill')
+        cls.specialty = Specialty(
+            title='specialty 1',
+            skill=skill,
+        )
+
         session.add(cls.specialty)
 
         cls.workflow1 = Workflow(title='Workflow 1')

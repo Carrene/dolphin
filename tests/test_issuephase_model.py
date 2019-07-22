@@ -6,7 +6,7 @@ from nanohttp import context
 from nanohttp.contexts import Context
 
 from dolphin.models import Item, Project, Member, Workflow, Group, Release, \
-    Specialty, Phase, Issue, Dailyreport, IssuePhase
+    Specialty, Phase, Issue, Dailyreport, IssuePhase, Skill
 
 
 def test_status(db):
@@ -32,7 +32,12 @@ def test_status(db):
         session.commit()
 
         workflow = Workflow(title='Default')
-        specialty = Specialty(title='First Specialty')
+        skill = Skill(title='First Skill')
+        specialty = Specialty(
+            title='First Specialty',
+            skill=skill,
+        )
+
         group = Group(title='default')
 
         release = Release(

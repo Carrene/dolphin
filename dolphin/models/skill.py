@@ -1,26 +1,13 @@
-from auditor import observe
-from nanohttp import context
-from restfulpy.orm import Field, relationship, SoftDeleteMixin, \
-    OrderingMixin, FilteringMixin, PaginationMixin
-from restfulpy.orm.metadata import MetadataField
-from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
-    join, case, exists
-from sqlalchemy.orm import column_property
-from sqlalchemy.ext.hybrid import hybrid_property
-
-from ..mixins import ModifiedByMixin
-from .issue import Issue, Boarding
-from .member import Member
-from .subscribable import Subscribable, Subscription
+from restfulpy.orm import Field, relationship
+from sqlalchemy import Integer, String
+from restfulpy.orm import DeclarativeBase
 
 
-class Skill(Subscribable):
-    __tabelname__ = 'skill'
-    __mapper_args__ = {'polymorphic_identity': __tabelname__}
+class Skill(DeclarativeBase):
+    __tablename__ = 'skill'
 
     id = Field(
         Integer,
-        ForeignKey('subscribable.id'),
         primary_key=True,
         readonly=True,
         not_none=True,

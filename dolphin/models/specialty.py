@@ -82,7 +82,7 @@ class Specialty(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase)
     )
     skill = relationship(
         'Skill',
-        back_populates='specialty',
+        back_populates='specialties',
         protected=True
     )
 

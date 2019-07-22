@@ -4,7 +4,7 @@ from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when
 
 from dolphin.models import Issue, Project, Member, Workflow, Item, Phase, \
-    Group, Release, Specialty, Activity, IssuePhase
+    Group, Release, Specialty, Activity, IssuePhase,Skill
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -35,7 +35,11 @@ class TestActivity(LocalApplicationTestCase):
         session.commit()
 
         workflow = Workflow(title='Default')
-        specialty = Specialty(title='First Specialty')
+        skill = Skill(title='First Skill')
+        specialty = Specialty(
+            title='First Specialty',
+            skill=skill,
+        )
         group = Group(title='default')
 
         release = Release(

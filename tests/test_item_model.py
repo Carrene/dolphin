@@ -7,7 +7,7 @@ from restfulpy.testing import db
 from auditor.context import Context as AuditLogContext
 
 from dolphin.models import Item, Project, Member, Workflow, Group, Release, \
-    Specialty, Phase, Issue, Dailyreport, IssuePhase
+    Specialty, Phase, Issue, Dailyreport, IssuePhase, Skill
 
 
 def test_item_perspective(db):
@@ -34,7 +34,12 @@ def test_item_perspective(db):
         session.commit()
 
         workflow = Workflow(title='Default')
-        specialty = Specialty(title='First Specialty')
+        skill = Skill(title='First Skill')
+        specialty = Specialty(
+            title='First Specialty',
+            skill=skill,
+        )
+
         group = Group(title='default')
         release = Release(
             title='My first release',
@@ -166,7 +171,12 @@ def test_item_hours_worked(db):
         session.commit()
 
         workflow = Workflow(title='Default')
-        specialty = Specialty(title='First Specialty')
+        skill = Skill(title='First Skill')
+        specialty = Specialty(
+            title='First Specialty',
+            skill=skill,
+        )
+
         group = Group(title='default')
         release = Release(
             title='My first release',
@@ -278,7 +288,12 @@ def test_item_status(db):
         session.commit()
 
         workflow = Workflow(title='Default')
-        specialty = Specialty(title='First Specialty')
+        skill = Skill(title='First Skill')
+        specialty = Specialty(
+            title='First Specialty',
+            skill=skill,
+        )
+
         group = Group(title='default')
         release = Release(
             title='My first release',
@@ -381,7 +396,12 @@ def test_response_time(db):
         session.commit()
 
         workflow = Workflow(title='Default')
-        specialty = Specialty(title='First Specialty')
+        skill = Skill(title='First Skill')
+        specialty = Specialty(
+            title='First Specialty',
+            skill=skill,
+        )
+
         group = Group(title='Example Group')
 
         phase1 = Phase(
@@ -476,7 +496,12 @@ def test_grace_period(db):
         session.commit()
 
         workflow = Workflow(title='Default')
-        specialty = Specialty(title='First Specialty')
+        skill = Skill(title='First Skill')
+        specialty = Specialty(
+            title='First Specialty',
+            skill=skill,
+        )
+
         group = Group(title='default')
         release = Release(
             title='My first release',
@@ -562,7 +587,12 @@ def test_mojo(db):
         session.commit()
 
         workflow = Workflow(title='Default')
-        specialty = Specialty(title='First Specialty')
+        skill = Skill(title='First Skill')
+        specialty = Specialty(
+            title='First Specialty',
+            skill=skill,
+        )
+
         group = Group(title='default')
         release = Release(
             title='My first release',

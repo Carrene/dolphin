@@ -1,6 +1,6 @@
 from bddrest import status, response, when, Remove, Update
 
-from dolphin.models import Member, Specialty
+from dolphin.models import Member, Specialty, Skill
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -19,9 +19,15 @@ class TestSpecialty(LocalApplicationTestCase):
         )
         session.add(cls.member)
 
+        cls.skill = Skill(
+            title='first skill',
+        )
         cls.specialty = Specialty(
             title='Already-added',
+            skill=cls.skill,
         )
+
+        session.add(cls.skill)
         session.add(cls.specialty)
         session.commit()
 
@@ -36,12 +42,14 @@ class TestSpecialty(LocalApplicationTestCase):
             json=dict(
                 title=title,
                 description='A description for specialty',
+                skillId=self.skill.id
             ),
         ):
             assert status == 200
             assert response.json['title'] == title
             assert response.json['id'] is not None
             assert response.json['description'] is not None
+            assert response.json['skillId'] is not None
 
             when('Trying to pass without form parameters', json={})
             assert status == '708 Empty Form'
@@ -51,7 +59,7 @@ class TestSpecialty(LocalApplicationTestCase):
                 json=dict(a='a'),
             )
             assert status == '707 Invalid field, only following fields are ' \
-                'accepted: title, description'
+                'accepted: title, description, skillId'
 
             when(
                 'Trying to pass with repetitive title',
