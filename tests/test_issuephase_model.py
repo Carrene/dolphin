@@ -221,7 +221,12 @@ def test_mojo(db):
         session.commit()
 
         workflow = Workflow(title='Default')
-        specialty = Specialty(title='First Specialty')
+        skill = Skill(title='First Skill')
+        specialty = Specialty(
+            title='First Specialty',
+            skill=skill,
+        )
+
         group = Group(title='default')
 
         release = Release(
