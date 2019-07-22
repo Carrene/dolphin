@@ -55,6 +55,14 @@ class Specialty(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase)
         python_type=str,
         example='Lorem Ipsum'
     )
+    skill_id = Field(
+        Integer,
+        ForeignKey('skill.id'),
+        label='Associated Skill',
+        required=True,
+        nullable=False,
+        not_none=True,
+    )
 
     phases = relationship(
         'Phase',
@@ -71,5 +79,10 @@ class Specialty(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase)
         secondary='specialty_member',
         back_populates='specialties',
         protected=True,
+    )
+    skill = relationship(
+        'Skill',
+        back_populates='specialty',
+        protected=True
     )
 
