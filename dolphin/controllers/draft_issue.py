@@ -1,7 +1,7 @@
 from nanohttp import json, context, HTTPNotFound, HTTPUnauthorized, \
     int_or_notfound, HTTPStatus
 from restfulpy.authorization import authorize
-from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
+from restfulpy.controllers import ModelRestController, JSONPatchControllerMixin
 from restfulpy.orm import commit, DBSession
 from sqlalchemy import and_, exists
 
@@ -31,7 +31,7 @@ FORM_WHITELIST = [
 FROM_WHITELISTS_STRING = ', '.join(FORM_WHITELIST)
 
 
-class DraftIssueController(ModelRestController, JsonPatchControllerMixin):
+class DraftIssueController(ModelRestController, JSONPatchControllerMixin):
     __model__ = DraftIssue
 
     def _ensure_room(self, title, token, access_token):

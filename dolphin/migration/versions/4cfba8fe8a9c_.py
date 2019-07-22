@@ -7,7 +7,7 @@ Create Date: 2018-12-18 11:51:00.167040
 """
 from alembic import op
 import sqlalchemy as sa
-from restfulpy.orm import FakeJson
+from restfulpy.orm import FakeJSON
 
 
 # revision identifiers, used by Alembic.
@@ -47,7 +47,7 @@ def upgrade():
     sa.Column('subject', sa.Unicode(length=256), nullable=False),
     sa.Column('cc', sa.Unicode(length=100), nullable=True),
     sa.Column('bcc', sa.Unicode(length=100), nullable=True),
-    sa.Column('body', FakeJson(), nullable=False),
+    sa.Column('body', FakeJSON(), nullable=False),
     sa.Column('from_', sa.Unicode(length=100), nullable=False),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['id'], ['restfulpy_task.id'], ),

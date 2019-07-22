@@ -2,7 +2,7 @@ from os.path import abspath, dirname, join
 
 from nanohttp import json, Static
 from restfulpy.controllers import RootController, RestController, \
-    JsonPatchControllerMixin
+    JSONPatchControllerMixin
 
 import dolphin
 from .issues import IssueController
@@ -35,7 +35,7 @@ here = abspath(dirname(__file__))
 attachment_storage = abspath(join(here, '../..', 'data/assets'))
 
 
-class Apiv1(RestController, JsonPatchControllerMixin):
+class Apiv1(RestController, JSONPatchControllerMixin):
 
     releases = ReleaseController()
     projects = ProjectController()

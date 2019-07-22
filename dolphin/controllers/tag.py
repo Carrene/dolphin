@@ -1,7 +1,7 @@
 from nanohttp import json, context, HTTPNotFound, HTTPForbidden, \
     int_or_notfound
 from restfulpy.authorization import authorize
-from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
+from restfulpy.controllers import ModelRestController, JSONPatchControllerMixin
 from restfulpy.orm import DBSession, commit
 from sqlalchemy import and_, exists
 
@@ -20,7 +20,7 @@ FORM_WHITELIST = [
 FORM_WHITELISTS_STRING = ', '.join(FORM_WHITELIST)
 
 
-class TagController(ModelRestController, JsonPatchControllerMixin):
+class TagController(ModelRestController, JSONPatchControllerMixin):
     __model__ = Tag
 
     def __init__(self, draft_issue=None, issue=None):
