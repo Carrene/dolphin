@@ -89,23 +89,23 @@ class IssuePhase(DeclarativeBase):
         deferred=True
     )
 
-    maximum_end_date = select([func.max(Item.end_date)]) \
+    _maximum_end_date = select([func.max(Item.end_date)]) \
         .where(Item.issue_phase_id == id) \
         .as_scalar()
 
-    minimum_start_date = select([func.min(Item.start_date)]) \
+    _minimum_start_date = select([func.min(Item.start_date)]) \
         .where(Item.issue_phase_id == id) \
         .as_scalar()
 
-    total_estimated_hours = select([func.sum(Item.estimated_hours)]) \
+    _total_estimated_hours = select([func.sum(Item.estimated_hours)]) \
         .where(Item.issue_phase_id == id) \
         .as_scalar()
 
-    total_estimated_hours = select([func.sum(Item.estimated_hours)]) \
+    _total_estimated_hours = select([func.sum(Item.estimated_hours)]) \
         .where(Item.issue_phase_id == id) \
         .as_scalar()
 
-    total_hours_worked = select([func.sum(Dailyreport.hours)]) \
+    _total_hours_worked = select([func.sum(Dailyreport.hours)]) \
         .select_from(
             join(Item, Dailyreport, Item.id == Dailyreport.item_id, isouter=True)
         ) \
@@ -113,7 +113,7 @@ class IssuePhase(DeclarativeBase):
         .as_scalar()
 
     mojo_remaining_hours = column_property(
-        total_estimated_hours - total_hours_worked
+        _total_estimated_hours - _total_hours_worked
     )
 
     mojo_progress = column_property(
@@ -127,7 +127,7 @@ class IssuePhase(DeclarativeBase):
         .as_scalar()
     )
 
-    total_days_length = column_property(
+    _total_days_length = column_property(
         select([
             func.sum(
                 func.date_part('days', Item.end_date - Item.start_date) + 1
@@ -147,13 +147,13 @@ class IssuePhase(DeclarativeBase):
         case([
             (
                 mojo_remaining_hours > _days_left_to_estimate * (
-                    total_hours_worked
+                    _total_hours_worked
                 ),
                 'at-risk'
             ),
             (
                 mojo_remaining_hours > _days_left_to_estimate * (
-                    total_estimated_hours / total_days_length
+                    _total_estimated_hours / _total_days_length
                 ),
                 'delayed'
             ),
