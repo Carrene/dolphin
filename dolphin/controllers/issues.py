@@ -7,7 +7,7 @@ from nanohttp import HTTPStatus, json, context, HTTPNotFound, \
     HTTPUnauthorized, int_or_notfound, settings, validate, HTTPNoContent, \
     action
 from restfulpy.authorization import authorize
-from restfulpy.controllers import ModelRestController, JsonPatchControllerMixin
+from restfulpy.controllers import ModelRestController, JSONPatchControllerMixin
 from restfulpy.orm import DBSession, commit
 from restfulpy.mule import MuleTask, worker
 from sqlalchemy import and_, exists, select, func, join, or_, Text, cast
@@ -55,7 +55,7 @@ FORM_WHITELIST_STRING = ', '.join(FORM_WHITELIST)
 TRIAGE_PHASE_ID_PATTERN = re.compile(r'[(,\s]0[,\)\s]|^0$')
 
 
-class IssueController(ModelRestController, JsonPatchControllerMixin):
+class IssueController(ModelRestController, JSONPatchControllerMixin):
     __model__ = Issue
 
     def __call__(self, *remaining_paths):

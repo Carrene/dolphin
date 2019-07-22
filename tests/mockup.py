@@ -7,7 +7,7 @@ from wsgiref.simple_server import WSGIServer, WSGIRequestHandler
 
 from restfulpy.application import Application
 from restfulpy.messaging import Messenger
-from restfulpy.utils import copy_stream
+from restfulpy.helpers import copy_stream
 
 
 SERVER_LOCK = threading.Event()
