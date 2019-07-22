@@ -1,9 +1,10 @@
 from restfulpy.orm import Field, DeclarativeBase, relationship
-from sqlalchemy import Integer, ForeignKey, select, case
+from sqlalchemy import Integer, ForeignKey, select, case, func, join
 from sqlalchemy.orm import column_property
 from sqlalchemy.sql.expression import any_, all_
 
 from .item import Item
+from .dailyreport import Dailyreport
 
 
 issue_phase_statuses = [
@@ -85,6 +86,78 @@ class IssuePhase(DeclarativeBase):
                 'complete'
             ),
         ], else_='to-do').label('status'),
+        deferred=True
+    )
+
+    maximum_end_date = select([func.max(Item.end_date)]) \
+        .where(Item.issue_phase_id == id) \
+        .as_scalar()
+
+    minimum_start_date = select([func.min(Item.start_date)]) \
+        .where(Item.issue_phase_id == id) \
+        .as_scalar()
+
+    total_estimated_hours = select([func.sum(Item.estimated_hours)]) \
+        .where(Item.issue_phase_id == id) \
+        .as_scalar()
+
+    total_estimated_hours = select([func.sum(Item.estimated_hours)]) \
+        .where(Item.issue_phase_id == id) \
+        .as_scalar()
+
+    total_hours_worked = select([func.sum(Dailyreport.hours)]) \
+        .select_from(
+            join(Item, Dailyreport, Item.id == Dailyreport.item_id, isouter=True)
+        ) \
+        .where(Item.issue_phase_id == id) \
+        .as_scalar()
+
+    mojo_remaining_hours = column_property(
+        total_estimated_hours - total_hours_worked
+    )
+
+    mojo_progress = column_property(
+        select([
+            (func.sum(Dailyreport.hours) / func.sum(Item.estimated_hours)) * 100
+        ]) \
+        .select_from(
+            join(Item, Dailyreport, Item.id == Dailyreport.item_id, isouter=True)
+        ) \
+        .where(Item.issue_phase_id == id) \
+        .as_scalar()
+    )
+
+    total_days_length = column_property(
+        select([
+            func.sum(
+                func.date_part('days', Item.end_date - Item.start_date) + 1
+            )
+        ]) \
+        .where(Item.issue_phase_id == id) \
+        .as_scalar()
+    )
+
+    _days_left_to_estimate = column_property(
+        select([func.sum(Item._days_left_to_estimate)]) \
+        .where(Item.issue_phase_id == id) \
+        .as_scalar()
+    )
+
+    mojo_boarding = column_property(
+        case([
+            (
+                mojo_remaining_hours > _days_left_to_estimate * (
+                    total_hours_worked
+                ),
+                'at-risk'
+            ),
+            (
+                mojo_remaining_hours > _days_left_to_estimate * (
+                    total_estimated_hours / total_days_length
+                ),
+                'delayed'
+            ),
+        ], else_='on-time').label('mojo_boarding'),
         deferred=True
     )
 
