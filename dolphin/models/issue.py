@@ -576,6 +576,13 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             required=False,
             readonly=True,
         )
+        yield MetadataField(
+            name='NeedEstimatePhaseId',
+            key='_need_estimate_phase_id',
+            label='need estimate phase id',
+            required=False,
+            readonly=True
+        )
 
     def to_dict(self, include_relations=True):
         # The `issue` relationship on Item model is `protected=False`, So the
