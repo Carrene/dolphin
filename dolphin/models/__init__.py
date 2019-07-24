@@ -26,5 +26,4 @@ from .admin import Admin
 from .phase_summary import AbstractPhaseSummaryView
 from .resource_summary import AbstractResourceSummaryView
 from .issue_phase import IssuePhase
-from .batch import Batch
 from .returntotriagejob import ReturnToTriageJob

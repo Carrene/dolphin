@@ -9,7 +9,7 @@ from ..exceptions import StatusChatRoomNotFound, \
     StatusRoomMemberAlreadyExist, StatusRoomMemberNotFound, \
     StatusManagerNotFound, StatusSecondaryManagerNotFound
 from ..models import Project, Member, Subscription, Workflow, Group, Release, \
-    Batch, GroupMember
+    GroupMember
 from ..validators import project_validator, update_project_validator
 from .files import FileController
 from .issues import IssueController
@@ -41,10 +41,6 @@ class ProjectController(ModelRestController):
         if len(remaining_paths) > 1 and remaining_paths[1] == 'issues':
             project = self._get_project(remaining_paths[0])
             return IssueController(project)(*remaining_paths[2:])
-
-        if len(remaining_paths) > 1 and remaining_paths[1] == 'batches':
-            project = self._get_project(remaining_paths[0])
-            return ProjectBatchesController(project)(*remaining_paths[2:])
 
         return super().__call__(*remaining_paths)
 
@@ -226,9 +222,6 @@ class ProjectController(ModelRestController):
                 creator.access_token
             )
             raise
-
-        batch = Batch(title='00')
-        project.batches.append(batch)
 
         DBSession.add(project)
         return project
@@ -480,19 +473,4 @@ class ProjectController(ModelRestController):
             raise HTTPNotFound()
 
         return project
-
-class ProjectBatchesController(ModelRestController):
-    __model__ = Batch
-
-    def __init__(self, project):
-        self.project = project
-
-    @authorize
-    @json
-    @Batch.expose
-    def list(self):
-        query = DBSession.query(Batch) \
-            .filter(Batch.project_id == self.project.id)
-
-        return query
 
