@@ -183,6 +183,16 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         not_none=False,
         readonly=True,
     )
+    batch = Field(
+        Integer,
+        python_type=int,
+        label='Batch',
+        minimum=1,
+        maximum=1000,
+        nullable=True,
+        not_none=False,
+        required=False
+    )
     attachments = relationship('Attachment', lazy='selectin')
     tags = relationship(
         'Tag',
