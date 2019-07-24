@@ -167,8 +167,3 @@ class TestIssue(LocalApplicationTestCase):
             assert fields['lastMovingTime']['readonly'] is not None
             assert fields['lastMovingTime']['protected'] is not None
 
-            assert fields['batchTitle']['label'] is not None
-            assert fields['batchTitle']['name'] is not None
-            assert fields['batchTitle']['required'] is not None
-            assert fields['batchTitle']['readonly'] is not None
-
