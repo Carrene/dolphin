@@ -559,9 +559,9 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             readonly=True,
         )
         yield MetadataField(
-            name='NeedEstimatePhaseId',
-            key='_need_estimate_phase_id',
-            label='need estimate phase id',
+            name='NeedEstimatedPhaseId',
+            key='_need_estimated_phase_id',
+            label='need estimated phase id',
             required=False,
             readonly=True
         )
