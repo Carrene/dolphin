@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from auditor.context import Context as AuditLogContext
 from nanohttp import context
@@ -874,4 +874,87 @@ def test_issue_response_time(db):
             session.commit()
 
             assert issue1.response_time == None
+
+
+def test_issue_boarding(db):
+    session = db()
+    session.expire_on_commit = True
+
+    with AuditLogContext(dict()):
+        member1 = Member(
+            title='First Member',
+            email='member1@example.com',
+            access_token='access token 1',
+            reference_id=2,
+        )
+        session.add(member1)
+        session.commit()
+
+        workflow = Workflow(title='Default')
+        specialty = Specialty(title='First Specialty')
+        group = Group(title='default')
+
+        release = Release(
+            title='My first release',
+            cutoff='2030-2-20',
+            launch_date='2030-2-20',
+            manager=member1,
+            room_id=0,
+            group=group,
+        )
+
+        project = Project(
+            release=release,
+            workflow=workflow,
+            group=group,
+            manager=member1,
+            title='My first project',
+            room_id=1,
+        )
+
+        with Context(dict()):
+            context.identity = member1
+
+            issue1 = Issue(
+                project=project,
+                title='First issue',
+                days=1,
+                room_id=2,
+                stage='on-hold',
+            )
+            session.add(issue1)
+            session.commit()
+
+            assert issue1.boarding == 'frozen'
+
+            issue1.stage = 'triage'
+            session.commit()
+
+            assert issue1.boarding == 'on-time'
+
+            phase1 = Phase(
+                workflow=workflow,
+                title='Backlog',
+                order=1,
+                specialty=specialty,
+            )
+            session.add(phase1)
+
+            issue_phase1 = IssuePhase(
+                issue=issue1,
+                phase=phase1,
+            )
+            session.add(issue_phase1)
+
+            item1 = Item(
+                issue_phase=issue_phase1,
+                member_id=member1.id,
+                start_date=datetime.now() - timedelta(days=2),
+                end_date=datetime.now() - timedelta(days=1),
+                estimated_hours=4,
+            )
+            session.add(item1)
+            session.commit()
+
+            assert issue1.boarding == 'delayed'
 
