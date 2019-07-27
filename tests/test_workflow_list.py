@@ -32,7 +32,6 @@ class TestListWorkflow(LocalApplicationTestCase):
             title='First Specialty',
             skill=skill,
         )
-
         session.add(specialty)
 
         phase1 = Phase(
