@@ -479,4 +479,3 @@ class ProjectController(ModelRestController):
 
         return project
 
-
