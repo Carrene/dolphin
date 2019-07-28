@@ -110,7 +110,7 @@ class TestIssue(LocalApplicationTestCase):
             session = self.create_session()
             assert session.query(Issue) \
                 .filter(Issue.id == self.issue2.id) \
-                .first().relations[0]
+                .first().relations[0].id == self.issue1.id
 
             when(
                 'Intended project with string type not found',
