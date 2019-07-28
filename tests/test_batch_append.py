@@ -1,10 +1,12 @@
+from datetime import datetime
+
 from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when, given
 from nanohttp.contexts import Context
 from nanohttp import context
 
 from dolphin.models import Workflow, Group, Release, Member, Issue, \
-    Project
+    Project, ReturnToTriageJob
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -65,9 +67,24 @@ class TestBatch(LocalApplicationTestCase):
                 days=1,
                 room_id=2,
             )
+            cls.issue3 = Issue(
+                title='third issue',
+                description='This is description of third issue',
+                kind='feature',
+                days=1,
+                room_id=2,
+                stage='backlog',
+                batch=1,
+            )
 
             cls.project1.issues.append(cls.issue1)
             cls.project1.issues.append(cls.issue2)
+            cls.project1.issues.append(cls.issue3)
+            cls.returntotriage = ReturnToTriageJob(
+                at=datetime.now(),
+                issue=cls.issue3,
+            )
+            session.add(cls.returntotriage)
             session.commit()
 
     def test_append(self):
@@ -84,11 +101,9 @@ class TestBatch(LocalApplicationTestCase):
             )
         ):
             assert status == 200
-            assert response.json['id'] is not None
-            assert response.json['title'] == title
+            assert response.json['id'] == title
             assert response.json['projectId'] == self.project1.id
-            assert self.issue1.id in response.json['issueIds']
-            assert len(response.json['issueIds']) == 1
+            assert len(response.json['issueIds']) == 2
 
             when(
                 'Trying to pass without issue id',
@@ -115,12 +130,6 @@ class TestBatch(LocalApplicationTestCase):
             assert status == '605 Issue Not Found: 0'
 
             when(
-                'Inended batch with integer type not found',
-                url_parameters=dict(id=101)
-            )
-            assert status == '936 Invalid Batch More Than 100'
-
-            when(
                 'Inended batch with string type not found',
                 url_parameters=dict(id='Alaphabet')
             )
@@ -128,23 +137,4 @@ class TestBatch(LocalApplicationTestCase):
 
             when('Request is not authorized', authorization=None)
             assert status == 401
-
-            session = self.create_session()
-            assert session.query(Batch) \
-                .filter(Batch.project_id == self.project1.id) \
-                .order_by(Batch.id.desc()) \
-                .first() != self.batch2
-
-            when(
-                'Appending a batch',
-                url_parameters=dict(id=self.batch1.title),
-                json=dict(issueIds=self.issue2.id)
-
-            )
-            assert response.json['id'] is not None
-            assert response.json['title'] == self.batch1.title
-            assert response.json['projectId'] == self.project1.id
-            assert self.issue2.id in response.json['issueIds']
-            assert len(response.json['issueIds']) == 1
-
 

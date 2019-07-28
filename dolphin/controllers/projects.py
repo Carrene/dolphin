@@ -45,7 +45,6 @@ class ProjectController(ModelRestController):
 
         if len(remaining_paths) > 1 and remaining_paths[1] == 'batches':
             project = self._get_project(remaining_paths[0])
-            import pudb; pudb.set_trace()  # XXX BREAKPOINT
             return BatchController(project)(*remaining_paths[2:])
 
         return super().__call__(*remaining_paths)

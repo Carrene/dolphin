@@ -617,7 +617,10 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
     @classmethod
     def __declare_last__(cls):
         super().__declare_last__()
-        observe(cls, ['modified_at', 'project_id', 'modified_by'])
+        observe(
+            cls,
+            ['modified_at', 'project_id', 'modified_by', 'returntotriagejobs']
+        )
 
     def get_room_title(self):
         return f'{self.title.lower()}-{self.project_id}'
