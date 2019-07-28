@@ -84,7 +84,6 @@ class TestBatch(LocalApplicationTestCase):
                 at=datetime.now(),
                 issue=cls.issue3,
             )
-            session.add(cls.returntotriage)
             session.commit()
 
     def test_append(self):
