@@ -92,7 +92,7 @@ class TestBatch(LocalApplicationTestCase):
         title = 1
 
         with oauth_mockup_server(), self.given(
-            'Appending a batch',
+            'Appending a batch that have before',
             f'/apiv1/projects/{self.project1.id}/batches/id: {title}',
             'APPEND',
             json=dict(
@@ -103,6 +103,16 @@ class TestBatch(LocalApplicationTestCase):
             assert response.json['id'] == title
             assert response.json['projectId'] == self.project1.id
             assert len(response.json['issueIds']) == 2
+
+            when(
+                'Appending a batch without have before',
+                url_parameters=dict(id=2),
+                json=dict(issueIds=self.issue2.id),
+            )
+            assert status == 200
+            assert response.json['id'] == 2
+            assert response.json['projectId'] == self.project1.id
+            assert len(response.json['issueIds']) == 1
 
             when(
                 'Trying to pass without issue id',
