@@ -140,7 +140,8 @@ def oauth_mockup_server():
                     title='member2',
                     email='member2@example.com',
                     avatar='avatar2',
-                    name='full name'
+                    firstName='first name',
+                    lastName='last name',
                 )
 
             if 'access token' in access_token:
@@ -149,7 +150,8 @@ def oauth_mockup_server():
                     title='member1',
                     email='member1@example.com',
                     avatar='avatar1',
-                    name='full name'
+                    firstName='first name',
+                    lastName='last name',
                 )
 
             raise HTTPForbidden()

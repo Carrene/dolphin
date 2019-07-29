@@ -84,7 +84,8 @@ class MemberController(ModelRestController):
         query = DBSession.query(Member) \
             .filter(or_(
                 Member.title.ilike(query),
-                Member.name.ilike(query)
+                Member.first_name.ilike(query),
+                Member.last_name.ilike(query),
             ))
 
         return query
