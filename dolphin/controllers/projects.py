@@ -527,3 +527,26 @@ class ProjectBatchController(RestController):
         )
         return batch
 
+    @authorize
+    @json
+    def list(self):
+        issues = DBSession.query(Issue) \
+            .filter(Issue.project_id == self.project.id)
+
+        batches = set([i.batch for i in issues if i.batch != None])
+        issues_per_batch = {batch:None for batch in batches}
+        for i in batches:
+            issues_ = []
+            for j in issues:
+                if i == j.batch:
+                   issues_.append(j.id)
+            issues_per_batch[i] = issues_
+
+        batch = [dict(
+            id=i,
+            projectId=self.project.id,
+            issueIds=issues_per_batch[i],
+        ) for i in batches]
+
+        return batch
+
