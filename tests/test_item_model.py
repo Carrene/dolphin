@@ -112,16 +112,15 @@ def test_item_perspective(db):
             session.add(dailyreport2)
             session.commit()
 
+            assert item.perspective == 'due'
+
             dailyreport3 = Dailyreport(
                 date=datetime.now().date(),
                 item=item,
+                hours=1,
+                note='The note for a daily report 3',
             )
             session.add(dailyreport3)
-            session.commit()
-
-            assert item.perspective == 'due'
-
-            dailyreport3.note = 'The note for a daily report 3'
             session.commit()
 
             assert item.perspective == 'submitted'
