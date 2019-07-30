@@ -121,3 +121,15 @@ class TestBatch(LocalApplicationTestCase):
             assert status == 200
             assert len(response.json) == 2
 
+            when(
+                'Inended batch with string type not found',
+                url_parameters=dict(project_id=0),
+            )
+            assert status == 404
+
+            when('The request with form parameter', form=dict(param='param'))
+            assert status == '709 Form Not Allowed'
+
+            when('Request is not authorized', authorization=None)
+            assert status == 401
+
