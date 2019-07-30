@@ -7,8 +7,8 @@ class BatchController(RestController):
     @json
     def metadata(self):
         metadata = dict(
-            name='Dailyreport', \
-            primaryKeys=['id'], \
+            name='Batch',
+            primaryKeys=['id'],
             fields=dict(
                 id={
                     'pattern': None,
@@ -29,7 +29,7 @@ class BatchController(RestController):
                     'watermark': None,
                     'example': 1,
                     'message': None,
-                    'type': None
+                    'type': None,
                 },
                 projectId={
                     'pattern': None,
@@ -44,14 +44,14 @@ class BatchController(RestController):
                     'required': False,
                     'default': None,
                     'name': 'projectId',
-                    'key': 'projectId',
+                    'key': 'project_id',
                     'primaryKey': True,
-                    'label': 'Project Id',
+                    'label': 'Lorem Ipsum',
                     'watermark': None,
                     'example': None,
                     'message': None,
-                    'type': None
-                }, \
+                    'type': None,
+                },
                 issueIds={
                     'pattern': None,
                     'patternDescription': None,
@@ -65,13 +65,13 @@ class BatchController(RestController):
                     'required': False,
                     'default': None,
                     'name': 'issueIds',
-                    'key': 'issueIds',
+                    'key': 'issue_ids',
                     'primaryKey': True,
-                    'label': 'Issue Ids',
+                    'label': 'Lorem Ipsum',
                     'watermark': None,
                     'example': None,
                     'message': None,
-                    'type': None
+                    'type': None,
                 },
             )
         )
