@@ -22,16 +22,24 @@ class TestBatch(LocalApplicationTestCase):
             assert fields['id']['label'] is not None
             assert fields['id']['minimum'] is not None
             assert fields['id']['example'] is not None
+            assert fields['id']['watermark'] is not None
+            assert fields['id']['message'] is not None
 
             assert fields['projectId']['key'] is not None
             assert fields['projectId']['notNone'] is not None
             assert fields['projectId']['readonly'] is not None
             assert fields['projectId']['label'] is not None
+            assert fields['projectId']['watermark'] is not None
             assert fields['projectId']['name'] is not None
+            assert fields['projectId']['example'] is not None
+            assert fields['projectId']['message'] is not None
 
             assert fields['issueIds']['key'] is not None
             assert fields['issueIds']['notNone'] is not None
             assert fields['issueIds']['readonly'] is not None
             assert fields['issueIds']['label'] is not None
+            assert fields['issueIds']['name'] is not None
+            assert fields['issueIds']['watermark'] is not None
+            assert fields['issueIds']['example'] is not None
             assert fields['issueIds']['name'] is not None
 
