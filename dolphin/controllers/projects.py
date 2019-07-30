@@ -7,9 +7,11 @@ from restfulpy.orm import DBSession, commit
 from ..backends import ChatClient
 from ..exceptions import StatusChatRoomNotFound, \
     StatusRoomMemberAlreadyExist, StatusRoomMemberNotFound, \
-    StatusManagerNotFound, StatusSecondaryManagerNotFound
+    StatusManagerNotFound, StatusSecondaryManagerNotFound, \
+    StatusIssueIdIsNull, StatusInvalidIssueIdType, \
+    StatusIssueIdNotInForm, StatusIssueNotFound
 from ..models import Project, Member, Subscription, Workflow, Group, Release, \
-    GroupMember
+    GroupMember, Issue, ReturnToTriageJob
 from ..validators import project_validator, update_project_validator
 from .files import FileController
 from .issues import IssueController
