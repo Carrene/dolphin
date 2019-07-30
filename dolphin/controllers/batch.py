@@ -46,7 +46,7 @@ class BatchController(RestController):
                     'name': 'projectId',
                     'key': 'projectId',
                     'primaryKey': True,
-                    'label': 'Lori mepso',
+                    'label': 'Project Id',
                     'watermark': None,
                     'example': None,
                     'message': None,
