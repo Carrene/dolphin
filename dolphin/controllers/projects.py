@@ -1,7 +1,7 @@
 from auditor import context as AuditLogContext
 from nanohttp import HTTPStatus, json, context, HTTPNotFound, int_or_notfound
 from restfulpy.authorization import authorize
-from restfulpy.controllers import ModelRestController
+from restfulpy.controllers import ModelRestController, RestController
 from restfulpy.orm import DBSession, commit
 
 from ..backends import ChatClient
@@ -12,7 +12,8 @@ from ..exceptions import StatusChatRoomNotFound, \
     StatusIssueIdNotInForm, StatusIssueNotFound
 from ..models import Project, Member, Subscription, Workflow, Group, Release, \
     GroupMember, Issue, ReturnToTriageJob
-from ..validators import project_validator, update_project_validator
+from ..validators import project_validator, update_project_validator, \
+    batch_append_validator
 from .files import FileController
 from .issues import IssueController
 
@@ -481,21 +482,13 @@ class ProjectController(ModelRestController):
         return project
 
 
-class ProjectBatchController(ModelRestController):
-    __model__ = Project
-
+class ProjectBatchController(RestController):
     def __init__(self, project):
         self.project = project
 
     @authorize
     @json
-    @Project.validate(fields=dict(
-        issueIds=dict(
-            required=StatusIssueIdNotInForm,
-            type_=(int, StatusInvalidIssueIdType),
-            not_none=StatusIssueIdIsNull,
-        ),
-    ))
+    @batch_append_validator
     @commit
     def append(self, id):
         id = int_or_notfound(id)
@@ -503,7 +496,6 @@ class ProjectBatchController(ModelRestController):
         issue = DBSession.query(Issue) \
             .filter(Issue.id == issue_id) \
             .one_or_none()
-
         if issue is None:
             raise StatusIssueNotFound(issue_id)
 

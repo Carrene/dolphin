@@ -191,7 +191,7 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         maximum=1000,
         nullable=True,
         not_none=False,
-        required=False
+        required=False,
     )
     attachments = relationship('Attachment', lazy='selectin')
     tags = relationship(

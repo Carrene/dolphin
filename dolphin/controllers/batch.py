@@ -74,6 +74,6 @@ class BatchController(RestController):
                     'type': None,
                 },
             )
-       )
+        )
         return metadata
 
