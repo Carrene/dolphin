@@ -48,8 +48,8 @@ class Dailyreport(OrderingMixin, FilteringMixin, PaginationMixin, \
         watermark='Hours spent on the assignment',
         label='Hours',
         example=2.5,
-        nullable=True,
-        not_none=False,
+        nullable=False,
+        not_none=True,
         required=True,
     )
     note = Field(
@@ -58,8 +58,8 @@ class Dailyreport(OrderingMixin, FilteringMixin, PaginationMixin, \
         max_length=1024,
         label='Notes',
         watermark='Lorem Ipsum',
-        not_none=False,
-        nullable=True,
+        nullable=False,
+        not_none=True,
         required=True,
         python_type=str,
         example='Lorem Ipsum',
