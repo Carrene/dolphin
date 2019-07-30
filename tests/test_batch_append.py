@@ -89,24 +89,25 @@ class TestBatch(LocalApplicationTestCase):
     def test_append(self):
         session = self.create_session()
         self.login('member1@example.com')
-        title = 1
+        batch_id = 1
 
         with oauth_mockup_server(), self.given(
             'Appending a batch that have before',
-            f'/apiv1/projects/{self.project1.id}/batches/id: {title}',
+            f'/apiv1/projects/project_id: {self.project1.id}' \
+            f'/batches/batch_id: {batch_id}',
             'APPEND',
             json=dict(
                 issueIds=self.issue1.id
             )
         ):
             assert status == 200
-            assert response.json['id'] == title
+            assert response.json['id'] == batch_id
             assert response.json['projectId'] == self.project1.id
             assert len(response.json['issueIds']) == 2
 
             when(
                 'Appending a batch without have before',
-                url_parameters=dict(id=2),
+                url_parameters=dict(project_id=self.project1.id, batch_id=2),
                 json=dict(issueIds=self.issue2.id),
             )
             assert status == 200
@@ -140,7 +141,16 @@ class TestBatch(LocalApplicationTestCase):
 
             when(
                 'Inended batch with string type not found',
-                url_parameters=dict(id='Alaphabet')
+                url_parameters=dict(
+                    project_id=self.project1.id,
+                    batch_id='Alaphabet'
+                ),
+            )
+            assert status == 404
+
+            when(
+                'Inended batch with string type not found',
+                url_parameters=dict(project_id=0, batch_id=2),
             )
             assert status == 404
 
