@@ -15,7 +15,6 @@ class TestBatch(LocalApplicationTestCase):
 
             fields = response.json['fields']
 
-            import pudb; pudb.set_trace()  # XXX BREAKPOINT
             assert fields['id']['primaryKey'] is not None
             assert fields['id']['readonly'] is not None
             assert fields['id']['notNone'] is not None
