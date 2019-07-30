@@ -183,6 +183,16 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         not_none=False,
         readonly=True,
     )
+    batch = Field(
+        Integer,
+        python_type=int,
+        label='Batch',
+        minimum=1,
+        maximum=1000,
+        nullable=True,
+        not_none=False,
+        required=False,
+    )
     attachments = relationship('Attachment', lazy='selectin')
     tags = relationship(
         'Tag',
@@ -607,7 +617,10 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
     @classmethod
     def __declare_last__(cls):
         super().__declare_last__()
-        observe(cls, ['modified_at', 'project_id', 'modified_by'])
+        observe(
+            cls,
+            ['modified_at', 'project_id', 'modified_by', 'returntotriagejobs']
+        )
 
     def get_room_title(self):
         return f'{self.title.lower()}-{self.project_id}'

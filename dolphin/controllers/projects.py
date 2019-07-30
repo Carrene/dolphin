@@ -1,16 +1,19 @@
 from auditor import context as AuditLogContext
 from nanohttp import HTTPStatus, json, context, HTTPNotFound, int_or_notfound
 from restfulpy.authorization import authorize
-from restfulpy.controllers import ModelRestController
+from restfulpy.controllers import ModelRestController, RestController
 from restfulpy.orm import DBSession, commit
 
 from ..backends import ChatClient
 from ..exceptions import StatusChatRoomNotFound, \
     StatusRoomMemberAlreadyExist, StatusRoomMemberNotFound, \
-    StatusManagerNotFound, StatusSecondaryManagerNotFound
+    StatusManagerNotFound, StatusSecondaryManagerNotFound, \
+    StatusIssueIdIsNull, StatusInvalidIssueIdType, \
+    StatusIssueIdNotInForm, StatusIssueNotFound
 from ..models import Project, Member, Subscription, Workflow, Group, Release, \
-    GroupMember
-from ..validators import project_validator, update_project_validator
+    GroupMember, Issue, ReturnToTriageJob
+from ..validators import project_validator, update_project_validator, \
+    batch_append_validator
 from .files import FileController
 from .issues import IssueController
 
@@ -41,6 +44,10 @@ class ProjectController(ModelRestController):
         if len(remaining_paths) > 1 and remaining_paths[1] == 'issues':
             project = self._get_project(remaining_paths[0])
             return IssueController(project)(*remaining_paths[2:])
+
+        if len(remaining_paths) > 1 and remaining_paths[1] == 'batches':
+            project = self._get_project(remaining_paths[0])
+            return ProjectBatchController(project)(*remaining_paths[2:])
 
         return super().__call__(*remaining_paths)
 
@@ -473,4 +480,50 @@ class ProjectController(ModelRestController):
             raise HTTPNotFound()
 
         return project
+
+
+class ProjectBatchController(RestController):
+    def __init__(self, project):
+        self.project = project
+
+    @authorize
+    @json
+    @batch_append_validator
+    @commit
+    def append(self, id):
+        id = int_or_notfound(id)
+        issue_id = context.form['issueIds']
+        issue = DBSession.query(Issue) \
+            .filter(Issue.id == issue_id) \
+            .one_or_none()
+        if issue is None:
+            raise StatusIssueNotFound(issue_id)
+
+        available_batch = DBSession.query(Issue) \
+            .filter(Issue.batch == id) \
+            .one_or_none()
+
+        if available_batch is None:
+            issue.batch = id
+
+        else:
+            issue.batch = id
+            issue.stage = available_batch.stage
+            if issue.stage == 'backlog' and available_batch.returntotriagejobs[0]:
+                returntotriage = ReturnToTriageJob(
+                    at=available_batch.returntotriagejobs[0].at,
+                    issue_id=issue.id,
+                )
+                issue.returntotriagejobs.append(returntotriage)
+
+        DBSession.flush()
+        issue_ids = DBSession.query(Issue.id) \
+            .filter(Issue.batch == id)
+
+        batch = dict(
+            id=int(id),
+            projectId=self.project.id,
+            issueIds=[i[0] for i in issue_ids],
+        )
+        return batch
 
