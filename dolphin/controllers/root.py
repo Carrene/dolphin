@@ -28,6 +28,7 @@ from .dailyreport import DailyreportController
 from .items import ItemController
 from .phase_summary import PhaseSummaryController
 from .resource_summary import ResourceSummaryController
+from .batch import BatchController
 
 
 here = abspath(dirname(__file__))
@@ -59,6 +60,7 @@ class Apiv1(RestController, JSONPatchControllerMixin):
     items = ItemController()
     phasessummaries = PhaseSummaryController()
     resourcessummaries = ResourceSummaryController()
+    batches = BatchController()
 
     @json
     def version(self):
