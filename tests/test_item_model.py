@@ -248,6 +248,7 @@ def test_item_hours_worked(db):
                 date=datetime.strptime('2019-1-3', '%Y-%m-%d').date(),
                 hours=3,
                 item=item1,
+                note='Example note',
             )
             session.add(dailyreport2)
             session.commit()
@@ -357,6 +358,7 @@ def test_item_status(db):
                 date=datetime.strptime('2019-1-3', '%Y-%m-%d').date(),
                 hours=3,
                 item=item1,
+                note='Example note',
             )
             session.add(dailyreport2)
             session.commit()

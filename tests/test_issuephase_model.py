@@ -165,6 +165,7 @@ def test_status(db):
         dailyreport2 = Dailyreport(
             date=datetime.strptime('2019-1-3', '%Y-%m-%d').date(),
             hours=3,
+            note='The note for a daily report',
             item_id=item1.id,
         )
         session.add(dailyreport2)
@@ -183,6 +184,7 @@ def test_status(db):
         dailyreport4 = Dailyreport(
             date=datetime.strptime('2019-1-3', '%Y-%m-%d').date(),
             hours=5,
+            note='The note for a daily report',
             item_id=item2.id,
         )
         session.add(dailyreport4)
