@@ -20,7 +20,7 @@ class TestDraftIssue(LocalApplicationTestCase):
             email='member1@example.com',
             access_token='access token 1',
             phone=123456789,
-            reference_id=2
+            reference_id=2,
         )
         session.add(cls.member)
         session.commit()
@@ -45,7 +45,7 @@ class TestDraftIssue(LocalApplicationTestCase):
             manager=cls.member,
             title='My first project',
             description='A decription for my project',
-            room_id=1
+            room_id=1,
         )
 
         with Context(dict()):
@@ -60,7 +60,7 @@ class TestDraftIssue(LocalApplicationTestCase):
                 description='This is description of first issue',
                 kind='feature',
                 days=1,
-                room_id=2
+                room_id=2,
             )
             session.add(cls.issue1)
             session.commit()
