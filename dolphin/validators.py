@@ -962,7 +962,7 @@ estimate_item_validator = validate(
 
 
 batch_append_validator = validate(
-    issueIds=dict(
+    issueId=dict(
         required=StatusIssueIdNotInForm,
         type_=(int, StatusInvalidIssueIdType),
         not_none=StatusIssueIdIsNull,

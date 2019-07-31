@@ -492,29 +492,31 @@ class ProjectBatchController(RestController):
     @commit
     def append(self, id):
         id = int_or_notfound(id)
-        issue_id = context.form['issueIds']
+        issue_id = context.form['issueId']
         issue = DBSession.query(Issue) \
             .filter(Issue.id == issue_id) \
             .one_or_none()
         if issue is None:
             raise StatusIssueNotFound(issue_id)
 
-        available_batch = DBSession.query(Issue) \
+        sibling_issue_by_batch = DBSession.query(Issue) \
             .filter(Issue.batch == id) \
-            .one_or_none()
+            .filter(Issue.is_batch_leader == True) \
+            .first()
 
-        if available_batch is None:
+        if sibling_issue_by_batch is None:
             issue.batch = id
+            issue.is_batch_leader = True
 
         else:
             issue.batch = id
-            issue.stage = available_batch.stage
+            issue.stage = sibling_issue_by_batch.stage
 
-            if issue.stage == 'backlog'  \
-                    and available_batch.returntotriagejobs[0]:
+            if issue.stage != 'triage'  \
+                    and len(sibling_issue_by_batch.returntotriagejobs) > 0:
 
                 returntotriage = ReturnToTriageJob(
-                    at=available_batch.returntotriagejobs[0].at,
+                    at=sibling_issue_by_batch.returntotriagejobs[0].at,
                     issue_id=issue.id,
                 )
                 issue.returntotriagejobs.append(returntotriage)
