@@ -68,7 +68,7 @@ class TestBatch(LocalApplicationTestCase):
 
         with oauth_mockup_server(), self.given(
             'Removing a batch',
-            f'/apiv1/projects/{self.project1.id}/batches',
+            f'/apiv1/projects/id: {self.project1.id}/batches',
             'REMOVE',
             json=dict(
                 issueIds=self.issue1.id
@@ -79,6 +79,7 @@ class TestBatch(LocalApplicationTestCase):
             assert response.json['stage'] == self.issue1.stage
             assert response.json['projectId'] == self.project1.id
             assert self.issue1.id not in response.json['issueIds']
+            assert not session.query(Issue).get(self.issue1.id).batch
 
             when(
                 'Trying to pass without issue id',
@@ -103,6 +104,12 @@ class TestBatch(LocalApplicationTestCase):
                 json=given | dict(issueIds=0),
             )
             assert status == '605 Issue Not Found'
+
+            when(
+                'Inended batch with string type not found',
+                url_parameters=dict(id=0),
+            )
+            assert status == 404
 
             when('Request is not authorized', authorization=None)
             assert status == 401

@@ -574,3 +574,4 @@ class ProjectBatchController(RestController):
             issueIds=[i[0] for i in issue_ids if i[0] != issue.id],
         )
         return batch
+
