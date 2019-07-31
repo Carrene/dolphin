@@ -748,11 +748,7 @@ specialty_create_validator = validate(
 
 
 skill_create_validator = validate(
-    description=dict(
-        max_length=(
-            512, StatusMaxLenghtForDescription(512),
-        ),
-    ),
+    description=dict(max_length=(512, StatusMaxLenghtForDescription(512))),
     title = dict(
         required=StatusTitleNotInForm,
         not_none=StatusTitleIsNull,
