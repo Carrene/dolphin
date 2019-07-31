@@ -171,11 +171,12 @@ class DraftIssueController(ModelRestController, JSONPatchControllerMixin):
                     issue_id=draft_issue.issue_id,
                     related_issue_id=related_issue.id,
                 )
+                DBSession.add(related_issue1)
+
                 related_issue2 = RelatedIssue(
                     issue_id=related_issue.id,
                     related_issue_id=draft_issue.issue_id,
                 )
-                DBSession.add(related_issue1)
                 DBSession.add(related_issue2)
 
         return draft_issue
