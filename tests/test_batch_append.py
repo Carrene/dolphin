@@ -65,6 +65,7 @@ class TestBatch(LocalApplicationTestCase):
                 description='This is description of second issue',
                 kind='feature',
                 days=1,
+                stage='backlog',
                 room_id=2,
             )
             cls.issue3 = Issue(
@@ -77,12 +78,26 @@ class TestBatch(LocalApplicationTestCase):
                 batch=1,
             )
 
+            cls.issue4 = Issue(
+                title='issue4',
+                description='This is description of third issue',
+                kind='feature',
+                days=1,
+                room_id=2,
+                stage='backlog',
+            )
+
             cls.project1.issues.append(cls.issue1)
             cls.project1.issues.append(cls.issue2)
             cls.project1.issues.append(cls.issue3)
+            cls.project1.issues.append(cls.issue4)
             cls.returntotriage = ReturnToTriageJob(
                 at=datetime.now(),
                 issue=cls.issue3,
+            )
+            cls.returntotriage2 = ReturnToTriageJob(
+                at=datetime.now(),
+                issue=cls.issue4,
             )
             session.commit()
 
@@ -112,6 +127,16 @@ class TestBatch(LocalApplicationTestCase):
             )
             assert status == 200
             assert response.json['id'] == 2
+            assert response.json['projectId'] == self.project1.id
+            assert len(response.json['issueIds']) == 1
+
+            when(
+                'Appending a batch without have before',
+                url_parameters=dict(project_id=self.project1.id, batch_id=3),
+                json=dict(issueIds=self.issue4.id),
+            )
+            assert status == 200
+            assert response.json['id'] == 3
             assert response.json['projectId'] == self.project1.id
             assert len(response.json['issueIds']) == 1
 

@@ -509,7 +509,7 @@ class ProjectBatchController(RestController):
         else:
             issue.batch = id
             issue.stage = available_batch.stage
-            if issue.stage == 'backlog' and available_batch.returntotriagejobs[0]:
+            if issue.stage == 'backlog' and available_batch.returntotriagejobs:
                 returntotriage = ReturnToTriageJob(
                     at=available_batch.returntotriagejobs[0].at,
                     issue_id=issue.id,
