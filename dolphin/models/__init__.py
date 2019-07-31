@@ -27,3 +27,4 @@ from .phase_summary import AbstractPhaseSummaryView
 from .resource_summary import AbstractResourceSummaryView
 from .issue_phase import IssuePhase
 from .returntotriagejob import ReturnToTriageJob
+from .skill import Skill

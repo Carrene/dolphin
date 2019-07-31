@@ -6,7 +6,7 @@ from restfulpy.testing import db
 from auditor.context import Context as AuditLogContext
 
 from dolphin.models import Resource, Group, Workflow, Specialty, Phase, \
-    Release, Project, Issue, Item, IssuePhase
+    Release, Project, Issue, Item, IssuePhase, Skill
 
 
 def test_resource_load(db):
@@ -62,7 +62,12 @@ def test_resource_load(db):
         workflow = Workflow(title='Default')
         session.add(workflow)
 
-        specialty = Specialty(title='First Specialty')
+        skill = Skill(title='First Skill')
+        specialty = Specialty(
+            title='First Specialty',
+            skill=skill,
+        )
+
         phase1 = Phase(
             title='backlog',
             order=-1,

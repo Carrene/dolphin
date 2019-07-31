@@ -1,6 +1,6 @@
 from bddrest import status, response, when, given
 
-from dolphin.models import Member, Specialty, SpecialtyMember
+from dolphin.models import Member, Specialty, SpecialtyMember, Skill
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -18,10 +18,11 @@ class TestSpecialty(LocalApplicationTestCase):
             reference_id=2
         )
         session.add(cls.member)
-
+        skill = Skill(title='First Skill')
         cls.specialty = Specialty(
             title='First specialty',
             description='Sample description',
+            skill=skill,
         )
         session.add(cls.specialty)
         session.commit()

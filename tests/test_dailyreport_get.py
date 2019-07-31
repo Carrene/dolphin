@@ -6,7 +6,7 @@ from nanohttp import context
 from nanohttp.contexts import Context
 
 from dolphin.models import Member, Dailyreport, Workflow, Specialty, Group, Release, \
-    Project, Issue, Item, Phase, IssuePhase
+    Project, Issue, Item, Phase, IssuePhase, Skill
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -28,7 +28,11 @@ class TestDailyreport(LocalApplicationTestCase):
         session.commit()
 
         workflow = Workflow(title='Default')
-        specialty = Specialty(title='First Specialty')
+        skill = Skill(title='First Skill')
+        specialty = Specialty(
+            title='First Specialty',
+            skill=skill,
+        )
         group = Group(title='default')
 
         phase = Phase(

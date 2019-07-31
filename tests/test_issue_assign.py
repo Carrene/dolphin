@@ -5,7 +5,7 @@ from nanohttp.contexts import Context
 from sqlalchemy import func
 
 from dolphin.models import Issue, Project, Member, Phase, Group, Workflow, \
-    Release, Specialty, Subscription, Item, IssuePhase
+    Release, Specialty, Subscription, Item, IssuePhase, Skill
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -46,7 +46,11 @@ class TestIssue(LocalApplicationTestCase):
         workflow = Workflow(title='Default')
         session.add(workflow)
 
-        specialty = Specialty(title='First Specialty')
+        skill = Skill(title='First Skill')
+        specialty = Specialty(
+            title='First Specialty',
+            skill=skill,
+        )
         cls.phase1 = Phase(
             title='design',
             order=1,

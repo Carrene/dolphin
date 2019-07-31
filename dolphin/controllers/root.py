@@ -29,6 +29,7 @@ from .items import ItemController
 from .phase_summary import PhaseSummaryController
 from .resource_summary import ResourceSummaryController
 from .batch import BatchController
+from .skill import SkillController
 
 
 here = abspath(dirname(__file__))
@@ -61,6 +62,7 @@ class Apiv1(RestController, JSONPatchControllerMixin):
     phasessummaries = PhaseSummaryController()
     resourcessummaries = ResourceSummaryController()
     batches = BatchController()
+    skills = SkillController()
 
     @json
     def version(self):

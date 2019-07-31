@@ -1,7 +1,7 @@
 from bddrest.authoring import when, status, response
 
 from dolphin.models import Member, Organization, OrganizationMember, Group, \
-    Specialty
+    Specialty, Skill
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
@@ -47,11 +47,13 @@ class TestOrganizationMembers(LocalApplicationTestCase):
             role='member',
         )
         session.add(organization_member2)
-
+        skill = Skill(title='First Skill')
         specialty = Specialty(
-            title='first specialty',
+            title='First Specialty',
+            skill=skill,
             members=[cls.member],
         )
+
         session.add(specialty)
 
         group = Group(

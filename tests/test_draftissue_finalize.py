@@ -8,7 +8,8 @@ from bddrest import status, response, Update, when, given, Remove
 from dolphin import Dolphin
 from dolphin.middleware_callback import callback as auditor_callback
 from dolphin.models import Issue, Project, Workflow, Phase, Tag, DraftIssue, \
-    Organization, OrganizationMember, Group, Release, Specialty, Resource
+    Organization, OrganizationMember, Group, Release, Specialty, Resource, \
+    Skill
 from .helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server, chat_server_status
 
@@ -27,7 +28,11 @@ class TestIssue(LocalApplicationTestCase):
     def mockup(cls):
         session = cls.create_session()
 
-        specialty = Specialty(title='Project Manager')
+        skill = Skill(title='First Skill')
+        specialty = Specialty(
+            title='Project Manager',
+            skill=skill,
+        )
 
         cls.member = Resource(
             title='First Member',
