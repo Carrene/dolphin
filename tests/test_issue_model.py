@@ -395,6 +395,7 @@ def test_issue_status(db):
                 date=datetime.strptime('2019-1-3', '%Y-%m-%d').date(),
                 hours=3,
                 item_id=item.id,
+                note='The note for a daily report',
             )
             session.add(dailyreport2)
             session.commit()

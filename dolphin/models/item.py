@@ -174,8 +174,8 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             ),
             (
                 and_(
-                    func.date_part('DAY', end_date - func.now()) >= 0,
-                    func.date_part('DAY', func.now() - start_date) >
+                    func.date_part('DAY', end_date - func.date(func.now())) >= 0,
+                    func.date_part('DAY', func.date(func.now()) - start_date) >
                     select([func.count(Dailyreport.id)])
                     .where(Dailyreport.item_id == id)
                     .where(Dailyreport.date < datetime.now().date())
@@ -185,7 +185,7 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
             ),
             (
                 and_(
-                    func.date_part('DAY', func.now() - end_date) > 0,
+                    func.date_part('DAY', func.date(func.now()) - end_date) > 0,
                     func.date_part('DAY', end_date - start_date) + 1 >
                     select([func.count(Dailyreport.id)])
                     .where(Dailyreport.item_id == id)
@@ -195,11 +195,10 @@ class Item(TimestampMixin, OrderingMixin, FilteringMixin, PaginationMixin,
                 'overdue'
             ),
             (
-                exists(
+                ~exists(
                     select([Dailyreport.note])
                     .where(Dailyreport.item_id == id)
                     .where(Dailyreport.date == datetime.now().date())
-                    .where(Dailyreport.note.is_(None))
                 ),
                 'due'
             )
