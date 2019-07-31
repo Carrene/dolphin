@@ -64,11 +64,11 @@ class TestBatch(LocalApplicationTestCase):
 
     def test_remove(self):
         session = self.create_session()
-        self.login('member1@example.com')
+        self.login(self.member1.email)
 
         with oauth_mockup_server(), self.given(
             'Removing a batch',
-            f'/apiv1/projects/id: {self.project1.id}/batches',
+            f'/apiv1/projects/project_id: {self.project1.id}/batches',
             'REMOVE',
             json=dict(
                 issueIds=self.issue1.id
@@ -106,8 +106,8 @@ class TestBatch(LocalApplicationTestCase):
             assert status == '605 Issue Not Found'
 
             when(
-                'Inended batch with string type not found',
-                url_parameters=dict(id=0),
+                'Intended project not found',
+                url_parameters=dict(project_id=0),
             )
             assert status == 404
 
