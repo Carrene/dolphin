@@ -46,6 +46,7 @@ FORM_WHITELIST = [
     'days',
     'priority',
     'kind',
+    'batch',
 ]
 
 
