@@ -569,6 +569,18 @@ class ProjectBatchController(RestController):
             .filter(Issue.project_id == self.project.id) \
             .filter(Issue.batch == batch_id)
 
+        sibling_issue_by_batch = DBSession.query(Issue) \
+            .filter(Issue.id != issue.id) \
+            .filter(Issue.batch == batch_id) \
+            .first()
+
+        # Transfering batch leadership from current leader to sibling issue
+        if issue.is_batch_leader:
+            issue.is_batch_leader = None
+
+            if sibling_issue_by_batch:
+                sibling_issue_by_batch.is_batch_leader = True
+
         batch = dict(
             id=batch_id,
             stage=issue.stage,

@@ -58,8 +58,22 @@ class TestBatch(LocalApplicationTestCase):
                 room_id=2,
                 batch=1,
                 stage='triage',
+                is_batch_leader=True,
+                project=cls.project1,
             )
-            cls.project1.issues.append(cls.issue1)
+            session.add(cls.issue1)
+
+            cls.issue2 = Issue(
+                title='Second issue',
+                description='This is description of second issue',
+                kind='feature',
+                days=1,
+                room_id=3,
+                batch=1,
+                stage='triage',
+                project=cls.project1,
+            )
+            session.add(cls.issue1)
             session.commit()
 
     def test_remove(self):
@@ -80,6 +94,14 @@ class TestBatch(LocalApplicationTestCase):
             assert response.json['projectId'] == self.project1.id
             assert self.issue1.id not in response.json['issueIds']
             assert not session.query(Issue).get(self.issue1.id).batch
+            assert session.query(Issue) \
+                .filter(Issue.id == self.issue1.id) \
+                .filter(Issue.is_batch_leader == None) \
+                .one()
+            assert session.query(Issue) \
+                .filter(Issue.id != self.issue1.id) \
+                .filter(Issue.is_batch_leader == True) \
+                .one()
 
             when(
                 'Trying to pass without issue id',
