@@ -969,3 +969,12 @@ batch_append_validator = validate(
     ),
  )
 
+
+batch_remove_validator = validate(
+    issueIds=dict(
+        required=StatusIssueIdNotInForm,
+        type_=(int, StatusInvalidIssueIdType),
+        not_none=StatusIssueIdIsNull,
+    ),
+ )
+

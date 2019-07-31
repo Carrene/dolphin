@@ -13,7 +13,7 @@ from ..exceptions import StatusChatRoomNotFound, \
 from ..models import Project, Member, Subscription, Workflow, Group, Release, \
     GroupMember, Issue, ReturnToTriageJob
 from ..validators import project_validator, update_project_validator, \
-    batch_append_validator
+    batch_append_validator, batch_remove_validator
 from .files import FileController
 from .issues import IssueController
 
@@ -551,4 +551,27 @@ class ProjectBatchController(RestController):
                 )
 
         return list(batches.values())
+
+    @authorize
+    @json
+    @batch_remove_validator
+    @commit
+    def remove(self):
+        issue = DBSession.query(Issue).get(context.form.get('issueIds'))
+        if issue is None:
+            raise StatusIssueNotFound()
+
+        batch_id = issue.batch
+        issue.batch = None
+        issue_ids = DBSession.query(Issue.id) \
+            .filter(Issue.project_id == self.project.id) \
+            .filter(Issue.batch == batch_id)
+
+        batch = dict(
+            id=batch_id,
+            stage=issue.stage,
+            projectId=issue.project_id,
+            issueIds=[i[0] for i in issue_ids if i[0] != issue.id],
+        )
+        return batch
 
