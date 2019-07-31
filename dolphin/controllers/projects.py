@@ -509,7 +509,10 @@ class ProjectBatchController(RestController):
         else:
             issue.batch = id
             issue.stage = available_batch.stage
-            if issue.stage == 'backlog' and available_batch.returntotriagejobs:
+
+            if issue.stage == 'backlog'  \
+                    and available_batch.returntotriagejobs[0]:
+
                 returntotriage = ReturnToTriageJob(
                     at=available_batch.returntotriagejobs[0].at,
                     issue_id=issue.id,
@@ -522,6 +525,7 @@ class ProjectBatchController(RestController):
 
         batch = dict(
             id=int(id),
+            stage=issue.stage,
             projectId=self.project.id,
             issueIds=[i[0] for i in issue_ids],
         )
@@ -541,6 +545,7 @@ class ProjectBatchController(RestController):
             else:
                 batches[issue.batch] = dict(
                     id=issue.batch,
+                    stage=issue.stage,
                     projectId=self.project.id,
                     issueIds=[issue.id],
                 )

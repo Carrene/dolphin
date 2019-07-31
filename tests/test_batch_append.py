@@ -117,6 +117,7 @@ class TestBatch(LocalApplicationTestCase):
         ):
             assert status == 200
             assert response.json['id'] == batch_id
+            assert response.json['stage'] == 'backlog'
             assert response.json['projectId'] == self.project1.id
             assert len(response.json['issueIds']) == 2
 
