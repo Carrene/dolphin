@@ -12,7 +12,7 @@ def insert(): # pragma: no cover
     # The GOD id is 1.
 
     specialty = DBSession.query(Specialty) \
-        .filter(Specialty.title == 'Project Manager') \
+        .filter(Specialty.title == 'front-end') \
         .one()
 
     with Context(dict()), StoreManager(DBSession):
