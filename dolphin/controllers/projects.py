@@ -541,6 +541,7 @@ class ProjectBatchController(RestController):
             else:
                 batches[issue.batch] = dict(
                     id=issue.batch,
+                    stage=issue.stage,
                     projectId=self.project.id,
                     issueIds=[issue.id],
                 )
