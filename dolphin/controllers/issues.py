@@ -681,6 +681,7 @@ class IssueController(ModelRestController, JSONPatchControllerMixin):
             raise HTTPStatus('645 Already Is Related')
 
         issue.relations.append(target)
+        target.relations.append(issue)
         return issue
 
     @authorize

@@ -45,7 +45,7 @@ class TestIssue(LocalApplicationTestCase):
             manager=cls.member,
             title='My first project',
             description='A decription for my project',
-            room_id=1
+            room_id=1,
         )
 
         with Context(dict()):
@@ -57,7 +57,7 @@ class TestIssue(LocalApplicationTestCase):
                 description='This is description of first issue',
                 kind='feature',
                 days=1,
-                room_id=2
+                room_id=2,
             )
             session.add(cls.issue1)
 
@@ -67,7 +67,7 @@ class TestIssue(LocalApplicationTestCase):
                 description='This is description of first issue',
                 kind='feature',
                 days=1,
-                room_id=2
+                room_id=2,
             )
             session.add(cls.issue2)
 
@@ -77,7 +77,7 @@ class TestIssue(LocalApplicationTestCase):
                 description='This is description of first issue',
                 kind='feature',
                 days=1,
-                room_id=2
+                room_id=2,
             )
             session.add(cls.issue3)
             session.flush()
@@ -87,6 +87,12 @@ class TestIssue(LocalApplicationTestCase):
                 related_issue_id=cls.issue3.id
             )
             session.add(related_issue)
+
+            related_issue1 = RelatedIssue(
+                issue_id=cls.issue3.id,
+                related_issue_id=cls.issue1.id
+            )
+            session.add(related_issue1)
             session.commit()
 
     def test_relate(self):
@@ -101,6 +107,11 @@ class TestIssue(LocalApplicationTestCase):
             assert status == 200
             assert response.json['id'] == self.issue1.id
             assert len(response.json['relations']) == 2
+
+            session = self.create_session()
+            assert session.query(Issue) \
+                .get(self.issue2.id) \
+                .relations[0].id == self.issue1.id
 
             when(
                 'Intended project with string type not found',
