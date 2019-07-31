@@ -120,6 +120,8 @@ class TestBatch(LocalApplicationTestCase):
         ):
             assert status == 200
             assert len(response.json) == 2
+            assert response.json[0]['stage'] == 'triage'
+            assert response.json[1]['stage'] == 'triage'
 
             when(
                 'Inended batch with string type not found',
