@@ -86,11 +86,12 @@ class TestIssue(LocalApplicationTestCase):
                 issue_id=cls.issue1.id,
                 related_issue_id=cls.issue3.id
             )
+            session.add(related_issue)
+
             related_issue1 = RelatedIssue(
                 issue_id=cls.issue3.id,
                 related_issue_id=cls.issue1.id
             )
-            session.add(related_issue)
             session.add(related_issue1)
             session.commit()
 
@@ -109,8 +110,8 @@ class TestIssue(LocalApplicationTestCase):
 
             session = self.create_session()
             assert session.query(Issue) \
-                .filter(Issue.id == self.issue2.id) \
-                .first().relations[0].id == self.issue1.id
+                .get(self.issue2.id) \
+                .relations[0].id == self.issue1.id
 
             when(
                 'Intended project with string type not found',
