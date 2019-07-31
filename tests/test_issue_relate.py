@@ -45,7 +45,7 @@ class TestIssue(LocalApplicationTestCase):
             manager=cls.member,
             title='My first project',
             description='A decription for my project',
-            room_id=1
+            room_id=1,
         )
 
         with Context(dict()):
@@ -57,7 +57,7 @@ class TestIssue(LocalApplicationTestCase):
                 description='This is description of first issue',
                 kind='feature',
                 days=1,
-                room_id=2
+                room_id=2,
             )
             session.add(cls.issue1)
 
@@ -67,7 +67,7 @@ class TestIssue(LocalApplicationTestCase):
                 description='This is description of first issue',
                 kind='feature',
                 days=1,
-                room_id=2
+                room_id=2,
             )
             session.add(cls.issue2)
 
@@ -77,7 +77,7 @@ class TestIssue(LocalApplicationTestCase):
                 description='This is description of first issue',
                 kind='feature',
                 days=1,
-                room_id=2
+                room_id=2,
             )
             session.add(cls.issue3)
             session.flush()
