@@ -80,7 +80,7 @@ class TestDraftIssue(LocalApplicationTestCase):
             )
             assert status == '707 Invalid field, only following fields are ' \
                 'accepted: title, description, kind, days, stage, isDone, ' \
-                'projectId, priority, relatedIssueId'
+                'projectId, priority, relatedIssueId, batch'
 
             when('Request is not authorized', authorization=None)
             assert status == 401

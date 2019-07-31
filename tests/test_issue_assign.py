@@ -179,7 +179,7 @@ class TestIssue(LocalApplicationTestCase):
             )
             assert status == '707 Invalid field, only following fields are ' \
                 'accepted: stage, isDone, description, phaseId, memberId, ' \
-                'projectId, title, days, priority, kind'
+                'projectId, title, days, priority, kind, batch'
 
             when(
                 'Stage value is wron',

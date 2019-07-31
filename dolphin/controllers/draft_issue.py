@@ -25,6 +25,7 @@ FORM_WHITELIST = [
     'projectId',
     'priority',
     'relatedIssueId',
+    'batch',
 ]
 
 

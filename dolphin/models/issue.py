@@ -192,6 +192,10 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         nullable=True,
         not_none=False,
         required=False,
+        readonly=False,
+        watermark='lorem ipsum',
+        example='lorem ipsum',
+        message='lorem ipsum',
     )
     attachments = relationship('Attachment', lazy='selectin')
     tags = relationship(
