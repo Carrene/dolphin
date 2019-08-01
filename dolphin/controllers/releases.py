@@ -3,13 +3,12 @@ from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 
+from ..backends import ChatClient
 from ..exceptions import StatusManagerNotFound, \
-    StatusLaunchDateMustGreaterThanCutoffDate, StatusChatRoomNotFound, \
-    StatusRoomMemberAlreadyExist, StatusRoomMemberNotFound, \
+    StatusLaunchDateMustGreaterThanCutoffDate, StatusRoomMemberAlreadyExist, \
     StatusGroupNotFound
 from ..models import Release, Subscription, Member, Group
 from ..validators import release_validator, update_release_validator
-from ..backends import ChatClient
 
 
 FORM_WHITELIST = [

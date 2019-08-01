@@ -1,7 +1,7 @@
 from bddrest import status, response, when
 
-from dolphin.models import Member, Tag, Organization, OrganizationMember
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.models import Member, Tag, Organization, OrganizationMember
 
 
 class TestTag(LocalApplicationTestCase):

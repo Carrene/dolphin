@@ -1,10 +1,9 @@
 from auditor.context import Context as AuditLogContext
-from bddrest import status, when, given, response
+from bddrest import status, when, response
 
-from dolphin.models import Release, Member, Project, Subscription, Workflow, \
-    Group
 from .helpers import LocalApplicationTestCase, \
     oauth_mockup_server
+from dolphin.models import Release, Member, Subscription, Workflow, Group
 
 
 class TestRelease(LocalApplicationTestCase):

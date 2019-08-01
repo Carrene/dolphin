@@ -1,7 +1,7 @@
 from bddrest import when, response, status
 
-from dolphin.models import Workflow, Phase, Resource, Specialty, Skill
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.models import Workflow, Phase, Resource, Specialty, Skill
 
 
 class TestResource(LocalApplicationTestCase):

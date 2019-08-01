@@ -5,10 +5,10 @@ from bddrest import status, response, when
 from nanohttp import context
 from nanohttp.contexts import Context
 
-from dolphin.models import Project, Member, Workflow, Group, Release, \
-    Specialty, Phase, Issue, Item, IssuePhase, Skill
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
 from dolphin.constants import ITEM_RESPONSE_TIME
+from dolphin.models import Project, Member, Workflow, Group, Release, \
+    Specialty, Phase, Issue, Item, IssuePhase, Skill
 
 
 class TestItem(LocalApplicationTestCase):

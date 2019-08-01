@@ -1,38 +1,28 @@
 import re
 from datetime import datetime
-import json
 
 from auditor import context as AuditLogContext
-from nanohttp import HTTPStatus, json, context, HTTPNotFound, \
-    HTTPUnauthorized, int_or_notfound, settings, validate, HTTPNoContent, \
-    action
+from nanohttp import HTTPStatus, context, json, HTTPNotFound, \
+    HTTPUnauthorized, int_or_notfound, validate, HTTPNoContent, action
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController, JSONPatchControllerMixin
 from restfulpy.orm import DBSession, commit
-from restfulpy.mule import MuleTask, worker
-from sqlalchemy import and_, exists, select, func, join, or_, Text, cast
+from sqlalchemy import and_, exists, func, join, or_, Text, cast
 
 from ..backends import ChatClient
 from ..exceptions import StatusRoomMemberAlreadyExist, \
-    StatusRoomMemberNotFound, StatusChatRoomNotFound, StatusRelatedIssueNotFound, \
+    StatusRoomMemberNotFound, StatusRelatedIssueNotFound, \
     StatusIssueBugMustHaveRelatedIssue, StatusIssueNotFound, \
     StatusQueryParameterNotInFormOrQueryString
 from ..models import Issue, Subscription, Phase, Item, Member, Project, \
-    RelatedIssue, Subscribable, IssueTag, Tag, Resource, SpecialtyMember, \
-    AbstractResourceSummaryView, AbstractPhaseSummaryView, IssuePhase, \
-    ReturnToTriageJob
+    RelatedIssue, IssueTag, Tag, AbstractResourceSummaryView, \
+    AbstractPhaseSummaryView, IssuePhase, ReturnToTriageJob
 from ..validators import update_issue_validator, assign_issue_validator, \
     issue_move_validator, unassign_issue_validator, issue_relate_validator, \
     issue_unrelate_validator, search_issue_validator
 from .activity import ActivityController
 from .files import FileController
-from .phases import PhaseController
 from .tag import TagController
-
-
-# FIXME: Remove these two redundant lines
-PENDING = -1
-UNKNOWN_ASSIGNEE = -1
 
 
 FORM_WHITELIST = [
@@ -80,7 +70,8 @@ class IssueController(ModelRestController, JSONPatchControllerMixin):
                 return ActivityController(issue=issue)(*remaining_paths[2:])
 
             elif remaining_paths[1] == 'phasessummaries':
-                return IssuePhaseSummaryController(issue=issue)(*remaining_paths[2:])
+                return IssuePhaseSummaryController(issue=issue) \
+                    (*remaining_paths[2:])
 
             elif remaining_paths[1] == 'jobs':
                 return IssueJobController(issue=issue)(*remaining_paths[2:])
@@ -886,8 +877,10 @@ class IssuePhaseResourceSummaryController(ModelRestController):
     @json(prevent_form='709 Form Not Allowed')
     @AbstractResourceSummaryView.expose
     def list(self):
-        phase_summary_view = AbstractResourceSummaryView \
-            .create_mapped_class(issue_id=self.issue.id, phase_id=self.phase.id)
+        phase_summary_view = AbstractResourceSummaryView.create_mapped_class(
+            issue_id=self.issue.id,
+            phase_id=self.phase.id
+        )
         query = DBSession.query(phase_summary_view)
         return query
 

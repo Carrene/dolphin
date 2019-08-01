@@ -2,8 +2,6 @@ from restfulpy.orm import DeclarativeBase, Field, relationship, \
     FilteringMixin, OrderingMixin, PaginationMixin
 from sqlalchemy import Integer, String, ForeignKey
 
-from .specialty import Specialty
-
 
 class Phase(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
     __tablename__ = 'phase'

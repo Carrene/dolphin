@@ -3,16 +3,14 @@ from nanohttp import json, HTTPNotFound, context, HTTPUnauthorized, \
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
-from sqlalchemy_media import store_manager
 from sqlalchemy import or_
+from sqlalchemy_media import store_manager
 
+from ..exceptions import StatusAlreadyGrantedSpecialty, \
+    StatusSpecialtyNotGrantedYet, StatusQueryParameterNotInFormOrQueryString
 from ..models import Member, Specialty, SpecialtyMember, Organization, \
     OrganizationMember, Group, GroupMember
-from ..exceptions import StatusAlreadyGrantedSpecialty, StatusSpecialtyNotGrantedYet, \
-    StatusQueryParameterNotInFormOrQueryString
 from ..validators import search_member_validator
-from .organization import OrganizationController
-from .specialty import SpecialtyController
 
 
 class MemberController(ModelRestController):
@@ -40,7 +38,8 @@ class MemberController(ModelRestController):
             if member is None:
                 raise HTTPNotFound()
 
-            return MemberSpecialtyController(member=member)(*remaining_paths[2:])
+            return MemberSpecialtyController(member=member) \
+                (*remaining_paths[2:])
 
         if len(remaining_paths) > 1 and remaining_paths[1] == 'groups':
             id = int_or_notfound(remaining_paths[0])
@@ -146,7 +145,10 @@ class MemberSpecialtyController(ModelRestController):
     @Specialty.expose
     def list(self):
         return DBSession.query(Specialty) \
-            .join(SpecialtyMember, Specialty.id == SpecialtyMember.specialty_id) \
+            .join(
+                SpecialtyMember,
+                Specialty.id == SpecialtyMember.specialty_id
+            ) \
             .filter(SpecialtyMember.member_id == self.member.id)
 
 

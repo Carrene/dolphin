@@ -1,8 +1,7 @@
 from restfulpy.mule import MuleTask
-from restfulpy.orm import Field, relationship, OrderingMixin, DeclarativeBase
+from restfulpy.orm import Field, relationship, OrderingMixin
 from sqlalchemy import Integer, ForeignKey
 from sqlalchemy.orm.session import object_session
-from sqlalchemy.sql import select, update
 
 from .issue import Issue
 

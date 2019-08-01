@@ -3,8 +3,8 @@ import time
 import pytest
 from nanohttp import settings, HTTPStatus
 
-from dolphin.tokens import OrganizationInvitationToken
 from .helpers import LocalApplicationTestCase
+from dolphin.tokens import OrganizationInvitationToken
 
 
 class TestTokens(LocalApplicationTestCase):

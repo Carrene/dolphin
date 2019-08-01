@@ -1,14 +1,13 @@
 from nanohttp import json, context, HTTPNotFound, int_or_notfound, HTTPStatus
-from restfulpy.controllers import ModelRestController, RestController
 from restfulpy.authorization import authorize
+from restfulpy.controllers import ModelRestController, RestController
 from restfulpy.orm import DBSession, commit
 
-from ..models import Workflow, Phase, Specialty
-from .phases import PhaseController
-from ..validators import workflow_create_validator, workflow_update_validator, \
-    phase_update_validator, phase_validator
 from ..exceptions import StatusRepetitiveTitle, StatusRepetitiveOrder, \
     StatusSpecialtyNotFound
+from ..models import Workflow, Phase, Specialty
+from ..validators import workflow_create_validator, \
+    workflow_update_validator, phase_update_validator, phase_validator
 
 
 FORM_WHITELIST_PHASE = [

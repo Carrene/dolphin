@@ -3,9 +3,9 @@ from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 
+from ..exceptions import StatusRepetitiveTitle
 from ..models import EventType
 from ..validators import eventtype_create_validator, eventtype_update_validator
-from ..exceptions import StatusRepetitiveTitle
 
 
 FORM_WHITELIST = [

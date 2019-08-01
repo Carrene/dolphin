@@ -1,6 +1,6 @@
 from restfulpy.orm import Field, PaginationMixin, FilteringMixin, \
     OrderingMixin, BaseModel, MetadataField
-from sqlalchemy import Integer, Unicode, select, join, DateTime, func, case
+from sqlalchemy import Integer, Unicode, select, join, DateTime, func
 from sqlalchemy.orm import mapper
 
 from . import Phase, Item, Resource, Dailyreport, SpecialtyMember

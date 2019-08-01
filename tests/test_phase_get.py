@@ -1,6 +1,7 @@
 from bddrest import status, response, when, given
-from dolphin.models import Member, Specialty, Phase, Workflow, Skill
+
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.models import Member, Specialty, Phase, Workflow, Skill
 
 
 class TestPhase(LocalApplicationTestCase):

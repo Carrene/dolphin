@@ -1,5 +1,5 @@
-from restfulpy.orm import Field, DeclarativeBase, relationship, OrderingMixin, \
-    FilteringMixin, PaginationMixin
+from restfulpy.orm import Field, DeclarativeBase, relationship, \
+    OrderingMixin, FilteringMixin, PaginationMixin
 from sqlalchemy import Integer, ForeignKey, String, Unicode
 
 

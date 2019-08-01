@@ -1,7 +1,7 @@
 from bddrest import status, response, when, Remove, Update
 
-from dolphin.models import Member, Specialty, Skill
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.models import Member, Specialty, Skill
 
 
 class TestSpecialty(LocalApplicationTestCase):

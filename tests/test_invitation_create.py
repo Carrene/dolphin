@@ -1,9 +1,9 @@
 from bddrest.authoring import when, status, response, Update, Remove
 from restfulpy.messaging import create_messenger
 
+from .helpers import LocalApplicationTestCase, oauth_mockup_server
 from dolphin.models import Member, Organization, OrganizationMember, \
    OrganizationInvitationEmail
-from .helpers import LocalApplicationTestCase, oauth_mockup_server
 from dolphin.tokens import OrganizationInvitationToken
 
 

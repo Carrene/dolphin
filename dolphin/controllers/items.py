@@ -4,15 +4,14 @@ from nanohttp import json, context, HTTPNotFound, int_or_notfound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
-from sqlalchemy import select, func, join, exists, and_
+from sqlalchemy import exists, and_
 from sqlalchemy.sql.expression import all_
 
-from ..models import Item, Dailyreport, Event, Member, Issue, Project, Phase, \
-    IssuePhase
-from ..validators import update_item_validator, dailyreport_update_validator, \
-    estimate_item_validator, dailyreport_create_validator
 from ..exceptions import StatusEndDateMustBeGreaterThanStartDate, \
     StatusInvalidDatePeriod, StatusDailyReportAlreadyExist
+from ..models import Item, Dailyreport, Issue, Project, Phase, IssuePhase
+from ..validators import dailyreport_update_validator, \
+    estimate_item_validator, dailyreport_create_validator
 
 
 FORM_WHITLELIST_ITEM = [

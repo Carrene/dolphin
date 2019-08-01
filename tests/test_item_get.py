@@ -1,13 +1,11 @@
-from datetime import datetime
-
 from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when
 from nanohttp import context
 from nanohttp.contexts import Context
 
+from .helpers import LocalApplicationTestCase, oauth_mockup_server
 from dolphin.models import Project, Member, Workflow, Group, Release, \
     Specialty, Phase, Issue, Item, IssuePhase, Skill
-from .helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
 class TestItem(LocalApplicationTestCase):

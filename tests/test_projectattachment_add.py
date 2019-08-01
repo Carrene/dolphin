@@ -4,8 +4,8 @@ from os.path import join, dirname, abspath
 from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when, Update, Remove
 
-from dolphin.models import Project, Member, Workflow, Group, Release
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.models import Project, Member, Workflow, Group, Release
 
 
 this_dir = abspath(join(dirname(__file__)))

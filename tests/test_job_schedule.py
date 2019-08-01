@@ -7,9 +7,9 @@ from nanohttp.contexts import Context
 from restfulpy.mule import MuleTask, worker
 from sqlalchemy import and_
 
+from .helpers import LocalApplicationTestCase, oauth_mockup_server
 from dolphin.models import Issue, Project, Member, Workflow, Group, \
     Release, ReturnToTriageJob
-from .helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
 class TestRetuenTotriageJob(LocalApplicationTestCase):

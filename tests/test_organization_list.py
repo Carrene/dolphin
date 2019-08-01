@@ -1,7 +1,7 @@
 from bddrest.authoring import when, status, response
 
-from dolphin.models import Member, Organization, OrganizationMember
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.models import Member, Organization, OrganizationMember
 
 
 class TestOrganization(LocalApplicationTestCase):

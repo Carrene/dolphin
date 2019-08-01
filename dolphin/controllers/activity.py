@@ -2,10 +2,9 @@ from datetime import datetime
 
 from nanohttp import context, int_or_notfound, json
 from nanohttp.exceptions import HTTPForbidden, HTTPNotFound, HTTPStatus
-from restfulpy.orm import DBSession, commit
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
-from sqlalchemy import and_
+from restfulpy.orm import DBSession, commit
 
 from ..models import Activity, Member, Item, IssuePhase
 

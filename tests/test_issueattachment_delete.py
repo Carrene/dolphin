@@ -6,9 +6,9 @@ from nanohttp import context
 from nanohttp.contexts import Context
 from sqlalchemy_media import StoreManager
 
+from .helpers import LocalApplicationTestCase, oauth_mockup_server
 from dolphin.models import Project, Member, Attachment, Workflow, Group, \
     Release, Issue
-from .helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
 this_dir = abspath(join(dirname(__file__)))

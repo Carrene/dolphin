@@ -1,6 +1,6 @@
 from restfulpy.orm import Field, DeclarativeBase, OrderingMixin, \
     FilteringMixin, PaginationMixin, relationship
-from sqlalchemy import Integer, String, Unicode
+from sqlalchemy import Integer, Unicode
 
 
 class EventType(OrderingMixin, FilteringMixin, PaginationMixin,

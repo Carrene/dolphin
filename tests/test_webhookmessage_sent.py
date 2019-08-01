@@ -5,9 +5,9 @@ from bddrest import status, when, Remove, Update
 from nanohttp import context
 from nanohttp.contexts import Context
 
+from .helpers import LocalApplicationTestCase, oauth_mockup_server
 from dolphin.models import Issue, Project, Member, Workflow, Group, \
     Subscription, Release
-from .helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
 class TestSentMessegeWebhook(LocalApplicationTestCase):

@@ -1,12 +1,10 @@
 from auditor import MiddleWare
 from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when, given, Update
-from nanohttp.contexts import Context
-from nanohttp import context
 
+from .helpers import LocalApplicationTestCase, oauth_mockup_server
 from dolphin import Dolphin
 from dolphin.models import Release, Member, Group
-from .helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
 def callback(audit_logs):

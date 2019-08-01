@@ -5,31 +5,31 @@ from restfulpy.controllers import RootController, RestController, \
     JSONPatchControllerMixin
 
 import dolphin
+from .activity import ActivityController
+from .batch import BatchController
+from .dailyreport import DailyreportController
+from .draft_issue import DraftIssueController
+from .event import EventController
+from .eventtype import EventTypeController
+from .files import FileController
+from .group import GroupController
+from .invitation import InvitationController
 from .issues import IssueController
+from .items import ItemController
 from .members import MemberController
 from .oauth2 import OAUTHController
+from .organization import OrganizationController
+from .phase_summary import PhaseSummaryController
+from .phases import PhaseController
 from .projects import ProjectController
 from .releases import ReleaseController
-from .tokens import TokenController
-from .organization import OrganizationController
-from .invitation import InvitationController
-from .tag import TagController
-from .workflows import WorkflowController
-from .phases import PhaseController
-from .draft_issue import DraftIssueController
-from .files import FileController
 from .resource import ResourceController
-from .specialty import SpecialtyController
-from .group import GroupController
-from .activity import ActivityController
-from .eventtype import EventTypeController
-from .event import EventController
-from .dailyreport import DailyreportController
-from .items import ItemController
-from .phase_summary import PhaseSummaryController
 from .resource_summary import ResourceSummaryController
-from .batch import BatchController
 from .skill import SkillController
+from .specialty import SpecialtyController
+from .tag import TagController
+from .tokens import TokenController
+from .workflows import WorkflowController
 
 
 here = abspath(dirname(__file__))

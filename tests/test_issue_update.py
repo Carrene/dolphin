@@ -5,11 +5,11 @@ from bddrest import status, when, given, response, Update
 from nanohttp import context
 from nanohttp.contexts import Context
 
+from .helpers import LocalApplicationTestCase, \
+    oauth_mockup_server, chat_mockup_server
 from dolphin import Dolphin
 from dolphin.middleware_callback import callback as auditor_callback
 from dolphin.models import Issue, Project, Member, Workflow, Group, Release
-from .helpers import LocalApplicationTestCase, \
-    oauth_mockup_server, chat_mockup_server
 
 
 def callback(audit_logs):

@@ -1,15 +1,13 @@
-from datetime import datetime
-
 from auditor import MiddleWare
 from auditor.context import Context as AuditLogContext
 from auditor.logentry import RequestLogEntry, InstantiationLogEntry
 from bddrest import status, response, when, Remove, given, Update
 
+from .helpers import LocalApplicationTestCase, \
+    oauth_mockup_server, chat_mockup_server, chat_server_status
 from dolphin import Dolphin
 from dolphin.middleware_callback import callback as auditor_callback
 from dolphin.models import Project, Member, Workflow, Release, Group
-from .helpers import LocalApplicationTestCase, \
-    oauth_mockup_server, chat_mockup_server, chat_server_status
 
 
 def callback(audit_logs):

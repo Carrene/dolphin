@@ -2,8 +2,8 @@ import datetime
 
 from bddrest import status, response, when, given
 
-from dolphin.models import Member, EventType
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.models import Member, EventType
 
 
 class TestEvent(LocalApplicationTestCase):

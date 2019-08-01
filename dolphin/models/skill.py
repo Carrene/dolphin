@@ -1,6 +1,5 @@
-from restfulpy.orm import Field, relationship
+from restfulpy.orm import Field, relationship, DeclarativeBase
 from sqlalchemy import Integer, String
-from restfulpy.orm import DeclarativeBase
 
 
 class Skill(DeclarativeBase):
