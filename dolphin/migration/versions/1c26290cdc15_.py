@@ -52,6 +52,7 @@ def upgrade():
     op.execute(f'UPDATE specialty SET skill_id = {skill.id};')
     op.execute('ALTER TABLE specialty ALTER COLUMN skill_id SET NOT NULL')
 
+
 def downgrade():
     op.drop_constraint(SPECIALTY_SKILL_ID_FK, 'specialty', type_='foreignkey')
     op.drop_column('specialty', 'skill_id')
