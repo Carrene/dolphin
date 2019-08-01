@@ -9,6 +9,7 @@ from .models import Admin, Organization, OrganizationMember, Workflow, \
 
 def insert(): # pragma: no cover
 
+    import pudb; pudb.set_trace()  # XXX BREAKPOINT
     default_workflow = Workflow(title='Default')
 
     public_group = Group(title='Public', public=True)
