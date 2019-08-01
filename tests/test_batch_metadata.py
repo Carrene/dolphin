@@ -43,3 +43,12 @@ class TestBatch(LocalApplicationTestCase):
             assert fields['issueIds']['example'] is not None
             assert fields['issueIds']['name'] is not None
 
+            assert fields['issueId']['key'] is not None
+            assert fields['issueId']['notNone'] is not None
+            assert fields['issueId']['readonly'] is not None
+            assert fields['issueId']['label'] is not None
+            assert fields['issueId']['name'] is not None
+            assert fields['issueId']['watermark'] is not None
+            assert fields['issueId']['example'] is not None
+            assert fields['issueId']['name'] is not None
+

@@ -559,7 +559,7 @@ class ProjectBatchController(RestController):
     @batch_remove_validator
     @commit
     def remove(self):
-        issue = DBSession.query(Issue).get(context.form.get('issueIds'))
+        issue = DBSession.query(Issue).get(context.form.get('issueId'))
         if issue is None:
             raise StatusIssueNotFound()
 
@@ -568,6 +568,18 @@ class ProjectBatchController(RestController):
         issue_ids = DBSession.query(Issue.id) \
             .filter(Issue.project_id == self.project.id) \
             .filter(Issue.batch == batch_id)
+
+        sibling_issue_by_batch = DBSession.query(Issue) \
+            .filter(Issue.id != issue.id) \
+            .filter(Issue.batch == batch_id) \
+            .first()
+
+        # Transfering batch leadership from current leader to sibling issue
+        if issue.is_batch_leader:
+            issue.is_batch_leader = None
+
+            if sibling_issue_by_batch:
+                sibling_issue_by_batch.is_batch_leader = True
 
         batch = dict(
             id=batch_id,

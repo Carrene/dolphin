@@ -58,8 +58,22 @@ class TestBatch(LocalApplicationTestCase):
                 room_id=2,
                 batch=1,
                 stage='triage',
+                is_batch_leader=True,
+                project=cls.project1,
             )
-            cls.project1.issues.append(cls.issue1)
+            session.add(cls.issue1)
+
+            cls.issue2 = Issue(
+                title='Second issue',
+                description='This is description of second issue',
+                kind='feature',
+                days=1,
+                room_id=3,
+                batch=1,
+                stage='triage',
+                project=cls.project1,
+            )
+            session.add(cls.issue1)
             session.commit()
 
     def test_remove(self):
@@ -71,7 +85,7 @@ class TestBatch(LocalApplicationTestCase):
             f'/apiv1/projects/project_id: {self.project1.id}/batches',
             'REMOVE',
             json=dict(
-                issueIds=self.issue1.id
+                issueId=self.issue1.id
             )
         ):
             assert status == 200
@@ -80,28 +94,36 @@ class TestBatch(LocalApplicationTestCase):
             assert response.json['projectId'] == self.project1.id
             assert self.issue1.id not in response.json['issueIds']
             assert not session.query(Issue).get(self.issue1.id).batch
+            assert session.query(Issue) \
+                .filter(Issue.id == self.issue1.id) \
+                .filter(Issue.is_batch_leader == None) \
+                .one()
+            assert session.query(Issue) \
+                .filter(Issue.id != self.issue1.id) \
+                .filter(Issue.is_batch_leader == True) \
+                .one()
 
             when(
                 'Trying to pass without issue id',
-                json=given - 'issueIds',
+                json=given - 'issueId',
             )
             assert status == '723 Issue Id Not In Form'
 
             when(
                 'Trying to pass with invalid issue id type',
-                json=given | dict(issueIds='a'),
+                json=given | dict(issueId='a'),
             )
             assert status == '722 Invalid Issue Id Type'
 
             when(
                 'Trying to pass with none issue id',
-                json=given | dict(issueIds=None),
+                json=given | dict(issueId=None),
             )
             assert status == '775 Issue Id Is Null'
 
             when(
                 'Intended issue not found',
-                json=given | dict(issueIds=0),
+                json=given | dict(issueId=0),
             )
             assert status == '605 Issue Not Found'
 
