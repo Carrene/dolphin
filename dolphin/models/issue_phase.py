@@ -3,8 +3,8 @@ from sqlalchemy import Integer, ForeignKey, select, case, func, join
 from sqlalchemy.orm import column_property
 from sqlalchemy.sql.expression import any_, all_
 
-from .item import Item
 from .dailyreport import Dailyreport
+from .item import Item
 
 
 issue_phase_statuses = [

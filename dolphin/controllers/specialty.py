@@ -1,11 +1,10 @@
-from nanohttp import json, int_or_notfound , HTTPNotFound, context, HTTPStatus
+from nanohttp import json, int_or_notfound, HTTPNotFound, context
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
 from restfulpy.orm import DBSession, commit
 
-from ..models import Specialty, SpecialtyMember
-from ..exceptions import StatusAlreadyGrantedSpecialty, \
-    StatusSpecialtyNotGrantedYet, StatusRepetitiveTitle
+from ..exceptions import StatusRepetitiveTitle
+from ..models import Specialty
 from ..validators import specialty_create_validator, specialty_update_validator
 
 

@@ -4,8 +4,8 @@ from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when
 from sqlalchemy_media import StoreManager
 
-from dolphin.models import Project, Member, Attachment, Workflow, Group, Release
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.models import Project, Member, Attachment, Workflow, Group, Release
 
 
 this_dir = abspath(join(dirname(__file__)))

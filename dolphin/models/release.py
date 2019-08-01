@@ -9,9 +9,9 @@ from sqlalchemy import Integer, Enum, DateTime, ForeignKey, select, func, \
     join, bindparam
 from sqlalchemy.orm import column_property
 
+from .member import Member
 from .project import Project
 from .subscribable import Subscribable, Subscription
-from .member import Member
 
 
 release_statuses = [

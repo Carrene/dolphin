@@ -1,13 +1,13 @@
 from nanohttp import settings
 from restfulpy.orm import DeclarativeBase, Field, relationship
 from sqlalchemy import Integer, ForeignKey, select, func, join, case, and_
-from sqlalchemy.orm import column_property
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import column_property
 
-from .member import Member
 from .issue import Issue
-from .item import Item
 from .issue_phase import IssuePhase
+from .item import Item
+from .member import Member
 
 
 class TeamResource(DeclarativeBase):

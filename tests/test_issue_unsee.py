@@ -1,13 +1,13 @@
 from datetime import datetime
 
-from nanohttp import context
-from bddrest import status, when
-from nanohttp.contexts import Context
 from auditor.context import Context as AuditLogContext
+from bddrest import status, when
+from nanohttp import context
+from nanohttp.contexts import Context
 
+from .helpers import LocalApplicationTestCase, oauth_mockup_server
 from dolphin.models import Issue, Project, Member, Workflow, Group, \
     Subscription, Release
-from .helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
 class TestUnseeIssue(LocalApplicationTestCase):

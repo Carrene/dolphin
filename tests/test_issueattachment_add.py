@@ -6,8 +6,8 @@ from bddrest import status, response, when, Update, Remove
 from nanohttp import context
 from nanohttp.contexts import Context
 
-from dolphin.models import Project, Member, Workflow, Group, Release, Issue
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.models import Project, Member, Workflow, Group, Release, Issue
 
 
 this_dir = abspath(join(dirname(__file__)))

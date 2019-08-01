@@ -6,10 +6,10 @@ from restfulpy.orm import commit, DBSession
 from sqlalchemy import and_, exists
 
 from ..backends import ChatClient
-from ..exceptions import StatusRoomMemberAlreadyExist, StatusChatRoomNotFound, \
-    StatusIssueBugMustHaveRelatedIssue
-from ..models import Issue, Phase, Item, Member, DraftIssue, DraftIssueTag, \
-    Tag, Specialty, Resource, IssueTag, RelatedIssue, DraftIssueIssue
+from ..exceptions import StatusRoomMemberAlreadyExist, \
+    StatusChatRoomNotFound, StatusIssueBugMustHaveRelatedIssue
+from ..models import Issue, Member, DraftIssue, DraftIssueTag, Tag, IssueTag, \
+    RelatedIssue, DraftIssueIssue
 from ..validators import draft_issue_finalize_validator, \
     draft_issue_define_validator, draft_issue_relate_validator
 from .tag import TagController

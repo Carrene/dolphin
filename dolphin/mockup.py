@@ -3,8 +3,8 @@ from nanohttp.contexts import Context
 from restfulpy.orm import DBSession
 from sqlalchemy_media import StoreManager
 
-from .models import Resource, Phase, Member, Organization, \
-    OrganizationMember, Specialty, Workflow
+from .models import Resource, Member, Organization, OrganizationMember, \
+    Specialty
 
 
 def insert(): # pragma: no cover

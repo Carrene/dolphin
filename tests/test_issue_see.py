@@ -1,11 +1,11 @@
+from auditor.context import Context as AuditLogContext
+from bddrest import status, when, response
 from nanohttp import context
 from nanohttp.contexts import Context
-from bddrest import status, when, response
-from auditor.context import Context as AuditLogContext
 
+from .helpers import LocalApplicationTestCase, oauth_mockup_server
 from dolphin.models import Issue, Project, Member, Workflow, Group, \
     Subscription, Release
-from .helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
 class TestSeeIssue(LocalApplicationTestCase):

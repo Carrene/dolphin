@@ -6,8 +6,8 @@ from mimetypes import guess_type
 from wsgiref.simple_server import WSGIServer, WSGIRequestHandler
 
 from restfulpy.application import Application
-from restfulpy.messaging import Messenger
 from restfulpy.helpers import copy_stream
+from restfulpy.messaging import Messenger
 
 
 SERVER_LOCK = threading.Event()

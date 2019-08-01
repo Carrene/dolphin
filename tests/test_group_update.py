@@ -1,8 +1,8 @@
 from bddrest import status, response, when, given
 
-from dolphin.models import Member
 from .helpers import create_group, LocalApplicationTestCase, \
     oauth_mockup_server
+from dolphin.models import Member
 
 
 class TestGroup(LocalApplicationTestCase):

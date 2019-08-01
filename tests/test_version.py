@@ -1,7 +1,7 @@
 from bddrest import status, response
 
-from dolphin import __version__ as application_version
 from .helpers import LocalApplicationTestCase
+from dolphin import __version__ as application_version
 
 
 class TestVersion(LocalApplicationTestCase):

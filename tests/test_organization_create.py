@@ -1,11 +1,11 @@
 import io
 from os.path import dirname, abspath, join
 
-from nanohttp import settings
 from bddrest.authoring import when, status, response, given
+from nanohttp import settings
 
-from dolphin.models import Member, Organization, OrganizationMember
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.models import Member, Organization, OrganizationMember
 
 
 TEST_DIR = abspath(dirname(__file__))

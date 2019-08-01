@@ -1,7 +1,7 @@
 from bddrest import status, response, when
 
-from dolphin.models import Member, EventType
 from .helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.models import Member, EventType
 
 
 class TestEventType(LocalApplicationTestCase):

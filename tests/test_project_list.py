@@ -3,9 +3,9 @@ from bddrest import status, response, when
 from nanohttp import context
 from nanohttp.contexts import Context
 
+from .helpers import LocalApplicationTestCase, oauth_mockup_server
 from dolphin.models import Project, Member, Workflow, Issue, Subscription, \
     Group, Release, Phase, Specialty, Item, IssuePhase, Skill
-from .helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
 class TestProject(LocalApplicationTestCase):

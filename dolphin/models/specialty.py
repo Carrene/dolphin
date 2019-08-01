@@ -18,7 +18,8 @@ class SpecialtyMember(DeclarativeBase):
     )
 
 
-class Specialty(OrderingMixin, FilteringMixin, PaginationMixin, DeclarativeBase):
+class Specialty(OrderingMixin, FilteringMixin, PaginationMixin, \
+                DeclarativeBase):
     __tablename__ = 'specialty'
 
     id = Field(

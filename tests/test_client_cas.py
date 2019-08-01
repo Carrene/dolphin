@@ -2,10 +2,10 @@ from datetime import datetime, timedelta
 
 from bddrest.authoring import status, when, Remove, Update
 
-from dolphin.models import Member, Organization, OrganizationMember, Invitation
 from .helpers import LocalApplicationTestCase, \
     oauth_mockup_server, oauth_server_status, chat_mockup_server, \
     chat_server_status
+from dolphin.models import Member, Organization, OrganizationMember, Invitation
 
 
 class TestToken(LocalApplicationTestCase):

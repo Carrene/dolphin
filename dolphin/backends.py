@@ -1,7 +1,7 @@
 import json
 
 import requests
-from nanohttp import settings, HTTPForbidden, HTTPUnauthorized, context
+from nanohttp import settings, HTTPForbidden, HTTPUnauthorized
 from restfulpy import logger
 
 from .exceptions import *

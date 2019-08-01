@@ -4,9 +4,9 @@ from nanohttp import context
 from nanohttp.contexts import Context
 from sqlalchemy import func
 
+from .helpers import LocalApplicationTestCase, oauth_mockup_server
 from dolphin.models import Issue, Project, Member, Phase, Group, Workflow, \
     Release, Specialty, Subscription, Item, IssuePhase, Skill
-from .helpers import LocalApplicationTestCase, oauth_mockup_server
 
 
 class TestIssue(LocalApplicationTestCase):

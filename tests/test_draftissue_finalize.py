@@ -1,17 +1,17 @@
-from nanohttp.contexts import Context
-from nanohttp import context
 from auditor import MiddleWare
 from auditor.context import Context as AuditLogContext
 from auditor.logentry import RequestLogEntry, InstantiationLogEntry
 from bddrest import status, response, Update, when, given, Remove
+from nanohttp import context
+from nanohttp.contexts import Context
 
+from .helpers import LocalApplicationTestCase, \
+    oauth_mockup_server, chat_mockup_server, chat_server_status
 from dolphin import Dolphin
 from dolphin.middleware_callback import callback as auditor_callback
 from dolphin.models import Issue, Project, Workflow, Phase, Tag, DraftIssue, \
     Organization, OrganizationMember, Group, Release, Specialty, Resource, \
     Skill
-from .helpers import LocalApplicationTestCase, \
-    oauth_mockup_server, chat_mockup_server, chat_server_status
 
 
 def callback(audit_logs):

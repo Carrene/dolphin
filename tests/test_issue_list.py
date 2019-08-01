@@ -5,11 +5,11 @@ from bddrest import status, response, when
 from nanohttp import context
 from nanohttp.contexts import Context
 
+from .helpers import LocalApplicationTestCase, oauth_mockup_server
+from dolphin.constants import ISSUE_RESPONSE_TIME
 from dolphin.models import Issue, Project, Member, Workflow, Item, Phase, \
     Group, Subscription, Release, Specialty, Organization, Tag, IssuePhase, \
     Skill
-from .helpers import LocalApplicationTestCase, oauth_mockup_server
-from dolphin.constants import ISSUE_RESPONSE_TIME
 
 
 class TestIssue(LocalApplicationTestCase):

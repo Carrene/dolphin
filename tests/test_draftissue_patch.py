@@ -3,10 +3,10 @@ from bddrest import status, response, when
 from nanohttp import context
 from nanohttp.contexts import Context
 
-from dolphin.models import Issue, Project, Workflow, Phase, Tag, \
-    Organization, DraftIssue, Group, Release, Specialty, Resource, Skill
 from .helpers import LocalApplicationTestCase, \
     oauth_mockup_server, chat_mockup_server
+from dolphin.models import Issue, Project, Workflow, Phase, Tag, \
+    Organization, DraftIssue, Group, Release, Specialty, Resource, Skill
 
 
 class TestIssue(LocalApplicationTestCase):

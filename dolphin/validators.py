@@ -2,8 +2,8 @@ import re
 
 from nanohttp import validate, HTTPStatus, context, int_or_notfound, \
     HTTPBadRequest
-from restfulpy.orm import DBSession
 from restfulpy.datetimehelpers import parse_datetime
+from restfulpy.orm import DBSession
 
 from .exceptions import *
 from .models import *

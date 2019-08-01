@@ -1,9 +1,8 @@
 from restfulpy.orm import Field, relationship, SoftDeleteMixin, \
     ModifiedMixin, OrderingMixin, FilteringMixin, PaginationMixin, \
     DeclarativeBase
-from sqlalchemy import Integer, String, Unicode
 from restfulpy.orm.metadata import MetadataField
-from sqlalchemy import Integer, String
+from sqlalchemy import Integer, String, Unicode
 
 from .phase import Phase
 
