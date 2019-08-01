@@ -59,6 +59,7 @@ class TestBatch(LocalApplicationTestCase):
                 kind='feature',
                 days=1,
                 room_id=2,
+                project=cls.project1,
             )
             cls.issue2 = Issue(
                 title='second issue',
@@ -67,6 +68,7 @@ class TestBatch(LocalApplicationTestCase):
                 days=1,
                 stage='backlog',
                 room_id=2,
+                project=cls.project1,
             )
             cls.issue3 = Issue(
                 title='third issue',
@@ -76,8 +78,8 @@ class TestBatch(LocalApplicationTestCase):
                 room_id=2,
                 stage='backlog',
                 batch=1,
+                project=cls.project1,
             )
-
             cls.issue4 = Issue(
                 title='issue4',
                 description='This is description of third issue',
@@ -85,12 +87,11 @@ class TestBatch(LocalApplicationTestCase):
                 days=1,
                 room_id=2,
                 stage='backlog',
+                project=cls.project1,
+                batch=1,
+                is_batch_leader=True,
             )
 
-            cls.project1.issues.append(cls.issue1)
-            cls.project1.issues.append(cls.issue2)
-            cls.project1.issues.append(cls.issue3)
-            cls.project1.issues.append(cls.issue4)
             cls.returntotriage = ReturnToTriageJob(
                 at=datetime.now(),
                 issue=cls.issue3,
@@ -112,19 +113,19 @@ class TestBatch(LocalApplicationTestCase):
             f'/batches/batch_id: {batch_id}',
             'APPEND',
             json=dict(
-                issueIds=self.issue1.id
+                issueId=self.issue1.id
             )
         ):
             assert status == 200
             assert response.json['id'] == batch_id
             assert response.json['stage'] == 'backlog'
             assert response.json['projectId'] == self.project1.id
-            assert len(response.json['issueIds']) == 2
+            assert len(response.json['issueIds']) == 3
 
             when(
                 'Appending a batch without have before',
                 url_parameters=dict(project_id=self.project1.id, batch_id=2),
-                json=dict(issueIds=self.issue2.id),
+                json=dict(issueId=self.issue2.id),
             )
             assert status == 200
             assert response.json['id'] == 2
@@ -134,7 +135,7 @@ class TestBatch(LocalApplicationTestCase):
             when(
                 'Appending a batch without have before',
                 url_parameters=dict(project_id=self.project1.id, batch_id=3),
-                json=dict(issueIds=self.issue4.id),
+                json=dict(issueId=self.issue4.id),
             )
             assert status == 200
             assert response.json['id'] == 3
@@ -143,25 +144,25 @@ class TestBatch(LocalApplicationTestCase):
 
             when(
                 'Trying to pass without issue id',
-                json=given - 'issueIds'
+                json=given - 'issueId'
             )
             assert status == '723 Issue Id Not In Form'
 
             when(
                 'Trying to pass with invalid issue id type',
-                json=given | dict(issueIds='a')
+                json=given | dict(issueId='a')
             )
             assert status == '722 Invalid Issue Id Type'
 
             when(
                 'Trying to pass with none issue id',
-                json=given | dict(issueIds=None)
+                json=given | dict(issueId=None)
             )
             assert status == '775 Issue Id Is Null'
 
             when(
                 'Issue is not found',
-                json=given | dict(issueIds=0)
+                json=given | dict(issueId=0)
             )
             assert status == '605 Issue Not Found: 0'
 

@@ -6,7 +6,7 @@ from restfulpy.orm import Field, DeclarativeBase, relationship, \
     OrderingMixin, FilteringMixin, PaginationMixin
 from restfulpy.orm.metadata import MetadataField
 from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
-    case, join, and_, exists, DateTime
+    case, join, and_, exists, DateTime, Boolean
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import column_property
@@ -193,6 +193,20 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         not_none=False,
         required=False,
         readonly=False,
+        watermark='lorem ipsum',
+        example='lorem ipsum',
+        message='lorem ipsum',
+    )
+    is_batch_leader = Field(
+        Boolean,
+        python_type=bool,
+        label='Batch Leader',
+        minimum=1,
+        maximum=1000,
+        nullable=True,
+        not_none=False,
+        required=False,
+        readonly=True,
         watermark='lorem ipsum',
         example='lorem ipsum',
         message='lorem ipsum',
