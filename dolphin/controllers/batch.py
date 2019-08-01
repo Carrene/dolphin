@@ -73,6 +73,27 @@ class BatchController(RestController):
                     'message': 'Lorem Ipsum',
                     'type': None,
                 },
+                issueId={
+                    'pattern': None,
+                    'patternDescription': None,
+                    'maxLength': None,
+                    'minLength': None,
+                    'minimum': None,
+                    'maximum': None,
+                    'readonly': False,
+                    'protected': False,
+                    'notNone': False,
+                    'required': True,
+                    'default': None,
+                    'name': 'issueId',
+                    'key': 'issue_id',
+                    'primaryKey': False,
+                    'label': 'Issue Id',
+                    'watermark': 'Lorem Ipsum',
+                    'example': 'Lorem Ipsum',
+                    'message': 'Lorem Ipsum',
+                    'type': None,
+                },
             )
         )
         return metadata
