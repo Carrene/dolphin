@@ -559,7 +559,7 @@ class ProjectBatchController(RestController):
     @batch_remove_validator
     @commit
     def remove(self):
-        issue = DBSession.query(Issue).get(context.form.get('issueIds'))
+        issue = DBSession.query(Issue).get(context.form.get('issueId'))
         if issue is None:
             raise StatusIssueNotFound()
 

@@ -85,7 +85,7 @@ class TestBatch(LocalApplicationTestCase):
             f'/apiv1/projects/project_id: {self.project1.id}/batches',
             'REMOVE',
             json=dict(
-                issueIds=self.issue1.id
+                issueId=self.issue1.id
             )
         ):
             assert status == 200
@@ -105,25 +105,25 @@ class TestBatch(LocalApplicationTestCase):
 
             when(
                 'Trying to pass without issue id',
-                json=given - 'issueIds',
+                json=given - 'issueId',
             )
             assert status == '723 Issue Id Not In Form'
 
             when(
                 'Trying to pass with invalid issue id type',
-                json=given | dict(issueIds='a'),
+                json=given | dict(issueId='a'),
             )
             assert status == '722 Invalid Issue Id Type'
 
             when(
                 'Trying to pass with none issue id',
-                json=given | dict(issueIds=None),
+                json=given | dict(issueId=None),
             )
             assert status == '775 Issue Id Is Null'
 
             when(
                 'Intended issue not found',
-                json=given | dict(issueIds=0),
+                json=given | dict(issueId=0),
             )
             assert status == '605 Issue Not Found'
 
