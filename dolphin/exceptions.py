@@ -530,7 +530,3 @@ class StatusIssueIdNotInForm(HTTPKnownStatus):
 class StatusInvalidBatch(HTTPKnownStatus):
     status = '936 Invalid Batch More Than 100'
 
-
-class StatusIssueIsAlreadyExtended(HTTPKnownStatus):
-    status = '666 Issue Is Already Extended'
-
