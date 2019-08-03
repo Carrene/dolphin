@@ -200,6 +200,16 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         example='lorem ipsum',
         message='lorem ipsum',
     )
+    is_extended = Field(
+        Boolean,
+        python_type=bool,
+        label='Last Moving Time',
+        nullable=True,
+        protected=True,
+        required=False,
+        not_none=False,
+        readonly=True,
+    )
     attachments = relationship('Attachment', lazy='selectin')
     tags = relationship(
         'Tag',
@@ -209,8 +219,8 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
     )
     project = relationship(
         'Project',
-        foreign_keys=[project_id],
         back_populates='issues',
+        foreign_keys=[project_id],
         protected=False,
     )
     returntotriagejobs = relationship(
@@ -339,6 +349,23 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             )
         ], else_='to-do').label('status'),
         deferred=True
+    )
+
+    boarding = column_property(
+        case([
+            (
+                stage == 'on-hold',
+                'frozen'
+            ),
+            (
+                due_date == null(),
+                'on-time'
+            ),
+            (
+                due_date < func.now(),
+                'delayed'
+            ),
+        ], else_='on-time').label('boarding'),
     )
 
     @hybrid_property
