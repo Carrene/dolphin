@@ -18,8 +18,6 @@ from .item import Item
 from .member import Member
 from .phase import Phase
 from .subscribable import Subscribable, Subscription
-#from .release import Release
-#from .project import Project
 
 
 class IssueTag(DeclarativeBase):
