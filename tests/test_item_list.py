@@ -417,9 +417,9 @@ class TestListGroup(LocalApplicationTestCase):
 
             when(
                 'Filter by issue boarding',
-                query=dict(issueBoarding=self.issue1.boarding)
+                query=dict(issueBoarding=f'IN({self.issue1.boarding})')
             )
-            assert len(response.json) == 4
+            assert len(response.json) == 5
 
             when(
                 'Filter by project title',
