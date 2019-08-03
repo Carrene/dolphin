@@ -1,59 +1,38 @@
-from bddcli import Given, given, when, stdout, Application, status
-from nanohttp import settings
-from restfulpy.db import PostgreSQLManager as DBManager
-
-from dolphin import dolphin
+from .helpers import LocalApplicationTestCase
+from dolphin.models import Member, Workflow, Specialty, Group, Phase, Skill, \
+    Tag, EventType
 
 
-def foo_main():
-    return dolphin.cli_main()
+class TestDatabaseCLI(LocalApplicationTestCase):
 
+    def test_basedata(self):
+        self.__application__.insert_basedata()
 
-app = Application('dolphin', 'tests.test_cli_basedata:foo_main')
+        session = self.create_session()
+        assert session.query(Group).filter(Group.title == 'Public').one()
+        assert session.query(Skill).filter(Skill.title == 'Developer').one()
+        assert session.query(Member).filter(Member.title == 'GOD').one()
+        assert session.query(Member).count() == 1
+        assert session.query(Phase).count() == 3
+        assert session.query(Tag).count() == 3
+        assert session.query(EventType).count() == 2
 
+        assert session.query(EventType) \
+            .filter(EventType.title == 'Personal') \
+            .one()
+        assert session.query(EventType) \
+            .filter(EventType.title == 'Company-Wide') \
+            .one()
+        assert session.query(Specialty) \
+            .filter(Specialty.title == 'front-end') \
+            .one()
+        assert session.query(Workflow) \
+            .filter(Workflow.title == 'Default') \
+            .one()
 
-class TestDatabaseAdministrationCommandLine:
-    db = None
+    def test_mockup(self):
+        self.__application__.insert_mockup()
 
-    @classmethod
-    def setup_class(cls):
-        dolphin.configure(force=True)
-        cls.db = DBManager(settings.db.url)
-        cls.db.__enter__()
-
-    @classmethod
-    def teardown_class(cls):
-        cls.db.__exit__(None, None, None)
-
-    def test_db(self):
-        self.db.drop_database()
-        assert not self.db.database_exists()
-
-        with Given(app, 'db create --drop --basedata'):
-            assert status == 0
-            assert len(stdout) > 10
-            with self.db.cursor('SELECT * FROM member') as c:
-                members = c.fetchall()
-                assert len(members) == 1
-                assert members[0][8] == 'GOD'
-
-            with self.db.cursor('SELECT * FROM skill') as c:
-                skills = c.fetchall()
-                assert len(skills) == 1
-
-            with self.db.cursor('SELECT * FROM tag') as c:
-                tags = c.fetchall()
-                assert len(tags) == 3
-
-            with self.db.cursor('SELECT * FROM phase') as c:
-                phases = c.fetchall()
-                assert len(phases) == 3
-
-            when(given + '--mockup')
-            with self.db.cursor('SELECT * FROM member') as c:
-                assert len(c.fetchall()) == 10
-
-
-if __name__ == '__main__':  # pragma: no cover
-    dolphin.cli_main(['db', 'create', '--drop', '--basedata'])
+        session = self.create_session()
+        assert session.query(Member).count() == 10
 
