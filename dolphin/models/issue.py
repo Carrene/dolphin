@@ -6,7 +6,7 @@ from restfulpy.orm import Field, DeclarativeBase, relationship, \
     OrderingMixin, FilteringMixin, PaginationMixin
 from restfulpy.orm.metadata import MetadataField
 from sqlalchemy import Integer, ForeignKey, Enum, select, func, bindparam, \
-    case, join, and_, exists, DateTime, Boolean
+    case, join, and_, exists, DateTime, Boolean, null
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import column_property
@@ -69,14 +69,6 @@ issue_origins = [
 ]
 
 
-# FIXME: Implement a class to encapsulate an enum value.
-class Boarding:
-    ontime =    (1, 'on-time')
-    delayed =   (2, 'delayed')
-    frozen =    (3, 'frozen')
-    atrisk =    (4, 'at-risk')
-
-
 class Priority:
     low =      (1, 'low')
     normal =   (2, 'normal')
@@ -88,8 +80,6 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
 
     __tablename__ = 'issue'
     __mapper_args__ = {'polymorphic_identity': __tablename__}
-
-    _boarding = ['on-time', 'delayed']
 
     id = Field(
         Integer,
@@ -386,42 +376,22 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
             )
         ])
 
-    @property
-    def _boarding(self):
-        if self.stage == 'on-hold':
-            return Boarding.frozen
-
-        if self.due_date == None:
-            return Boarding.ontime
-
-        if self.due_date < datetime.now():
-            return Boarding.delayed
-
-        return Boarding.ontime
-
-    @hybrid_property
-    def boarding_value(self):
-        return self._boarding[0]
-
-    @boarding_value.expression
-    def boarding_value(cls):
-        return case([
-            (cls.due_date == None, Boarding.frozen[0]),
-            (cls.due_date < datetime.now(), Boarding.delayed[0]),
-            (cls.due_date > datetime.now(), Boarding.ontime[0])
-        ])
-
-    @hybrid_property
-    def boarding(self):
-        return self._boarding[1]
-
-    @boarding.expression
-    def boarding(cls):
-        return case([
-            (cls.due_date == None, Boarding.frozen[1]),
-            (cls.due_date < datetime.now(), Boarding.delayed[1]),
-            (cls.due_date > datetime.now(), Boarding.ontime[1])
-        ])
+    boarding = column_property(
+        case([
+            (
+                stage == 'on-hold',
+                'frozen'
+            ),
+            (
+                due_date == null(),
+                'on-time'
+            ),
+            (
+                due_date < func.now(),
+                'delayed'
+            ),
+        ], else_='on-time').label('boarding'),
+    )
 
     @hybrid_property
     def priority_value(self):
