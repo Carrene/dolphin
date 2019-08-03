@@ -13,7 +13,7 @@ from ..backends import ChatClient
 from ..exceptions import StatusRoomMemberAlreadyExist, \
     StatusRoomMemberNotFound, StatusRelatedIssueNotFound, \
     StatusIssueBugMustHaveRelatedIssue, StatusIssueNotFound, \
-    StatusQueryParameterNotInFormOrQueryString, StatusIssueIsAlreadyExtended
+    StatusQueryParameterNotInFormOrQueryString
 from ..models import Issue, Subscription, Phase, Item, Member, Project, \
     RelatedIssue, IssueTag, Tag, AbstractResourceSummaryView, \
     AbstractPhaseSummaryView, IssuePhase, ReturnToTriageJob
@@ -825,21 +825,6 @@ class IssueController(ModelRestController, JSONPatchControllerMixin):
                 .filter(Subscription.member_id == context.identity.id)
 
         return query
-
-    @authorize
-    @json(prevent_form='709 Form Not Allowed')
-    @commit
-    def extend(self, id):
-        id = int_or_notfound(id)
-        issue = DBSession.query(Issue).get(id)
-        if issue is None:
-            raise HTTPNotFound()
-
-        if issue.is_extended:
-            raise StatusIssueIsAlreadyExtended()
-
-        issue.is_extended = True
-        return issue
 
 
 class IssuePhaseSummaryController(ModelRestController):

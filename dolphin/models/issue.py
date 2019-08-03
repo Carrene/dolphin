@@ -200,16 +200,6 @@ class Issue(OrderingMixin, FilteringMixin, PaginationMixin, ModifiedByMixin,
         example='lorem ipsum',
         message='lorem ipsum',
     )
-    is_extended = Field(
-        Boolean,
-        python_type=bool,
-        label='Last Moving Time',
-        nullable=True,
-        protected=True,
-        required=False,
-        not_none=False,
-        readonly=True,
-    )
     attachments = relationship('Attachment', lazy='selectin')
     tags = relationship(
         'Tag',
