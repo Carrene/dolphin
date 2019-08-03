@@ -1,42 +1,59 @@
-import base64
-import json
-
-from bddcli import Given, given, when, stdout, stderr, Application, status
-from restfulpy import Application as RestfulpyApplication
-from restfulpy.testing import db
+from bddcli import Given, given, when, stdout, Application, status
+from nanohttp import settings
+from restfulpy.db import PostgreSQLManager as DBManager
 
 from dolphin import dolphin
-from dolphin.models import Member
-
-
-foo = RestfulpyApplication(name='jwt')
 
 
 def foo_main():
-    import pudb; pudb.set_trace()  # XXX BREAKPOINT
     return dolphin.cli_main()
 
 
 app = Application('dolphin', 'tests.test_cli_basedata:foo_main')
 
 
-def test_jwt(db):
-    session = db()
-    with Given(app, 'db create --drop --basedata'):
-        import pudb; pudb.set_trace()  # XXX BREAKPOINT
-        assert status == 0
-        assert len(stdout) > 10
-        god = session.query(Member).get(1)
+class TestDatabaseAdministrationCommandLine:
+    db = None
 
-        when(given + '\'{"foo": 1}\'')
-        assert stderr == ''
-        assert status == 0
-        header, payload, signature = stdout.encode().split(b'.')
-        payload = base64.urlsafe_b64decode(payload)
-        assert json.loads(payload) == {'foo': 1}
+    @classmethod
+    def setup_class(cls):
+        dolphin.configure(force=True)
+        cls.db = DBManager(settings.db.url)
+        cls.db.__enter__()
+
+    @classmethod
+    def teardown_class(cls):
+        cls.db.__exit__(None, None, None)
+
+    def test_db(self):
+        self.db.drop_database()
+        assert not self.db.database_exists()
+
+        with Given(app, 'db create --drop --basedata'):
+            assert status == 0
+            assert len(stdout) > 10
+            with self.db.cursor('SELECT * FROM member') as c:
+                members = c.fetchall()
+                assert len(members) == 1
+                assert members[0][8] == 'GOD'
+
+            with self.db.cursor('SELECT * FROM skill') as c:
+                skills = c.fetchall()
+                assert len(skills) == 1
+
+            with self.db.cursor('SELECT * FROM tag') as c:
+                tags = c.fetchall()
+                assert len(tags) == 3
+
+            with self.db.cursor('SELECT * FROM phase') as c:
+                phases = c.fetchall()
+                assert len(phases) == 3
+
+            when(given + '--mockup')
+            with self.db.cursor('SELECT * FROM member') as c:
+                assert len(c.fetchall()) == 10
 
 
 if __name__ == '__main__':  # pragma: no cover
-    import pudb; pudb.set_trace()  # XXX BREAKPOINT
-    foo.cli_main(['db', 'create', '--drop', '--basedata'])
+    dolphin.cli_main(['db', 'create', '--drop', '--basedata'])
 

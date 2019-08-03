@@ -83,7 +83,6 @@ class Dolphin(Application):
    '''
 
     def __init__(self, application_name='dolphin', root=Root()):
-        import pudb; pudb.set_trace()  # XXX BREAKPOINT
         super().__init__(
             application_name,
             root=root,
@@ -92,7 +91,6 @@ class Dolphin(Application):
         )
 
     def insert_basedata(self, *args):# pragma: no cover
-        import pudb; pudb.set_trace()  # XXX BREAKPOINT
         basedata.insert()
 
     def insert_mockup(self, *args):# pragma: no cover
