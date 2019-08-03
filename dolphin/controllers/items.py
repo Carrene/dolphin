@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from auditor import context as AuditLogContext
 from nanohttp import json, context, HTTPNotFound, int_or_notfound
 from restfulpy.authorization import authorize
 from restfulpy.controllers import ModelRestController
@@ -226,11 +227,13 @@ class ItemController(ModelRestController):
     @commit
     def estimate(self, id):
         id = int_or_notfound(id)
-
         item = DBSession.query(Item).get(id)
         if not item:
             raise HTTPNotFound()
 
+        old_start_date = item.start_date
+        old_end_date = item.end_date
+        old_estimated_hours = item.estimated_hours
         item.update_from_request()
         if item.start_date > item.end_date:
             raise StatusEndDateMustBeGreaterThanStartDate()
@@ -258,6 +261,36 @@ class ItemController(ModelRestController):
             if next_issue_phase is not None:
                 self._set_need_estimate_sibling_items(next_issue_phase)
                 self._unset_need_estimate_sibling_items(item.issue_phase)
+
+        if old_estimated_hours != item.estimated_hours:
+            AuditLogContext.append_change_attribute(
+                user=context.identity.email,
+                object_=item.issue_phase.issue,
+                attribute_key=f'EST-{item.issue_phase.phase.title}',
+                attribute_label=f'Est-{item.issue_phase.phase.title}',
+                old_value=old_estimated_hours,
+                new_value=item.estimated_hours,
+            )
+
+        if old_end_date != item.end_date:
+            AuditLogContext.append_change_attribute(
+                user=context.identity.email,
+                object_=item.issue_phase.issue,
+                attribute_key=f'TRG-{item.issue_phase.phase.title}',
+                attribute_label=f'Trg-{item.issue_phase.phase.title}',
+                old_value=old_end_date,
+                new_value=item.end_date,
+            )
+
+        if old_start_date != item.start_date:
+            AuditLogContext.append_change_attribute(
+                user=context.identity.email,
+                object_=item.issue_phase.issue,
+                attribute_key=f'STR-{item.issue_phase.phase.title}',
+                attribute_label=f'Str-{item.issue_phase.phase.title}',
+                old_value=old_start_date,
+                new_value=item.start_date,
+            )
 
         return item
 

@@ -1,16 +1,27 @@
 from datetime import datetime
 
+from auditor import MiddleWare
 from auditor.context import Context as AuditLogContext
 from bddrest import status, response, when, given
 from nanohttp import context
 from nanohttp.contexts import Context
 
-from .helpers import LocalApplicationTestCase, oauth_mockup_server
+from .helpers import LocalApplicationTestCase, oauth_mockup_server, \
+    chat_mockup_server
 from dolphin.models import Project, Member, Workflow, Group, Release, \
     Specialty, Phase, Issue, Item, IssuePhase, Skill
+from dolphin import Dolphin
+from dolphin.middleware_callback import callback as auditor_callback
+
+
+def callback(audit_logs):
+    global logs
+    logs = audit_logs
+    auditor_callback(audit_logs)
 
 
 class TestItem(LocalApplicationTestCase):
+    __application__ = MiddleWare(Dolphin(), callback)
 
     @classmethod
     @AuditLogContext(dict())
@@ -122,13 +133,16 @@ class TestItem(LocalApplicationTestCase):
     def test_estimate(self):
         session = self.create_session()
         self.login(self.member1.email)
+        start_date=datetime.strptime('2019-2-2', '%Y-%m-%d')
+        end_date=datetime.strptime('2019-2-3', '%Y-%m-%d')
+        estimated_hours= 3
         json = dict(
-            startDate=datetime.strptime('2019-2-2', '%Y-%m-%d').isoformat(),
-            endDate=datetime.strptime('2019-2-3', '%Y-%m-%d').isoformat(),
-            estimatedHours=3,
+            startDate=start_date.isoformat(),
+            endDate=end_date.isoformat(),
+            estimatedHours=estimated_hours,
         )
 
-        with oauth_mockup_server(), self.given(
+        with oauth_mockup_server(), chat_mockup_server(), self.given(
             'Estimating an item',
             f'/apiv1/items/id: {self.item1.id}',
             'ESTIMATE',
@@ -150,6 +164,19 @@ class TestItem(LocalApplicationTestCase):
                 .filter(Item.id == self.item2.id) \
                 .filter(Item.need_estimate_timestamp != None) \
                 .one()
+
+            assert len(logs) == 5
+            assert logs[1].attribute_key == 'EST-backlog'
+            assert logs[1].old_value == None
+            assert logs[1].new_value == estimated_hours
+
+            assert logs[2].attribute_key == 'TRG-backlog'
+            assert logs[2].old_value == None
+            assert logs[2].new_value == end_date
+
+            assert logs[3].attribute_key == 'STR-backlog'
+            assert logs[3].old_value == None
+            assert logs[3].new_value == start_date
 
             when(
                 'Intended item with string type not found',
