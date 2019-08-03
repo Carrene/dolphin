@@ -891,7 +891,8 @@ def test_issue_boarding(db):
         session.commit()
 
         workflow = Workflow(title='Default')
-        specialty = Specialty(title='First Specialty')
+        skill = Skill(title='First Skill')
+        specialty = Specialty(skill=skill, title='First Specialty')
         group = Group(title='default')
 
         release = Release(
