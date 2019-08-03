@@ -8,10 +8,10 @@ from nanohttp.contexts import Context
 
 from .helpers import LocalApplicationTestCase, oauth_mockup_server, \
     chat_mockup_server
-from dolphin.models import Project, Member, Workflow, Group, Release, \
-    Specialty, Phase, Issue, Item, IssuePhase, Skill
 from dolphin import Dolphin
 from dolphin.middleware_callback import callback as auditor_callback
+from dolphin.models import Project, Member, Workflow, Group, Release, \
+    Specialty, Phase, Issue, Item, IssuePhase, Skill
 
 
 def callback(audit_logs):
