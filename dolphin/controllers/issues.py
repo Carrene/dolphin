@@ -506,9 +506,6 @@ class IssueController(ModelRestController, JSONPatchControllerMixin):
         member = DBSession.query(Member).get(context.form.get('memberId'))
         phase = DBSession.query(Phase).get(context.form.get('phaseId'))
 
-        need_estimate_phase = DBSession.query(Phase) \
-            .get(issue._need_estimated_phase_id)
-
         related_items_count = DBSession.query(func.count(Item.id)) \
             .join(IssuePhase, IssuePhase.id == Item.issue_phase_id) \
             .filter(IssuePhase.id == issue_phase.id) \
@@ -525,34 +522,40 @@ class IssueController(ModelRestController, JSONPatchControllerMixin):
             .where(Item.estimated_hours == None) \
         ).one()
 
-        # Set and unset Items response time related to Issue
-        # More description: https://github.com/Carrene/dolphin/issues/1021
-        if need_estimate_phase.id == phase.id and \
-                (related_items_count == 0 or are_related_items_estimated):
+        if issue._need_estimated_phase_id is not None:
 
-            next_need_estimate_phase = DBSession.query(Phase) \
-                .join(IssuePhase, IssuePhase.phase_id == Phase.id) \
-                .join(Item, Item.issue_phase_id == IssuePhase.id) \
-                .filter(IssuePhase.issue_id == issue.id) \
-                .filter(Item.estimated_hours.is_(None)) \
-                .filter(Phase.order > phase.order) \
-                .order_by(Phase.order) \
-                .first()
+            need_estimate_phase = DBSession.query(Phase) \
+                .get(issue._need_estimated_phase_id)
 
-            if next_need_estimate_phase is not None:
-                for next_phase_item in DBSession.query(Item) \
-                        .join(
-                            IssuePhase,
-                            IssuePhase.id == Item.issue_phase_id
-                        ) \
-                        .filter(
-                            IssuePhase.issue_id == issue.id
-                        ) \
-                        .filter(
-                            IssuePhase.phase_id == next_need_estimate_phase.id
-                        ):
+            # Set and unset Items response time related to Issue
+            # More description: https://github.com/Carrene/dolphin/issues/1021
+            if need_estimate_phase.id == phase.id and \
+                    (related_items_count == 0 or are_related_items_estimated):
 
-                    next_phase_item.need_estimate_timestamp = datetime.now()
+                next_need_estimate_phase = DBSession.query(Phase) \
+                    .join(IssuePhase, IssuePhase.phase_id == Phase.id) \
+                    .join(Item, Item.issue_phase_id == IssuePhase.id) \
+                    .filter(IssuePhase.issue_id == issue.id) \
+                    .filter(Item.estimated_hours.is_(None)) \
+                    .filter(Phase.order > phase.order) \
+                    .order_by(Phase.order) \
+                    .first()
+
+                if next_need_estimate_phase is not None:
+                    for next_phase_item in DBSession.query(Item) \
+                            .join(
+                                IssuePhase,
+                                IssuePhase.id == Item.issue_phase_id
+                            ) \
+                            .filter(
+                                IssuePhase.issue_id == issue.id
+                            ) \
+                            .filter(
+                                IssuePhase.phase_id == \
+                                next_need_estimate_phase.id
+                            ):
+
+                        next_phase_item.need_estimate_timestamp = datetime.now()
 
         DBSession.delete(item)
 
