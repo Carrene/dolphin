@@ -135,6 +135,19 @@ class TestIssue(LocalApplicationTestCase):
                 member_id=cls.member.id,
             )
             session.add(item3)
+
+            issue_phase3 = IssuePhase(
+                issue=cls.issue2,
+                phase=cls.phase1,
+            )
+            item4 = Item(
+                issue_phase=issue_phase3,
+                member_id=cls.member.id,
+                start_date=datetime.now() - timedelta(days=1),
+                end_date=datetime.now() + timedelta(days=1),
+                estimated_hours=10,
+            )
+            session.add(item3)
             session.commit()
 
     def test_unassign(self):
@@ -150,6 +163,13 @@ class TestIssue(LocalApplicationTestCase):
         ):
             assert status == 200
             assert response.json['id'] == self.issue1.id
+
+            when(
+                'The issue has only one estimated item and has no need '
+                'estimate phase',
+                url_parameters=dict(id=self.issue2.id),
+            )
+            assert status == 200
 
             when(
                 'There is one item on need estimate phase of issue',
